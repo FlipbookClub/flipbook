@@ -1,0 +1,82 @@
+{
+  "meta": {
+    "createdAt": "2026-04-30T12:00:00Z",
+    "updatedAt": "2026-04-30T12:00:00Z",
+    "version": "1.0",
+    "plaidVersion": "1.0"
+  },
+  "creator": {
+    "name": "Moks",
+    "expertise": "Product designer with 5+ years in healthcare; lifelong reader and book club member",
+    "background": "I'm a product designer by trade, but I've been an obsessive reader and book club member for years — the kind of person who's tried every app that promised to make reading more social and walked away from all of them. None of them got it. Flipbook is what I've wanted to exist for a decade, and after five years of shipping product in healthcare, I finally have the chops to build it myself."
+  },
+  "purpose": {
+    "whoYouHelp": "Accountability-craving readers in their 20s–40s who genuinely want to read more — they have a stack of books they keep meaning to finish, they've joined Goodreads and ghosted, and they know from experience that reading is more fun and more consistent when it's social. They want the structure of a book club without the friction of finding one, scheduling Zooms, and remembering whose turn it is to host.",
+    "problemYouSolve": "Reading alone has no stakes, so books die in the gap between intention and finishing. The existing social options don't fix it — IRL book clubs are too much work, online communities like Goodreads and Discord are review graveyards or ghost towns. There's no place that's actually social, low-friction, and tied to the book the user is reading right now.",
+    "desiredTransformation": "From lonely reading to a living conversation. Before: closing a book and having no one to text 'wait, what just happened in chapter 11.' After: every book becomes a thread of reactions, theories, and shared moments with people who are exactly where the reader is in the story. Reading stops being something done alone in bed and becomes the most consistent social ritual in the week — without needing to schedule a thing.",
+    "whyYou": "I've spent five years designing healthcare products, where every interaction has to earn trust, reduce friction, and respect attention — exactly the disciplines this product needs to feel calm instead of noisy. And I'm not designing for a user I read about in research — I am the user. I know what every existing reading app gets wrong because I've abandoned each of them, and I know what a great book club moment feels like because I've lived inside several."
+  },
+  "product": {
+    "name": "Flipbook",
+    "oneLiner": "Flipbook is a social reading platform where book clubs read together in real time and creators turn audiences into communities.",
+    "howItWorks": "A user lands on Flipbook, creates a book club community as easily as creating a WhatsApp group, and invites their friends and community members. Members join Flipbook through the moderator's link and are instantly added to the community. The moderator uploads a PDF of a book the community is to read; uploads default to private (visible only to that club, not searchable, not redistributable) to manage copyright exposure. Members open the book and begin reading inside the app. The app tracks their reading page by page — including offline — and each member's progress is visible to the rest of the community, alongside reactions and chapter-keyed conversations.",
+    "keyCapabilities": [
+      "Community-led book clubs — create a club, share an invite link, members auto-join (WhatsApp-easy)",
+      "In-app reading with offline support — open the book, read on the train, progress syncs when online",
+      "Page-synchronized reactions and discussion — comments, highlights, and reactions tied to the exact page so conversations don't spoil ahead",
+      "Creator publishing (Phase 1: free; Phase 2: monetized) — authors publish chapters, build a community around their work, and eventually charge for subscriptions or one-time access",
+      "Discovery feed — find active clubs and creators worth following"
+    ],
+    "platform": "mobile",
+    "marketDifferentiation": "Unlike Goodreads — which is a graveyard of past reviews — and unlike Discord book clubs that dissolve in three weeks, Flipbook ties the conversation to the page itself. The community stays alive as long as someone is reading, and creators get a home where their audience doesn't just subscribe — they show up to read together.",
+    "magicMoment": "A reader is following an indie author on Flipbook. The author drops a new chapter. The reader opens it, reads it in-app, and on the last page sees other subscribers' reactions appearing live in the margins. They reply. The author replies back. They're inside a release party that didn't exist before — a small, intimate moment that proves the two-sided model works. (Supporting moments: synchronized chapter reactions inside a club, and the 'caught up to the club' rush when dormant reactions light up across the pages a new member just read.)"
+  },
+  "audience": {
+    "primaryUser": "Maya, 29, marketing manager in a mid-size city. Reads on her commute and before bed. Has a tower of half-read books on her nightstand and a Goodreads account she hasn't opened in a year. Joined two book clubs — one IRL that fizzled out, one Discord that went quiet by week three. Buys books faster than she finishes them. Wants reading to be the social ritual it used to feel like in college, but doesn't have the time or energy to host. She'd happily pay for something that just worked.",
+    "secondaryUsers": [
+      "Indie authors and serialized writers — the creator side. Self-published authors, Substack novelists, Wattpad graduates, and indie nonfiction writers who already have small audiences (500–10,000 readers) and are stitching together Substack + Discord + Amazon + Patreon. They publish chapters on Flipbook, build paid communities (Phase 2), and monetize directly.",
+      "Book club moderators — the power users among readers. They create clubs, invite friends, set the reading pace. Often become unofficial creators themselves; many graduate into the creator side over time."
+    ],
+    "currentAlternatives": "Direct competitors: Goodreads (review graveyard, conversation happens after the book not during), Fable (closer in spirit but more content feed than club), StoryGraph (beautiful tracker but solitary). Adjacent tools people misuse: Discord servers (die after three weeks because there's no structure tied to the book), WhatsApp/group chats (works for two friends, falls apart at five+), Substack (great for creators, terrible for readers wanting to discuss a chapter with strangers). Manual workarounds and just-living-with-it: IRL book clubs (high overhead — scheduling, hosting, snacks; half the group hasn't read), reading alone with a book log in Notes, or simply not reading.",
+    "frustrations": "Three pain dimensions. Functional: existing tools are either review graveyards or solo trackers; none put readers in the room with others reading the book right now. Practical: people stitch together Discord + Goodreads + group chat + Kindle to do something that should be one thing — every seam is friction and the conversation gets lost in the gaps. Emotional: it's so much work to read 'with' people that most just don't, and the books that excite them most are the ones they have nowhere to talk about."
+  },
+  "business": {
+    "revenueModel": "marketplace",
+    "initialGoal": "First 90 days (balanced target): 1,000 active readers across 75+ active clubs (avg ~8 members per club), 20 paying creators with ~$2k MRR through the platform (Phase 2 dependent), featured in two bookish newsletters, 3–5 Bookstagram/BookTok seeds running clubs, and 60% of clubs making it past their first book without dying.",
+    "sixMonthVision": "10,000 monthly active readers, a steady drip of new clubs forming weekly, ~$50k MRR, real BookTok/Bookstagram presence, raising a small seed round to expand the team.",
+    "constraints": "Solo, part-time, bootstrapped — full-time job, can dedicate 10–15 hours a week. Designer, not a backend engineer; will lean hard on AI coding agents (Claude Code) and managed services. Nigerian-based founder with tight infrastructure budget — realistic monthly spend is ~$15–30/month for MVP (Apple Developer fee amortized + domain), with the rest sitting on free tiers (Convex, Clerk, RevenueCat, Expo). Will only graduate to paid tiers once revenue justifies it. Note: Stripe Connect doesn't natively support Nigeria, which complicates creator payouts — Phase 2 will need a deliberate plan (potentially incorporating outside Nigeria, or routing payouts via Wise / Paystack / Flutterwave).",
+    "goToMarket": "Blend of build-in-public + community-first private beta. First 30 days: invite 100 hand-picked readers (existing book club friends + bookish friends-of-friends) into a closed beta — no marketing, optimize for retention and word-of-mouth. Day 30–45 onward: open up and seed 10–20 BookTok and Bookstagram creators with early access; give them the moderator tool to run public clubs, and document the build on X / Threads / TikTok. Their followers become the first wave of users; the creators seeded become candidates for the creator side later."
+  },
+  "feeling": {
+    "brandPersonality": "Bookish modern with a cozy-communal undertone. Refined, witty, social, alive — but also warm, intimate, and inviting. Like Letterboxd for books or a really good literary magazine that found its way onto your phone, with a candlelit-reading-nook warmth underneath. Knows reading is cool again and acts like it. Confident but not loud, social but not chaotic, beautiful without being precious.",
+    "visualMood": "Editorial-modern with strong identity and a three-theme system, sourced from the existing Flipbook Figma design (https://www.figma.com/design/RyDVCNU81xqjN6D3O3jIGU/Flipbook). The brand ships THREE theme modes at MVP: (1) Light mode — warm/near-white surfaces (Surface Primary #fdfdfd, Warm Ivory #f7f3e3) with Deep Indigo text (#3b3a6d) and Vibrant Coral accents (#ff6b6b/#f83b3b); (2) Flip mode — the Flipbook-native theme, Deep Indigo surfaces (#3b3a6d as base) with cream/ivory text and Coral accents, a brand-coded 'candle-lit-reading-nook' aesthetic that's neither standard dark nor light; (3) Dark mode — near-black surfaces (#121212) with cream text and Coral accents, a standard high-contrast dark for low-light reading. All three modes share the same brand identity (Deep Indigo + Vibrant Coral) and the same component system — only the surface and text token mappings change. Accent highlights across all modes: Golden Sand (#e4b363) and Muted Plum (#5d3a5a). Typography pairs Raleway (Medium-weight, primary content/body/headlines) with Inter (Medium/Semi-Bold, UI labels, captions, overlines with 4px letter-spacing) and Font Awesome 6 Pro for icons. Components observed in the Figma library: bottom tab bar (Community/Library/Profile), book club community cards, author cards, full button system with default/hover/pressed/muted states, form inputs, tag chips, logo wordmark + 'F' mark. Currently designed screens (light + flip + dark variants): Sign-up, Home/Welcome, Create Community, Join Existing Community. Remaining screens to be designed during the build will follow the design system + brand voice. Energy: confident, library-grade, made-for-readers, with a quietly bold coral accent that signals 'reading is alive.' Full structured token set captured in design-tokens.json alongside this vision file.",
+    "toneOfVoice": "Warm-witty bookish. Speaks like a literary friend — generous, lightly clever, never cute. Examples — empty club: 'No clubs yet. Want to start one — or wait for one to find you?' Finished a book: 'That's a wrap. Add a thought before it fades?'",
+    "antiPatterns": "Don't be Goodreads, don't be Duolingo, don't be Substack, don't be cheap. Specifically: never feel like a forum from 2008 (no flat threads, no review counts as primary UI, no avatar-and-text grids); never gamify reading with streaks-as-anxiety, owl shame, or push notifications guilting users into opening the app; never let book metadata feel like a database (ISBN, edition codes, average rating out of 5 — none of that as primary UI); never let creator content feel like a paywall (paid content should feel like joining something, not unlocking something); no infinite scroll on the home screen — Flipbook is a place, not a timeline; no algorithmic recommendations as primary discovery (the human curator and the active club are the discovery); no 'engagement' surfaces (likes-on-likes, follower counts as status); never use generic stock photography of 'a person reading a book by a window'; never use AI-generated illustrations or auto-generated book covers; never use the word 'platform' in user-facing copy; never crowd a screen — every page earns its real estate."
+  },
+  "techStack": {
+    "appType": "mobile",
+    "frontend": {
+      "choice": "Expo (React Native)",
+      "rationale": "Single codebase for iOS + Android, generous free tier (EAS builds), first-class libraries for offline storage, file handling (PDFs), and push notifications, massive community and lots of working examples. Best mobile path for a solo designer-founder shipping with an AI coding agent."
+    },
+    "backend": {
+      "choice": "Convex",
+      "rationale": "Real-time reactivity is exactly what the live reactions in margins feature needs — no polling, no websocket plumbing. Zero backend boilerplate so a designer-founder can ship without writing servers. Built-in file storage for PDF uploads. Generous free tier (1M function calls, 1GB storage). Best-in-class with Claude Code."
+    },
+    "database": {
+      "choice": "Convex Database",
+      "rationale": "Included with Convex backend, automatic indexing, ACID transactions, reactive queries for real-time progress and reactions. Document-relational model fits the social/reactive shape of Flipbook better than pure SQL."
+    },
+    "auth": {
+      "choice": "Clerk",
+      "rationale": "Drop-in auth with pre-built UI components for React Native — Apple Sign-In (required for App Store), Google, magic links, and phone OTP (good for African markets where phone-first is common). 10,000 MAU free tier well exceeds the 90-day target. Polished, documented Convex + Clerk integration path."
+    },
+    "payments": {
+      "choice": "RevenueCat",
+      "rationale": "MVP scope: RevenueCat handles only the reader Pro tier (unlimited clubs, offline downloads, advanced features) via Apple/Google in-app billing — works globally, including Nigeria. Free up to $2.5k tracked monthly revenue. Creator monetization (subscriptions, one-time book purchases) is explicitly Phase 2; it will route via web checkout (Polar or Stripe Connect) with in-app entitlement check, deferred to avoid solo-founder build overload and to give time to solve Nigerian creator-payout complications properly."
+    }
+  },
+  "tooling": {
+    "codingAgent": "claude-code"
+  }
+}

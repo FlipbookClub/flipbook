@@ -39,3 +39,7 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Agent skills — regenerable from skills-lock.json via `npx skills install`.
+.agents/
+.claude/skills/

@@ -1,11 +1,12 @@
 {
   "expo": {
-    "name": "flipbook",
+    "name": "Flipbook",
     "slug": "flipbook",
     "version": "1.0.0",
     "orientation": "portrait",
+    "scheme": "flipbook",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
       "image": "./assets/splash-icon.png",
@@ -13,9 +14,11 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.flipbook.app"
     },
     "android": {
+      "package": "com.flipbook.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
@@ -25,6 +28,15 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-font",
+      "expo-secure-store"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "81dc61a2-b202-456d-afc6-a974bce1254f"
+      }
     }
   }
 }

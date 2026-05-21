@@ -1,0 +1,180 @@
+{
+  "source": {
+    "figmaFile": "https://www.figma.com/design/RyDVCNU81xqjN6D3O3jIGU/Flipbook",
+    "extractedAt": "2026-04-30T12:00:00Z",
+    "tool": "Figma MCP get_variable_defs"
+  },
+  "color": {
+    "brand": {
+      "deepIndigo": {
+        "900": "#3b3a6d",
+        "800": "#48448f",
+        "700": "#5752b0",
+        "300": "#b4bfed"
+      },
+      "vibrantCoral": {
+        "400": "#ff6b6b",
+        "500": "#f83b3b",
+        "600": "#e51d1d",
+        "200": "#ffc7c7"
+      },
+      "goldenSand": "#e4b363",
+      "mutedPlum": "#5d3a5a",
+      "warmIvory": "#f7f3e3",
+      "charcoalGrey": "#121212"
+    },
+    "neutral": {
+      "50": "#fdfdfd",
+      "gray1": "#EFEFEF",
+      "gray2": "#D9D9D9",
+      "gray3": "#C4C4C4",
+      "gray4": "#AEAEAE",
+      "gray5": "#989898",
+      "gray6": "#828282",
+      "gray7": "#6D6D6D",
+      "gray8": "#575757",
+      "gray9": "#414141",
+      "gray10": "#2B2B2B",
+      "gray11": "#161616",
+      "gray12": "#000000"
+    },
+    "surface": {
+      "primary": "#fdfdfd",
+      "secondary": "#f1f4fc",
+      "accent": "#5d3a5a",
+      "borders": "#b4bfed",
+      "backgroundBlack": "#121212",
+      "warmIvory": "#f7f3e3"
+    },
+    "text": {
+      "primary": "#3b3a6d",
+      "secondary": "#464646",
+      "muted": "#989898",
+      "accent": "#5d3a5a",
+      "alt": "#2f2f2f",
+      "inverse": "#fdfdfd"
+    },
+    "button": {
+      "primary": {
+        "surfaceDefault": "#3b3a6d",
+        "surfaceHover": "#48448f",
+        "surfacePressed": "#252442",
+        "surfaceMuted": "#b4bfed",
+        "text": "#fdfdfd",
+        "textMuted": "#fdfdfd"
+      },
+      "secondary": {
+        "surfaceDefault": "#f83b3b",
+        "surfaceHover": "#ff6b6b",
+        "surfacePressed": "#e51d1d",
+        "surfaceMuted": "#ffc7c7",
+        "text": "#fdfdfd",
+        "textMuted": "#fdfdfd"
+      },
+      "alt": {
+        "textDefault": "#f83b3b",
+        "textHover": "#ff6b6b",
+        "textPressed": "#e51d1d",
+        "textMuted": "#ffc7c7"
+      }
+    }
+  },
+  "typography": {
+    "families": {
+      "primary": "Raleway",
+      "secondary": "Inter",
+      "icons": "Font Awesome 6 Pro"
+    },
+    "scales": {
+      "bodyLarge": {
+        "family": "Raleway",
+        "weight": 500,
+        "size": 16,
+        "lineHeight": 1.3,
+        "letterSpacing": 0
+      },
+      "bodySmall": {
+        "family": "Raleway",
+        "weight": 500,
+        "size": 12,
+        "lineHeight": 1.3,
+        "letterSpacing": 0
+      },
+      "bodyCaption": {
+        "family": "Raleway",
+        "weight": 500,
+        "size": 10,
+        "lineHeight": 1.3,
+        "letterSpacing": 0
+      },
+      "bodyOverlineLarge": {
+        "family": "Inter",
+        "weight": 600,
+        "size": 14,
+        "lineHeight": 1.3,
+        "letterSpacing": 4,
+        "textTransform": "uppercase"
+      },
+      "paragraphMedium": {
+        "family": "Raleway",
+        "weight": 500,
+        "size": 16,
+        "lineHeight": 24,
+        "letterSpacing": 0
+      },
+      "paragraphSmall": {
+        "family": "Raleway",
+        "weight": 500,
+        "size": 14,
+        "lineHeight": 20,
+        "letterSpacing": 0
+      },
+      "paragraphXsmall": {
+        "family": "Raleway",
+        "weight": 500,
+        "size": 12,
+        "lineHeight": 20,
+        "letterSpacing": 0
+      },
+      "uiXsmallMedium": {
+        "family": "Inter",
+        "weight": 500,
+        "size": 12,
+        "lineHeight": 16,
+        "letterSpacing": 0
+      },
+      "uiXsmallRegular": {
+        "family": "Inter",
+        "weight": 400,
+        "size": 12,
+        "lineHeight": 16,
+        "letterSpacing": 0
+      },
+      "iconSmall": {
+        "family": "Font Awesome 6 Pro",
+        "weight": 400,
+        "size": 12,
+        "lineHeight": 1.0,
+        "letterSpacing": 0
+      }
+    }
+  },
+  "componentsObserved": [
+    "Bottom tab bar (Community / Library / Profile)",
+    "Community / book club cards (cover image + title + meta + member count)",
+    "Author cards (avatar + name + tag)",
+    "Primary buttons (Deep Indigo) — default / hover / pressed / muted states",
+    "Secondary buttons (Vibrant Coral) — default / hover / pressed / muted states",
+    "Alt buttons (text-only, coral)",
+    "Icon buttons (square + circular variants)",
+    "Form inputs (placeholder text, multiple states)",
+    "Tag chips (pill-shaped)",
+    "Logo wordmark + 'F' mark (multiple color variants)"
+  ],
+  "implementationNotes": {
+    "rnTokensFile": "Recommended: codify these tokens into a single `theme.ts` file in the Expo app — exporting `colors`, `typography`, `spacing` objects — and consume via a ThemeProvider context.",
+    "fonts": "Load Raleway (Medium 500), Inter (Regular 400, Medium 500, Semi Bold 600), and Font Awesome 6 Pro at app boot via expo-font. Provide fallbacks: Raleway → system serif-friendly fallback; Inter → system sans fallback.",
+    "darkMode": "The brand has a dedicated BackgroundBlack (#121212) — dark mode is implied. Plan for it in Phase 2 of the build, not MVP, but structure the theme to support it.",
+    "iconLibrary": "Font Awesome 6 Pro requires a license. If unavailable, fall back to Lucide React Native (open source, MIT) which has a comparable icon set."
+  }
+}
