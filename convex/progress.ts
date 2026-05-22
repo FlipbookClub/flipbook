@@ -58,18 +58,20 @@ export const update = mutation({
       .unique();
 
     const now = Date.now();
-    // FR-013: server takes the highest reported page across devices.
-    // furthestPageReached is monotonic (drives FR-018 spoiler filtering).
-    const nextCurrent = existing
-      ? Math.max(existing.currentPage, args.currentPage)
-      : args.currentPage;
+    // currentPage is the literal "where I am right now" — can move forward
+    // OR backward as the user re-reads. furthestPageReached is the monotonic
+    // max (drives FR-018 spoiler filtering in Phase 4). Cross-device conflict
+    // is resolved by last-write-wins on currentPage; that's the UX users
+    // expect ("open where I left off") and Convex serializes writes anyway.
+    const nextCurrent = args.currentPage;
     const nextFurthest = existing
       ? Math.max(existing.furthestPageReached, args.currentPage)
       : args.currentPage;
+    // finishedAt sticks once set — re-reading earlier pages shouldn't
+    // un-finish a book in the Library's Finished tab.
     const finishedAt =
-      nextCurrent >= args.totalPages
-        ? (existing?.finishedAt ?? now)
-        : undefined;
+      existing?.finishedAt ??
+      (nextFurthest >= args.totalPages ? now : undefined);
 
     if (existing) {
       await ctx.db.patch(existing._id, {

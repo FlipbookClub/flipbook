@@ -48,10 +48,18 @@ export function SignInScreen({ navigation }: Props) {
         setFormError("Sign-in incomplete. Check the verification link in your email.");
       }
     } catch (err) {
-      const message =
-        (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Sign-in failed. Please try again.";
-      setFormError(message);
+      // Clerk reports session_exists when a valid session is still cached
+      // (e.g. after a network blip the RN side hadn't reconciled with Clerk's
+      // internal state yet). The user IS signed in — RootNavigator's auth
+      // gate will route them forward as soon as useAuth() catches up, so
+      // swallow this rather than showing a scary error.
+      const errors = (err as { errors?: { code?: string; message?: string }[] })?.errors;
+      const code = errors?.[0]?.code;
+      if (code === "session_exists") {
+        setFormError(null);
+        return;
+      }
+      setFormError(errors?.[0]?.message ?? "Sign-in failed. Please try again.");
     } finally {
       setSubmitting(false);
     }

@@ -17,16 +17,34 @@ import { palette } from "@/theme/palette";
 import { spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
-import { ensureCachedPdf } from "@/lib/pdf";
+import { ensureCachedPdf, getCachedPdfPath } from "@/lib/pdf";
 import {
   PROGRESS_SYNC_INTERVAL_MS,
   readCachedProgress,
   useThrottledCallback,
   writeCachedProgress,
 } from "@/lib/progress";
+import { readBookMeta, writeBookMeta, type CachedBookMeta } from "@/lib/bookMeta";
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+
+// Source-of-truth view the reader actually renders from. Either fresh server
+// data (online) or a hydrated local meta cache (offline). Both expose the
+// minimum the reader needs without coupling render code to the Convex shape.
+interface EffectiveBook {
+  source: "server" | "local";
+  storageId: Id<"_storage">;
+  clubId: Id<"clubs">;
+  title: string;
+  author: string;
+  pageCount: number;
+  isRemoved: boolean;
+  clubName: string | null;
+  // null when we only have local meta (offline) — the reader has to fall
+  // back to a previously-cached disk file or surface "not downloaded yet".
+  pdfUrl: string | null;
+}
 
 // Reader is registered in both CommunityStack and LibraryStack, so type the
 // props minimally (just what we use) rather than tying to one stack's params.
@@ -39,25 +57,89 @@ export function ReaderScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
   const { bookId } = route.params;
   const data = useQuery(api.books.get, { bookId });
+
+  // Read local meta synchronously on mount so the reader can render offline
+  // before any Convex query resolves.
+  const localMeta = useMemo<CachedBookMeta | null>(() => readBookMeta(bookId), [bookId]);
+
   const club = useQuery(
     api.clubs.get,
     data?.book ? { clubId: data.book.clubId } : "skip",
   );
+
+  // Effective view: server when online, local fallback when not. `undefined`
+  // means "still loading and no fallback yet" → show spinner. `null` means
+  // explicitly not-found / no-access → show the dead-end state.
+  const effective = useMemo<EffectiveBook | null | undefined>(() => {
+    if (data === undefined) {
+      if (!localMeta) return undefined;
+      return {
+        source: "local",
+        storageId: localMeta.storageId as Id<"_storage">,
+        clubId: localMeta.clubId as Id<"clubs">,
+        title: localMeta.title,
+        author: localMeta.author,
+        pageCount: localMeta.pageCount,
+        isRemoved: localMeta.isRemoved,
+        clubName: localMeta.clubName,
+        pdfUrl: null,
+      };
+    }
+    if (data === null) return null;
+    return {
+      source: "server",
+      storageId: data.book.pdfStorageId,
+      clubId: data.book.clubId,
+      title: data.book.title,
+      author: data.book.author,
+      pageCount: data.book.pdfPageCount,
+      isRemoved: data.book.isRemoved,
+      clubName: club?.name ?? localMeta?.clubName ?? null,
+      pdfUrl: data.pdfUrl,
+    };
+  }, [data, club, localMeta]);
+
   const serverProgress = useQuery(
     api.progress.getMine,
-    data?.book ? { clubId: data.book.clubId, bookId } : "skip",
+    effective?.source === "server" ? { clubId: effective.clubId, bookId } : "skip",
   );
   const updateProgress = useMutation(api.progress.update);
 
-  // Compute the initial page once both sources have resolved — local cache
-  // (for offline / cross-session) and server (for cross-device). Take the max
-  // since that's the furthest the user has actually read across devices.
+  // Persist book metadata after every successful server fetch so future
+  // offline opens have what they need to hydrate without hitting Convex.
+  useEffect(() => {
+    if (!data?.book) return;
+    writeBookMeta({
+      bookId,
+      storageId: data.book.pdfStorageId,
+      clubId: data.book.clubId,
+      clubName: club?.name ?? localMeta?.clubName ?? "",
+      title: data.book.title,
+      author: data.book.author,
+      pageCount: data.book.pdfPageCount,
+      isRemoved: data.book.isRemoved,
+      updatedAt: Date.now(),
+    });
+  }, [data, club, localMeta, bookId]);
+
+  // Compute the initial page. When the source is server, wait for the
+  // serverProgress query so we can take the more recent of {cache, server}.
+  // When the source is local (offline), the cache is all we have.
   const initialPage = useMemo(() => {
-    if (serverProgress === undefined) return null;
+    if (!effective) return null;
     const cached = readCachedProgress(bookId);
-    const candidates = [1, cached?.page ?? 0, serverProgress?.currentPage ?? 0];
-    return Math.max(...candidates);
-  }, [bookId, serverProgress]);
+    if (effective.source === "local") {
+      return Math.max(1, cached?.page ?? 1);
+    }
+    if (serverProgress === undefined) return null;
+    const cachedAt = cached?.updatedAt ?? 0;
+    const serverAt = serverProgress?.updatedAt ?? 0;
+    const winner =
+      cachedAt > serverAt
+        ? cached?.page
+        : (serverProgress?.currentPage ?? cached?.page);
+    return Math.max(1, winner ?? 1);
+  }, [effective, bookId, serverProgress]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState<number | null>(null);
@@ -68,53 +150,70 @@ export function ReaderScreen({ navigation, route }: Props) {
 
   const syncToServer = useThrottledCallback(
     (page: number, total: number) => {
-      if (!data?.book) return;
+      if (!effective) return;
       updateProgress({
-        clubId: data.book.clubId,
+        clubId: effective.clubId,
         bookId,
         currentPage: page,
         totalPages: total,
       }).catch(() => {
-        // Best-effort — local cache already has the page; next successful
-        // call will reconcile (server takes max per FR-013).
+        // Best-effort — local cache already has the page; offline mutations
+        // will fail here, and the next successful call reconciles state.
       });
     },
     PROGRESS_SYNC_INTERVAL_MS,
   );
 
   const handlePageChanged = (page: number, total: number) => {
+    // react-native-pdf occasionally fires onPageChanged with transient bogus
+    // values during paging animations (e.g. page=0 or total=0). Drop those
+    // before writing cache or syncing — server validation rejects them too.
+    if (!Number.isFinite(page) || !Number.isFinite(total)) return;
+    if (page < 1 || total < 1 || page > total) return;
     setCurrentPage(page);
     setTotalPages(total);
     writeCachedProgress({ bookId, page, totalPages: total, updatedAt: Date.now() });
     syncToServer(page, total);
   };
 
-  // Resolve PDF source: prefer a cached local file (FR-012), download on miss.
-  // Falls back to the signed URL directly if caching fails so the user can
-  // still read even when local storage is unwritable.
+  // Resolve PDF source.
+  // - Server source + signed URL → ensure cached on disk, render from there.
+  // - Local source (offline) → must rely on a previously-cached disk file;
+  //   surface a friendly "not downloaded yet" error if there isn't one.
+  // - DMCA takedown is handled in the render path, not here.
   useEffect(() => {
-    if (!data || data.pdfUrl === null) return;
-    const storageId = data.book.pdfStorageId;
-    const signedUrl = data.pdfUrl;
+    if (!effective || effective.isRemoved) return;
+    const { storageId, pdfUrl } = effective;
+    if (pdfUrl === null) {
+      const cached = getCachedPdfPath(storageId);
+      if (cached) {
+        setResolvedUri(cached);
+      } else {
+        setLoadError(
+          "You're offline and this book hasn't been downloaded yet. Connect to the internet to load it.",
+        );
+      }
+      return;
+    }
     let cancelled = false;
-    ensureCachedPdf(storageId, signedUrl)
+    ensureCachedPdf(storageId, pdfUrl)
       .then((path) => {
         if (!cancelled) setResolvedUri(path);
       })
       .catch(() => {
-        if (!cancelled) setResolvedUri(signedUrl);
+        if (!cancelled) setResolvedUri(pdfUrl);
       });
     return () => {
       cancelled = true;
     };
-  }, [data]);
+  }, [effective]);
 
   const { width, height } = Dimensions.get("window");
 
-  if (data === undefined) {
+  if (effective === undefined) {
     return <LoadingState bg={colors.surfacePrimary} fg={colors.textPrimary} />;
   }
-  if (data === null) {
+  if (effective === null) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
         <Header
@@ -132,14 +231,13 @@ export function ReaderScreen({ navigation, route }: Props) {
     );
   }
 
-  const { book, pdfUrl } = data;
-  if (pdfUrl === null) {
+  if (effective.isRemoved) {
     // FR-edge: DMCA / removed-book takedown state.
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
         <Header
-          title={book.title}
-          subtitle={club?.name ?? null}
+          title={effective.title}
+          subtitle={effective.clubName}
           onClose={() => navigation.goBack()}
           onSettings={() => setCustomizeOpen(true)}
         />
@@ -158,11 +256,10 @@ export function ReaderScreen({ navigation, route }: Props) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
       <Header
-        title={book.title}
-        subtitle={club?.name ?? null}
+        title={effective.title}
+        subtitle={effective.clubName}
         onClose={() => navigation.goBack()}
-        onSettings={() => undefined}
-        settingsDisabled
+        onSettings={() => setCustomizeOpen(true)}
       />
       <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary }}>
         {loadError ? (
@@ -180,10 +277,11 @@ export function ReaderScreen({ navigation, route }: Props) {
             enablePaging
             page={initialPage}
             onLoadComplete={(numberOfPages) => {
+              if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
               setTotalPages(numberOfPages);
               // Sync immediately on first load so the server learns about the
               // resumed page even if the user closes before scrolling.
-              const startPage = Math.min(initialPage, numberOfPages);
+              const startPage = Math.min(Math.max(1, initialPage), numberOfPages);
               setCurrentPage(startPage);
               syncToServer(startPage, numberOfPages);
             }}

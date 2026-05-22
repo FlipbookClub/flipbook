@@ -53,10 +53,16 @@ export function CreateAccountScreen({ navigation }: Props) {
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       navigation.navigate("VerifyEmail", { email: email.trim() });
     } catch (err) {
-      const message =
-        (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Sign-up failed. Please try again.";
-      setFormError(message);
+      // Same session_exists handling as SignInScreen — a cached session
+      // means the user is already signed up + signed in, let the auth gate
+      // route forward instead of erroring at them.
+      const errors = (err as { errors?: { code?: string; message?: string }[] })?.errors;
+      const code = errors?.[0]?.code;
+      if (code === "session_exists") {
+        setFormError(null);
+        return;
+      }
+      setFormError(errors?.[0]?.message ?? "Sign-up failed. Please try again.");
     } finally {
       setSubmitting(false);
     }
