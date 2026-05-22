@@ -1,9 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BookOpen, Palette, User, Users } from "lucide-react-native";
 
-import { CommunityHomeScreen } from "@/screens/community/CommunityHomeScreen";
+import { CommunityStack } from "@/navigation/CommunityStack";
 import { LibraryScreen } from "@/screens/library/LibraryScreen";
-import { ProfileScreen } from "@/screens/profile/ProfileScreen";
+import { ProfileStack } from "@/navigation/ProfileStack";
 import { DesignSystemPreview } from "@/screens/_dev/DesignSystemPreview";
 import { palette } from "@/theme/palette";
 import { useTheme } from "@/theme/ThemeContext";
@@ -34,7 +34,7 @@ export function MainTabs() {
     >
       <Tab.Screen
         name="Community"
-        component={CommunityHomeScreen}
+        component={CommunityStack}
         options={{
           tabBarIcon: ({ color, size }) => <Users color={color} size={size} />,
         }}
@@ -48,7 +48,7 @@ export function MainTabs() {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={ProfileStack}
         options={{
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}

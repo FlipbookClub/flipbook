@@ -2,7 +2,7 @@ export { palette } from "./palette";
 export type { PaletteToken } from "./palette";
 
 export { themes } from "./themes";
-export type { ThemeMode, ThemeColors } from "./themes";
+export type { Theme, ThemeButtons, ThemeColors, ThemeMode } from "./themes";
 
 export { spacing, radius, shadows } from "./spacing";
 export type { SpacingToken, RadiusToken } from "./spacing";

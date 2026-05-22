@@ -15,7 +15,13 @@ import {
 } from "@expo-google-fonts/raleway";
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { StatusBar } from "expo-status-bar";
+import * as WebBrowser from "expo-web-browser";
 import { View } from "react-native";
+
+// Closes the in-app browser when the OAuth redirect returns. Required for
+// Clerk's `useSSO()` flow (Apple/Google) to complete properly in Expo Go and
+// dev builds. Safe to call at module scope — no-op outside of OAuth flows.
+WebBrowser.maybeCompleteAuthSession();
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 

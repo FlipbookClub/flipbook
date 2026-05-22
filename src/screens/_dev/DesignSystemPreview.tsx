@@ -24,7 +24,7 @@ export function DesignSystemPreview() {
   const sheetRef = useRef<BottomSheetModal>(null);
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceSecondary }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
       <ScrollView contentContainerStyle={{ padding: spacing.s5, gap: spacing.s5 }}>
         <View style={{ gap: spacing.s2 }}>
           <Text style={{ ...typography.headingLg, color: colors.textPrimary }}>
@@ -48,13 +48,13 @@ export function DesignSystemPreview() {
                   borderRadius: radius.sm,
                   borderWidth: selected ? 2 : 1,
                   borderColor: selected ? palette.accentStrong : colors.border,
-                  backgroundColor: themes[option].surfacePrimary,
+                  backgroundColor: themes[option].colors.surfacePrimary,
                 }}
               >
                 <Text
                   style={{
                     ...typography.uiLabelMd,
-                    color: themes[option].textPrimary,
+                    color: themes[option].colors.textPrimary,
                   }}
                 >
                   {option}

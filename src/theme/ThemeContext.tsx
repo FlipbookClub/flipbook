@@ -8,7 +8,7 @@ import {
 } from "react";
 
 import { palette } from "./palette";
-import { themes, type ThemeColors, type ThemeMode } from "./themes";
+import { themes, type ThemeButtons, type ThemeColors, type ThemeMode } from "./themes";
 
 const STORAGE_KEY = "themeMode";
 const DEFAULT_MODE: ThemeMode = "light";
@@ -43,6 +43,7 @@ interface ThemeContextValue {
   mode: ThemeMode;
   setMode: (mode: ThemeMode) => void;
   colors: ThemeColors;
+  buttons: ThemeButtons;
   palette: typeof palette;
 }
 
@@ -65,7 +66,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo<ThemeContextValue>(
-    () => ({ mode, setMode, colors: themes[mode], palette }),
+    () => ({
+      mode,
+      setMode,
+      colors: themes[mode].colors,
+      buttons: themes[mode].buttons,
+      palette,
+    }),
     [mode, setMode],
   );
 

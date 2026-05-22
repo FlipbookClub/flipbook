@@ -8,13 +8,23 @@
  * @module
  */
 
+import type * as clubs from "../clubs.js";
+import type * as lib_inviteCode from "../lib/inviteCode.js";
+import type * as memberships from "../memberships.js";
+import type * as users from "../users.js";
+
 import type {
   ApiFromModules,
   FilterApi,
   FunctionReference,
 } from "convex/server";
 
-declare const fullApi: ApiFromModules<{}>;
+declare const fullApi: ApiFromModules<{
+  clubs: typeof clubs;
+  "lib/inviteCode": typeof lib_inviteCode;
+  memberships: typeof memberships;
+  users: typeof users;
+}>;
 
 /**
  * A utility for referencing Convex functions in your app's public API.

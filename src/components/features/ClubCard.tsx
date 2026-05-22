@@ -1,0 +1,143 @@
+import { useState } from "react";
+import { Image, Pressable, Text, View } from "react-native";
+
+import { Avatar } from "@/components/ui/Avatar";
+import { palette } from "@/theme/palette";
+import { radius, spacing } from "@/theme/spacing";
+import { useTheme } from "@/theme/ThemeContext";
+import { typography } from "@/theme/typography";
+
+export interface ClubCardData {
+  name: string;
+  description?: string;
+  moderatorName?: string;
+  memberCount: number;
+  coverImageUrl?: string | null;
+  isMember?: boolean;
+}
+
+interface ClubCardProps {
+  club: ClubCardData;
+  onPress?: () => void;
+}
+
+// Community card per Figma "Community link card": square emblem on the left,
+// name + "Moderated by …" + member count on the right, optional Member badge.
+// Stubbed avatar stack uses initials from the moderator name until we wire
+// the member-avatars endpoint in Phase 4.
+export function ClubCard({ club, onPress }: ClubCardProps) {
+  const { colors } = useTheme();
+  const [pressed, setPressed] = useState(false);
+
+  const initials = club.name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => setPressed(true)}
+      onPressOut={() => setPressed(false)}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${club.name}`}
+      style={{
+        flexDirection: "row",
+        gap: spacing.s3,
+        padding: spacing.s3,
+        borderRadius: radius.md,
+        backgroundColor: pressed ? colors.surfaceSecondary : "transparent",
+        alignItems: "center",
+      }}
+    >
+      <View
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: radius.sm,
+          overflow: "hidden",
+          backgroundColor: colors.surfaceSecondary,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        {club.coverImageUrl ? (
+          <Image
+            source={{ uri: club.coverImageUrl }}
+            style={{ width: "100%", height: "100%" }}
+          />
+        ) : (
+          <Text
+            style={{
+              fontFamily: "Raleway-Bold",
+              fontSize: 22,
+              color: palette.brandPrimary,
+            }}
+          >
+            {initials || "?"}
+          </Text>
+        )}
+      </View>
+
+      <View style={{ flex: 1, gap: spacing.s1 }}>
+        <Text
+          style={{
+            ...typography.headingMd,
+            fontSize: 16,
+            color: colors.textPrimary,
+          }}
+          numberOfLines={2}
+        >
+          {club.name}
+        </Text>
+        {club.moderatorName ? (
+          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+            Moderated by:{" "}
+            <Text style={{ color: palette.accent, fontFamily: "Raleway-SemiBold" }}>
+              {club.moderatorName}
+            </Text>
+          </Text>
+        ) : null}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s2 }}>
+          <View style={{ flexDirection: "row" }}>
+            {/* Placeholder avatar stack — wires to real member avatars later. */}
+            <Avatar name="A B" size="sm" />
+            <View style={{ marginLeft: -10 }}>
+              <Avatar name="C D" size="sm" />
+            </View>
+            <View style={{ marginLeft: -10 }}>
+              <Avatar name="E F" size="sm" />
+            </View>
+          </View>
+          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+            {club.memberCount.toLocaleString()} members
+          </Text>
+        </View>
+      </View>
+
+      {club.isMember ? (
+        <View
+          style={{
+            paddingVertical: spacing.s1,
+            paddingHorizontal: spacing.s2,
+            borderRadius: radius.pill,
+            backgroundColor: palette.brandPrimary,
+          }}
+        >
+          <Text
+            style={{
+              ...typography.uiLabelMd,
+              fontSize: 11,
+              color: palette.textOnBrand,
+              fontFamily: "Raleway-SemiBold",
+            }}
+          >
+            Member
+          </Text>
+        </View>
+      ) : null}
+    </Pressable>
+  );
+}

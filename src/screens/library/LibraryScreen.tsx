@@ -9,7 +9,7 @@ export function LibraryScreen() {
   const { colors } = useTheme();
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfaceSecondary }}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
       <View style={{ padding: spacing.s5, gap: spacing.s3 }}>
         <Text style={{ ...typography.headingLg, color: colors.textPrimary }}>Library</Text>
         <Text style={{ ...typography.bodyMd, color: colors.textSecondary }}>
