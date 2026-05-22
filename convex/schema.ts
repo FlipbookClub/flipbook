@@ -38,8 +38,6 @@ export default defineSchema({
       membersCanInviteOthers: v.boolean(),
       membersCanUpdateInfo: v.boolean(),
     }),
-    // `bookId` (v.id("books")) is added in TASK-033 once the `books` table
-    // exists. Schemas can't reference tables that haven't been defined yet.
     inviteCode: v.string(),
     memberCount: v.number(),
     createdAt: v.number(),
@@ -62,4 +60,36 @@ export default defineSchema({
     .index("by_club", ["clubId"])
     .index("by_user", ["userId"])
     .index("by_club_and_user", ["clubId", "userId"]),
+
+  books: defineTable({
+    title: v.string(),
+    author: v.string(),
+    pdfStorageId: v.id("_storage"),
+    pdfPageCount: v.number(),
+    coverImageUrl: v.optional(v.string()),
+    uploadedByUserId: v.id("users"),
+    clubId: v.id("clubs"),
+    isPublic: v.boolean(),
+    isRemoved: v.boolean(),
+    fileSize: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_club", ["clubId"])
+    .index("by_uploader", ["uploadedByUserId"]),
+
+  progress: defineTable({
+    userId: v.id("users"),
+    clubId: v.id("clubs"),
+    bookId: v.optional(v.id("books")),
+    currentPage: v.number(),
+    totalPages: v.number(),
+    // FR-018: reactions on pages beyond this are filtered out (no spoilers).
+    // Monotonically non-decreasing; max(currentPage, prevFurthestPageReached).
+    furthestPageReached: v.number(),
+    finishedAt: v.optional(v.number()),
+    updatedAt: v.number(),
+  })
+    .index("by_user_and_club", ["userId", "clubId"])
+    .index("by_book", ["bookId"])
+    .index("by_club", ["clubId"]),
 });

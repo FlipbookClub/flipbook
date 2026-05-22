@@ -44,7 +44,10 @@
     "plugins": [
       "expo-font",
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      "expo-document-picker",
+      "@config-plugins/react-native-pdf",
+      "@config-plugins/react-native-blob-util"
     ],
     "extra": {
       "eas": {

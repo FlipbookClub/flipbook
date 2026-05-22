@@ -2,7 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { BookOpen, Palette, User, Users } from "lucide-react-native";
 
 import { CommunityStack } from "@/navigation/CommunityStack";
-import { LibraryScreen } from "@/screens/library/LibraryScreen";
+import { LibraryStack } from "@/navigation/LibraryStack";
 import { ProfileStack } from "@/navigation/ProfileStack";
 import { DesignSystemPreview } from "@/screens/_dev/DesignSystemPreview";
 import { palette } from "@/theme/palette";
@@ -41,7 +41,7 @@ export function MainTabs() {
       />
       <Tab.Screen
         name="Library"
-        component={LibraryScreen}
+        component={LibraryStack}
         options={{
           tabBarIcon: ({ color, size }) => <BookOpen color={color} size={size} />,
         }}

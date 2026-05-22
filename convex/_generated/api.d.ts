@@ -8,9 +8,11 @@
  * @module
  */
 
+import type * as books from "../books.js";
 import type * as clubs from "../clubs.js";
 import type * as lib_inviteCode from "../lib/inviteCode.js";
 import type * as memberships from "../memberships.js";
+import type * as progress from "../progress.js";
 import type * as users from "../users.js";
 
 import type {
@@ -20,9 +22,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  books: typeof books;
   clubs: typeof clubs;
   "lib/inviteCode": typeof lib_inviteCode;
   memberships: typeof memberships;
+  progress: typeof progress;
   users: typeof users;
 }>;
 

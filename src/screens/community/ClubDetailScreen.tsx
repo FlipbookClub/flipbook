@@ -1,12 +1,17 @@
 import { useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
-import { ChevronLeft, Settings, Share2 } from "lucide-react-native";
+import { Alert, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
+import { BookPlus, ChevronLeft, Settings, Share2 } from "lucide-react-native";
 import { useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Avatar } from "@/components/ui/Avatar";
+import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { BookCover } from "@/components/features/BookCover";
+import { BookUploadSheet } from "@/components/features/BookUploadSheet";
 import { ClubModeratorSheet } from "@/components/features/ClubModeratorSheet";
+import { ProgressVisualization } from "@/components/features/ProgressVisualization";
+import { MAX_PDF_BYTES, pickPdf, type PickedPdf } from "@/lib/pdf";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -30,13 +35,38 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const { clubId } = route.params;
   const club = useQuery(api.clubs.get, { clubId });
   const members = useQuery(api.memberships.listClubMembers, { clubId });
+  const books = useQuery(api.books.listForClub, { clubId });
+  const activeBook = books && books.length > 0 ? books[0] : null;
+  const progressRows = useQuery(
+    api.progress.listForClub,
+    activeBook ? { clubId, bookId: activeBook._id } : "skip",
+  );
   const me = useQuery(api.users.me);
 
-  const [tab, setTab] = useState<TabKey>("members");
+  const [tab, setTab] = useState<TabKey>("book");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
 
   const isModerator = !!me && !!club && club.moderatorId === me._id;
+  const canUpload =
+    isModerator || (!!club && club.permissions.membersCanUploadBooks);
   const inviteUrl = club ? `${DEEP_LINK_BASE}/${club.inviteCode}` : null;
+
+  const handleAddBook = async () => {
+    const result = await pickPdf();
+    if (!result.ok) {
+      if (result.reason === "cancelled") return;
+      const message =
+        result.reason === "too_large"
+          ? `Books are limited to ${Math.round(MAX_PDF_BYTES / (1024 * 1024))}MB. Try a smaller file.`
+          : result.reason === "not_pdf"
+            ? "That doesn't look like a PDF. Pick a .pdf file."
+            : "Couldn't read that file. Try a different one.";
+      Alert.alert("Can't upload", message);
+      return;
+    }
+    setPickedFile(result.file);
+  };
 
   const handleShare = async () => {
     if (!club || !inviteUrl) return;
@@ -199,16 +229,56 @@ export function ClubDetailScreen({ navigation, route }: Props) {
 
         <View style={{ padding: spacing.s4 }}>
           {tab === "book" ? (
-            <Card>
-              <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
-                <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
-                  No book yet
-                </Text>
-                <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
-                  Book upload + reading land in Phase 3.
-                </Text>
+            books && books.length > 0 ? (
+              <View style={{ gap: spacing.s4 }}>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.s4 }}>
+                  {books.map((b) => (
+                    <BookCover
+                      key={b._id}
+                      title={b.title}
+                      author={b.author}
+                      pageCount={b.pdfPageCount}
+                      onPress={() => navigation.navigate("Reader", { bookId: b._id })}
+                    />
+                  ))}
+                </View>
+                {activeBook ? (
+                  <ProgressVisualization
+                    rows={progressRows?.map((p) => ({
+                      userId: p.userId,
+                      displayName: p.user.displayName,
+                      avatarUrl: p.user.avatarUrl,
+                      currentPage: p.currentPage,
+                      totalPages: p.totalPages,
+                    }))}
+                    bookTitle={activeBook.title}
+                  />
+                ) : null}
+                {canUpload ? (
+                  <Button label="Add another book" variant="secondary" fullWidth onPress={handleAddBook} />
+                ) : null}
               </View>
-            </Card>
+            ) : (
+              <Card>
+                <View style={{ gap: spacing.s3, alignItems: "center", paddingVertical: spacing.s3 }}>
+                  <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
+                    No book yet
+                  </Text>
+                  <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
+                    {canUpload
+                      ? "Upload a PDF to kick off the club's first read."
+                      : "Waiting on the moderator to add the first book."}
+                  </Text>
+                  {canUpload ? (
+                    <Button
+                      label="Add a book"
+                      onPress={handleAddBook}
+                      leadingIcon={<BookPlus size={18} color={palette.textOnBrand} />}
+                    />
+                  ) : null}
+                </View>
+              </Card>
+            )
           ) : tab === "activity" ? (
             <Card>
               <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
@@ -286,6 +356,14 @@ export function ClubDetailScreen({ navigation, route }: Props) {
           onDeleted={() => navigation.popToTop()}
         />
       ) : null}
+
+      <BookUploadSheet
+        visible={pickedFile !== null}
+        clubId={clubId}
+        file={pickedFile}
+        onClose={() => setPickedFile(null)}
+        onUploaded={() => setPickedFile(null)}
+      />
     </SafeAreaView>
   );
 }
