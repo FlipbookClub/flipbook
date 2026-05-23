@@ -17,6 +17,14 @@ export default defineSchema({
       v.literal("expired"),
     ),
     proExpiresAt: v.optional(v.number()),
+    // FR-087: notification preferences. Optional → unset means "deliver
+    // everything" (the default before the user has visited Settings).
+    notificationPrefs: v.optional(
+      v.object({
+        chapterDrops: v.boolean(),
+        reactionReplies: v.boolean(),
+      }),
+    ),
     createdAt: v.number(),
     lastActiveAt: v.number(),
   })
@@ -135,6 +143,32 @@ export default defineSchema({
     .index("by_parent", ["parentReactionId"])
     // Rate-limit lookup (FR: max 10 reactions/min per user).
     .index("by_user_and_created", ["userId", "createdAt"]),
+
+  // Pre-launch waitlist signups from the marketing site (getflipbook.com).
+  // Public-write via convex/http.ts → POST /waitlist. Dedup is enforced on
+  // emailLower (case-insensitive) — repeat submissions update qualifier in
+  // place rather than creating duplicates.
+  waitlist: defineTable({
+    email: v.string(),
+    emailLower: v.string(),
+    audience: v.union(v.literal("reader"), v.literal("creator")),
+    // The "what's the last book you finished?" / "which book club are you in?"
+    // answer. Optional but high-signal — see GTM §9 "Waitlist mechanics".
+    qualifier: v.optional(v.string()),
+    // Creator-only — link to their existing work (Substack, IG, etc).
+    creatorLink: v.optional(v.string()),
+    // utm_source, utm_campaign, etc — flattened to a single string.
+    source: v.optional(v.string()),
+    referrer: v.optional(v.string()),
+    userAgent: v.optional(v.string()),
+    // For abuse mitigation — hashed, never raw IP.
+    ipHash: v.optional(v.string()),
+    confirmedAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_email", ["emailLower"])
+    .index("by_audience_created", ["audience", "createdAt"])
+    .index("by_created", ["createdAt"]),
 
   notifications: defineTable({
     userId: v.id("users"),

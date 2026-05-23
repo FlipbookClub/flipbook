@@ -35,6 +35,8 @@ import {
   type CachedContentMeta,
   type ContentKind,
 } from "@/lib/bookMeta";
+import { useConnectivity } from "@/lib/connectivity";
+import { enqueueReaction } from "@/lib/reactionQueue";
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
@@ -204,6 +206,7 @@ export function ReaderScreen({ navigation, route }: Props) {
 
   const me = useQuery(api.users.me);
   const createReaction = useMutation(api.reactions.create);
+  const { isOnline } = useConnectivity();
 
   // Hide the bottom tab bar while reading so the Pdf gets the full screen
   // (and so the floating React FAB isn't obscured by the tab strip).
@@ -244,22 +247,46 @@ export function ReaderScreen({ navigation, route }: Props) {
 
   const handleReactionSubmit = async (payload: ReactionSubmission) => {
     if (!effective || !scopePayload) return;
-    try {
-      await createReaction({
-        clubId: effective.clubId,
-        ...scopePayload,
-        page: currentPage,
-        type: payload.type,
-        emoji: payload.emoji,
-        text: payload.text,
+    const args = {
+      clubId: effective.clubId,
+      ...scopePayload,
+      page: currentPage,
+      type: payload.type,
+      emoji: payload.emoji,
+      text: payload.text,
+    };
+    // FR-013 / FR-016 edge case: offline reactions queue locally and sync
+    // on reconnect. The flush worker in RootNavigator drains the queue.
+    if (!isOnline) {
+      enqueueReaction({
+        clubId: args.clubId,
+        bookId: scopePayload.bookId,
+        chapterId: scopePayload.chapterId,
+        page: args.page,
+        type: args.type,
+        emoji: args.emoji,
+        text: args.text,
       });
-      // Vision § Motion: subtle light impact when YOUR reaction lands.
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
+      return;
+    }
+    try {
+      await createReaction(args);
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
     } catch (err) {
       const code = (err as { data?: { code?: string } })?.data?.code;
-      if (code === "rate_limited") {
-        setLoadError(null);
-        // Surface via a transient toast in a follow-up.
+      // Network-y failures get queued for retry; server-side rejections
+      // (rate limited, validation) are surfaced and not retried.
+      if (!code) {
+        enqueueReaction({
+          clubId: args.clubId,
+          bookId: scopePayload.bookId,
+          chapterId: scopePayload.chapterId,
+          page: args.page,
+          type: args.type,
+          emoji: args.emoji,
+          text: args.text,
+        });
       }
     }
   };
@@ -420,7 +447,11 @@ export function ReaderScreen({ navigation, route }: Props) {
                 }}
                 onPageChanged={(page, total) => handlePageChanged(page, total)}
                 onError={(err) => {
-                  setLoadError(typeof err === "string" ? err : "Couldn't open this.");
+                  setLoadError(
+                    typeof err === "string"
+                      ? err
+                      : "The pages aren't loading. Mind trying again in a moment?",
+                  );
                 }}
                 renderActivityIndicator={() => <ActivityIndicator color={colors.textPrimary} />}
                 style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}

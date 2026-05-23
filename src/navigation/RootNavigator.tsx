@@ -8,6 +8,7 @@ import { MainTabs } from "./MainTabs";
 import { OnboardingStack } from "./OnboardingStack";
 import { linkingConfig, linkingPrefixes } from "@/lib/deeplinks";
 import { usePushTokenRegistration } from "@/lib/notifications";
+import { useReactionQueueFlush } from "@/lib/useReactionQueueFlush";
 import { useTheme } from "@/theme/ThemeContext";
 import { api } from "../../convex/_generated/api";
 
@@ -31,6 +32,10 @@ export function RootNavigator() {
   // FR-028: register a push token once an onboarded user exists. Permission
   // prompt fires here (post-onboarding) rather than at first sign-in.
   usePushTokenRegistration(me != null);
+
+  // FR-013 / FR-016 edge case: drain the offline reaction queue when network
+  // returns. Idempotent — only runs when there are queued items.
+  useReactionQueueFlush();
 
   const navTheme = {
     ...(mode === "light" ? DefaultTheme : DarkTheme),

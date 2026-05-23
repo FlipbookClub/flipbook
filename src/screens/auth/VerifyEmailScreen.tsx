@@ -49,7 +49,7 @@ export function VerifyEmailScreen({ route }: Props) {
     } catch (err) {
       const message =
         (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Verification failed. Please try again.";
+        "Couldn't verify that code. Want to try again?";
       setFormError(message);
     } finally {
       setSubmitting(false);

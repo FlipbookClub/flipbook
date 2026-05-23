@@ -11,12 +11,15 @@
 import type * as books from "../books.js";
 import type * as chapters from "../chapters.js";
 import type * as clubs from "../clubs.js";
+import type * as http from "../http.js";
+import type * as lib_admins from "../lib/admins.js";
 import type * as lib_inviteCode from "../lib/inviteCode.js";
 import type * as memberships from "../memberships.js";
 import type * as notifications from "../notifications.js";
 import type * as progress from "../progress.js";
 import type * as reactions from "../reactions.js";
 import type * as users from "../users.js";
+import type * as waitlist from "../waitlist.js";
 
 import type {
   ApiFromModules,
@@ -28,12 +31,15 @@ declare const fullApi: ApiFromModules<{
   books: typeof books;
   chapters: typeof chapters;
   clubs: typeof clubs;
+  http: typeof http;
+  "lib/admins": typeof lib_admins;
   "lib/inviteCode": typeof lib_inviteCode;
   memberships: typeof memberships;
   notifications: typeof notifications;
   progress: typeof progress;
   reactions: typeof reactions;
   users: typeof users;
+  waitlist: typeof waitlist;
 }>;
 
 /**

@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
+import { isAdminEmail } from "./lib/admins";
 import { getCurrentUser } from "./users";
 
 const MAX_TITLE = 200;
@@ -145,6 +146,34 @@ export const get = query({
     // book is marked removed (DMCA) so the reader renders the takedown state.
     const pdfUrl = book.isRemoved ? null : await ctx.storage.getUrl(book.pdfStorageId);
     return { book, pdfUrl };
+  },
+});
+
+// FR-086 / Edge case "DMCA takedown received": admins flip isRemoved on a
+// book row. The reader picks up the flag and renders the takedown message
+// (Phase 3 already handles the rendering). No real admin UI for MVP — call
+// this from the Convex dashboard "Run a function" panel.
+export const markRemoved = mutation({
+  args: { bookId: v.id("books"), reason: v.string() },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const identity = await ctx.auth.getUserIdentity();
+    if (!isAdminEmail(identity?.email)) {
+      throw new ConvexError({ code: "not_admin" });
+    }
+    const book = await ctx.db.get(args.bookId);
+    if (!book) throw new ConvexError({ code: "not_found" });
+    await ctx.db.patch(args.bookId, { isRemoved: true });
+    // Lightweight audit trail — written to logs so the dashboard captures it.
+    console.log("DMCA takedown", {
+      bookId: args.bookId,
+      title: book.title,
+      adminUserId: me._id,
+      reason: args.reason,
+      at: new Date().toISOString(),
+    });
+    return null;
   },
 });
 

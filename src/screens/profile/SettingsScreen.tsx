@@ -1,29 +1,28 @@
-import { useState } from "react";
-import { Linking, Platform, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { ChevronLeft, ChevronRight, CreditCard, LogOut, Palette as PaletteIcon } from "lucide-react-native";
+import { useEffect, useState } from "react";
+import { Alert, Linking, Platform, Pressable, SafeAreaView, ScrollView, Switch, Text, View } from "react-native";
+import {
+  Bell,
+  ChevronLeft,
+  ChevronRight,
+  CreditCard,
+  LogOut,
+  Trash2,
+} from "lucide-react-native";
 import { useAuth, useUser } from "@clerk/clerk-expo";
+import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+import { ThemePicker } from "@/components/features/ThemePicker";
+
+import { api } from "../../../convex/_generated/api";
 
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
-import type { ThemeMode } from "@/theme/themes";
-
 import type { ProfileStackParamList } from "@/navigation/ProfileStack";
 
 type Props = NativeStackScreenProps<ProfileStackParamList, "Settings">;
-
-const MODE_CYCLE: ThemeMode[] = ["light", "flip", "dark"];
-
-function nextMode(current: ThemeMode): ThemeMode {
-  const i = MODE_CYCLE.indexOf(current);
-  return MODE_CYCLE[(i + 1) % MODE_CYCLE.length];
-}
-
-function modeLabel(m: ThemeMode): string {
-  return m === "light" ? "Light" : m === "flip" ? "Flip" : "Dark";
-}
 
 interface RowProps {
   icon: React.ReactNode;
@@ -66,9 +65,65 @@ function Row({ icon, label, value, destructive, onPress }: RowProps) {
 }
 
 export function SettingsScreen({ navigation }: Props) {
-  const { colors, mode, setMode } = useTheme();
+  const { colors } = useTheme();
   const { signOut } = useAuth();
   const { user } = useUser();
+  const deleteSelf = useMutation(api.users.deleteSelf);
+  const me = useQuery(api.users.me);
+  const updateNotificationPrefs = useMutation(api.users.updateNotificationPrefs);
+
+  // Local mirror so toggles flip instantly; sync to server in the background.
+  // Defaults to "all on" when the user has never visited Settings (matches
+  // server-side opt-in default).
+  const [chapterDrops, setChapterDrops] = useState(true);
+  const [reactionReplies, setReactionReplies] = useState(true);
+  useEffect(() => {
+    if (me?.notificationPrefs) {
+      setChapterDrops(me.notificationPrefs.chapterDrops);
+      setReactionReplies(me.notificationPrefs.reactionReplies);
+    }
+  }, [me?.notificationPrefs]);
+
+  const persistPrefs = (next: { chapterDrops: boolean; reactionReplies: boolean }) => {
+    updateNotificationPrefs({ prefs: next }).catch(() => undefined);
+  };
+
+  const handleDeleteAccount = () => {
+    Alert.alert(
+      "Delete account?",
+      "This wipes your profile, memberships, reactions, and reading progress. It can't be undone.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Delete",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await deleteSelf();
+              try {
+                await user?.delete();
+              } catch {
+                // If Clerk delete fails (network, etc.) the Convex side is
+                // already gone — fall back to signOut so the user lands on
+                // a fresh state. They can re-attempt the Clerk delete later.
+              }
+              await signOut();
+            } catch (err) {
+              const code = (err as { data?: { code?: string } })?.data?.code;
+              if (code === "moderator_blocks_delete") {
+                Alert.alert(
+                  "Hand off your clubs first",
+                  "You moderate one or more communities. Delete or transfer them, then try again.",
+                );
+              } else {
+                Alert.alert("Couldn't delete account", "Try again in a moment.");
+              }
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const primaryEmail =
     user?.primaryEmailAddress?.emailAddress ??
@@ -116,11 +171,29 @@ export function SettingsScreen({ navigation }: Props) {
         </Section>
 
         <Section title="Appearance">
-          <Row
-            icon={<PaletteIcon size={18} color={colors.textPrimary} />}
-            label="Theme"
-            value={modeLabel(mode)}
-            onPress={() => setMode(nextMode(mode))}
+          <ThemePicker />
+        </Section>
+
+        <Section title="Notifications">
+          <ToggleRow
+            icon={<Bell size={18} color={colors.textPrimary} />}
+            label="Chapter drops"
+            sublabel="Pushes when an author you follow publishes a new chapter."
+            value={chapterDrops}
+            onChange={(v) => {
+              setChapterDrops(v);
+              persistPrefs({ chapterDrops: v, reactionReplies });
+            }}
+          />
+          <ToggleRow
+            icon={<Bell size={18} color={colors.textPrimary} />}
+            label="Reaction replies"
+            sublabel="Pushes when someone replies to your reaction."
+            value={reactionReplies}
+            onChange={(v) => {
+              setReactionReplies(v);
+              persistPrefs({ chapterDrops, reactionReplies: v });
+            }}
           />
         </Section>
 
@@ -144,10 +217,15 @@ export function SettingsScreen({ navigation }: Props) {
 
         <Section>
           <Row
-            icon={<LogOut size={18} color={palette.error} />}
+            icon={<LogOut size={18} color={colors.textPrimary} />}
             label="Sign out"
-            destructive
             onPress={() => signOut()}
+          />
+          <Row
+            icon={<Trash2 size={18} color={palette.error} />}
+            label="Delete account"
+            destructive
+            onPress={handleDeleteAccount}
           />
         </Section>
       </ScrollView>
@@ -158,6 +236,44 @@ export function SettingsScreen({ navigation }: Props) {
 interface SectionProps {
   title?: string;
   children: React.ReactNode;
+}
+
+interface ToggleRowProps {
+  icon: React.ReactNode;
+  label: string;
+  sublabel?: string;
+  value: boolean;
+  onChange: (next: boolean) => void;
+}
+
+function ToggleRow({ icon, label, sublabel, value, onChange }: ToggleRowProps) {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.s3,
+        paddingVertical: spacing.s3,
+        paddingHorizontal: spacing.s4,
+      }}
+    >
+      <View style={{ width: 24, alignItems: "center", justifyContent: "center" }}>{icon}</View>
+      <View style={{ flex: 1, gap: 2 }}>
+        <Text style={{ ...typography.bodyLg, color: colors.textPrimary }}>{label}</Text>
+        {sublabel ? (
+          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{sublabel}</Text>
+        ) : null}
+      </View>
+      <Switch
+        value={value}
+        onValueChange={onChange}
+        trackColor={{ true: palette.brandPrimary, false: colors.border }}
+        thumbColor={palette.textOnBrand}
+        accessibilityLabel={label}
+      />
+    </View>
+  );
 }
 
 function Section({ title, children }: SectionProps) {

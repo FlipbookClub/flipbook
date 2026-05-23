@@ -12,6 +12,11 @@ const proStatusValidator = v.union(
   v.literal("expired"),
 );
 
+const notificationPrefsValidator = v.object({
+  chapterDrops: v.boolean(),
+  reactionReplies: v.boolean(),
+});
+
 const userValidator = v.object({
   _id: v.id("users"),
   _creationTime: v.number(),
@@ -25,6 +30,7 @@ const userValidator = v.object({
   pushToken: v.optional(v.string()),
   proSubscriptionStatus: proStatusValidator,
   proExpiresAt: v.optional(v.number()),
+  notificationPrefs: v.optional(notificationPrefsValidator),
   createdAt: v.number(),
   lastActiveAt: v.number(),
 });
@@ -157,6 +163,20 @@ export const syncProStatus = mutation({
   },
 });
 
+// FR-087: per-type notification opt-outs honored by the push fanouts.
+export const updateNotificationPrefs = mutation({
+  args: { prefs: notificationPrefsValidator },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
+    await ctx.db.patch(user._id, {
+      notificationPrefs: args.prefs,
+      lastActiveAt: Date.now(),
+    });
+    return null;
+  },
+});
+
 // FR-028: client calls this on app boot once it has a fresh Expo push token.
 // Stored on the user record so notification fanouts can look it up.
 export const updatePushToken = mutation({
@@ -170,6 +190,70 @@ export const updatePushToken = mutation({
       pushToken: next,
       lastActiveAt: Date.now(),
     });
+    return null;
+  },
+});
+
+// FR-088: account deletion. Removes the user's Convex footprint so the
+// Clerk delete on the client side is the last step. Refuses if the user
+// moderates any clubs — the founder forces explicit handling (transfer
+// or delete) before they can wipe themselves.
+export const deleteSelf = mutation({
+  args: {},
+  returns: v.null(),
+  handler: async (ctx) => {
+    const me = await getCurrentUser(ctx);
+
+    const moderatedClubs = await ctx.db
+      .query("clubs")
+      .withIndex("by_moderator", (q) => q.eq("moderatorId", me._id))
+      .collect();
+    if (moderatedClubs.length > 0) {
+      throw new ConvexError({
+        code: "moderator_blocks_delete",
+        clubCount: moderatedClubs.length,
+      });
+    }
+
+    // Decrement memberCount on every club the user is in, then delete
+    // their memberships.
+    const memberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_user", (q) => q.eq("userId", me._id))
+      .collect();
+    for (const m of memberships) {
+      const club = await ctx.db.get(m.clubId);
+      if (club) {
+        await ctx.db.patch(m.clubId, {
+          memberCount: Math.max(0, club.memberCount - 1),
+        });
+      }
+      await ctx.db.delete(m._id);
+    }
+
+    // Hard-delete the user's reactions. PRD suggested anonymization for
+    // continuity, but that needs schema changes and beta-stage users
+    // mostly care about scrubbing themselves rather than preserving
+    // context for others.
+    const reactions = await ctx.db
+      .query("reactions")
+      .withIndex("by_user", (q) => q.eq("userId", me._id))
+      .collect();
+    for (const r of reactions) await ctx.db.delete(r._id);
+
+    const progressRows = await ctx.db
+      .query("progress")
+      .withIndex("by_user_and_club", (q) => q.eq("userId", me._id))
+      .collect();
+    for (const p of progressRows) await ctx.db.delete(p._id);
+
+    const notifications = await ctx.db
+      .query("notifications")
+      .withIndex("by_user_and_sent", (q) => q.eq("userId", me._id))
+      .collect();
+    for (const n of notifications) await ctx.db.delete(n._id);
+
+    await ctx.db.delete(me._id);
     return null;
   },
 });

@@ -90,7 +90,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       const message =
         (err as { data?: { code?: string } })?.data?.code ??
         (err as { message?: string })?.message ??
-        "Upload failed. Try again.";
+        "The book didn't quite make it. Try again?";
       setError(message);
       setStage("metadata");
     }

@@ -8,6 +8,7 @@ import Animated, {
 } from "react-native-reanimated";
 
 import { Avatar } from "@/components/ui/Avatar";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import { palette } from "@/theme/palette";
 import { useTheme } from "@/theme/ThemeContext";
 
@@ -27,13 +28,17 @@ const BUBBLE_SIZE = 36;
 
 export function ReactionBubble({ emoji, isComment, isAuthor, user, onPress }: Props) {
   const { colors } = useTheme();
+  const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(0);
-  const translateX = useSharedValue(SLIDE_FROM_X);
+  const translateX = useSharedValue(reduceMotion ? 0 : SLIDE_FROM_X);
 
   useEffect(() => {
     opacity.value = withTiming(1, { duration: FADE_DURATION_MS });
-    translateX.value = withTiming(0, { duration: FADE_DURATION_MS });
-  }, [opacity, translateX]);
+    // FR-083: skip the slide when Reduce Motion is on; opacity fade alone.
+    if (!reduceMotion) {
+      translateX.value = withTiming(0, { duration: FADE_DURATION_MS });
+    }
+  }, [opacity, translateX, reduceMotion]);
 
   const animatedStyle = useAnimatedStyle(() => ({
     opacity: opacity.value,

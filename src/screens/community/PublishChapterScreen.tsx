@@ -101,7 +101,7 @@ export function PublishChapterScreen({ navigation, route }: Props) {
     } catch (err) {
       const code = (err as { data?: { code?: string } })?.data?.code;
       const message = (err as { message?: string })?.message;
-      setError(code ?? message ?? "Publish failed. Try again.");
+      setError(code ?? message ?? "The chapter didn't quite make it. Try again?");
       setStage("form");
     }
   };

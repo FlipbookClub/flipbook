@@ -134,6 +134,8 @@ export const collectChapterDropAudience = internalQuery({
       if (m.userId === chapter.publishedByUserId) continue;
       const user = await ctx.db.get(m.userId);
       if (!user) continue;
+      // FR-087: honor per-user notification preferences. Unset = opt-in.
+      if (user.notificationPrefs && !user.notificationPrefs.chapterDrops) continue;
       recipients.push({ userId: user._id, pushToken: user.pushToken });
     }
 
@@ -294,6 +296,10 @@ export const collectReplyAudience = internalQuery({
     if (parent.userId === reply.userId) return null;
     const recipient = await ctx.db.get(parent.userId);
     if (!recipient) return null;
+    // FR-087: honor opt-out.
+    if (recipient.notificationPrefs && !recipient.notificationPrefs.reactionReplies) {
+      return null;
+    }
     const replier = await ctx.db.get(reply.userId);
     const club = await ctx.db.get(reply.clubId);
 

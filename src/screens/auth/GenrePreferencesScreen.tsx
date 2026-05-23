@@ -64,7 +64,7 @@ export function GenrePreferencesScreen({ route }: Props) {
       const message =
         (err as { data?: { code?: string }; message?: string })?.data?.code ??
         (err as { message?: string })?.message ??
-        "Couldn't save your profile. Please try again.";
+        "Couldn't save your profile. Mind trying again?";
       setFormError(
         message === "display_name_taken"
           ? `"${displayName}" is taken. Tap back to try another.`

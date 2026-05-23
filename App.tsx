@@ -25,6 +25,7 @@ WebBrowser.maybeCompleteAuthSession();
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { RootNavigator } from "@/navigation/RootNavigator";
 import { CLERK_PUBLISHABLE_KEY, tokenCache } from "@/lib/clerk";
 import { convex } from "@/lib/convex";
@@ -77,6 +78,7 @@ function ThemedShell() {
     <>
       <StatusBar style={statusBarStyle} />
       <RootNavigator />
+      <OfflineBanner />
     </>
   );
 }
