@@ -12,6 +12,7 @@ import { useMutation, useQuery } from "convex/react";
 
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
+import { AuthorBadge } from "@/components/features/AuthorBadge";
 import { ReactionComposer } from "@/screens/reader/ReactionComposer";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
@@ -24,12 +25,15 @@ import { api } from "../../../convex/_generated/api";
 interface Props {
   visible: boolean;
   reactionId: Id<"reactions"> | null;
-  // The reader passes its current clubId/bookId/page so we can scope the
+  // The reader passes its current clubId/scope/page so we can scope the
   // reply mutation correctly without re-deriving from the parent reaction.
   clubId: Id<"clubs">;
-  bookId: Id<"books">;
+  scope: { bookId?: Id<"books">; chapterId?: Id<"chapters"> };
   page: number;
   currentUserId: Id<"users"> | null;
+  // FR-022: when set, reactions from this user get the Author badge in the
+  // sheet (creator clubs only).
+  authorUserId?: Id<"users"> | null;
   onClose: () => void;
 }
 
@@ -49,9 +53,10 @@ export function ReactionDetailsSheet({
   visible,
   reactionId,
   clubId,
-  bookId,
+  scope,
   page,
   currentUserId,
+  authorUserId,
   onClose,
 }: Props) {
   const { colors } = useTheme();
@@ -67,7 +72,7 @@ export function ReactionDetailsSheet({
   );
   const pageReactions = useQuery(
     api.reactions.listForPage,
-    visible ? { clubId, bookId, page } : "skip",
+    visible ? { clubId, ...scope, page } : "skip",
   );
   const parent = pageReactions?.find((r) => r._id === reactionId) ?? null;
 
@@ -78,7 +83,7 @@ export function ReactionDetailsSheet({
     try {
       await createReaction({
         clubId,
-        bookId,
+        ...scope,
         page,
         type: "comment",
         text: payload.text,
@@ -168,6 +173,7 @@ export function ReactionDetailsSheet({
               avatarUri={parent.user.avatarUrl}
               name={parent.user.displayName}
               timestamp={parent.createdAt}
+              isAuthor={!!authorUserId && parent.userId === authorUserId}
               body={
                 parent.type === "emoji"
                   ? <Text style={{ fontSize: 28 }}>{parent.emoji}</Text>
@@ -194,6 +200,7 @@ export function ReactionDetailsSheet({
                     avatarUri={r.user.avatarUrl}
                     name={r.user.displayName}
                     timestamp={r.createdAt}
+                    isAuthor={!!authorUserId && r.userId === authorUserId}
                     body={
                       <Text style={{ ...typography.bodyMd, color: colors.textPrimary }}>
                         {r.text}
@@ -233,21 +240,23 @@ interface RowProps {
   name: string;
   timestamp: number;
   body: React.ReactNode;
+  isAuthor?: boolean;
   onDelete?: () => void;
 }
 
-function ReactionRow({ avatarUri, name, timestamp, body, onDelete }: RowProps) {
+function ReactionRow({ avatarUri, name, timestamp, body, isAuthor, onDelete }: RowProps) {
   const { colors } = useTheme();
   return (
     <View style={{ flexDirection: "row", gap: spacing.s3, alignItems: "flex-start" }}>
       <Avatar name={name} imageUri={avatarUri} size="md" />
       <View style={{ flex: 1, gap: 4 }}>
-        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s2 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s2, flexWrap: "wrap" }}>
           <Text
             style={{ ...typography.bodyMd, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}
           >
             {name}
           </Text>
+          {isAuthor ? <AuthorBadge /> : null}
           <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
             {formatRelative(timestamp)}
           </Text>

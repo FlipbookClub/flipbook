@@ -40,12 +40,14 @@ export const joinByCode = mutation({
     if (existing) return club._id;
 
     const now = Date.now();
+    // FR-019: creator-club members are followers (subscriber semantics) — gets
+    // them on the chapter-drop push fanout. Standard clubs stay at false.
     await ctx.db.insert("memberships", {
       clubId: club._id,
       userId: me._id,
       role: "member",
       joinedAt: now,
-      isFollowing: false,
+      isFollowing: club.type === "creator",
     });
     await ctx.db.patch(club._id, {
       memberCount: club.memberCount + 1,

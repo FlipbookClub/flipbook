@@ -6,13 +6,14 @@ import { CreateCommunityScreen } from "@/screens/community/CreateCommunityScreen
 import { InviteMembersScreen } from "@/screens/community/InviteMembersScreen";
 import { JoinCommunityScreen } from "@/screens/community/JoinCommunityScreen";
 import { InviteAcceptScreen } from "@/screens/community/InviteAcceptScreen";
+import { PublishChapterScreen } from "@/screens/community/PublishChapterScreen";
 import { ReaderScreen } from "@/screens/reader/ReaderScreen";
 
 import type { Id } from "../../convex/_generated/dataModel";
 
 // Stack inside the Community tab so club navigation (detail, create, join,
-// invite-accept) stays scoped to the tab. Reader is registered here too so
-// taps from ClubDetail's Book tab open the PDF in the same nav context.
+// invite-accept, publish) stays scoped to the tab. Reader is registered here
+// too so taps from ClubDetail open the PDF in the same nav context.
 export type CommunityStackParamList = {
   CommunityHome: undefined;
   CreateCommunity: undefined;
@@ -20,7 +21,12 @@ export type CommunityStackParamList = {
   JoinCommunity: undefined;
   ClubDetail: { clubId: Id<"clubs"> };
   InviteAccept: { inviteCode: string };
-  Reader: { bookId: Id<"books">; jumpToPage?: number };
+  PublishChapter: { clubId: Id<"clubs"> };
+  Reader: {
+    bookId?: Id<"books">;
+    chapterId?: Id<"chapters">;
+    jumpToPage?: number;
+  };
 };
 
 const Stack = createNativeStackNavigator<CommunityStackParamList>();
@@ -34,6 +40,7 @@ export function CommunityStack() {
       <Stack.Screen name="JoinCommunity" component={JoinCommunityScreen} />
       <Stack.Screen name="ClubDetail" component={ClubDetailScreen} />
       <Stack.Screen name="InviteAccept" component={InviteAcceptScreen} />
+      <Stack.Screen name="PublishChapter" component={PublishChapterScreen} />
       <Stack.Screen name="Reader" component={ReaderScreen} options={{ animation: "slide_from_bottom" }} />
     </Stack.Navigator>
   );

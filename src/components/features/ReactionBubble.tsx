@@ -14,6 +14,7 @@ import { useTheme } from "@/theme/ThemeContext";
 interface Props {
   emoji?: string;
   isComment: boolean;
+  isAuthor?: boolean;
   user: { displayName: string; avatarUrl?: string };
   onPress: () => void;
 }
@@ -24,7 +25,7 @@ const FADE_DURATION_MS = 160;
 const SLIDE_FROM_X = 8;
 const BUBBLE_SIZE = 36;
 
-export function ReactionBubble({ emoji, isComment, user, onPress }: Props) {
+export function ReactionBubble({ emoji, isComment, isAuthor, user, onPress }: Props) {
   const { colors } = useTheme();
   const opacity = useSharedValue(0);
   const translateX = useSharedValue(SLIDE_FROM_X);
@@ -55,8 +56,10 @@ export function ReactionBubble({ emoji, isComment, user, onPress }: Props) {
             height: BUBBLE_SIZE,
             borderRadius: BUBBLE_SIZE / 2,
             backgroundColor: colors.surfacePrimary,
-            borderWidth: 1,
-            borderColor: colors.border,
+            // FR-022: author reactions get a Golden Sand ring instead of the
+            // standard border — quieter than the badge but still distinct.
+            borderWidth: isAuthor ? 2 : 1,
+            borderColor: isAuthor ? palette.highlight : colors.border,
             alignItems: "center",
             justifyContent: "center",
             shadowColor: "#000",

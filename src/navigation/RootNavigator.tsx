@@ -7,6 +7,7 @@ import { AuthStack } from "./AuthStack";
 import { MainTabs } from "./MainTabs";
 import { OnboardingStack } from "./OnboardingStack";
 import { linkingConfig, linkingPrefixes } from "@/lib/deeplinks";
+import { usePushTokenRegistration } from "@/lib/notifications";
 import { useTheme } from "@/theme/ThemeContext";
 import { api } from "../../convex/_generated/api";
 
@@ -26,6 +27,10 @@ export function RootNavigator() {
   // an unauthenticated identity and throws. "skip" is Convex's documented way
   // to defer a query until inputs are ready.
   const me = useQuery(api.users.me, isLoaded && isSignedIn ? {} : "skip");
+
+  // FR-028: register a push token once an onboarded user exists. Permission
+  // prompt fires here (post-onboarding) rather than at first sign-in.
+  usePushTokenRegistration(me != null);
 
   const navTheme = {
     ...(mode === "light" ? DefaultTheme : DarkTheme),

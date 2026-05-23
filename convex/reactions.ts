@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { mutation, query, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
+import { internal } from "./_generated/api";
 import { getCurrentUser } from "./users";
 
 // Curated emoji set per FR-014. Reject anything else server-side so the
@@ -16,6 +17,7 @@ const reactionValidator = v.object({
   _creationTime: v.number(),
   clubId: v.id("clubs"),
   bookId: v.optional(v.id("books")),
+  chapterId: v.optional(v.id("chapters")),
   page: v.number(),
   paragraphIndex: v.optional(v.number()),
   userId: v.id("users"),
@@ -52,13 +54,15 @@ async function furthestPageFor(
   ctx: QueryCtx,
   userId: Id<"users">,
   clubId: Id<"clubs">,
-  bookId: Id<"books">,
+  scope: { bookId?: Id<"books">; chapterId?: Id<"chapters"> },
 ): Promise<number> {
   const rows = await ctx.db
     .query("progress")
     .withIndex("by_user_and_club", (q) => q.eq("userId", userId).eq("clubId", clubId))
     .collect();
-  const row = rows.find((r) => r.bookId === bookId);
+  const row = rows.find((r) =>
+    scope.bookId ? r.bookId === scope.bookId : r.chapterId === scope.chapterId,
+  );
   return row?.furthestPageReached ?? 0;
 }
 
@@ -87,7 +91,9 @@ async function enrichWithUsers(
 export const create = mutation({
   args: {
     clubId: v.id("clubs"),
-    bookId: v.id("books"),
+    // Exactly one of bookId / chapterId must be set. Enforced server-side.
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
     page: v.number(),
     paragraphIndex: v.optional(v.number()),
     type: v.union(v.literal("emoji"), v.literal("comment")),
@@ -98,6 +104,10 @@ export const create = mutation({
   returns: v.id("reactions"),
   handler: async (ctx, args) => {
     const me = await getCurrentUser(ctx);
+
+    if ((args.bookId && args.chapterId) || (!args.bookId && !args.chapterId)) {
+      throw new ConvexError({ code: "exactly_one_scope_required" });
+    }
 
     const membership = await membershipFor(ctx, args.clubId, me._id);
     if (!membership) throw new ConvexError({ code: "not_a_member" });
@@ -126,9 +136,11 @@ export const create = mutation({
       if (parent.parentReactionId) {
         throw new ConvexError({ code: "replies_are_flat" });
       }
-      if (parent.bookId !== args.bookId || parent.page !== args.page) {
+      const sameScope =
+        parent.bookId === args.bookId && parent.chapterId === args.chapterId;
+      if (!sameScope || parent.page !== args.page) {
         // Catch a buggy client that tries to reply to a reaction from a
-        // different page/book. The reply must live alongside its parent.
+        // different page/book/chapter. The reply must live alongside its parent.
         throw new ConvexError({ code: "reply_page_mismatch" });
       }
     }
@@ -148,6 +160,7 @@ export const create = mutation({
     const reactionId = await ctx.db.insert("reactions", {
       clubId: args.clubId,
       bookId: args.bookId,
+      chapterId: args.chapterId,
       page: args.page,
       paragraphIndex: args.paragraphIndex,
       userId: me._id,
@@ -159,6 +172,15 @@ export const create = mutation({
     });
 
     await ctx.db.patch(args.clubId, { lastActivityAt: now });
+
+    // FR-030: schedule a reply push to the parent reaction's author.
+    // The fanout action handles self-ping and throttle checks.
+    if (args.parentReactionId) {
+      await ctx.scheduler.runAfter(0, internal.notifications.sendReplyPushFanout, {
+        reactionId,
+      });
+    }
+
     return reactionId;
   },
 });
@@ -170,11 +192,16 @@ export const create = mutation({
 export const listForPage = query({
   args: {
     clubId: v.id("clubs"),
-    bookId: v.id("books"),
+    // Exactly one of bookId / chapterId.
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
     page: v.number(),
   },
   returns: v.array(reactionWithUserValidator),
   handler: async (ctx, args) => {
+    if ((args.bookId && args.chapterId) || (!args.bookId && !args.chapterId)) {
+      return [];
+    }
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
     const me = await ctx.db
@@ -185,14 +212,27 @@ export const listForPage = query({
     const membership = await membershipFor(ctx, args.clubId, me._id);
     if (!membership) return [];
 
-    const furthest = await furthestPageFor(ctx, me._id, args.clubId, args.bookId);
+    const furthest = await furthestPageFor(ctx, me._id, args.clubId, {
+      bookId: args.bookId,
+      chapterId: args.chapterId,
+    });
     if (args.page > furthest) return [];
 
-    const rows = await ctx.db
-      .query("reactions")
-      .withIndex("by_book_and_page", (q) => q.eq("bookId", args.bookId).eq("page", args.page))
-      .order("asc")
-      .collect();
+    const rows = args.bookId
+      ? await ctx.db
+          .query("reactions")
+          .withIndex("by_book_and_page", (q) =>
+            q.eq("bookId", args.bookId).eq("page", args.page),
+          )
+          .order("asc")
+          .collect()
+      : await ctx.db
+          .query("reactions")
+          .withIndex("by_chapter_and_page", (q) =>
+            q.eq("chapterId", args.chapterId).eq("page", args.page),
+          )
+          .order("asc")
+          .collect();
     const topLevel = rows.filter((r) => !r.parentReactionId);
     return await enrichWithUsers(ctx, topLevel);
   },
@@ -230,11 +270,15 @@ export const listReplies = query({
 export const listForBook = query({
   args: {
     clubId: v.id("clubs"),
-    bookId: v.id("books"),
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
     limit: v.optional(v.number()),
   },
   returns: v.array(reactionWithUserValidator),
   handler: async (ctx, args) => {
+    if ((args.bookId && args.chapterId) || (!args.bookId && !args.chapterId)) {
+      return [];
+    }
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) return [];
     const me = await ctx.db
@@ -245,14 +289,23 @@ export const listForBook = query({
     const membership = await membershipFor(ctx, args.clubId, me._id);
     if (!membership) return [];
 
-    const furthest = await furthestPageFor(ctx, me._id, args.clubId, args.bookId);
+    const furthest = await furthestPageFor(ctx, me._id, args.clubId, {
+      bookId: args.bookId,
+      chapterId: args.chapterId,
+    });
     const limit = Math.min(args.limit ?? 20, 50);
 
-    const rows = await ctx.db
-      .query("reactions")
-      .withIndex("by_book_and_page", (q) => q.eq("bookId", args.bookId))
-      .order("desc")
-      .take(limit * 4);
+    const rows = args.bookId
+      ? await ctx.db
+          .query("reactions")
+          .withIndex("by_book_and_page", (q) => q.eq("bookId", args.bookId))
+          .order("desc")
+          .take(limit * 4)
+      : await ctx.db
+          .query("reactions")
+          .withIndex("by_chapter_and_page", (q) => q.eq("chapterId", args.chapterId))
+          .order("desc")
+          .take(limit * 4);
     const visible = rows
       .filter((r) => !r.parentReactionId)
       .filter((r) => r.page <= furthest)

@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { BookCover } from "@/components/features/BookCover";
 import { BookUploadSheet } from "@/components/features/BookUploadSheet";
+import { ChapterListItem } from "@/components/features/ChapterListItem";
 import { ClubModeratorSheet } from "@/components/features/ClubModeratorSheet";
 import { ProgressVisualization } from "@/components/features/ProgressVisualization";
 import { MAX_PDF_BYTES, pickPdf, type PickedPdf } from "@/lib/pdf";
@@ -24,11 +25,6 @@ type Props = NativeStackScreenProps<CommunityStackParamList, "ClubDetail">;
 type TabKey = "book" | "members" | "activity";
 
 const DEEP_LINK_BASE = "flipbook://join";
-const TABS: Array<{ key: TabKey; label: string }> = [
-  { key: "book", label: "Book" },
-  { key: "members", label: "Members" },
-  { key: "activity", label: "Activity" },
-];
 
 export function ClubDetailScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
@@ -36,14 +32,29 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const club = useQuery(api.clubs.get, { clubId });
   const members = useQuery(api.memberships.listClubMembers, { clubId });
   const books = useQuery(api.books.listForClub, { clubId });
+  const chapters = useQuery(api.chapters.list, { clubId });
+  const isCreatorClub = club?.type === "creator";
   const activeBook = books && books.length > 0 ? books[0] : null;
+  const latestChapter = chapters && chapters.length > 0 ? chapters[0] : null;
   const progressRows = useQuery(
     api.progress.listForClub,
-    activeBook ? { clubId, bookId: activeBook._id } : "skip",
+    isCreatorClub
+      ? latestChapter
+        ? { clubId, chapterId: latestChapter._id }
+        : "skip"
+      : activeBook
+        ? { clubId, bookId: activeBook._id }
+        : "skip",
   );
   const activity = useQuery(
     api.reactions.listForBook,
-    activeBook ? { clubId, bookId: activeBook._id, limit: 20 } : "skip",
+    isCreatorClub
+      ? latestChapter
+        ? { clubId, chapterId: latestChapter._id, limit: 20 }
+        : "skip"
+      : activeBook
+        ? { clubId, bookId: activeBook._id, limit: 20 }
+        : "skip",
   );
   const me = useQuery(api.users.me);
 
@@ -53,8 +64,15 @@ export function ClubDetailScreen({ navigation, route }: Props) {
 
   const isModerator = !!me && !!club && club.moderatorId === me._id;
   const canUpload =
-    isModerator || (!!club && club.permissions.membersCanUploadBooks);
+    !isCreatorClub &&
+    (isModerator || (!!club && club.permissions.membersCanUploadBooks));
   const inviteUrl = club ? `${DEEP_LINK_BASE}/${club.inviteCode}` : null;
+
+  const tabs: Array<{ key: TabKey; label: string }> = [
+    { key: "book", label: isCreatorClub ? "Chapters" : "Book" },
+    { key: "members", label: "Members" },
+    { key: "activity", label: "Activity" },
+  ];
 
   const handleAddBook = async () => {
     const result = await pickPdf();
@@ -203,7 +221,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
               padding: 4,
             }}
           >
-            {TABS.map((t) => (
+            {tabs.map((t) => (
               <Pressable
                 key={t.key}
                 onPress={() => setTab(t.key)}
@@ -233,7 +251,50 @@ export function ClubDetailScreen({ navigation, route }: Props) {
 
         <View style={{ padding: spacing.s4 }}>
           {tab === "book" ? (
-            books && books.length > 0 ? (
+            isCreatorClub ? (
+              chapters && chapters.length > 0 ? (
+                <View style={{ gap: spacing.s3 }}>
+                  {chapters.map((c) => (
+                    <ChapterListItem
+                      key={c._id}
+                      chapterNumber={c.chapterNumber}
+                      title={c.title}
+                      publishedAt={c.publishedAt}
+                      pageCount={c.pdfPageCount}
+                      onPress={() => navigation.navigate("Reader", { chapterId: c._id })}
+                    />
+                  ))}
+                  {isModerator ? (
+                    <Button
+                      label="Publish next chapter"
+                      variant="secondary"
+                      fullWidth
+                      onPress={() => navigation.navigate("PublishChapter", { clubId })}
+                    />
+                  ) : null}
+                </View>
+              ) : (
+                <Card>
+                  <View style={{ gap: spacing.s3, alignItems: "center", paddingVertical: spacing.s3 }}>
+                    <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
+                      No chapters yet
+                    </Text>
+                    <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
+                      {isModerator
+                        ? "Drop your first chapter. Followers get a push."
+                        : "Waiting on the author to drop the first chapter."}
+                    </Text>
+                    {isModerator ? (
+                      <Button
+                        label="Publish chapter"
+                        onPress={() => navigation.navigate("PublishChapter", { clubId })}
+                        leadingIcon={<BookPlus size={18} color={palette.textOnBrand} />}
+                      />
+                    ) : null}
+                  </View>
+                </Card>
+              )
+            ) : books && books.length > 0 ? (
               <View style={{ gap: spacing.s4 }}>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.s4 }}>
                   {books.map((b) => (
@@ -284,14 +345,16 @@ export function ClubDetailScreen({ navigation, route }: Props) {
               </Card>
             )
           ) : tab === "activity" ? (
-            !activeBook ? (
+            !(isCreatorClub ? latestChapter : activeBook) ? (
               <Card>
                 <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
                   <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
                     Quiet for now
                   </Text>
                   <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
-                    Once a book is open, reactions show up here in real time.
+                    {isCreatorClub
+                      ? "Once the first chapter drops, reactions show up here."
+                      : "Once a book is open, reactions show up here in real time."}
                   </Text>
                 </View>
               </Card>
@@ -312,10 +375,14 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                   <Pressable
                     key={r._id}
                     onPress={() =>
-                      navigation.navigate("Reader", {
-                        bookId: activeBook._id,
-                        jumpToPage: r.page,
-                      })
+                      navigation.navigate(
+                        "Reader",
+                        isCreatorClub && latestChapter
+                          ? { chapterId: latestChapter._id, jumpToPage: r.page }
+                          : activeBook
+                            ? { bookId: activeBook._id, jumpToPage: r.page }
+                            : { jumpToPage: r.page },
+                      )
                     }
                     accessibilityRole="button"
                     accessibilityLabel={`Open page ${r.page}`}

@@ -136,6 +136,23 @@ export const create = mutation({
   },
 });
 
+// FR-028: client calls this on app boot once it has a fresh Expo push token.
+// Stored on the user record so notification fanouts can look it up.
+export const updatePushToken = mutation({
+  args: { pushToken: v.union(v.string(), v.null()) },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
+    const next = args.pushToken ?? undefined;
+    if (user.pushToken === next) return null;
+    await ctx.db.patch(user._id, {
+      pushToken: next,
+      lastActiveAt: Date.now(),
+    });
+    return null;
+  },
+});
+
 export const update = mutation({
   args: {
     displayName: v.optional(v.string()),

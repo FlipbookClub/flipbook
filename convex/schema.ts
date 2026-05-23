@@ -77,10 +77,26 @@ export default defineSchema({
     .index("by_club", ["clubId"])
     .index("by_uploader", ["uploadedByUserId"]),
 
+  chapters: defineTable({
+    clubId: v.id("clubs"),
+    title: v.string(),
+    chapterNumber: v.number(),
+    pdfStorageId: v.id("_storage"),
+    pdfPageCount: v.number(),
+    publishedAt: v.number(),
+    publishedByUserId: v.id("users"),
+    authorNote: v.optional(v.string()),
+    fileSize: v.number(),
+  })
+    .index("by_club", ["clubId"])
+    .index("by_club_and_number", ["clubId", "chapterNumber"]),
+
   progress: defineTable({
     userId: v.id("users"),
     clubId: v.id("clubs"),
     bookId: v.optional(v.id("books")),
+    // Now available since the chapters table is defined above (Phase 5).
+    chapterId: v.optional(v.id("chapters")),
     currentPage: v.number(),
     totalPages: v.number(),
     // FR-018: reactions on pages beyond this are filtered out (no spoilers).
@@ -91,13 +107,14 @@ export default defineSchema({
   })
     .index("by_user_and_club", ["userId", "clubId"])
     .index("by_book", ["bookId"])
+    .index("by_chapter", ["chapterId"])
     .index("by_club", ["clubId"]),
 
   reactions: defineTable({
     clubId: v.id("clubs"),
-    // Either bookId or chapterId is set (chapterId arrives in Phase 5 when
-    // the chapters table lands). For Phase 4, every reaction has a bookId.
+    // Exactly one of bookId / chapterId is set per reaction.
     bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
     page: v.number(),
     // 0-indexed within page; nullable when paragraph detection isn't
     // available (we anchor page-level in that case — see FR-016 edge case).
@@ -113,8 +130,30 @@ export default defineSchema({
   })
     .index("by_club", ["clubId"])
     .index("by_book_and_page", ["bookId", "page"])
+    .index("by_chapter_and_page", ["chapterId", "page"])
     .index("by_user", ["userId"])
     .index("by_parent", ["parentReactionId"])
     // Rate-limit lookup (FR: max 10 reactions/min per user).
     .index("by_user_and_created", ["userId", "createdAt"]),
+
+  notifications: defineTable({
+    userId: v.id("users"),
+    type: v.union(
+      v.literal("chapter_drop"),
+      v.literal("reaction_reply"),
+      v.literal("club_invite"),
+      v.literal("milestone"),
+    ),
+    title: v.string(),
+    body: v.string(),
+    // Deep link the client opens on tap. E.g.
+    // "flipbook://clubs/<clubId>/chapters/<chapterId>".
+    deepLink: v.string(),
+    isRead: v.boolean(),
+    sentAt: v.number(),
+    // Generic foreign-key string (chapter, reaction, etc).
+    relatedId: v.optional(v.string()),
+  })
+    .index("by_user_and_sent", ["userId", "sentAt"])
+    .index("by_user_unread", ["userId", "isRead"]),
 });

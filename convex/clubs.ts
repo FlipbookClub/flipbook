@@ -230,8 +230,8 @@ export const remove = mutation({
       throw new ConvexError({ code: "not_moderator" });
     }
 
-    // Cascade memberships, books (+ PDF storage), reactions, and progress.
-    // Chapters cascade lands when the table exists (Phase 5).
+    // Cascade memberships, books, chapters (+ PDF storage for both),
+    // reactions, progress, and club-related notifications.
     const memberships = await ctx.db
       .query("memberships")
       .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
@@ -245,6 +245,15 @@ export const remove = mutation({
     for (const b of books) {
       await ctx.storage.delete(b.pdfStorageId);
       await ctx.db.delete(b._id);
+    }
+
+    const chapters = await ctx.db
+      .query("chapters")
+      .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
+      .collect();
+    for (const c of chapters) {
+      await ctx.storage.delete(c.pdfStorageId);
+      await ctx.db.delete(c._id);
     }
 
     const reactions = await ctx.db

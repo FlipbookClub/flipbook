@@ -29,68 +29,92 @@ import {
   useThrottledCallback,
   writeCachedProgress,
 } from "@/lib/progress";
-import { readBookMeta, writeBookMeta, type CachedBookMeta } from "@/lib/bookMeta";
+import {
+  readContentMeta,
+  writeContentMeta,
+  type CachedContentMeta,
+  type ContentKind,
+} from "@/lib/bookMeta";
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
 
-// Source-of-truth view the reader actually renders from. Either fresh server
-// data (online) or a hydrated local meta cache (offline). Both expose the
-// minimum the reader needs without coupling render code to the Convex shape.
-interface EffectiveBook {
+// Source-of-truth view the reader renders from. Server data online, hydrated
+// from local meta cache offline. Both books and chapters land here.
+interface EffectiveContent {
   source: "server" | "local";
+  kind: ContentKind;
+  contentId: Id<"books"> | Id<"chapters">;
   storageId: Id<"_storage">;
   clubId: Id<"clubs">;
   title: string;
-  author: string;
   pageCount: number;
   isRemoved: boolean;
   clubName: string | null;
-  // null when we only have local meta (offline) — the reader has to fall
-  // back to a previously-cached disk file or surface "not downloaded yet".
+  // null when we only have local meta (offline) — the reader falls back to
+  // a previously-cached disk file or surfaces "not downloaded yet".
   pdfUrl: string | null;
 }
 
-// Reader is registered in both CommunityStack and LibraryStack, so type the
-// props minimally (just what we use) rather than tying to one stack's params.
-// `jumpToPage` lets the Activity tab open the reader at a specific page (TASK-051).
+// Reader is registered in both CommunityStack and LibraryStack. Accept either
+// a bookId or chapterId (exactly one); jumpToPage deep-links from Activity.
+type ReaderRouteParams = {
+  bookId?: Id<"books">;
+  chapterId?: Id<"chapters">;
+  jumpToPage?: number;
+};
+
 interface Props {
   navigation: {
     goBack: () => void;
     getParent: () => { setOptions: (opts: Record<string, unknown>) => void } | undefined;
   };
-  route: RouteProp<
-    { Reader: { bookId: Id<"books">; jumpToPage?: number } },
-    "Reader"
-  >;
+  route: RouteProp<{ Reader: ReaderRouteParams }, "Reader">;
 }
 
 export function ReaderScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
-  const { bookId, jumpToPage } = route.params;
-  const data = useQuery(api.books.get, { bookId });
+  const { bookId, chapterId, jumpToPage } = route.params;
+
+  const kind: ContentKind | null = bookId ? "book" : chapterId ? "chapter" : null;
+  const contentId = (bookId ?? chapterId) as Id<"books"> | Id<"chapters"> | undefined;
+
+  const bookData = useQuery(api.books.get, bookId ? { bookId } : "skip");
+  const chapterData = useQuery(
+    api.chapters.get,
+    chapterId ? { chapterId } : "skip",
+  );
 
   // Read local meta synchronously on mount so the reader can render offline
   // before any Convex query resolves.
-  const localMeta = useMemo<CachedBookMeta | null>(() => readBookMeta(bookId), [bookId]);
-
-  const club = useQuery(
-    api.clubs.get,
-    data?.book ? { clubId: data.book.clubId } : "skip",
+  const localMeta = useMemo<CachedContentMeta | null>(
+    () => (contentId ? readContentMeta(contentId) : null),
+    [contentId],
   );
 
-  // Effective view: server when online, local fallback when not. `undefined`
-  // means "still loading and no fallback yet" → show spinner. `null` means
-  // explicitly not-found / no-access → show the dead-end state.
-  const effective = useMemo<EffectiveBook | null | undefined>(() => {
+  // Effective view: server when online, local fallback when not.
+  // `undefined` → still loading (spinner). `null` → not found / no access.
+  const data = kind === "book" ? bookData : chapterData;
+  const club = useQuery(
+    api.clubs.get,
+    bookData?.book
+      ? { clubId: bookData.book.clubId }
+      : chapterData?.chapter
+        ? { clubId: chapterData.chapter.clubId }
+        : "skip",
+  );
+
+  const effective = useMemo<EffectiveContent | null | undefined>(() => {
+    if (!kind || !contentId) return null;
     if (data === undefined) {
       if (!localMeta) return undefined;
       return {
         source: "local",
+        kind: localMeta.kind,
+        contentId,
         storageId: localMeta.storageId as Id<"_storage">,
         clubId: localMeta.clubId as Id<"clubs">,
         title: localMeta.title,
-        author: localMeta.author,
         pageCount: localMeta.pageCount,
         isRemoved: localMeta.isRemoved,
         clubName: localMeta.clubName,
@@ -98,51 +122,73 @@ export function ReaderScreen({ navigation, route }: Props) {
       };
     }
     if (data === null) return null;
-    return {
-      source: "server",
-      storageId: data.book.pdfStorageId,
-      clubId: data.book.clubId,
-      title: data.book.title,
-      author: data.book.author,
-      pageCount: data.book.pdfPageCount,
-      isRemoved: data.book.isRemoved,
-      clubName: club?.name ?? localMeta?.clubName ?? null,
-      pdfUrl: data.pdfUrl,
-    };
-  }, [data, club, localMeta]);
+    if (kind === "book" && bookData) {
+      return {
+        source: "server",
+        kind: "book",
+        contentId: bookData.book._id,
+        storageId: bookData.book.pdfStorageId,
+        clubId: bookData.book.clubId,
+        title: bookData.book.title,
+        pageCount: bookData.book.pdfPageCount,
+        isRemoved: bookData.book.isRemoved,
+        clubName: club?.name ?? localMeta?.clubName ?? null,
+        pdfUrl: bookData.pdfUrl,
+      };
+    }
+    if (kind === "chapter" && chapterData) {
+      return {
+        source: "server",
+        kind: "chapter",
+        contentId: chapterData.chapter._id,
+        storageId: chapterData.chapter.pdfStorageId,
+        clubId: chapterData.chapter.clubId,
+        title: `Ch. ${chapterData.chapter.chapterNumber} — ${chapterData.chapter.title}`,
+        pageCount: chapterData.chapter.pdfPageCount,
+        isRemoved: false,
+        clubName: club?.name ?? localMeta?.clubName ?? null,
+        pdfUrl: chapterData.pdfUrl,
+      };
+    }
+    return undefined;
+  }, [kind, contentId, data, bookData, chapterData, club, localMeta]);
 
   const serverProgress = useQuery(
     api.progress.getMine,
-    effective?.source === "server" ? { clubId: effective.clubId, bookId } : "skip",
+    effective?.source === "server"
+      ? effective.kind === "book"
+        ? { clubId: effective.clubId, bookId: effective.contentId as Id<"books"> }
+        : { clubId: effective.clubId, chapterId: effective.contentId as Id<"chapters"> }
+      : "skip",
   );
   const updateProgress = useMutation(api.progress.update);
 
-  // Persist book metadata after every successful server fetch so future
+  // Persist content metadata after every successful server fetch so future
   // offline opens have what they need to hydrate without hitting Convex.
   useEffect(() => {
-    if (!data?.book) return;
-    writeBookMeta({
-      bookId,
-      storageId: data.book.pdfStorageId,
-      clubId: data.book.clubId,
-      clubName: club?.name ?? localMeta?.clubName ?? "",
-      title: data.book.title,
-      author: data.book.author,
-      pageCount: data.book.pdfPageCount,
-      isRemoved: data.book.isRemoved,
+    if (!effective || effective.source !== "server" || !contentId) return;
+    writeContentMeta({
+      kind: effective.kind,
+      contentId,
+      storageId: effective.storageId,
+      clubId: effective.clubId,
+      clubName: effective.clubName ?? "",
+      title: effective.title,
+      pageCount: effective.pageCount,
+      isRemoved: effective.isRemoved,
       updatedAt: Date.now(),
     });
-  }, [data, club, localMeta, bookId]);
+  }, [effective, contentId]);
 
   // Compute the initial page. When the source is server, wait for the
   // serverProgress query so we can take the more recent of {cache, server}.
   // When the source is local (offline), the cache is all we have.
   // A `jumpToPage` route param overrides both — used when deep-linking from
-  // the Activity tab to land on a specific reaction's page.
+  // the Activity tab or a chapter-drop notification.
   const initialPage = useMemo(() => {
     if (jumpToPage && jumpToPage >= 1) return jumpToPage;
-    if (!effective) return null;
-    const cached = readCachedProgress(bookId);
+    if (!effective || !contentId) return null;
+    const cached = readCachedProgress(contentId);
     if (effective.source === "local") {
       return Math.max(1, cached?.page ?? 1);
     }
@@ -154,14 +200,13 @@ export function ReaderScreen({ navigation, route }: Props) {
         ? cached?.page
         : (serverProgress?.currentPage ?? cached?.page);
     return Math.max(1, winner ?? 1);
-  }, [effective, bookId, serverProgress, jumpToPage]);
+  }, [effective, contentId, serverProgress, jumpToPage]);
 
   const me = useQuery(api.users.me);
   const createReaction = useMutation(api.reactions.create);
 
   // Hide the bottom tab bar while reading so the Pdf gets the full screen
   // (and so the floating React FAB isn't obscured by the tab strip).
-  // Restored on blur / unmount.
   useFocusEffect(
     useCallback(() => {
       const parent = navigation.getParent();
@@ -181,44 +226,46 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
 
-  // FR-016 hot path. Skip until we know the effective source so we don't
-  // fire the query with a missing clubId/bookId during the offline-hydrate
-  // window.
+  // Build the scope payload once — used in three places (reactions query,
+  // reaction submit, reaction details sheet).
+  const scopePayload = effective
+    ? effective.kind === "book"
+      ? { bookId: effective.contentId as Id<"books"> }
+      : { chapterId: effective.contentId as Id<"chapters"> }
+    : null;
+
+  // FR-016 hot path. Skip until we know the effective source.
   const pageReactions = useQuery(
     api.reactions.listForPage,
-    effective && !effective.isRemoved
-      ? { clubId: effective.clubId, bookId, page: currentPage }
+    effective && !effective.isRemoved && scopePayload
+      ? { clubId: effective.clubId, ...scopePayload, page: currentPage }
       : "skip",
   );
 
   const handleReactionSubmit = async (payload: ReactionSubmission) => {
-    if (!effective) return;
+    if (!effective || !scopePayload) return;
     try {
       await createReaction({
         clubId: effective.clubId,
-        bookId,
+        ...scopePayload,
         page: currentPage,
         type: payload.type,
         emoji: payload.emoji,
         text: payload.text,
       });
       // Vision § Motion: subtle light impact when YOUR reaction lands.
-      // Best-effort; haptics aren't available on every simulator/device.
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
     } catch (err) {
       const code = (err as { data?: { code?: string } })?.data?.code;
       if (code === "rate_limited") {
-        // FR edge case: rate-limited
         setLoadError(null);
-        // Surface to user via a transient toast in a follow-up — for now
-        // swallowing keeps the composer feeling responsive.
+        // Surface via a transient toast in a follow-up.
       }
     }
   };
 
-  // FR-014: 400ms long-press opens the picker. Using gesture-handler so we
-  // coexist with react-native-pdf's internal swipe handlers — quick swipes
-  // still page; only a held touch triggers the composer.
+  // FR-014: 400ms long-press opens the picker (the floating Smile FAB is the
+  // reliable entry on iOS where PDFKit consumes touches before JS can see).
   const longPress = Gesture.LongPress()
     .minDuration(400)
     .onStart(() => {
@@ -228,10 +275,10 @@ export function ReaderScreen({ navigation, route }: Props) {
 
   const syncToServer = useThrottledCallback(
     (page: number, total: number) => {
-      if (!effective) return;
+      if (!effective || !scopePayload) return;
       updateProgress({
         clubId: effective.clubId,
-        bookId,
+        ...scopePayload,
         currentPage: page,
         totalPages: total,
       }).catch(() => {
@@ -243,22 +290,16 @@ export function ReaderScreen({ navigation, route }: Props) {
   );
 
   const handlePageChanged = (page: number, total: number) => {
-    // react-native-pdf occasionally fires onPageChanged with transient bogus
-    // values during paging animations (e.g. page=0 or total=0). Drop those
-    // before writing cache or syncing — server validation rejects them too.
     if (!Number.isFinite(page) || !Number.isFinite(total)) return;
     if (page < 1 || total < 1 || page > total) return;
+    if (!contentId) return;
     setCurrentPage(page);
     setTotalPages(total);
-    writeCachedProgress({ bookId, page, totalPages: total, updatedAt: Date.now() });
+    writeCachedProgress({ bookId: contentId, page, totalPages: total, updatedAt: Date.now() });
     syncToServer(page, total);
   };
 
-  // Resolve PDF source.
-  // - Server source + signed URL → ensure cached on disk, render from there.
-  // - Local source (offline) → must rely on a previously-cached disk file;
-  //   surface a friendly "not downloaded yet" error if there isn't one.
-  // - DMCA takedown is handled in the render path, not here.
+  // Resolve PDF source — cached file when available, fresh signed URL on miss.
   useEffect(() => {
     if (!effective || effective.isRemoved) return;
     const { storageId, pdfUrl } = effective;
@@ -268,7 +309,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         setResolvedUri(cached);
       } else {
         setLoadError(
-          "You're offline and this book hasn't been downloaded yet. Connect to the internet to load it.",
+          "You're offline and this hasn't been downloaded yet. Connect to the internet to load it.",
         );
       }
       return;
@@ -288,21 +329,35 @@ export function ReaderScreen({ navigation, route }: Props) {
 
   const { width, height } = Dimensions.get("window");
 
+  if (!kind) {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
+        <Header
+          title="Nothing to read"
+          subtitle={null}
+          onClose={() => navigation.goBack()}
+          onSettings={() => undefined}
+          settingsDisabled
+        />
+      </SafeAreaView>
+    );
+  }
   if (effective === undefined) {
     return <LoadingState bg={colors.surfacePrimary} fg={colors.textPrimary} />;
   }
   if (effective === null) {
+    const noun = kind === "chapter" ? "Chapter" : "Book";
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
         <Header
-          title="Book not found"
+          title={`${noun} not found`}
           subtitle={null}
           onClose={() => navigation.goBack()}
           onSettings={() => setCustomizeOpen(true)}
         />
         <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center" }}>
           <Text style={{ ...typography.bodyLg, color: colors.textPrimary, textAlign: "center" }}>
-            This book may have been removed or you don't have access.
+            This may have been removed or you don't have access.
           </Text>
         </View>
       </SafeAreaView>
@@ -321,7 +376,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         />
         <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center", gap: spacing.s3 }}>
           <Text style={{ ...typography.headingMd, color: colors.textPrimary, textAlign: "center" }}>
-            This book was removed
+            This was removed
           </Text>
           <Text style={{ ...typography.bodyMd, color: colors.textSecondary, textAlign: "center" }}>
             Reach out to the moderator for context.
@@ -359,15 +414,13 @@ export function ReaderScreen({ navigation, route }: Props) {
                 onLoadComplete={(numberOfPages) => {
                   if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
                   setTotalPages(numberOfPages);
-                  // Sync immediately on first load so the server learns about the
-                  // resumed page even if the user closes before scrolling.
                   const startPage = Math.min(Math.max(1, initialPage), numberOfPages);
                   setCurrentPage(startPage);
                   syncToServer(startPage, numberOfPages);
                 }}
                 onPageChanged={(page, total) => handlePageChanged(page, total)}
                 onError={(err) => {
-                  setLoadError(typeof err === "string" ? err : "Couldn't open this book.");
+                  setLoadError(typeof err === "string" ? err : "Couldn't open this.");
                 }}
                 renderActivityIndicator={() => <ActivityIndicator color={colors.textPrimary} />}
                 style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
@@ -377,6 +430,7 @@ export function ReaderScreen({ navigation, route }: Props) {
                 <MarginReactionsList
                   reactions={pageReactions}
                   onSelectReaction={setSelectedReactionId}
+                  authorUserId={club?.type === "creator" ? club.moderatorId : null}
                 />
               ) : null}
             </View>
@@ -396,9 +450,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         </Text>
       </View>
       {/* Floating React button — sibling of the Pdf area, not a child, so
-          it's guaranteed to overlay the native PDFKit view. Long-press on
-          the Pdf doesn't fire reliably because PDFKit consumes touches at
-          the native layer; the FAB is the discoverable fallback. */}
+          it's guaranteed to overlay the native PDFKit view. */}
       {resolvedUri && !loadError && initialPage !== null ? (
         <Pressable
           onPress={() => setComposerOpen(true)}
@@ -435,14 +487,15 @@ export function ReaderScreen({ navigation, route }: Props) {
         onClose={() => setComposerOpen(false)}
         onSubmit={handleReactionSubmit}
       />
-      {effective && !effective.isRemoved ? (
+      {effective && !effective.isRemoved && scopePayload ? (
         <ReactionDetailsSheet
           visible={selectedReactionId !== null}
           reactionId={selectedReactionId}
           clubId={effective.clubId}
-          bookId={bookId}
+          scope={scopePayload}
           page={currentPage}
           currentUserId={me?._id ?? null}
+          authorUserId={club?.type === "creator" ? club.moderatorId : null}
           onClose={() => setSelectedReactionId(null)}
         />
       ) : null}

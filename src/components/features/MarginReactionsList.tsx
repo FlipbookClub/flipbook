@@ -22,6 +22,9 @@ export interface MarginReaction {
 interface Props {
   reactions: MarginReaction[];
   onSelectReaction: (reactionId: Id<"reactions">) => void;
+  // FR-022: when this reaction's user matches, the bubble gets the Golden
+  // Sand author treatment. Only set for creator-type clubs.
+  authorUserId?: Id<"users"> | null;
 }
 
 // One bubble ≈ 36px + small avatar overlap + spacing.s3 (12px) gap. 56px
@@ -35,7 +38,7 @@ const EXPANDED_MAX_HEIGHT = ROW_HEIGHT * MAX_VISIBLE_EXPANDED;
 // for the rest, keeping the reading surface uncluttered. Tap the badge to
 // expand and see all reactions; tap anywhere outside the strip to collapse
 // back. Founder UX call 2026-05-23 — five bubbles in the margin felt noisy.
-export function MarginReactionsList({ reactions, onSelectReaction }: Props) {
+export function MarginReactionsList({ reactions, onSelectReaction, authorUserId }: Props) {
   const { colors } = useTheme();
   const [expanded, setExpanded] = useState(false);
 
@@ -89,6 +92,7 @@ export function MarginReactionsList({ reactions, onSelectReaction }: Props) {
                 key={r._id}
                 emoji={r.emoji}
                 isComment={r.type === "comment"}
+                isAuthor={!!authorUserId && r.user._id === authorUserId}
                 user={{ displayName: r.user.displayName, avatarUrl: r.user.avatarUrl }}
                 onPress={() => {
                   setExpanded(false);
@@ -103,6 +107,7 @@ export function MarginReactionsList({ reactions, onSelectReaction }: Props) {
               key={headline._id}
               emoji={headline.emoji}
               isComment={headline.type === "comment"}
+              isAuthor={!!authorUserId && headline.user._id === authorUserId}
               user={{
                 displayName: headline.user.displayName,
                 avatarUrl: headline.user.avatarUrl,

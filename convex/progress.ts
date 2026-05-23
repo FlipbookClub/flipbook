@@ -10,6 +10,7 @@ const progressValidator = v.object({
   userId: v.id("users"),
   clubId: v.id("clubs"),
   bookId: v.optional(v.id("books")),
+  chapterId: v.optional(v.id("chapters")),
   currentPage: v.number(),
   totalPages: v.number(),
   furthestPageReached: v.number(),
@@ -31,7 +32,9 @@ const progressWithUserValidator = v.object({
 export const update = mutation({
   args: {
     clubId: v.id("clubs"),
-    bookId: v.id("books"),
+    // Exactly one of bookId / chapterId.
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
     currentPage: v.number(),
     totalPages: v.number(),
   },
@@ -39,6 +42,9 @@ export const update = mutation({
   handler: async (ctx, args) => {
     const me = await getCurrentUser(ctx);
 
+    if ((args.bookId && args.chapterId) || (!args.bookId && !args.chapterId)) {
+      throw new ConvexError({ code: "exactly_one_scope_required" });
+    }
     if (args.currentPage < 1 || args.totalPages < 1 || args.currentPage > args.totalPages) {
       throw new ConvexError({ code: "invalid_page" });
     }
@@ -54,7 +60,11 @@ export const update = mutation({
     const existing = await ctx.db
       .query("progress")
       .withIndex("by_user_and_club", (q) => q.eq("userId", me._id).eq("clubId", args.clubId))
-      .filter((q) => q.eq(q.field("bookId"), args.bookId))
+      .filter((q) =>
+        args.bookId
+          ? q.eq(q.field("bookId"), args.bookId)
+          : q.eq(q.field("chapterId"), args.chapterId),
+      )
       .unique();
 
     const now = Date.now();
@@ -86,6 +96,7 @@ export const update = mutation({
         userId: me._id,
         clubId: args.clubId,
         bookId: args.bookId,
+        chapterId: args.chapterId,
         currentPage: nextCurrent,
         totalPages: args.totalPages,
         furthestPageReached: nextFurthest,
@@ -101,7 +112,11 @@ export const update = mutation({
 });
 
 export const getMine = query({
-  args: { clubId: v.id("clubs"), bookId: v.optional(v.id("books")) },
+  args: {
+    clubId: v.id("clubs"),
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
+  },
   returns: v.union(v.null(), progressValidator),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -121,13 +136,20 @@ export const getMine = query({
     if (args.bookId) {
       return rows.find((r) => r.bookId === args.bookId) ?? null;
     }
-    // No bookId filter — return the most recent.
+    if (args.chapterId) {
+      return rows.find((r) => r.chapterId === args.chapterId) ?? null;
+    }
+    // No scope filter — return the most recent.
     return rows.sort((a, b) => b.updatedAt - a.updatedAt)[0];
   },
 });
 
 export const listForClub = query({
-  args: { clubId: v.id("clubs"), bookId: v.optional(v.id("books")) },
+  args: {
+    clubId: v.id("clubs"),
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
+  },
   returns: v.array(progressWithUserValidator),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -148,6 +170,12 @@ export const listForClub = query({
       rows = await ctx.db
         .query("progress")
         .withIndex("by_book", (q) => q.eq("bookId", args.bookId))
+        .collect();
+      rows = rows.filter((r) => r.clubId === args.clubId);
+    } else if (args.chapterId) {
+      rows = await ctx.db
+        .query("progress")
+        .withIndex("by_chapter", (q) => q.eq("chapterId", args.chapterId))
         .collect();
       rows = rows.filter((r) => r.clubId === args.clubId);
     } else {

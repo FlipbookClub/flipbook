@@ -38,6 +38,7 @@ export function CreateCommunityScreen({ navigation }: Props) {
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isPrivate, setIsPrivate] = useState(true);
+  const [clubType, setClubType] = useState<"standard" | "creator">("standard");
   const [emblemUri, setEmblemUri] = useState<string | null>(null);
   const [perms, setPerms] = useState({
     membersCanUploadBooks: false,
@@ -72,7 +73,7 @@ export function CreateCommunityScreen({ navigation }: Props) {
       const { clubId, inviteCode } = await createClub({
         name: trimmedName,
         description: description.trim() || undefined,
-        type: "standard",
+        type: clubType,
         visibility: isPrivate ? "private" : "public",
         // Emblem URI is a local file path — real upload pipeline lands in
         // TASK-034 (books storage). For now we just don't persist it; the
@@ -184,6 +185,49 @@ export function CreateCommunityScreen({ navigation }: Props) {
               multiline
               numberOfLines={3}
             />
+          </View>
+
+          <View style={{ gap: spacing.s2 }}>
+            <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
+              Community type
+            </Text>
+            <View style={{ flexDirection: "row", gap: spacing.s2 }}>
+              {(["standard", "creator"] as const).map((type) => {
+                const selected = clubType === type;
+                return (
+                  <Pressable
+                    key={type}
+                    onPress={() => setClubType(type)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    style={{
+                      flex: 1,
+                      borderWidth: 1,
+                      borderColor: selected ? palette.brandPrimary : colors.border,
+                      borderRadius: radius.md,
+                      padding: spacing.s3,
+                      gap: 2,
+                      backgroundColor: selected ? colors.surfaceSecondary : "transparent",
+                    }}
+                  >
+                    <Text
+                      style={{
+                        ...typography.bodyMd,
+                        color: colors.textPrimary,
+                        fontFamily: "Raleway-SemiBold",
+                      }}
+                    >
+                      {type === "standard" ? "Standard" : "Creator"}
+                    </Text>
+                    <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+                      {type === "standard"
+                        ? "Read a book together"
+                        : "Publish chapters to subscribers"}
+                    </Text>
+                  </Pressable>
+                );
+              })}
+            </View>
           </View>
 
           <View

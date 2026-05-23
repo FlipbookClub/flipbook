@@ -9,7 +9,11 @@ import type { Id } from "../../convex/_generated/dataModel";
 // library keeps "back" inside the Library tab instead of bouncing across tabs.
 export type LibraryStackParamList = {
   LibraryHome: undefined;
-  Reader: { bookId: Id<"books">; jumpToPage?: number };
+  Reader: {
+    bookId?: Id<"books">;
+    chapterId?: Id<"chapters">;
+    jumpToPage?: number;
+  };
 };
 
 const Stack = createNativeStackNavigator<LibraryStackParamList>();
