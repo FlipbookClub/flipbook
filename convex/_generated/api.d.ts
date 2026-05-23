@@ -13,6 +13,7 @@ import type * as clubs from "../clubs.js";
 import type * as lib_inviteCode from "../lib/inviteCode.js";
 import type * as memberships from "../memberships.js";
 import type * as progress from "../progress.js";
+import type * as reactions from "../reactions.js";
 import type * as users from "../users.js";
 
 import type {
@@ -27,6 +28,7 @@ declare const fullApi: ApiFromModules<{
   "lib/inviteCode": typeof lib_inviteCode;
   memberships: typeof memberships;
   progress: typeof progress;
+  reactions: typeof reactions;
   users: typeof users;
 }>;
 

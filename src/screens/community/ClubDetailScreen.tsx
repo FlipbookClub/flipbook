@@ -41,6 +41,10 @@ export function ClubDetailScreen({ navigation, route }: Props) {
     api.progress.listForClub,
     activeBook ? { clubId, bookId: activeBook._id } : "skip",
   );
+  const activity = useQuery(
+    api.reactions.listForBook,
+    activeBook ? { clubId, bookId: activeBook._id, limit: 20 } : "skip",
+  );
   const me = useQuery(api.users.me);
 
   const [tab, setTab] = useState<TabKey>("book");
@@ -280,16 +284,77 @@ export function ClubDetailScreen({ navigation, route }: Props) {
               </Card>
             )
           ) : tab === "activity" ? (
-            <Card>
-              <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
-                <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
-                  Quiet for now
-                </Text>
-                <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
-                  Reactions + activity feed land in Phase 4.
-                </Text>
+            !activeBook ? (
+              <Card>
+                <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
+                  <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
+                    Quiet for now
+                  </Text>
+                  <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
+                    Once a book is open, reactions show up here in real time.
+                  </Text>
+                </View>
+              </Card>
+            ) : activity && activity.length === 0 ? (
+              <Card>
+                <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
+                  <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
+                    No reactions yet
+                  </Text>
+                  <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
+                    Long-press a page in the reader to drop the first one.
+                  </Text>
+                </View>
+              </Card>
+            ) : (
+              <View style={{ gap: spacing.s2 }}>
+                {activity?.map((r) => (
+                  <Pressable
+                    key={r._id}
+                    onPress={() =>
+                      navigation.navigate("Reader", {
+                        bookId: activeBook._id,
+                        jumpToPage: r.page,
+                      })
+                    }
+                    accessibilityRole="button"
+                    accessibilityLabel={`Open page ${r.page}`}
+                    style={({ pressed }) => ({
+                      flexDirection: "row",
+                      alignItems: "flex-start",
+                      gap: spacing.s3,
+                      paddingVertical: spacing.s2,
+                      paddingHorizontal: spacing.s2,
+                      borderRadius: radius.md,
+                      backgroundColor: pressed ? colors.surfaceSecondary : "transparent",
+                    })}
+                  >
+                    <Avatar
+                      name={r.user.displayName}
+                      imageUri={r.user.avatarUrl}
+                      size="md"
+                    />
+                    <View style={{ flex: 1, gap: 2 }}>
+                      <Text
+                        style={{
+                          ...typography.bodyMd,
+                          color: colors.textPrimary,
+                          fontFamily: "Raleway-SemiBold",
+                        }}
+                      >
+                        {r.user.displayName}{" "}
+                        <Text style={{ fontFamily: "Inter-Regular", color: colors.textSecondary }}>
+                          reacted on page {r.page}
+                        </Text>
+                      </Text>
+                      <Text style={{ ...typography.bodyMd, color: colors.textPrimary }} numberOfLines={2}>
+                        {r.type === "emoji" ? r.emoji : r.text}
+                      </Text>
+                    </View>
+                  </Pressable>
+                ))}
               </View>
-            </Card>
+            )
           ) : (
             <View style={{ gap: spacing.s2 }}>
               {members?.map((m) => (

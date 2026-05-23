@@ -92,4 +92,29 @@ export default defineSchema({
     .index("by_user_and_club", ["userId", "clubId"])
     .index("by_book", ["bookId"])
     .index("by_club", ["clubId"]),
+
+  reactions: defineTable({
+    clubId: v.id("clubs"),
+    // Either bookId or chapterId is set (chapterId arrives in Phase 5 when
+    // the chapters table lands). For Phase 4, every reaction has a bookId.
+    bookId: v.optional(v.id("books")),
+    page: v.number(),
+    // 0-indexed within page; nullable when paragraph detection isn't
+    // available (we anchor page-level in that case — see FR-016 edge case).
+    paragraphIndex: v.optional(v.number()),
+    userId: v.id("users"),
+    type: v.union(v.literal("emoji"), v.literal("comment")),
+    emoji: v.optional(v.string()),
+    text: v.optional(v.string()),
+    // For replies (FR-017). Flat — replies to replies are disallowed in the
+    // create mutation.
+    parentReactionId: v.optional(v.id("reactions")),
+    createdAt: v.number(),
+  })
+    .index("by_club", ["clubId"])
+    .index("by_book_and_page", ["bookId", "page"])
+    .index("by_user", ["userId"])
+    .index("by_parent", ["parentReactionId"])
+    // Rate-limit lookup (FR: max 10 reactions/min per user).
+    .index("by_user_and_created", ["userId", "createdAt"]),
 });

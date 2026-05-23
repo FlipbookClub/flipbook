@@ -20,7 +20,7 @@ export type CommunityStackParamList = {
   JoinCommunity: undefined;
   ClubDetail: { clubId: Id<"clubs"> };
   InviteAccept: { inviteCode: string };
-  Reader: { bookId: Id<"books"> };
+  Reader: { bookId: Id<"books">; jumpToPage?: number };
 };
 
 const Stack = createNativeStackNavigator<CommunityStackParamList>();
