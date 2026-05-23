@@ -136,6 +136,27 @@ export const create = mutation({
   },
 });
 
+// FR-025: client calls this after RevenueCat reports an entitlement change
+// (initial boot, post-purchase, post-restore). Persisting on the user record
+// lets server-side gates (e.g. memberships.joinByCode FR-027 limit) check
+// without round-tripping RevenueCat.
+export const syncProStatus = mutation({
+  args: {
+    status: v.union(v.literal("free"), v.literal("active"), v.literal("expired")),
+    expiresAt: v.optional(v.number()),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
+    await ctx.db.patch(user._id, {
+      proSubscriptionStatus: args.status,
+      proExpiresAt: args.expiresAt,
+      lastActiveAt: Date.now(),
+    });
+    return null;
+  },
+});
+
 // FR-028: client calls this on app boot once it has a fresh Expo push token.
 // Stored on the user record so notification fanouts can look it up.
 export const updatePushToken = mutation({

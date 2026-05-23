@@ -56,17 +56,16 @@ export function JoinCommunityScreen({ navigation }: Props) {
       const clubId = await joinByCode({ inviteCode: normalizedCode });
       navigation.replace("ClubDetail", { clubId });
     } catch (err) {
+      const code = (err as { data?: { code?: string } })?.data?.code;
       const message =
-        (err as { data?: { code?: string } })?.data?.code ??
-        (err as { message?: string })?.message ??
-        "Couldn't join with that code.";
-      setFormError(
-        message === "club_not_found"
+        code === "club_not_found"
           ? "No community matches that code."
-          : message === "invalid_code"
+          : code === "invalid_code"
             ? "Enter a 6-character code."
-            : message,
-      );
+            : code === "pro_required"
+              ? "You're at the 3-club limit on the free tier. Flipbook Pro will lift the cap — coming soon."
+              : code ?? (err as { message?: string })?.message ?? "Couldn't join with that code.";
+      setFormError(message);
       setSubmitting(false);
     }
   };

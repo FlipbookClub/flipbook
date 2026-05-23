@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Alert, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
 import { BookPlus, ChevronLeft, Settings, Share2 } from "lucide-react-native";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+
+import { BlurView } from "expo-blur";
 
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
@@ -27,7 +29,7 @@ type TabKey = "book" | "members" | "activity";
 const DEEP_LINK_BASE = "flipbook://join";
 
 export function ClubDetailScreen({ navigation, route }: Props) {
-  const { colors } = useTheme();
+  const { colors, mode } = useTheme();
   const { clubId } = route.params;
   const club = useQuery(api.clubs.get, { clubId });
   const members = useQuery(api.memberships.listClubMembers, { clubId });
@@ -63,10 +65,34 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
 
   const isModerator = !!me && !!club && club.moderatorId === me._id;
+  // FR-075: when previewing a public club from Discovery without having
+  // joined, the user can see the club but the Activity tab's reactions
+  // should be blurred until they join.
+  const isMember =
+    isModerator || (!!me && !!members && members.some((m) => m.userId === me._id));
   const canUpload =
     !isCreatorClub &&
     (isModerator || (!!club && club.permissions.membersCanUploadBooks));
   const inviteUrl = club ? `${DEEP_LINK_BASE}/${club.inviteCode}` : null;
+  const joinByCode = useMutation(api.memberships.joinByCode);
+  const [joining, setJoining] = useState(false);
+  const handleJoinFromPreview = async () => {
+    if (!club || joining) return;
+    setJoining(true);
+    try {
+      await joinByCode({ inviteCode: club.inviteCode });
+    } catch (err) {
+      const code = (err as { data?: { code?: string } })?.data?.code;
+      Alert.alert(
+        "Can't join",
+        code === "pro_required"
+          ? "You're at the 3-club limit on the free tier. Flipbook Pro will lift the cap — coming soon."
+          : code ?? "Try again in a moment.",
+      );
+    } finally {
+      setJoining(false);
+    }
+  };
 
   const tabs: Array<{ key: TabKey; label: string }> = [
     { key: "book", label: isCreatorClub ? "Chapters" : "Book" },
@@ -345,7 +371,90 @@ export function ClubDetailScreen({ navigation, route }: Props) {
               </Card>
             )
           ) : tab === "activity" ? (
-            !(isCreatorClub ? latestChapter : activeBook) ? (
+            !isMember ? (
+              // FR-075 / US-012: preview safety. Public clubs are visible to
+              // non-members from Discovery, but reactions stay locked behind
+              // a soft blur with a Join CTA — sells the join without leaking
+              // anyone's commentary.
+              <View style={{ gap: spacing.s3 }}>
+                <View style={{ position: "relative", borderRadius: radius.md, overflow: "hidden" }}>
+                  <View style={{ gap: spacing.s2 }}>
+                    {[0, 1, 2, 3].map((i) => (
+                      <View
+                        key={i}
+                        style={{
+                          flexDirection: "row",
+                          gap: spacing.s3,
+                          paddingVertical: spacing.s2,
+                          paddingHorizontal: spacing.s2,
+                        }}
+                      >
+                        <View
+                          style={{
+                            width: 36,
+                            height: 36,
+                            borderRadius: 18,
+                            backgroundColor: colors.surfaceSecondary,
+                          }}
+                        />
+                        <View style={{ flex: 1, gap: spacing.s1 }}>
+                          <View
+                            style={{
+                              height: 12,
+                              borderRadius: 6,
+                              width: "60%",
+                              backgroundColor: colors.surfaceSecondary,
+                            }}
+                          />
+                          <View
+                            style={{
+                              height: 10,
+                              borderRadius: 5,
+                              width: "85%",
+                              backgroundColor: colors.surfaceSecondary,
+                              opacity: 0.7,
+                            }}
+                          />
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                  <BlurView
+                    intensity={28}
+                    tint={mode === "dark" ? "dark" : "light"}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      bottom: 0,
+                    }}
+                  />
+                </View>
+                <Card>
+                  <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s2 }}>
+                    <Text
+                      style={{
+                        ...typography.bodyLg,
+                        color: colors.textPrimary,
+                        fontFamily: "Raleway-SemiBold",
+                        textAlign: "center",
+                      }}
+                    >
+                      Join to see what people are saying
+                    </Text>
+                    <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
+                      Reactions and replies unlock when you become a member.
+                    </Text>
+                    <Button
+                      label={joining ? "Joining…" : "Join community"}
+                      onPress={handleJoinFromPreview}
+                      disabled={joining}
+                    />
+                  </View>
+                </Card>
+              </View>
+            ) : !(isCreatorClub ? latestChapter : activeBook) ? (
               <Card>
                 <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
                   <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>

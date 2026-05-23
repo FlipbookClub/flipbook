@@ -82,10 +82,11 @@ export function CreateCommunityScreen({ navigation }: Props) {
       });
       navigation.replace("InviteMembers", { clubId, inviteCode });
     } catch (err) {
+      const code = (err as { data?: { code?: string } })?.data?.code;
       const message =
-        (err as { data?: { code?: string }; message?: string })?.data?.code ??
-        (err as { message?: string })?.message ??
-        "Couldn't create the community. Please try again.";
+        code === "pro_required"
+          ? "You're at the 3-club limit on the free tier. Flipbook Pro will lift the cap — coming soon."
+          : code ?? (err as { message?: string })?.message ?? "Couldn't create the community. Please try again.";
       setFormError(message);
       setSubmitting(false);
     }

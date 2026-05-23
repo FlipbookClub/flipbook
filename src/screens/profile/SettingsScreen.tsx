@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { ChevronLeft, ChevronRight, LogOut, Palette as PaletteIcon } from "lucide-react-native";
+import { Linking, Platform, Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { ChevronLeft, ChevronRight, CreditCard, LogOut, Palette as PaletteIcon } from "lucide-react-native";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -121,6 +121,24 @@ export function SettingsScreen({ navigation }: Props) {
             label="Theme"
             value={modeLabel(mode)}
             onPress={() => setMode(nextMode(mode))}
+          />
+        </Section>
+
+        <Section title="Subscription">
+          <Row
+            icon={<CreditCard size={18} color={colors.textPrimary} />}
+            label="Manage subscription"
+            onPress={() => {
+              // FR-026 / Edge-case: opens the OS-native subscription manager.
+              // Works for users who have an active Pro subscription (and is a
+              // no-op for users who never subscribed — they just see the
+              // empty subscriptions screen).
+              const url =
+                Platform.OS === "ios"
+                  ? "https://apps.apple.com/account/subscriptions"
+                  : "https://play.google.com/store/account/subscriptions";
+              Linking.openURL(url).catch(() => undefined);
+            }}
           />
         </Section>
 

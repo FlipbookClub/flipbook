@@ -207,6 +207,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
                   description: club.description,
                   memberCount: club.memberCount,
                   coverImageUrl: club.coverImageUrl,
+                  lastActivityAt: club.lastActivityAt,
                 }}
                 onPress={() => openClub(club._id)}
               />

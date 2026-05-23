@@ -84,6 +84,19 @@ export const create = mutation({
       throw new ConvexError({ code: "description_too_long" });
     }
 
+    // FR-027: creating a club implies a moderator membership — counts toward
+    // the free-tier 3-club cap. Same error code as memberships.joinByCode so
+    // the client can surface the same upgrade flow.
+    if (me.proSubscriptionStatus !== "active") {
+      const myMemberships = await ctx.db
+        .query("memberships")
+        .withIndex("by_user", (q) => q.eq("userId", me._id))
+        .collect();
+      if (myMemberships.length >= 3) {
+        throw new ConvexError({ code: "pro_required", limit: 3 });
+      }
+    }
+
     const inviteCode = await uniqueInviteCode(ctx);
     const now = Date.now();
 

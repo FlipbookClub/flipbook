@@ -37,10 +37,14 @@ export function InviteAcceptScreen({ navigation, route }: Props) {
       const clubId = await joinByCode({ inviteCode });
       navigation.replace("ClubDetail", { clubId });
     } catch (err) {
+      const code = (err as { data?: { code?: string } })?.data?.code;
+      // FR-027: free tier 3-club cap. Surface a brand-aligned upgrade nudge.
+      // The real Pro upgrade flow lands once RevenueCat is wired (Phase 6
+      // post-Apple-Developer enrollment).
       const message =
-        (err as { data?: { code?: string } })?.data?.code ??
-        (err as { message?: string })?.message ??
-        "Couldn't join. Please try again.";
+        code === "pro_required"
+          ? "You're at the 3-club limit on the free tier. Flipbook Pro will lift the cap — coming soon."
+          : code ?? (err as { message?: string })?.message ?? "Couldn't join. Please try again.";
       setFormError(message);
       setSubmitting(false);
     }

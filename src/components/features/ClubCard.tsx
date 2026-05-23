@@ -14,6 +14,21 @@ export interface ClubCardData {
   memberCount: number;
   coverImageUrl?: string | null;
   isMember?: boolean;
+  lastActivityAt?: number;
+}
+
+function formatActivity(ts: number): string {
+  const diff = Date.now() - ts;
+  const minutes = Math.floor(diff / 60_000);
+  if (minutes < 1) return "Active just now";
+  if (minutes < 60) return `Active ${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `Active ${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `Active ${days}d ago`;
+  const weeks = Math.floor(days / 7);
+  if (weeks < 5) return `Active ${weeks}w ago`;
+  return "Quiet for a while";
 }
 
 interface ClubCardProps {
@@ -115,6 +130,11 @@ export function ClubCard({ club, onPress }: ClubCardProps) {
             {club.memberCount.toLocaleString()} members
           </Text>
         </View>
+        {club.lastActivityAt ? (
+          <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
+            {formatActivity(club.lastActivityAt)}
+          </Text>
+        ) : null}
       </View>
 
       {club.isMember ? (

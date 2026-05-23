@@ -39,6 +39,19 @@ export const joinByCode = mutation({
       .unique();
     if (existing) return club._id;
 
+    // FR-027: free users are capped at 3 club memberships total. The client
+    // catches this code and routes to the Pro upgrade flow with the invite
+    // code preserved so the join completes after subscribing.
+    if (me.proSubscriptionStatus !== "active") {
+      const myMemberships = await ctx.db
+        .query("memberships")
+        .withIndex("by_user", (q) => q.eq("userId", me._id))
+        .collect();
+      if (myMemberships.length >= 3) {
+        throw new ConvexError({ code: "pro_required", limit: 3 });
+      }
+    }
+
     const now = Date.now();
     // FR-019: creator-club members are followers (subscriber semantics) — gets
     // them on the chapter-drop push fanout. Standard clubs stay at false.
