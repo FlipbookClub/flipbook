@@ -9,7 +9,7 @@ export type AuthStackParamList = {
   Welcome: undefined;
   CreateAccount: undefined;
   SignIn: undefined;
-  VerifyEmail: { email: string };
+  VerifyEmail: { email: string; flow?: "signup" | "signin" };
 };
 
 const Stack = createNativeStackNavigator<AuthStackParamList>();

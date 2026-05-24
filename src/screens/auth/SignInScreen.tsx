@@ -44,9 +44,27 @@ export function SignInScreen({ navigation }: Props) {
       if (attempt.status === "complete") {
         await setActive({ session: attempt.createdSessionId });
         // RootNavigator's auth gate (TASK-021) will route forward on signed-in.
-      } else {
-        setFormError("Sign-in incomplete. Check the verification link in your email.");
+        return;
       }
+      // Most common non-complete: the account exists but its email was never
+      // verified. Clerk returns needs_first_factor with email_code as a
+      // supported strategy. Auto-trigger the code send and route to the
+      // verification screen in signin mode.
+      if (attempt.status === "needs_first_factor") {
+        const factor = attempt.supportedFirstFactors?.find(
+          (f): f is typeof f & { emailAddressId: string } =>
+            f.strategy === "email_code" && "emailAddressId" in f,
+        );
+        if (factor) {
+          await signIn.prepareFirstFactor({
+            strategy: "email_code",
+            emailAddressId: factor.emailAddressId,
+          });
+          navigation.navigate("VerifyEmail", { email: email.trim(), flow: "signin" });
+          return;
+        }
+      }
+      setFormError(`Sign-in incomplete (${attempt.status}). Try again or contact support.`);
     } catch (err) {
       // Clerk reports session_exists when a valid session is still cached
       // (e.g. after a network blip the RN side hadn't reconciled with Clerk's

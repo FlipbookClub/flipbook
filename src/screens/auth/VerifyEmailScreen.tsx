@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { useSignUp } from "@clerk/clerk-expo";
+import { useSignIn, useSignUp } from "@clerk/clerk-expo";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -16,15 +16,21 @@ type Props = NativeStackScreenProps<AuthStackParamList, "VerifyEmail">;
 
 const CODE_LENGTH = 6;
 
-// Email-verification step inserted between CreateAccount and the rest of the
-// onboarding flow. Clerk requires verification before `setActive` makes the
-// user truly signed-in. Not in Figma (the design jumps straight from email
-// to display name) — visual style intentionally matches the other auth
-// screens so it reads as part of the same flow.
+// Email-verification step. Two entry points:
+//   1. signup flow — inserted between CreateAccount and the rest of onboarding;
+//      uses useSignUp's attemptEmailAddressVerification.
+//   2. signin flow — entered when SignInScreen detects an unverified account
+//      (needs_first_factor + email_code); uses useSignIn's attemptFirstFactor.
+// Both end with setActive on the resulting session. Not in Figma — visual
+// style intentionally matches the other auth screens so it reads as part of
+// the same flow.
 export function VerifyEmailScreen({ route }: Props) {
   const { colors } = useTheme();
-  const { isLoaded, signUp, setActive } = useSignUp();
+  const { signUp, setActive: setActiveSignUp, isLoaded: signUpLoaded } = useSignUp();
+  const { signIn, setActive: setActiveSignIn, isLoaded: signInLoaded } = useSignIn();
   const email = route.params.email;
+  const flow = route.params.flow ?? "signup";
+  const isLoaded = flow === "signin" ? signInLoaded : signUpLoaded;
 
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -35,16 +41,27 @@ export function VerifyEmailScreen({ route }: Props) {
   const canSubmit = isLoaded && code.length === CODE_LENGTH && !submitting;
 
   const handleVerify = async () => {
-    if (!isLoaded || !canSubmit) return;
+    if (!canSubmit) return;
     setFormError(null);
     setSubmitting(true);
     try {
-      const result = await signUp.attemptEmailAddressVerification({ code });
-      if (result.status === "complete") {
-        await setActive({ session: result.createdSessionId });
-        // RootNavigator (TASK-021) will route to profile-setup since no Convex user yet.
+      if (flow === "signin") {
+        if (!signInLoaded || !signIn || !setActiveSignIn) return;
+        const result = await signIn.attemptFirstFactor({ strategy: "email_code", code });
+        if (result.status === "complete") {
+          await setActiveSignIn({ session: result.createdSessionId });
+        } else {
+          setFormError("Verification incomplete. Check the code and try again.");
+        }
       } else {
-        setFormError("Verification incomplete. Check the code and try again.");
+        if (!signUpLoaded || !signUp || !setActiveSignUp) return;
+        const result = await signUp.attemptEmailAddressVerification({ code });
+        if (result.status === "complete") {
+          await setActiveSignUp({ session: result.createdSessionId });
+          // RootNavigator (TASK-021) will route to profile-setup since no Convex user yet.
+        } else {
+          setFormError("Verification incomplete. Check the code and try again.");
+        }
       }
     } catch (err) {
       const message =
@@ -57,12 +74,28 @@ export function VerifyEmailScreen({ route }: Props) {
   };
 
   const handleResend = async () => {
-    if (!isLoaded) return;
     setFormError(null);
     setResentNotice(null);
     setResending(true);
     try {
-      await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      if (flow === "signin") {
+        if (!signInLoaded || !signIn) return;
+        // Re-derive the email_code factor's emailAddressId from the in-flight
+        // sign-in attempt. SignInScreen already kicked off prepareFirstFactor
+        // once; this is just the resend path.
+        const factor = signIn.supportedFirstFactors?.find(
+          (f): f is typeof f & { emailAddressId: string } =>
+            f.strategy === "email_code" && "emailAddressId" in f,
+        );
+        if (!factor) {
+          setFormError("Couldn't resend — try going back and signing in again.");
+          return;
+        }
+        await signIn.prepareFirstFactor({ strategy: "email_code", emailAddressId: factor.emailAddressId });
+      } else {
+        if (!signUpLoaded || !signUp) return;
+        await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
+      }
       setResentNotice("We sent a new code.");
     } catch (err) {
       const message =
