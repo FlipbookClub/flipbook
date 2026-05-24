@@ -6,7 +6,7 @@ import { ActivityIndicator, View } from "react-native";
 import { AuthStack } from "./AuthStack";
 import { MainTabs } from "./MainTabs";
 import { OnboardingStack } from "./OnboardingStack";
-import { linkingConfig, linkingPrefixes } from "@/lib/deeplinks";
+import { getInitialURL, linkingConfig, linkingPrefixes, subscribeToURL } from "@/lib/deeplinks";
 import { usePushTokenRegistration } from "@/lib/notifications";
 import { useReactionQueueFlush } from "@/lib/useReactionQueueFlush";
 import { useTheme } from "@/theme/ThemeContext";
@@ -65,7 +65,14 @@ export function RootNavigator() {
   return (
     <NavigationContainer
       theme={navTheme}
-      linking={{ prefixes: linkingPrefixes, config: linkingConfig }}
+      linking={{
+        prefixes: linkingPrefixes,
+        config: linkingConfig,
+        // TASK-089: combine OS deep links with push-notification taps so
+        // cold-launches from a notification route to the right screen.
+        getInitialURL,
+        subscribe: subscribeToURL,
+      }}
     >
       {content}
     </NavigationContainer>
