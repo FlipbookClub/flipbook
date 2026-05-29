@@ -113,6 +113,15 @@ http.route({
         userAgent,
         ipHash,
       });
+      // Fire the welcome email only for brand-new rows, and schedule it rather
+      // than await it so the form response returns immediately. Resubmits
+      // (isNew=false) don't re-send.
+      if (result.isNew) {
+        await ctx.scheduler.runAfter(0, internal.email.sendWelcomeEmail, {
+          email,
+          audience: result.audience,
+        });
+      }
       return json(
         {
           ok: true,
