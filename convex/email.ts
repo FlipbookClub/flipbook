@@ -24,13 +24,13 @@ function buildText(audience: "reader" | "creator"): string {
     audience === "creator"
       ? "\n\nYou flagged that you're writing something serial — you're on the creator list too. I'll reach out about the private creator beta separately.\n"
       : "";
-  return `Hi — Moks here. Real human, sending this from Lagos.
+  return `Hey there 👋, Moks here. Real human, sending this from Lagos.
 
 You're on the Flipbook waitlist, and I'm glad you are. I'll send your invite the day the beta opens.${creatorLine}
 
-Before launch, I'd love to know: what's the last book you finished, and what do you wish your current book-club setup did better? Just hit reply — even one sentence helps.
+Before launch, I'd love to know: what's the last book you finished, and what do you wish your current book-club setup did better? Just hit reply, even one sentence helps.
 
-— Moks
+Victory Moks
 Designer & founder, Flipbook`;
 }
 
@@ -43,12 +43,12 @@ function buildHtml(audience: "reader" | "creator"): string {
   // restrained, personal: this should read like a note, not a campaign.
   return `<!doctype html><html><body style="margin:0;padding:0;background:#f7f3e3;">
   <div style="max-width:520px;margin:0 auto;padding:40px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#3b3a6d;">
-    <div style="font-size:20px;font-weight:700;letter-spacing:-0.01em;color:#3b3a6d;margin-bottom:28px;">Flip<span style="color:#ff6b6b;">book</span></div>
-    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Hi — Moks here. Real human, sending this from Lagos.</p>
+    <img src="https://www.useflipbook.com/logo/wordmark-light.png" alt="Flipbook" width="150" height="36" style="display:block;width:150px;height:auto;margin-bottom:28px;border:0;" />
+    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Hey there 👋, Moks here. Real human, sending this from Lagos.</p>
     <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">You're on the Flipbook waitlist, and I'm glad you are. I'll send your invite the day the beta opens.</p>
     ${creatorBlock}
-    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Before launch, I'd love to know: <strong>what's the last book you finished, and what do you wish your current book-club setup did better?</strong> Just hit reply — even one sentence helps.</p>
-    <p style="margin:28px 0 0;font-size:16px;line-height:1.5;">— Moks<br/><span style="color:#6b6a93;font-size:14px;">Designer &amp; founder, Flipbook</span></p>
+    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Before launch, I'd love to know: <strong>what's the last book you finished, and what do you wish your current book-club setup did better?</strong> Just hit reply, even one sentence helps.</p>
+    <p style="margin:28px 0 0;font-size:16px;line-height:1.5;">Victory Moks<br/><span style="color:#6b6a93;font-size:14px;">Designer &amp; founder, Flipbook</span></p>
   </div></body></html>`;
 }
 
