@@ -40,7 +40,9 @@ export const metadata: Metadata = {
     description:
       "Share a book. See your friends' reactions in the margins. Finally finish what you started.",
   },
-  icons: { icon: "/favicon.ico" },
+  // Icons are picked up from the App Router file conventions in app/:
+  // favicon.ico (legacy + bare /favicon.ico), icon.svg (modern, crisp),
+  // apple-icon.png (iOS). All are the Flipbook coral mark.
 };
 
 export const viewport: Viewport = {

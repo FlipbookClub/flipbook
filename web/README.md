@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Flipbook — marketing site
 
-## Getting Started
+The pre-launch waitlist landing page for [useflipbook.com](https://www.useflipbook.com).
+Next.js 16 (App Router, Turbopack), Tailwind v4, Framer Motion.
 
-First, run the development server:
+## Develop
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Local dev posts signups to the **dev** Convex deployment via
+`NEXT_PUBLIC_CONVEX_SITE_URL` in `.env.local`. Production uses the prod
+deployment, set in the host's environment.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## How it fits together
 
-## Learn More
+- **Backend:** signups POST to the Convex HTTP endpoint (`/waitlist`) in the
+  repo-root `convex/` package — no shared code, just the public endpoint. A
+  welcome email is sent via Resend on each new signup.
+- **Fonts:** Raleway (sans/UI/brand) + Instrument Serif (display). No Inter.
+- **Theme:** three modes (Light / Flip / Dark), `data-theme` on `<html>`; Flip
+  (indigo) is the SSR default.
+- **Icons:** Flipbook coral mark — `app/favicon.ico`, `app/icon.svg`,
+  `app/apple-icon.png`.
 
-To learn more about Next.js, take a look at the following resources:
+## Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Hosted on Vercel, Git-connected (root directory = `web/`). Set
+`NEXT_PUBLIC_CONVEX_SITE_URL` to the production Convex `.convex.site` URL.
