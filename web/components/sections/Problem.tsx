@@ -1,11 +1,12 @@
+import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 
 export function Problem() {
   return (
-    <section id="problem" className="relative px-6 py-28 md:px-10 md:py-40">
+    <section id="problem" className="relative px-6 py-32 md:px-10 md:py-48">
       <div className="mx-auto max-w-3xl">
         <Reveal>
-          <p className="eyebrow">The honest part</p>
+          <Eyebrow>The honest part</Eyebrow>
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="display mt-6 text-[clamp(34px,5vw,56px)] text-text">

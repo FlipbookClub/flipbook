@@ -36,7 +36,7 @@
 > You can again.
 
 **Subheadline**  
-Book clubs read together — share a book, see your friends' reactions in the margins. Turns out reading alongside people — even quietly — is the only accountability that actually gets you to the last page.
+Your friends and family are *this close* to reading the same book as you — they just need a reason to show up. Flipbook makes reading together as easy as a group chat, and as alive as the best book club you've ever been in.
 
 **Primary CTA**  
 `Get the beta`
@@ -60,7 +60,7 @@ Book clubs read together — share a book, see your friends' reactions in the ma
 ## MARQUEE STRIP
 *(Slow, decorative scroll — tone-setter, no functional load)*
 
-`Reading is a verb. · The book is the room. · Finish more of what you start. · Reactions live next to the paragraph. · No streaks. No shame. No leaderboards. · Built in the open from Lagos. · Three modes. One library.`
+`Reading is a verb. · The book is the room. · Finish more of what you start. · Reactions live next to the paragraph. · No streaks. No shame. No leaderboards. · Three modes. One library.`
 
 ---
 
@@ -151,7 +151,7 @@ Light for the morning commute. Flip — our brand-native indigo — for the late
 **Identifier**  
 `Moks — Designer, founder · Lagos`
 
-> "I've been a product designer for five years and a member of more book clubs than I've finished books. I abandoned every reading app on the market. Flipbook is the one I wished existed — I'm building it from Lagos, in the open, all the way to launch."
+> "I've been in enough book clubs to know they almost never work. People join with the best intentions and quietly fall off — because reading alone isn't fun, and no one's keeping anyone honest. I wanted to read a book with my closest friends and family. Not review it. Not discuss it once a month. Actually read it — together, page by page. I built Flipbook because that experience didn't exist yet. It's for my people. And maybe yours too."
 
 **Links row**  
 `Follow the build` (X) · `Instagram` · `LinkedIn`

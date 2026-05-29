@@ -4,6 +4,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { useState } from "react";
 import { Plus } from "lucide-react";
 
+import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 
 const items: Array<{ q: string; a: React.ReactNode }> = [
@@ -37,11 +38,11 @@ export function Faq() {
   return (
     <section
       id="faq"
-      className="relative border-t border-line bg-pull px-6 py-28 md:px-10 md:py-40"
+      className="relative border-t border-line bg-pull px-6 py-32 md:px-10 md:py-48"
     >
       <div className="mx-auto max-w-4xl">
         <Reveal>
-          <p className="eyebrow">The questions we keep getting</p>
+          <Eyebrow>The questions we keep getting</Eyebrow>
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="display mt-6 text-[clamp(34px,5vw,56px)] text-text">

@@ -1,4 +1,5 @@
 import { Nav } from "@/components/Nav";
+import { Comparison } from "@/components/sections/Comparison";
 import { CreatorCard } from "@/components/sections/CreatorCard";
 import { Faq } from "@/components/sections/Faq";
 import { FinalCta } from "@/components/sections/FinalCta";
@@ -19,6 +20,7 @@ export default function Page() {
         <Hero />
         <Marquee />
         <Problem />
+        <Comparison />
         <Pillars />
         <HowItWorks />
         <ThreeModes />

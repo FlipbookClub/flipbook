@@ -1,15 +1,8 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Instrument_Serif, Raleway } from "next/font/google";
+import { Instrument_Serif, Raleway } from "next/font/google";
 
-import { SmoothScroll } from "@/components/SmoothScroll";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
-
-const inter = Inter({
-  variable: "--font-inter",
-  subsets: ["latin"],
-  display: "swap",
-});
 
 // Editorial display serif — Contra-style headline weight without the cost
 // of self-hosting a paid foundry typeface.
@@ -21,7 +14,8 @@ const display = Instrument_Serif({
   display: "swap",
 });
 
-// Brand wordmark + section headings — matches the Expo app's Raleway usage.
+// The one sans on the site — body, UI, and brand wordmark — matching the Expo
+// app. No Inter; Raleway carries everything that isn't the display serif.
 const raleway = Raleway({
   variable: "--font-raleway",
   subsets: ["latin"],
@@ -29,7 +23,7 @@ const raleway = Raleway({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://getflipbook.com"),
+  metadataBase: new URL("https://useflipbook.com"),
   title: "Flipbook — Read with the people who are reading right now",
   description:
     "A social reading app where book clubs read together, with live reactions in the margins. Beta opens soon.",
@@ -63,13 +57,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       // matches the brand-native Flip mode so the first paint is on-brand
       // even before the script runs.
       data-theme="flip"
-      className={`${inter.variable} ${display.variable} ${raleway.variable}`}
+      className={`${display.variable} ${raleway.variable}`}
       suppressHydrationWarning
     >
       <body className="min-h-screen bg-bg text-text">
-        <ThemeProvider>
-          <SmoothScroll>{children}</SmoothScroll>
-        </ThemeProvider>
+        <ThemeProvider>{children}</ThemeProvider>
       </body>
     </html>
   );

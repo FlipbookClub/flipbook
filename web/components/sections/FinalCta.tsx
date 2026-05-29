@@ -1,3 +1,4 @@
+import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 import { WaitlistForm } from "@/components/WaitlistForm";
 
@@ -5,11 +6,11 @@ export function FinalCta() {
   return (
     <section
       id="get-the-beta"
-      className="relative border-t border-line px-6 py-28 md:px-10 md:py-40"
+      className="relative border-t border-line px-6 py-32 md:px-10 md:py-48"
     >
       <div className="mx-auto max-w-3xl">
         <Reveal>
-          <p className="eyebrow coral-dot">Closed beta — opens soon</p>
+          <Eyebrow>Closed beta — opens soon</Eyebrow>
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="display mt-7 text-[clamp(40px,6.2vw,80px)] leading-[1.02] text-text">

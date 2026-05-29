@@ -132,7 +132,7 @@ export function WaitlistForm({
               <button
                 type="submit"
                 disabled={isLoading}
-                className="group inline-flex h-12 items-center justify-center rounded-full bg-accent px-7 text-[14px] font-semibold tracking-wide text-white transition-transform duration-300 hover:bg-accent-strong active:scale-[0.98] disabled:opacity-70"
+                className="group inline-flex h-12 items-center justify-center rounded-full bg-accent px-7 text-[14px] font-semibold tracking-wide text-white shadow-lg shadow-accent/25 transition-all duration-300 hover:bg-accent-strong hover:shadow-accent/35 active:scale-[0.98] disabled:opacity-70 disabled:shadow-none"
               >
                 {buttonLabel}
               </button>

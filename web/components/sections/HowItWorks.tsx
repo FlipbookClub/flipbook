@@ -1,3 +1,4 @@
+import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 
 const steps = [
@@ -22,11 +23,11 @@ export function HowItWorks() {
   return (
     <section
       id="how-it-works"
-      className="relative border-t border-line bg-pull px-6 py-28 md:px-10 md:py-40"
+      className="relative border-t border-line bg-pull px-6 py-32 md:px-10 md:py-48"
     >
       <div className="mx-auto max-w-7xl">
         <Reveal>
-          <p className="eyebrow">How a Flipbook club works</p>
+          <Eyebrow>How a Flipbook club works</Eyebrow>
         </Reveal>
         <Reveal delay={0.1}>
           <h2 className="display mt-6 max-w-3xl text-[clamp(34px,5vw,56px)] text-text">
@@ -34,17 +35,17 @@ export function HowItWorks() {
           </h2>
         </Reveal>
 
-        <ol className="mt-20 grid gap-12 md:grid-cols-3 md:gap-10">
+        <ol className="mt-20 grid gap-6 md:grid-cols-3">
           {steps.map((s, i) => (
             <Reveal as="li" key={s.number} delay={i * 0.1}>
-              <div className="h-full border-t border-line pt-8">
-                <span className="font-brand text-[13px] font-semibold tracking-[0.18em] text-accent">
-                  Step {s.number}
+              <div className="card card-interactive flex h-full flex-col p-7 md:p-8">
+                <span className="font-brand inline-flex h-9 w-9 items-center justify-center rounded-full border border-accent/40 text-[13px] font-semibold tracking-[0.04em] text-accent">
+                  {s.number}
                 </span>
-                <h3 className="font-display mt-5 text-[clamp(22px,2.4vw,30px)] leading-tight text-text">
+                <h3 className="font-display mt-6 text-[clamp(22px,2.4vw,30px)] leading-tight text-text">
                   {s.title}
                 </h3>
-                <p className="mt-5 text-[15px] leading-[1.7] text-text-muted md:text-[16px]">
+                <p className="mt-4 text-[15px] leading-[1.7] text-text-muted md:text-[16px]">
                   {s.body}
                 </p>
               </div>

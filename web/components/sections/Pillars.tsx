@@ -1,3 +1,4 @@
+import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 
 const pillars = [
@@ -32,22 +33,22 @@ const pillars = [
 
 export function Pillars() {
   return (
-    <section id="pillars" className="relative border-t border-line px-6 py-28 md:px-10 md:py-40">
+    <section id="pillars" className="relative border-t border-line px-6 py-32 md:px-10 md:py-48">
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-4 md:grid-cols-[1fr_2fr] md:gap-16">
           <Reveal>
             <div className="md:sticky md:top-32">
-              <p className="eyebrow">Why Flipbook</p>
+              <Eyebrow>Why Flipbook</Eyebrow>
               <h2 className="display mt-6 text-[clamp(32px,4.5vw,52px)] leading-[1.05] text-text">
                 Reading, the way it used to feel.
               </h2>
             </div>
           </Reveal>
 
-          <ul className="mt-12 space-y-16 md:mt-0">
+          <ul className="mt-12 space-y-5 md:mt-0">
             {pillars.map((p, i) => (
               <Reveal as="li" key={p.number} delay={i * 0.05}>
-                <div className="grid grid-cols-[auto_1fr] gap-6 border-t border-line pt-10">
+                <div className="card card-interactive grid grid-cols-[auto_1fr] gap-6 p-7 md:gap-8 md:p-9">
                   <span className="font-brand text-[13px] font-semibold tracking-[0.18em] text-accent">
                     {p.number}
                   </span>

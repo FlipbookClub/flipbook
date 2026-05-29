@@ -2,6 +2,8 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+import { Eyebrow } from "@/components/Eyebrow";
+import { SignupCount } from "@/components/SignupCount";
 import { WaitlistForm } from "@/components/WaitlistForm";
 
 const ease = [0.16, 1, 0.3, 1] as const;
@@ -22,9 +24,9 @@ export function Hero() {
     <section className="relative overflow-hidden pt-36 pb-24 md:pt-44 md:pb-32">
       <div className="mx-auto grid max-w-7xl items-center gap-16 px-6 md:grid-cols-[1.05fr_0.95fr] md:px-10">
         <div>
-          <motion.p {...fade(0.05)} className="eyebrow coral-dot">
-            Closed beta — opens soon
-          </motion.p>
+          <motion.div {...fade(0.05)}>
+            <Eyebrow>Closed beta — opens soon</Eyebrow>
+          </motion.div>
 
           <motion.h1
             {...fade(0.15)}
@@ -39,9 +41,11 @@ export function Hero() {
             {...fade(0.3)}
             className="mt-8 max-w-xl text-[17px] leading-[1.6] text-text-muted md:text-[18px]"
           >
-            Book clubs read together — share a book, see your friends' reactions in
-            the margins. Turns out reading alongside people — even quietly — is the
-            only accountability that actually gets you to the last page.
+            Your friends and family are{" "}
+            <em className="italic text-text">this close</em> to reading the same book
+            as you — they just need a reason to show up. Flipbook makes reading
+            together as easy as a group chat, and as alive as the best book club
+            you&apos;ve ever been in.
           </motion.p>
 
           <motion.div {...fade(0.45)}>
@@ -49,7 +53,7 @@ export function Hero() {
           </motion.div>
 
           <motion.p {...fade(0.6)} className="mt-6 text-[13px] text-text-subtle">
-            A growing room of readers already on the list.
+            <SignupCount />
           </motion.p>
         </div>
 

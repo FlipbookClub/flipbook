@@ -1,23 +1,22 @@
 import { CreatorForm } from "@/components/CreatorForm";
+import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 
 export function CreatorCard() {
   return (
     <section
       id="creators"
-      className="relative border-t border-line px-6 py-28 md:px-10 md:py-40"
+      className="relative border-t border-line px-6 py-32 md:px-10 md:py-48"
     >
       <div className="mx-auto max-w-7xl">
-        <div className="grid items-start gap-16 md:grid-cols-[1fr_1.1fr]">
-          <Reveal>
+        <Reveal>
+          <div className="card grid items-start gap-12 p-8 md:grid-cols-[1fr_1.1fr] md:gap-16 md:p-14">
             <div>
-              <p className="eyebrow">For creators</p>
+              <Eyebrow>For creators</Eyebrow>
               <h2 className="display mt-6 text-[clamp(32px,4.5vw,52px)] leading-[1.05] text-text">
                 Writing something serial?
               </h2>
             </div>
-          </Reveal>
-          <Reveal delay={0.1}>
             <div>
               <p className="text-[17px] leading-[1.7] text-text-muted md:text-[18px]">
                 Indie authors and serialized novelists get a private creator beta.
@@ -26,8 +25,8 @@ export function CreatorCard() {
               </p>
               <CreatorForm />
             </div>
-          </Reveal>
-        </div>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

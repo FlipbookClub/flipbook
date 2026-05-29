@@ -1,7 +1,7 @@
 import { httpRouter } from "convex/server";
 
 import { httpAction } from "./_generated/server";
-import { internal } from "./_generated/api";
+import { api, internal } from "./_generated/api";
 
 const http = httpRouter();
 
@@ -10,7 +10,7 @@ const http = httpRouter();
 // Tighten this when we have a stable production marketing domain.
 const CORS_HEADERS: Record<string, string> = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type",
   "Access-Control-Max-Age": "86400",
   Vary: "Origin",
@@ -36,6 +36,26 @@ async function sha256Hex(input: string): Promise<string> {
 
 http.route({
   path: "/waitlist",
+  method: "OPTIONS",
+  handler: httpAction(async () => {
+    return new Response(null, { status: 204, headers: CORS_HEADERS });
+  }),
+});
+
+// Public signup count for the landing page's social-proof line. Returns the
+// raw row count; the marketing site adds its display offset (see
+// components/SignupCount.tsx). No identifiable data leaves here.
+http.route({
+  path: "/waitlist/count",
+  method: "GET",
+  handler: httpAction(async (ctx) => {
+    const count = await ctx.runQuery(api.waitlist.publicCount, {});
+    return json({ count }, 200);
+  }),
+});
+
+http.route({
+  path: "/waitlist/count",
   method: "OPTIONS",
   handler: httpAction(async () => {
     return new Response(null, { status: 204, headers: CORS_HEADERS });

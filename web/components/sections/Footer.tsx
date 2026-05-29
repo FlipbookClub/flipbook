@@ -1,3 +1,5 @@
+import { Wordmark } from "@/components/Wordmark";
+
 // Footer is the editorial closing — three columns, bottom rule, italic
 // tagline on the right. No nav menu — anchors in the same page.
 const columns: Array<{ title: string; links: Array<{ label: string; href: string }> }> = [
@@ -20,10 +22,10 @@ const columns: Array<{ title: string; links: Array<{ label: string; href: string
   {
     title: "Follow the build",
     links: [
-      { label: "X / Twitter", href: "https://x.com/" },
-      { label: "Instagram", href: "https://instagram.com/" },
-      { label: "LinkedIn", href: "https://linkedin.com/" },
-      { label: "hello@getflipbook.com", href: "mailto:hello@getflipbook.com" },
+      { label: "X / Twitter", href: "https://x.com/useflipbook" },
+      { label: "Instagram", href: "https://instagram.com/useflipbook" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/useflipbook" },
+      { label: "hello@useflipbook.com", href: "mailto:hello@useflipbook.com" },
     ],
   },
 ];
@@ -35,8 +37,8 @@ export function Footer() {
       <div className="mx-auto max-w-7xl">
         <div className="grid gap-12 md:grid-cols-[1.2fr_2fr]">
           <div>
-            <p className="font-brand text-xl font-semibold text-text">Flipbook</p>
-            <p className="mt-3 max-w-xs text-[14px] leading-[1.7] text-text-muted">
+            <Wordmark height={30} />
+            <p className="mt-5 max-w-xs text-[14px] leading-[1.7] text-text-muted">
               Read together. Finish more. Talk on the page.
             </p>
           </div>

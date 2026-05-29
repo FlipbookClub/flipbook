@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+import { Eyebrow } from "@/components/Eyebrow";
 import { Reveal } from "@/components/Reveal";
 import { useTheme, type ThemeMode } from "@/components/ThemeProvider";
 
@@ -26,13 +27,13 @@ export function ThreeModes() {
   return (
     <section
       id="three-modes"
-      className="relative border-t border-line px-6 py-28 md:px-10 md:py-40"
+      className="relative border-t border-line px-6 py-32 md:px-10 md:py-48"
     >
       <div className="mx-auto max-w-7xl">
         <div className="grid items-center gap-16 md:grid-cols-[0.9fr_1.1fr]">
           <div>
             <Reveal>
-              <p className="eyebrow">A reader for every hour</p>
+              <Eyebrow>A reader for every hour</Eyebrow>
             </Reveal>
             <Reveal delay={0.1}>
               <h2 className="display mt-6 text-[clamp(34px,5vw,56px)] text-text">

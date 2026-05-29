@@ -69,7 +69,7 @@ export function CreatorForm() {
                 ? "You're on the creator list."
                 : "You're already on the creator list."}
             </p>
-            <p className="mt-1 text-sm text-text-muted">We'll be in touch.</p>
+            <p className="mt-1 text-sm text-text-muted">We&apos;ll be in touch.</p>
           </motion.div>
         ) : (
           <motion.div
