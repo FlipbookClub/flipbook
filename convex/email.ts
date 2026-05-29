@@ -31,7 +31,7 @@ You're on the Flipbook waitlist, and I'm glad you are. I'll send your invite the
 Before launch, I'd love to know: what's the last book you finished, and what do you wish your current book-club setup did better? Just hit reply, even one sentence helps.
 
 Victory Moks
-Designer & founder, Flipbook`;
+Designer & Co-founder, Flipbook`;
 }
 
 function buildHtml(audience: "reader" | "creator"): string {
@@ -48,7 +48,7 @@ function buildHtml(audience: "reader" | "creator"): string {
     <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">You're on the Flipbook waitlist, and I'm glad you are. I'll send your invite the day the beta opens.</p>
     ${creatorBlock}
     <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Before launch, I'd love to know: <strong>what's the last book you finished, and what do you wish your current book-club setup did better?</strong> Just hit reply, even one sentence helps.</p>
-    <p style="margin:28px 0 0;font-size:16px;line-height:1.5;">Victory Moks<br/><span style="color:#6b6a93;font-size:14px;">Designer &amp; founder, Flipbook</span></p>
+    <p style="margin:28px 0 0;font-size:16px;line-height:1.5;">Victory Moks<br/><span style="color:#6b6a93;font-size:14px;">Designer &amp; Co-founder, Flipbook</span></p>
   </div></body></html>`;
 }
 
