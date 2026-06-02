@@ -113,7 +113,8 @@ export function CommunityHomeScreen({ navigation }: Props) {
   const popularClubs = useQuery(api.clubs.listPublic, {});
 
   const ModeIcon = mode === "dark" ? Moon : mode === "flip" ? Sparkles : Sun;
-  const firstName = me?.firstName ?? me?.displayName ?? "there";
+  // Greeting uses the public display name (username), per Figma — not first name.
+  const username = me?.displayName ?? me?.firstName ?? "there";
   const hasClubs = !!myClubs && myClubs.length > 0;
 
   const [refreshing, setRefreshing] = useState(false);
@@ -168,7 +169,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
       >
         <View style={{ gap: spacing.s2, marginTop: spacing.s3 }}>
           <Text style={{ ...typography.displayMd, color: colors.textPrimary }}>
-            Welcome {firstName} 👋🏽
+            Welcome {username} 👋🏽
           </Text>
           <View
             style={{

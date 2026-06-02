@@ -1,10 +1,9 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { BookOpen, Palette, User, Users } from "lucide-react-native";
+import { BookOpen, User, Users } from "lucide-react-native";
 
 import { CommunityStack } from "@/navigation/CommunityStack";
 import { LibraryStack } from "@/navigation/LibraryStack";
 import { ProfileStack } from "@/navigation/ProfileStack";
-import { DesignSystemPreview } from "@/screens/_dev/DesignSystemPreview";
 import { palette } from "@/theme/palette";
 import { useTheme } from "@/theme/ThemeContext";
 
@@ -12,7 +11,6 @@ export type MainTabsParamList = {
   Community: undefined;
   Library: undefined;
   Profile: undefined;
-  Dev: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabsParamList>();
