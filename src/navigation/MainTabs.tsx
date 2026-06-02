@@ -51,16 +51,6 @@ export function MainTabs() {
           tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
         }}
       />
-      {__DEV__ ? (
-        <Tab.Screen
-          name="Dev"
-          component={DesignSystemPreview}
-          options={{
-            title: "Design",
-            tabBarIcon: ({ color, size }) => <Palette color={color} size={size} />,
-          }}
-        />
-      ) : null}
     </Tab.Navigator>
   );
 }
