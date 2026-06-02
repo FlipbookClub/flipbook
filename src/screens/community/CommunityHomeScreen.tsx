@@ -266,7 +266,8 @@ export function CommunityHomeScreen({ navigation }: Props) {
                 contained
                 club={{
                   name: club.name,
-                  moderatorName: club.role === "moderator" ? "You" : undefined,
+                  moderatorName:
+                    club.role === "moderator" ? "You" : club.moderatorName,
                   memberCount: club.memberCount,
                   coverImageUrl: club.coverImageUrl,
                   isMember: true,

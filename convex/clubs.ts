@@ -35,6 +35,9 @@ const clubWithMembershipValidator = v.object({
   ...clubValidator.fields,
   role: v.union(v.literal("moderator"), v.literal("member")),
   joinedAt: v.number(),
+  // The moderator's display name, so cards can show "Moderated by …" even when
+  // the viewer is a plain member (not just "You").
+  moderatorName: v.string(),
 });
 
 async function uniqueInviteCode(ctx: { db: QueryCtx["db"] }): Promise<string> {
@@ -180,10 +183,19 @@ export const listMine = query({
       .withIndex("by_user", (q) => q.eq("userId", me._id))
       .collect();
 
-    const results = [] as Array<Doc<"clubs"> & { role: "moderator" | "member"; joinedAt: number }>;
+    const results = [] as Array<
+      Doc<"clubs"> & { role: "moderator" | "member"; joinedAt: number; moderatorName: string }
+    >;
     for (const m of memberships) {
       const club = await ctx.db.get(m.clubId);
-      if (club) results.push({ ...club, role: m.role, joinedAt: m.joinedAt });
+      if (!club) continue;
+      const moderator = await ctx.db.get(club.moderatorId);
+      results.push({
+        ...club,
+        role: m.role,
+        joinedAt: m.joinedAt,
+        moderatorName: moderator?.displayName ?? "Unknown",
+      });
     }
     results.sort((a, b) => b.lastActivityAt - a.lastActivityAt);
     return results;

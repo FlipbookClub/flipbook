@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, Text, View } from "react-native";
+import {
+  Alert,
+  KeyboardAvoidingView,
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
 import { Pencil, Trash2, X } from "lucide-react-native";
 import { useMutation } from "convex/react";
 
@@ -155,7 +164,12 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
             />
           </View>
         ) : (
-          <View style={{ gap: spacing.s4 }}>
+          <ScrollView
+            style={{ maxHeight: 380 }}
+            contentContainerStyle={{ gap: spacing.s4 }}
+            keyboardShouldPersistTaps="handled"
+            showsVerticalScrollIndicator={false}
+          >
             <Input
               variant="underline"
               placeholder="Club name"
@@ -180,7 +194,7 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
               disabled={submitting || !name.trim()}
               onPress={handleSaveEdit}
             />
-          </View>
+          </ScrollView>
         )}
         </View>
       </KeyboardAvoidingView>
