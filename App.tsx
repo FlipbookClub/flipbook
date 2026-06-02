@@ -16,7 +16,22 @@ import {
 import { ConvexProviderWithClerk } from "convex/react-clerk";
 import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
-import { View } from "react-native";
+import { Text, TextInput, View } from "react-native";
+
+// TASK-082 — Dynamic Type. RN scales text with the OS font-size setting by
+// default; we cap the multiplier so very large accessibility sizes degrade
+// gracefully instead of breaking the reading-room layouts, while still
+// honoring reasonable scaling (up to ~1.6x). Host components take defaultProps.
+const FONT_SCALE_CAP = 1.6;
+type FontScalable = { defaultProps?: { maxFontSizeMultiplier?: number } };
+(Text as unknown as FontScalable).defaultProps = {
+  ...(Text as unknown as FontScalable).defaultProps,
+  maxFontSizeMultiplier: FONT_SCALE_CAP,
+};
+(TextInput as unknown as FontScalable).defaultProps = {
+  ...(TextInput as unknown as FontScalable).defaultProps,
+  maxFontSizeMultiplier: FONT_SCALE_CAP,
+};
 
 // Closes the in-app browser when the OAuth redirect returns. Required for
 // Clerk's `useSSO()` flow (Apple/Google) to complete properly in Expo Go and
