@@ -13,5 +13,9 @@
     "**/*.tsx",
     "nativewind-env.d.ts",
     "declarations/**/*.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "web"
   ]
 }

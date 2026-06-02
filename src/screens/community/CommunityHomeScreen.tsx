@@ -7,6 +7,8 @@ import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { ClubCard } from "@/components/features/ClubCard";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { Moon, Sparkles, Sun } from "lucide-react-native";
 import { palette } from "@/theme/palette";
@@ -28,6 +30,18 @@ const MODE_CYCLE: ThemeMode[] = ["light", "flip", "dark"];
 function nextMode(current: ThemeMode): ThemeMode {
   const i = MODE_CYCLE.indexOf(current);
   return MODE_CYCLE[(i + 1) % MODE_CYCLE.length];
+}
+
+// Placeholder club rows shown while the live query is still resolving — keeps
+// the home screen from flashing the "create/join" prompt at returning members.
+function ClubSkeletons({ count }: { count: number }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <Skeleton key={i} height={76} borderRadius={radius.md} />
+      ))}
+    </>
+  );
 }
 
 interface ActionCardProps {
@@ -153,7 +167,14 @@ export function CommunityHomeScreen({ navigation }: Props) {
           </View>
         </View>
 
-        {!hasClubs ? (
+        {myClubs === undefined ? (
+          <View style={{ gap: spacing.s2 }}>
+            <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
+              My communities
+            </Text>
+            <ClubSkeletons count={2} />
+          </View>
+        ) : !hasClubs ? (
           <View style={{ gap: spacing.s3 }}>
             <Text style={{ ...typography.bodyMd, color: colors.textSecondary }}>
               Please complete at least one of these actions.
@@ -178,7 +199,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
             <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
               My communities
             </Text>
-            {myClubs!.map((club) => (
+            {myClubs.map((club) => (
               <ClubCard
                 key={club._id}
                 club={{
@@ -198,7 +219,9 @@ export function CommunityHomeScreen({ navigation }: Props) {
           <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
             Popular communities
           </Text>
-          {popularClubs && popularClubs.length > 0 ? (
+          {popularClubs === undefined ? (
+            <ClubSkeletons count={2} />
+          ) : popularClubs.length > 0 ? (
             popularClubs.map((club) => (
               <ClubCard
                 key={club._id}
@@ -213,25 +236,11 @@ export function CommunityHomeScreen({ navigation }: Props) {
               />
             ))
           ) : (
-            <View
-              style={{
-                padding: spacing.s4,
-                borderRadius: radius.md,
-                borderWidth: 1,
-                borderColor: colors.border,
-                borderStyle: "dashed",
-              }}
-            >
-              <Text
-                style={{
-                  ...typography.bodyMd,
-                  color: colors.textMuted,
-                  textAlign: "center",
-                }}
-              >
-                No public communities yet — be the first to share one.
-              </Text>
-            </View>
+            <EmptyState
+              compact
+              title="No public communities yet"
+              description="Be the first to share one."
+            />
           )}
         </View>
       </ScrollView>

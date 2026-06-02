@@ -4,7 +4,8 @@ import { useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { BookCover } from "@/components/features/BookCover";
-import { Card } from "@/components/ui/Card";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -20,6 +21,29 @@ const TABS: Array<{ key: TabKey; label: string }> = [
   { key: "reading", label: "Reading" },
   { key: "finished", label: "Finished" },
 ];
+
+// Placeholder rows that match the book-row layout while the library query loads.
+function LibrarySkeletons() {
+  return (
+    <>
+      {Array.from({ length: 3 }).map((_, i) => (
+        <View key={i} style={{ flexDirection: "row", gap: spacing.s4 }}>
+          <Skeleton width={52} height={72} borderRadius={radius.sm} />
+          <View style={{ flex: 1, gap: spacing.s2, paddingTop: spacing.s1 }}>
+            <Skeleton width="70%" height={16} />
+            <Skeleton width="45%" height={12} />
+            <Skeleton
+              width="100%"
+              height={4}
+              borderRadius={2}
+              style={{ marginTop: spacing.s2 }}
+            />
+          </View>
+        </View>
+      ))}
+    </>
+  );
+}
 
 export function LibraryScreen({ navigation }: Props) {
   const { colors } = useTheme();
@@ -83,25 +107,17 @@ export function LibraryScreen({ navigation }: Props) {
           gap: spacing.s4,
         }}
       >
-        {library === undefined ? null : visible.length === 0 ? (
-          <Card>
-            <View style={{ gap: spacing.s2, paddingVertical: spacing.s3, alignItems: "center" }}>
-              <Text
-                style={{
-                  ...typography.bodyLg,
-                  color: colors.textPrimary,
-                  fontFamily: "Raleway-SemiBold",
-                }}
-              >
-                {tab === "reading" ? "Nothing in progress" : "No finished books yet"}
-              </Text>
-              <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
-                {tab === "reading"
-                  ? "Join a club and open a book to start reading."
-                  : "Books you finish will land here."}
-              </Text>
-            </View>
-          </Card>
+        {library === undefined ? (
+          <LibrarySkeletons />
+        ) : visible.length === 0 ? (
+          <EmptyState
+            title={tab === "reading" ? "Nothing in progress" : "No finished books yet"}
+            description={
+              tab === "reading"
+                ? "Join a club and open a book to start reading."
+                : "Books you finish will land here."
+            }
+          />
         ) : (
           visible.map((item) => {
             const pct = Math.round((item.currentPage / item.totalPages) * 100);

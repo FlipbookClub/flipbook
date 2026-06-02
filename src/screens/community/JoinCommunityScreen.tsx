@@ -15,7 +15,9 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Button } from "@/components/ui/Button";
 import { ClubCard } from "@/components/features/ClubCard";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
+import { Skeleton } from "@/components/ui/Skeleton";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -187,7 +189,12 @@ export function JoinCommunityScreen({ navigation }: Props) {
               <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
                 Popular communities
               </Text>
-              {popular && popular.length > 0 ? (
+              {popular === undefined ? (
+                <>
+                  <Skeleton height={76} borderRadius={radius.md} />
+                  <Skeleton height={76} borderRadius={radius.md} />
+                </>
+              ) : popular.length > 0 ? (
                 popular.map((club) => (
                   <ClubCard
                     key={club._id}
@@ -201,27 +208,19 @@ export function JoinCommunityScreen({ navigation }: Props) {
                   />
                 ))
               ) : (
-                <View
-                  style={{
-                    padding: spacing.s4,
-                    borderRadius: radius.md,
-                    borderWidth: 1,
-                    borderColor: colors.border,
-                    borderStyle: "dashed",
-                  }}
-                >
-                  <Text
-                    style={{
-                      ...typography.bodyMd,
-                      color: colors.textMuted,
-                      textAlign: "center",
-                    }}
-                  >
-                    {searchTerm.trim()
-                      ? "No communities match that search."
-                      : "No public communities yet."}
-                  </Text>
-                </View>
+                <EmptyState
+                  compact
+                  title={
+                    searchTerm.trim()
+                      ? "No communities match that search"
+                      : "No public communities yet"
+                  }
+                  description={
+                    searchTerm.trim()
+                      ? "Try a different name, or join with a private code."
+                      : undefined
+                  }
+                />
               )}
             </View>
           ) : null}
