@@ -6,6 +6,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/Button";
 import { analytics } from "@/lib/analytics";
+import { GENRES } from "@/lib/genres";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -15,22 +16,6 @@ import type { OnboardingStackParamList } from "@/navigation/OnboardingStack";
 import { api } from "../../../convex/_generated/api";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "GenrePreferences">;
-
-// PRD § Functional Requirements > Profile setup: predefined list. Originally
-// spec'd ≥3 required; founder relaxed to optional (users can add later from
-// Profile/Settings).
-const GENRES = [
-  "Fiction",
-  "Nonfiction",
-  "Sci-Fi/Fantasy",
-  "Romance",
-  "Mystery/Thriller",
-  "Memoir",
-  "History",
-  "Self-Help",
-  "Poetry",
-  "YA",
-] as const;
 
 export function GenrePreferencesScreen({ route }: Props) {
   const { colors } = useTheme();

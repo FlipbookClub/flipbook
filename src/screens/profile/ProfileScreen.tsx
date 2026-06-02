@@ -5,14 +5,14 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Avatar } from "@/components/ui/Avatar";
 import { Card } from "@/components/ui/Card";
-import { spacing } from "@/theme/spacing";
+import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { ProfileStackParamList } from "@/navigation/ProfileStack";
 import { api } from "../../../convex/_generated/api";
 
-type Props = NativeStackScreenProps<ProfileStackParamList, "Profile">;
+type Props = NativeStackScreenProps<ProfileStackParamList, "ProfileHome">;
 
 // Stub profile screen — stats are hardcoded placeholders until the clubs +
 // reading-progress features ship (TASK-024+ and TASK-042+). Real avatar
@@ -20,9 +20,14 @@ type Props = NativeStackScreenProps<ProfileStackParamList, "Profile">;
 export function ProfileScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const me = useQuery(api.users.me);
+  const myClubs = useQuery(api.clubs.listMine);
+  const library = useQuery(api.progress.listMyLibrary);
 
   const displayName = me?.displayName ?? "";
   const fullName = me ? `${me.firstName} ${me.lastName}`.trim() : "";
+  // Real stats (replacing the old hardcoded 0s). "—" while the query resolves.
+  const clubCount = myClubs?.length;
+  const booksRead = library?.filter((i) => i.finishedAt !== undefined).length;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
@@ -70,18 +75,45 @@ export function ProfileScreen({ navigation }: Props) {
               {me.bio}
             </Text>
           ) : null}
+          <Pressable
+            onPress={() => navigation.navigate("EditProfile")}
+            accessibilityRole="button"
+            accessibilityLabel="Edit profile"
+            style={{
+              marginTop: spacing.s2,
+              paddingVertical: spacing.s2,
+              paddingHorizontal: spacing.s4,
+              borderRadius: radius.pill,
+              borderWidth: 1,
+              borderColor: colors.border,
+            }}
+          >
+            <Text
+              style={{
+                ...typography.bodyMd,
+                fontFamily: "Raleway-SemiBold",
+                color: colors.textPrimary,
+              }}
+            >
+              Edit profile
+            </Text>
+          </Pressable>
         </View>
 
         <View style={{ flexDirection: "row", gap: spacing.s3 }}>
           <Card style={{ flex: 1 }}>
             <View style={{ alignItems: "center", gap: spacing.s1, paddingVertical: spacing.s2 }}>
-              <Text style={{ ...typography.displayMd, color: colors.textPrimary }}>0</Text>
+              <Text style={{ ...typography.displayMd, color: colors.textPrimary }}>
+                {clubCount ?? "—"}
+              </Text>
               <Text style={{ ...typography.bodySm, color: colors.textMuted }}>Clubs</Text>
             </View>
           </Card>
           <Card style={{ flex: 1 }}>
             <View style={{ alignItems: "center", gap: spacing.s1, paddingVertical: spacing.s2 }}>
-              <Text style={{ ...typography.displayMd, color: colors.textPrimary }}>0</Text>
+              <Text style={{ ...typography.displayMd, color: colors.textPrimary }}>
+                {booksRead ?? "—"}
+              </Text>
               <Text style={{ ...typography.bodySm, color: colors.textMuted }}>Books read</Text>
             </View>
           </Card>
@@ -92,7 +124,7 @@ export function ProfileScreen({ navigation }: Props) {
             <Text
               style={{
                 ...typography.overlineLg,
-                color: colors.textMuted,
+                color: colors.textPrimary,
               }}
             >
               Genres
