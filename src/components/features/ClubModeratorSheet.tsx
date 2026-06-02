@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Modal, Pressable, Text, View } from "react-native";
+import { Alert, KeyboardAvoidingView, Modal, Platform, Pressable, Text, View } from "react-native";
 import { Pencil, Trash2, X } from "lucide-react-native";
 import { useMutation } from "convex/react";
 
@@ -100,22 +100,26 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
       onRequestClose={close}
       accessibilityViewIsModal
     >
-      <Pressable
-        onPress={close}
-        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
-        accessibilityLabel="Dismiss sheet"
-      />
-      <View
-        style={{
-          backgroundColor: colors.surfacePrimary,
-          borderTopLeftRadius: radius.lg,
-          borderTopRightRadius: radius.lg,
-          paddingHorizontal: spacing.s4,
-          paddingTop: spacing.s3,
-          paddingBottom: spacing.s5,
-          gap: spacing.s4,
-        }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
+        <Pressable
+          onPress={close}
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
+          accessibilityLabel="Dismiss sheet"
+        />
+        <View
+          style={{
+            backgroundColor: colors.surfacePrimary,
+            borderTopLeftRadius: radius.lg,
+            borderTopRightRadius: radius.lg,
+            paddingHorizontal: spacing.s4,
+            paddingTop: spacing.s3,
+            paddingBottom: spacing.s5,
+            gap: spacing.s4,
+          }}
+        >
         <View
           style={{
             flexDirection: "row",
@@ -178,7 +182,8 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
             />
           </View>
         )}
-      </View>
+        </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }

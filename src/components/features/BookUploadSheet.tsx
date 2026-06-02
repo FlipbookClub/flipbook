@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Modal, Pressable, Text, View } from "react-native";
+import { KeyboardAvoidingView, Modal, Platform, Pressable, Text, View } from "react-native";
 import Pdf from "react-native-pdf";
 import { X } from "lucide-react-native";
 import { useMutation } from "convex/react";
@@ -113,22 +113,26 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       onRequestClose={onClose}
       accessibilityViewIsModal
     >
-      <Pressable
-        onPress={stage === "metadata" ? onClose : undefined}
-        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
-        accessibilityLabel="Dismiss sheet"
-      />
-      <View
-        style={{
-          backgroundColor: colors.surfacePrimary,
-          borderTopLeftRadius: radius.lg,
-          borderTopRightRadius: radius.lg,
-          paddingHorizontal: spacing.s4,
-          paddingTop: spacing.s3,
-          paddingBottom: spacing.s5,
-          gap: spacing.s4,
-        }}
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
       >
+        <Pressable
+          onPress={stage === "metadata" ? onClose : undefined}
+          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
+          accessibilityLabel="Dismiss sheet"
+        />
+        <View
+          style={{
+            backgroundColor: colors.surfacePrimary,
+            borderTopLeftRadius: radius.lg,
+            borderTopRightRadius: radius.lg,
+            paddingHorizontal: spacing.s4,
+            paddingTop: spacing.s3,
+            paddingBottom: spacing.s5,
+            gap: spacing.s4,
+          }}
+        >
         <View
           style={{
             flexDirection: "row",
@@ -193,7 +197,8 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
           disabled={!canSubmit}
           onPress={handleSubmit}
         />
-      </View>
+        </View>
+      </KeyboardAvoidingView>
 
       {/* Hidden Pdf viewer to read pageCount via onLoadComplete without
           rendering the file to the user yet. */}

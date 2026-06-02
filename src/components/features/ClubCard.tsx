@@ -97,7 +97,8 @@ export function ClubCard({ club, onPress, contained }: ClubCardProps) {
             style={{
               fontFamily: "Raleway-Bold",
               fontSize: 22,
-              color: palette.brandPrimary,
+              // Match the club name's color so it's readable in every mode.
+              color: contained ? colors.textAlt : colors.textPrimary,
             }}
           >
             {initials || "?"}

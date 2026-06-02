@@ -217,7 +217,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 justifyContent: "center",
               }}
             >
-              <Text style={{ fontFamily: "Raleway-Bold", fontSize: 28, color: palette.brandPrimary }}>
+              <Text style={{ fontFamily: "Raleway-Bold", fontSize: 28, color: colors.textPrimary }}>
                 {club.name.slice(0, 1).toUpperCase()}
               </Text>
             </View>
