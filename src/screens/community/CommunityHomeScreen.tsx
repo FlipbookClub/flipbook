@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { Pressable, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { CircleDashed, Leaf, Rocket } from "lucide-react-native";
 import { useQuery } from "convex/react";
 import type { CompositeScreenProps } from "@react-navigation/native";
@@ -10,6 +10,7 @@ import { ClubCard } from "@/components/features/ClubCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Wordmark } from "@/components/ui/Wordmark";
+import { isOnlineNow } from "@/lib/connectivity";
 import { Moon, Sparkles, Sun } from "lucide-react-native";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
@@ -115,6 +116,17 @@ export function CommunityHomeScreen({ navigation }: Props) {
   const firstName = me?.firstName ?? me?.displayName ?? "there";
   const hasClubs = !!myClubs && myClubs.length > 0;
 
+  const [refreshing, setRefreshing] = useState(false);
+  // Queries are live; pull-to-refresh re-probes the network (honest gesture).
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await isOnlineNow();
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
   const goCreate = () => navigation.navigate("CreateCommunity");
   const goJoin = () => navigation.navigate("JoinCommunity");
   const openClub = (clubId: string) =>
@@ -143,7 +155,17 @@ export function CommunityHomeScreen({ navigation }: Props) {
         </Pressable>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingHorizontal: spacing.s4, paddingBottom: spacing.s7, gap: spacing.s5 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingHorizontal: spacing.s4, paddingBottom: spacing.s7, gap: spacing.s5 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.textMuted}
+            colors={[palette.accent]}
+          />
+        }
+      >
         <View style={{ gap: spacing.s2, marginTop: spacing.s3 }}>
           <Text style={{ ...typography.displayMd, color: colors.textPrimary }}>
             Welcome {firstName} 👋🏽

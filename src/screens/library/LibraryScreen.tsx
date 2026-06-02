@@ -1,6 +1,8 @@
-import { useMemo, useState } from "react";
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import { useCallback, useMemo, useState } from "react";
+import { Pressable, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
 import { useQuery } from "convex/react";
+
+import { isOnlineNow } from "@/lib/connectivity";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { BookCover } from "@/components/features/BookCover";
@@ -49,6 +51,19 @@ export function LibraryScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const library = useQuery(api.progress.listMyLibrary);
   const [tab, setTab] = useState<TabKey>("reading");
+  const [refreshing, setRefreshing] = useState(false);
+
+  // The library query is live, so there's nothing to refetch — but pull-to-
+  // refresh is the expected gesture, and we make it honest by re-probing the
+  // network (which updates the offline banner if connectivity changed).
+  const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    try {
+      await isOnlineNow();
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   const { reading, finished } = useMemo(() => {
     if (!library) return { reading: [], finished: [] };
@@ -106,6 +121,14 @@ export function LibraryScreen({ navigation }: Props) {
           paddingBottom: spacing.s7,
           gap: spacing.s4,
         }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+            tintColor={colors.textMuted}
+            colors={[palette.accent]}
+          />
+        }
       >
         {library === undefined ? (
           <LibrarySkeletons />
