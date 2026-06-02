@@ -100,6 +100,11 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
       <View style={{ position: "relative" }}>
         <TextInput
           ref={ref}
+          // Many fields use only a placeholder (no visible label) — placeholders
+          // aren't a reliable accessible name across screen readers, so derive
+          // one from label → placeholder. A caller-supplied accessibilityLabel
+          // in `rest` still wins (spread below).
+          accessibilityLabel={label ?? rest.placeholder}
           placeholderTextColor={colors.textMuted}
           secureTextEntry={effectiveSecure}
           style={inputStyle}
