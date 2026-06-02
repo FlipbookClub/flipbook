@@ -35,11 +35,18 @@ export function CreateAccountScreen({ navigation }: Props) {
   const linkColor = mode === "dark" ? palette.highlight : palette.accent;
 
   const [email, setEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
   const [password, setPassword] = useState("");
   const [passwordTouched, setPasswordTouched] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
+  // Only nag about email format once the field's been touched and has content —
+  // an empty field just keeps the submit button disabled, no scary red text.
+  const emailError =
+    emailTouched && email.trim().length > 0 && !EMAIL_RE.test(email.trim())
+      ? "That doesn't look like an email address."
+      : null;
   const passwordError = passwordTouched ? validatePassword(password) : null;
   const canSubmit =
     isLoaded && EMAIL_RE.test(email.trim()) && validatePassword(password) === null && !submitting;
@@ -87,6 +94,8 @@ export function CreateAccountScreen({ navigation }: Props) {
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
+          onBlur={() => setEmailTouched(true)}
+          errorText={emailError ?? undefined}
           returnKeyType="next"
         />
         <Input

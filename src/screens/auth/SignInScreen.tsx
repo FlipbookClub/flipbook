@@ -26,9 +26,15 @@ export function SignInScreen({ navigation }: Props) {
   const { startFlow, providerInFlight, error: socialError } = useSocialAuth();
 
   const [email, setEmail] = useState("");
+  const [emailTouched, setEmailTouched] = useState(false);
   const [password, setPassword] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
+
+  const emailError =
+    emailTouched && email.trim().length > 0 && !EMAIL_RE.test(email.trim())
+      ? "That doesn't look like an email address."
+      : null;
 
   // Link color matches the wordmark accent per mode — coral in Light/Flip,
   // GoldenSand in Dark (see WelcomeScreen for the same rationale).
@@ -102,6 +108,8 @@ export function SignInScreen({ navigation }: Props) {
           keyboardType="email-address"
           value={email}
           onChangeText={setEmail}
+          onBlur={() => setEmailTouched(true)}
+          errorText={emailError ?? undefined}
           returnKeyType="next"
         />
         <Input
