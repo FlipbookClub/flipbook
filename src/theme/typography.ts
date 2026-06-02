@@ -91,7 +91,9 @@ export const typography = {
     fontFamily: "Inter-SemiBold",
     fontSize: 14,
     lineHeight: 18,
-    letterSpacing: 4,
+    // Figma "letterSpacing: 4" is a percentage (4% of 14px = 0.56px); RN takes
+    // px, so 4 here rendered far too wide. 0.56px matches the design.
+    letterSpacing: 0.56,
     textTransform: "uppercase" as const,
   },
 } as const;

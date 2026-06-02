@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Pressable, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { CircleDashed, Leaf, Rocket } from "lucide-react-native";
+import { CircleDashed, Compass, Leaf, Plus, Rocket } from "lucide-react-native";
 import { useQuery } from "convex/react";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -42,6 +42,36 @@ function ClubSkeletons({ count }: { count: number }) {
         <Skeleton key={i} height={76} borderRadius={radius.md} />
       ))}
     </>
+  );
+}
+
+// One row inside the "+ Community" popover.
+function FabMenuRow({
+  icon,
+  label,
+  onPress,
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      style={{
+        flexDirection: "row",
+        alignItems: "center",
+        gap: spacing.s3,
+        paddingVertical: spacing.s2,
+        paddingHorizontal: spacing.s3,
+        borderRadius: radius.sm,
+      }}
+    >
+      {icon}
+      <Text style={{ ...typography.bodyMd, color: palette.textOnBrand }}>{label}</Text>
+    </Pressable>
   );
 }
 
@@ -118,6 +148,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
   const hasClubs = !!myClubs && myClubs.length > 0;
 
   const [refreshing, setRefreshing] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   // Queries are live; pull-to-refresh re-probes the network (honest gesture).
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
@@ -167,7 +198,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
           />
         }
       >
-        <View style={{ gap: spacing.s2, marginTop: spacing.s3 }}>
+        <View style={{ gap: spacing.s3, marginTop: spacing.s6 }}>
           <Text style={{ ...typography.displayMd, color: colors.textPrimary }}>
             Welcome {username} 👋🏽
           </Text>
@@ -183,8 +214,10 @@ export function CommunityHomeScreen({ navigation }: Props) {
               backgroundColor: colors.surfaceSecondary,
             }}
           >
-            <Leaf size={14} color={palette.accent} />
-            <Text style={{ ...typography.bodySm, color: colors.textPrimary, fontStyle: "italic" }}>
+            {/* textAlt is the mode-correct "text on a secondary surface" token —
+                readable on the light Flip/Light chip and the dark Dark chip. */}
+            <Leaf size={14} color={colors.textAccent} />
+            <Text style={{ ...typography.bodySm, color: colors.textAlt, fontStyle: "italic" }}>
               Books are a uniquely portable magic
             </Text>
           </View>
@@ -192,7 +225,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
 
         {myClubs === undefined ? (
           <View style={{ gap: spacing.s2 }}>
-            <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
+            <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
               My communities
             </Text>
             <ClubSkeletons count={2} />
@@ -219,12 +252,13 @@ export function CommunityHomeScreen({ navigation }: Props) {
           </View>
         ) : (
           <View style={{ gap: spacing.s2 }}>
-            <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
+            <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
               My communities
             </Text>
             {myClubs.map((club) => (
               <ClubCard
                 key={club._id}
+                contained
                 club={{
                   name: club.name,
                   moderatorName: club.role === "moderator" ? "You" : undefined,
@@ -239,7 +273,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
         )}
 
         <View style={{ gap: spacing.s2 }}>
-          <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
+          <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
             Popular communities
           </Text>
           {popularClubs === undefined ? (
@@ -267,6 +301,93 @@ export function CommunityHomeScreen({ navigation }: Props) {
           )}
         </View>
       </ScrollView>
+
+      {/* Tap-out backdrop while the menu is open. */}
+      {menuOpen ? (
+        <Pressable
+          onPress={() => setMenuOpen(false)}
+          accessibilityLabel="Close menu"
+          style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+        />
+      ) : null}
+
+      {/* Persistent "+ Community" FAB → reveals Create / Join (Figma 103-12595). */}
+      <View
+        pointerEvents="box-none"
+        style={{
+          position: "absolute",
+          left: 0,
+          right: 0,
+          bottom: spacing.s5,
+          alignItems: "center",
+          gap: spacing.s3,
+        }}
+      >
+        {menuOpen ? (
+          <View
+            style={{
+              backgroundColor: palette.brandPrimary,
+              borderRadius: radius.md,
+              padding: spacing.s2,
+              minWidth: 220,
+              shadowColor: "#000",
+              shadowOpacity: 0.18,
+              shadowRadius: 16,
+              shadowOffset: { width: 0, height: 6 },
+              elevation: 8,
+            }}
+          >
+            <FabMenuRow
+              icon={<Rocket size={16} color={palette.textOnBrand} />}
+              label="Create a community"
+              onPress={() => {
+                setMenuOpen(false);
+                goCreate();
+              }}
+            />
+            <FabMenuRow
+              icon={<Compass size={16} color={palette.textOnBrand} />}
+              label="Join a community"
+              onPress={() => {
+                setMenuOpen(false);
+                goJoin();
+              }}
+            />
+          </View>
+        ) : null}
+
+        <Pressable
+          onPress={() => setMenuOpen((v) => !v)}
+          accessibilityRole="button"
+          accessibilityLabel="Add community"
+          accessibilityState={{ expanded: menuOpen }}
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.s2,
+            backgroundColor: palette.brandPrimary,
+            paddingVertical: spacing.s3,
+            paddingHorizontal: spacing.s4,
+            borderRadius: radius.pill,
+            shadowColor: "#000",
+            shadowOpacity: 0.18,
+            shadowRadius: 12,
+            shadowOffset: { width: 0, height: 4 },
+            elevation: 8,
+          }}
+        >
+          <Plus size={18} color={palette.textOnBrand} />
+          <Text
+            style={{
+              ...typography.bodyMd,
+              fontFamily: "Raleway-SemiBold",
+              color: palette.textOnBrand,
+            }}
+          >
+            Community
+          </Text>
+        </Pressable>
+      </View>
     </SafeAreaView>
   );
 }

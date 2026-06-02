@@ -34,15 +34,23 @@ function formatActivity(ts: number): string {
 interface ClubCardProps {
   club: ClubCardData;
   onPress?: () => void;
+  /** Render on a filled surfaceSecondary card (per Figma "my communities"). */
+  contained?: boolean;
 }
 
 // Community card per Figma "Community link card": square emblem on the left,
 // name + "Moderated by …" + member count on the right, optional Member badge.
 // Stubbed avatar stack uses initials from the moderator name until we wire
 // the member-avatars endpoint in Phase 4.
-export function ClubCard({ club, onPress }: ClubCardProps) {
+export function ClubCard({ club, onPress, contained }: ClubCardProps) {
   const { colors } = useTheme();
   const [pressed, setPressed] = useState(false);
+
+  const surface = contained
+    ? colors.surfaceSecondary
+    : pressed
+      ? colors.surfaceSecondary
+      : "transparent";
 
   const initials = club.name
     .split(/\s+/)
@@ -63,7 +71,7 @@ export function ClubCard({ club, onPress }: ClubCardProps) {
         gap: spacing.s3,
         padding: spacing.s3,
         borderRadius: radius.md,
-        backgroundColor: pressed ? colors.surfaceSecondary : "transparent",
+        backgroundColor: surface,
         alignItems: "center",
       }}
     >
