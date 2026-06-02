@@ -49,10 +49,12 @@ function ClubSkeletons({ count }: { count: number }) {
 function FabMenuRow({
   icon,
   label,
+  color,
   onPress,
 }: {
   icon: React.ReactNode;
   label: string;
+  color: string;
   onPress: () => void;
 }) {
   return (
@@ -70,7 +72,7 @@ function FabMenuRow({
       }}
     >
       {icon}
-      <Text style={{ ...typography.bodyMd, color: palette.textOnBrand }}>{label}</Text>
+      <Text style={{ ...typography.bodyMd, color }}>{label}</Text>
     </Pressable>
   );
 }
@@ -137,7 +139,10 @@ function ActionCard({ variant, icon, title, subtitle, onPress }: ActionCardProps
 }
 
 export function CommunityHomeScreen({ navigation }: Props) {
-  const { colors, mode, setMode } = useTheme();
+  const { colors, mode, setMode, buttons } = useTheme();
+  // The FAB + popover use the primary-button token so they're indigo in Light,
+  // coral in Flip, and purple in Dark — matching the Figma per-mode renders.
+  const fab = buttons.primary.default;
   const me = useQuery(api.users.me);
   const myClubs = useQuery(api.clubs.listMine);
   const popularClubs = useQuery(api.clubs.listPublic, {});
@@ -326,7 +331,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
         {menuOpen ? (
           <View
             style={{
-              backgroundColor: palette.brandPrimary,
+              backgroundColor: fab.surface,
               borderRadius: radius.md,
               padding: spacing.s2,
               minWidth: 220,
@@ -338,16 +343,18 @@ export function CommunityHomeScreen({ navigation }: Props) {
             }}
           >
             <FabMenuRow
-              icon={<Rocket size={16} color={palette.textOnBrand} />}
+              icon={<Rocket size={16} color={fab.text} />}
               label="Create a community"
+              color={fab.text}
               onPress={() => {
                 setMenuOpen(false);
                 goCreate();
               }}
             />
             <FabMenuRow
-              icon={<Compass size={16} color={palette.textOnBrand} />}
+              icon={<Compass size={16} color={fab.text} />}
               label="Join a community"
+              color={fab.text}
               onPress={() => {
                 setMenuOpen(false);
                 goJoin();
@@ -365,7 +372,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
             flexDirection: "row",
             alignItems: "center",
             gap: spacing.s2,
-            backgroundColor: palette.brandPrimary,
+            backgroundColor: fab.surface,
             paddingVertical: spacing.s3,
             paddingHorizontal: spacing.s4,
             borderRadius: radius.pill,
@@ -376,12 +383,12 @@ export function CommunityHomeScreen({ navigation }: Props) {
             elevation: 8,
           }}
         >
-          <Plus size={18} color={palette.textOnBrand} />
+          <Plus size={18} color={fab.text} />
           <Text
             style={{
               ...typography.bodyMd,
               fontFamily: "Raleway-SemiBold",
-              color: palette.textOnBrand,
+              color: fab.text,
             }}
           >
             Community

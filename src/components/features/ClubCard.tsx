@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
+import { CheckCircle2 } from "lucide-react-native";
 
 import { Avatar } from "@/components/ui/Avatar";
 import { palette } from "@/theme/palette";
@@ -107,9 +108,11 @@ export function ClubCard({ club, onPress, contained }: ClubCardProps) {
       <View style={{ flex: 1, gap: spacing.s1 }}>
         <Text
           style={{
-            ...typography.headingMd,
-            fontSize: 16,
-            color: colors.textPrimary,
+            // Figma: community name is Body/Overline/Large (uppercase). textAlt
+            // reads on the light contained card (Light/Flip) and the dark card
+            // (Dark); textPrimary on the plain primary surface (popular list).
+            ...typography.overlineLg,
+            color: contained ? colors.textAlt : colors.textPrimary,
           }}
           numberOfLines={2}
         >
@@ -118,7 +121,7 @@ export function ClubCard({ club, onPress, contained }: ClubCardProps) {
         {club.moderatorName ? (
           <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
             Moderated by:{" "}
-            <Text style={{ color: palette.accent, fontFamily: "Raleway-SemiBold" }}>
+            <Text style={{ color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
               {club.moderatorName}
             </Text>
           </Text>
@@ -148,17 +151,22 @@ export function ClubCard({ club, onPress, contained }: ClubCardProps) {
       {club.isMember ? (
         <View
           style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.s1,
             paddingVertical: spacing.s1,
             paddingHorizontal: spacing.s2,
             borderRadius: radius.pill,
-            backgroundColor: palette.brandPrimary,
+            borderWidth: 1,
+            borderColor: colors.textAccent,
           }}
         >
+          <CheckCircle2 size={12} color={colors.textAccent} />
           <Text
             style={{
               ...typography.uiLabelMd,
               fontSize: 11,
-              color: palette.textOnBrand,
+              color: colors.textAccent,
               fontFamily: "Raleway-SemiBold",
             }}
           >
