@@ -35,6 +35,7 @@ import {
   type CachedContentMeta,
   type ContentKind,
 } from "@/lib/bookMeta";
+import { analytics } from "@/lib/analytics";
 import { useConnectivity } from "@/lib/connectivity";
 import { enqueueReaction } from "@/lib/reactionQueue";
 
@@ -272,6 +273,7 @@ export function ReaderScreen({ navigation, route }: Props) {
     }
     try {
       await createReaction(args);
+      analytics.track("reaction_added", { type: payload.type });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
     } catch (err) {
       const code = (err as { data?: { code?: string } })?.data?.code;

@@ -5,6 +5,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/Button";
+import { analytics } from "@/lib/analytics";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -58,6 +59,7 @@ export function GenrePreferencesScreen({ route }: Props) {
     setSubmitting(true);
     try {
       await createUser({ displayName, firstName, lastName, genres });
+      analytics.track("profile_completed", { genres: genres.length });
       // RootNavigator's auth gate sees users.me become non-null and routes to
       // MainTabs automatically — no explicit navigation here.
     } catch (err) {

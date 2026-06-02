@@ -37,11 +37,16 @@ type FontScalable = { defaultProps?: { maxFontSizeMultiplier?: number } };
 // Clerk's `useSSO()` flow (Apple/Google) to complete properly in Expo Go and
 // dev builds. Safe to call at module scope — no-op outside of OAuth flows.
 WebBrowser.maybeCompleteAuthSession();
+
+// Initialise analytics once at module load (no-op until PostHog is wired).
+initAnalytics();
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { RootNavigator } from "@/navigation/RootNavigator";
+import { initAnalytics } from "@/lib/analytics";
+import { useAnalyticsIdentity } from "@/lib/useAnalyticsIdentity";
 import { CLERK_PUBLISHABLE_KEY, tokenCache } from "@/lib/clerk";
 import { convex } from "@/lib/convex";
 import { palette } from "@/theme/palette";
@@ -86,6 +91,7 @@ export default function App() {
 
 function ThemedShell() {
   const { mode } = useTheme();
+  useAnalyticsIdentity();
   // Light wants dark icons in the status bar; Flip + Dark want light.
   const statusBarStyle = mode === "light" ? "dark" : "light";
 

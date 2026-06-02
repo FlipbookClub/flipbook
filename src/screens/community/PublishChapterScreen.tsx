@@ -17,6 +17,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
+import { analytics } from "@/lib/analytics";
 import { MAX_PDF_BYTES, pickPdf, uploadPdf, type PickedPdf } from "@/lib/pdf";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
@@ -97,6 +98,7 @@ export function PublishChapterScreen({ navigation, route }: Props) {
         fileSize: file.size,
         authorNote: note.trim() || undefined,
       });
+      analytics.track("chapter_published", { pages: pageCount });
       navigation.goBack();
     } catch (err) {
       const code = (err as { data?: { code?: string } })?.data?.code;

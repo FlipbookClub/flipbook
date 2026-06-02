@@ -18,6 +18,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
+import { analytics } from "@/lib/analytics";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -79,6 +80,10 @@ export function CreateCommunityScreen({ navigation }: Props) {
         // TASK-034 (books storage). For now we just don't persist it; the
         // moderator can update later via Edit Club (TASK-032).
         permissions: perms,
+      });
+      analytics.track("club_created", {
+        type: clubType,
+        visibility: isPrivate ? "private" : "public",
       });
       navigation.replace("InviteMembers", { clubId, inviteCode });
     } catch (err) {

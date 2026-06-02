@@ -18,6 +18,7 @@ import { ClubCard } from "@/components/features/ClubCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { analytics } from "@/lib/analytics";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -56,6 +57,7 @@ export function JoinCommunityScreen({ navigation }: Props) {
     setSubmitting(true);
     try {
       const clubId = await joinByCode({ inviteCode: normalizedCode });
+      analytics.track("club_joined", { via: "code" });
       navigation.replace("ClubDetail", { clubId });
     } catch (err) {
       const code = (err as { data?: { code?: string } })?.data?.code;
