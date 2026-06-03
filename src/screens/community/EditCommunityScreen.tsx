@@ -11,7 +11,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { ChevronLeft, ImagePlus } from "lucide-react-native";
+import { ChevronLeft, ImagePlus } from "@/lib/icons";
 import * as ImagePicker from "expo-image-picker";
 import { createUploadTask, FileSystemUploadType } from "expo-file-system/legacy";
 import { useMutation, useQuery } from "convex/react";

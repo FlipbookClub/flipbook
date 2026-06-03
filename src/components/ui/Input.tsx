@@ -8,7 +8,7 @@ import {
   type TextInputProps,
   type ViewStyle,
 } from "react-native";
-import { Eye, EyeOff } from "lucide-react-native";
+import { Eye, EyeOff } from "@/lib/icons";
 
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";

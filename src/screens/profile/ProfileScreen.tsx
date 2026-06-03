@@ -1,5 +1,5 @@
 import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { Settings } from "lucide-react-native";
+import { Settings } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 

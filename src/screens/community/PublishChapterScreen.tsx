@@ -10,7 +10,7 @@ import {
   View,
 } from "react-native";
 import Pdf from "react-native-pdf";
-import { ChevronLeft, Upload } from "lucide-react-native";
+import { ChevronLeft, Upload } from "@/lib/icons";
 import { useMutation } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 

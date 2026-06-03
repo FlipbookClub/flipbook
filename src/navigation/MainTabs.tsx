@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { BookOpen, User, Users } from "lucide-react-native";
+import { BookOpen, User, Users } from "@/lib/icons";
 
 import { CommunityStack } from "@/navigation/CommunityStack";
 import { LibraryStack } from "@/navigation/LibraryStack";

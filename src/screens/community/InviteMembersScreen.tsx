@@ -8,7 +8,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { ChevronLeft, ExternalLink, ShieldCheck } from "lucide-react-native";
+import { ChevronLeft, ExternalLink, ShieldCheck } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 

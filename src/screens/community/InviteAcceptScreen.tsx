@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, SafeAreaView, Text, View } from "react-native";
-import { ChevronLeft, ShieldCheck } from "lucide-react-native";
+import { ChevronLeft, ShieldCheck } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 

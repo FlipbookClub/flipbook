@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { ChevronLeft, Moon, Sparkles, Sun } from "lucide-react-native";
+import { ChevronLeft, Moon, Sparkles, Sun } from "@/lib/icons";
 import { useAuth } from "@clerk/clerk-expo";
 import { useNavigation } from "@react-navigation/native";
 

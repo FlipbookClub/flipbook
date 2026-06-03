@@ -7,7 +7,7 @@ import {
   CreditCard,
   LogOut,
   Trash2,
-} from "lucide-react-native";
+} from "@/lib/icons";
 import { useAuth, useUser } from "@clerk/clerk-expo";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, Text, View } from "react-native";
 import Pdf from "react-native-pdf";
-import { X } from "lucide-react-native";
+import { X } from "@/lib/icons";
 import { useMutation } from "convex/react";
 
 import { Button } from "@/components/ui/Button";

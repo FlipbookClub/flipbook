@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert, Image, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
-import { BookPlus, ChevronLeft, MoreVertical, Search, Settings, Share2 } from "lucide-react-native";
+import { BookPlus, ChevronLeft, MoreVertical, Search, Settings, Share2 } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 

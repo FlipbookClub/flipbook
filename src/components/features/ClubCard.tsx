@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Image, Pressable, Text, View } from "react-native";
-import { CheckCircle2 } from "lucide-react-native";
+import { CheckCircle2 } from "@/lib/icons";
 
 import { Avatar } from "@/components/ui/Avatar";
 import { palette } from "@/theme/palette";

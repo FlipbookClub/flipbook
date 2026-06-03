@@ -8,7 +8,7 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { MessageSquare, X } from "lucide-react-native";
+import { MessageSquare, X } from "@/lib/icons";
 
 import { Button } from "@/components/ui/Button";
 import { radius, spacing } from "@/theme/spacing";

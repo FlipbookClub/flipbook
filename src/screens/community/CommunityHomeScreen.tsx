@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Pressable, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { CircleDashed, Compass, Leaf, Plus, Rocket } from "lucide-react-native";
+import { CircleDashed, Compass, Leaf, Plus, Rocket } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -10,7 +10,7 @@ import { ClubCard } from "@/components/features/ClubCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { isOnlineNow } from "@/lib/connectivity";
-import { Moon, Sparkles, Sun } from "lucide-react-native";
+import { Moon, Sparkles, Sun } from "@/lib/icons";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";

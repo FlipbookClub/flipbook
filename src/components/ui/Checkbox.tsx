@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Pressable, Text, View } from "react-native";
-import { Check } from "lucide-react-native";
+import { Check } from "@/lib/icons";
 
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";

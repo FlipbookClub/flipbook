@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
-import { Pencil, Trash2, X } from "lucide-react-native";
+import { Pencil, Trash2, X } from "@/lib/icons";
 import { useMutation } from "convex/react";
 
 import { palette } from "@/theme/palette";

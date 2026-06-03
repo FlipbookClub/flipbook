@@ -10,7 +10,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { ImagePlus, ShieldCheck, X } from "lucide-react-native";
+import { ImagePlus, ShieldCheck, X } from "@/lib/icons";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";

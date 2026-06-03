@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Text, View } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
-import { CloudOff } from "lucide-react-native";
+import { CloudOff } from "@/lib/icons";
 
 import { useConnectivity } from "@/lib/connectivity";
 import { useReducedMotion } from "@/lib/useReducedMotion";

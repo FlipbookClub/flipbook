@@ -7,7 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { MessageSquare, Trash2, X } from "lucide-react-native";
+import { MessageSquare, Trash2, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 
 import { Avatar } from "@/components/ui/Avatar";

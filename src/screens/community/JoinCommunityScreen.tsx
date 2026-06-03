@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { ChevronLeft, Lock, Search, ShieldCheck } from "lucide-react-native";
+import { ChevronLeft, Lock, Search, ShieldCheck } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 

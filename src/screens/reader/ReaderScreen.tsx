@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import Pdf from "react-native-pdf";
-import { Settings2, Smile, X } from "lucide-react-native";
+import { Settings2, Smile, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
