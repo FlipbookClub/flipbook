@@ -6,6 +6,7 @@ import { useMutation } from "convex/react";
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { GenrePicker } from "@/components/features/GenrePicker";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -32,6 +33,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
+  const [genre, setGenre] = useState<string | null>(null);
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [pageDetectionError, setPageDetectionError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -42,6 +44,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
     if (!visible) {
       setTitle("");
       setAuthor("");
+      setGenre(null);
       setPageCount(null);
       setPageDetectionError(null);
       setProgress(0);
@@ -80,6 +83,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         clubId,
         title: title.trim(),
         author: author.trim(),
+        genre: genre ?? undefined,
         pdfStorageId: storageId as Id<"_storage">,
         pdfPageCount: pageCount,
         fileSize: file.size,
@@ -181,6 +185,15 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
             autoCapitalize="words"
             editable={stage === "metadata"}
             maxLength={100}
+          />
+        </View>
+
+        <View style={{ gap: spacing.s2 }}>
+          <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>Genre (optional)</Text>
+          <GenrePicker
+            value={genre}
+            onChange={setGenre}
+            disabled={stage !== "metadata"}
           />
         </View>
 

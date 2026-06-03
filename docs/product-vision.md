@@ -246,6 +246,7 @@ In scope. Buildable in 6–8 weeks of focused part-time work with Claude Code.
 
 **Could Have (P2 — Phase 2 or later).**
 
+- **Live review sessions (Phase 8 — fast-follow, the first thing after MVP launch).** Clubs schedule and hold live, Twitter Spaces–style review sessions: a host (the moderator, or a member granted hosting rights) goes live with real-time audio, members join to listen or request to speak (raise-hand), and a synchronized live text chat + reaction stream runs alongside the voice. Deliberately *not* in the launch MVP — it adds real-time audio infrastructure (a WebRTC provider on top of Convex) that would delay launch — but it's the highest-priority post-launch addition because it turns the async, page-keyed conversation into a scheduled synchronous ritual the community shows up for. Spec'd in full in `prd.md` (§ Live Review Sessions) and `product-roadmap.md` (Phase 8).
 - Web companion (invite landing page, creator dashboard)
 - Creator monetization (paid subscriptions, one-time purchases) via Polar / Stripe Connect
 - System-theme auto-switching (the "Match system" toggle that maps OS dark mode to either Flip or Dark)

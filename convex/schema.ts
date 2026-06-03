@@ -72,6 +72,8 @@ export default defineSchema({
   books: defineTable({
     title: v.string(),
     author: v.string(),
+    // Optional genre from the shared GENRES catalogue (src/lib/genres.ts).
+    genre: v.optional(v.string()),
     pdfStorageId: v.id("_storage"),
     pdfPageCount: v.number(),
     coverImageUrl: v.optional(v.string()),

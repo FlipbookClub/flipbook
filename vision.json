@@ -1,8 +1,8 @@
 {
   "meta": {
     "createdAt": "2026-04-30T12:00:00Z",
-    "updatedAt": "2026-04-30T12:00:00Z",
-    "version": "1.0",
+    "updatedAt": "2026-06-02T12:00:00Z",
+    "version": "1.1",
     "plaidVersion": "1.0"
   },
   "creator": {
@@ -25,7 +25,8 @@
       "In-app reading with offline support — open the book, read on the train, progress syncs when online",
       "Page-synchronized reactions and discussion — comments, highlights, and reactions tied to the exact page so conversations don't spoil ahead",
       "Creator publishing (Phase 1: free; Phase 2: monetized) — authors publish chapters, build a community around their work, and eventually charge for subscriptions or one-time access",
-      "Discovery feed — find active clubs and creators worth following"
+      "Discovery feed — find active clubs and creators worth following",
+      "Live review sessions (fast-follow after MVP launch) — clubs schedule and hold live, Twitter Spaces–style review sessions: a host (moderator or a permitted member) goes live with real-time audio, members join to listen or speak (raise-hand), and a synchronized live text chat + reaction stream runs alongside the voice. Turns the async page-keyed conversation into a scheduled, synchronous moment the community shows up for"
     ],
     "platform": "mobile",
     "marketDifferentiation": "Unlike Goodreads — which is a graveyard of past reviews — and unlike Discord book clubs that dissolve in three weeks, Flipbook ties the conversation to the page itself. The community stays alive as long as someone is reading, and creators get a home where their audience doesn't just subscribe — they show up to read together.",

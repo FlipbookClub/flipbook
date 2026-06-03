@@ -331,6 +331,10 @@ export default defineSchema({
       membersCanUploadBooks: v.boolean(),
       membersCanInviteOthers: v.boolean(),
       membersCanUpdateInfo: v.boolean(),
+      // Phase 8 (Live Review Sessions). Optional so existing club docs remain
+      // valid without a migration; treat `undefined` as `false`. When true,
+      // any member may schedule and host a live session in this club.
+      membersCanHostSessions: v.optional(v.boolean()),
     }),
     bookId: v.optional(v.id("books")),   // Currently-reading book; null for creator clubs that drop chapters
     inviteCode: v.string(),              // Unique short code for invite URLs
@@ -430,16 +434,88 @@ export default defineSchema({
       v.literal("reaction_reply"),
       v.literal("club_invite"),
       v.literal("milestone"),
+      v.literal("session_scheduled"),    // Phase 8 — a session was scheduled in a club you're in
+      v.literal("session_starting"),     // Phase 8 — a session you're attending / in its club is going live
     ),
     title: v.string(),
     body: v.string(),
     deepLink: v.string(),                // E.g. "flipbook://clubs/abc123/chapters/4"
     isRead: v.boolean(),
     sentAt: v.number(),
-    relatedId: v.optional(v.string()),   // Generic ID for the entity (chapter, reaction)
+    relatedId: v.optional(v.string()),   // Generic ID for the entity (chapter, reaction, session)
   })
     .index("by_user_and_sent", ["userId", "sentAt"])
     .index("by_user_unread", ["userId", "isRead"]),
+
+  // ---- Phase 8: Live Review Sessions (fast-follow after MVP launch) ----
+  // Twitter Spaces–style live audio rooms scoped to a club, with a
+  // synchronized live text chat. Audio media is carried by a WebRTC provider
+  // (LiveKit Cloud — see § Dependencies); Convex owns scheduling, lifecycle,
+  // presence, roles, and the text chat. The LiveKit "room" name is the
+  // session's Convex _id, so the two systems stay in lockstep.
+  liveSessions: defineTable({
+    clubId: v.id("clubs"),
+    title: v.string(),                   // Required, max 80 chars — "Chapter 1–5 deep dive"
+    description: v.optional(v.string()), // Max 280 chars
+    hostId: v.id("users"),               // Who created/hosts it (moderator or permitted member)
+    // Optional anchor to what's being reviewed, for deep-linking + context.
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
+    status: v.union(
+      v.literal("scheduled"),            // Created with a future scheduledFor
+      v.literal("live"),                 // Host has started it; audio room is open
+      v.literal("ended"),                // Host ended it (or it auto-ended)
+      v.literal("cancelled"),            // Host cancelled before going live
+    ),
+    scheduledFor: v.number(),            // Unix ms — when it's set to start
+    startedAt: v.optional(v.number()),   // Set when status → live
+    endedAt: v.optional(v.number()),     // Set when status → ended/cancelled
+    // Denormalized peak + current counts for list rendering without a join.
+    participantCount: v.number(),        // Currently-present participants
+    peakParticipantCount: v.number(),
+    // LiveKit room name == this session's _id (set at creation via a patch).
+    createdAt: v.number(),
+  })
+    .index("by_club", ["clubId"])
+    .index("by_club_and_status", ["clubId", "status"])
+    .index("by_status_and_scheduled", ["status", "scheduledFor"])
+    .index("by_host", ["hostId"]),
+
+  sessionParticipants: defineTable({
+    sessionId: v.id("liveSessions"),
+    userId: v.id("users"),
+    role: v.union(
+      v.literal("host"),                 // Started it; full controls
+      v.literal("speaker"),              // Granted mic by host
+      v.literal("listener"),             // Default on join
+    ),
+    // Raise-hand request to speak. Cleared when promoted or denied.
+    handRaised: v.boolean(),
+    // Mute state is mirrored from the audio layer for UI; source of truth for
+    // actual audio publish is LiveKit, this is for fast reactive rendering.
+    isMuted: v.boolean(),
+    joinedAt: v.number(),
+    leftAt: v.optional(v.number()),      // Set on leave; row kept for history
+    isPresent: v.boolean(),              // false after leftAt; drives live roster
+  })
+    .index("by_session", ["sessionId"])
+    .index("by_session_and_user", ["sessionId", "userId"])
+    .index("by_session_present", ["sessionId", "isPresent"])
+    .index("by_user", ["userId"]),
+
+  sessionMessages: defineTable({
+    sessionId: v.id("liveSessions"),
+    userId: v.id("users"),
+    type: v.union(
+      v.literal("comment"),              // Live text chat message
+      v.literal("emoji"),                // Reaction stream (curated set, like reactions)
+    ),
+    text: v.optional(v.string()),        // Required if type=comment, max 280 chars
+    emoji: v.optional(v.string()),       // Required if type=emoji
+    createdAt: v.number(),
+  })
+    .index("by_session_and_created", ["sessionId", "createdAt"])
+    .index("by_user_and_created", ["userId", "createdAt"]),   // Rate-limit lookup
 });
 ```
 
@@ -455,8 +531,12 @@ export default defineSchema({
 - **`reactions` 1:N `reactions`** (self-referential via `parentReactionId`) — Reactions can have replies; only 1 level of nesting.
 - **`users` 1:N `progress`** — A user has progress per (club, book/chapter).
 - **`users` 1:N `notifications`** — Notifications belong to a specific user.
+- **`clubs` 1:N `liveSessions`** (Phase 8) — A club can hold many live sessions over time; at most one `live` at a time (enforced in the start mutation).
+- **`liveSessions` 1:N `sessionParticipants`** (Phase 8) — A session has many participants, each with a role (host/speaker/listener) and presence state.
+- **`liveSessions` 1:N `sessionMessages`** (Phase 8) — A session has many live-chat messages and emoji reactions.
+- **`liveSessions` 0:1 `books`/`chapters`** (Phase 8) — A session may optionally be anchored to the book or chapter under review.
 
-**Cascade behavior.** Convex doesn't have foreign-key cascades — implement manually. When a club is deleted: delete memberships, books (and storage), chapters (and storage), reactions, progress entries for that club. When a user is deleted: anonymize their reactions (set `userId` to a "deleted" sentinel), remove their memberships, delete their progress, delete their notifications.
+**Cascade behavior.** Convex doesn't have foreign-key cascades — implement manually. When a club is deleted: delete memberships, books (and storage), chapters (and storage), reactions, progress entries, live sessions (and their participants + messages), for that club. When a user is deleted: anonymize their reactions and session messages (set `userId` to a "deleted" sentinel), remove their memberships and session-participant rows, delete their progress, delete their notifications. When a live session ends: keep the row (status `ended`) and its messages for history; mark all participants `isPresent: false`.
 
 ### Indexes
 
@@ -474,6 +554,10 @@ The indexes defined inline in the schema above cover all common query patterns:
 - `progress.by_user_and_club` — show user's progress in a club
 - `notifications.by_user_unread` — unread notification count
 - `chapters.by_club_and_number` — list chapters in order
+- `liveSessions.by_club_and_status` (Phase 8) — show a club's live/scheduled sessions
+- `liveSessions.by_status_and_scheduled` (Phase 8) — upcoming-session reminders (cron) + "live now" surfacing
+- `sessionParticipants.by_session_present` (Phase 8) — render the live roster (speakers + listeners)
+- `sessionMessages.by_session_and_created` (Phase 8) — load the live chat in order
 
 -----
 
@@ -1236,6 +1320,184 @@ Acceptance Criteria:
 - [ ] Given I'm on Settings, when I tap "Theme", then I see a picker with three options (Light, Flip, Dark) each with a small preview swatch.
 - [ ] Given I select a mode, when I return to any screen, then the app is now rendered in that mode.
 - [ ] Given I quit and reopen the app, when it boots, then it boots in my previously selected mode.
+
+-----
+
+## 6A. Live Review Sessions (Phase 8 — Fast-Follow)
+
+> **Status:** NOT in the launch MVP. This is the highest-priority post-launch addition, built as **Phase 8** immediately after the closed-beta launch. It is fully specified here so the coding agent can build it without re-planning. Everything in this section is gated behind Phase 8 — do not build it during Phases 0–7.
+
+### 6A.1 Overview
+
+A live review session is a **Twitter Spaces–style live audio room scoped to a club**, with a **synchronized live text chat + emoji reaction stream** running alongside the voice. A host goes live; members join to listen, raise a hand to speak, and chat in real time. It turns Flipbook's async, page-keyed conversation into a scheduled, synchronous ritual the community shows up for.
+
+**Architecture split (important).** Audio media is carried by **LiveKit Cloud** (a managed WebRTC SFU — see § Dependencies). **Convex owns everything else**: scheduling, session lifecycle/state machine, participant roster + roles, raise-hand, presence, and the live text chat (which rides Convex's existing reactivity, exactly like margin reactions). The LiveKit room name **is** the session's Convex document `_id`, so the two systems never drift. Clients get a short-lived LiveKit access token from a Convex action that signs it with the LiveKit API secret server-side — the secret never reaches the device.
+
+**Why this split:** the founder is solo, part-time, and budget-constrained. Building custom WebRTC audio is out of the question; a managed SFU with a generous free tier (LiveKit Cloud) gives production-grade audio with a documented React Native SDK, while Convex — already in the stack and already reactive — handles the parts it's best at for free.
+
+### 6A.2 Session State Machine
+
+`scheduled → live → ended` (happy path). `scheduled → cancelled` (host cancels before going live). Transitions:
+
+- **create** → `scheduled` (requires a `scheduledFor` ≥ now). Host may also "start now" which creates and immediately transitions to `live`.
+- **start** (host only) → `live`. Sets `startedAt`, opens the LiveKit room, mints the host token. Guard: a club may have **at most one `live` session at a time** — reject with a clear error if one is already live.
+- **end** (host only) → `ended`. Sets `endedAt`, marks all participants `isPresent: false`, closes the LiveKit room. Also auto-ends if the host disconnects and doesn't return within 90s, or after 10 min with zero participants.
+- **cancel** (host only, only while `scheduled`) → `cancelled`. Notifies club members the session won't happen.
+
+### 6A.3 Permissions
+
+Hosting is governed by the existing `clubs.permissions` object, extended with `membersCanHostSessions` (see § Data Model). The **moderator can always host** (derived from role). A **member can schedule/host only if `membersCanHostSessions === true`** for that club. All other members (and followers, for creator clubs) can **join, listen, chat, and raise hand**. Only the host can: promote a hand-raiser to speaker, mute/remove a speaker, and end the session. Enforce all of this **server-side** in the relevant mutations — never trust the client.
+
+### 6A.4 API Specification (Convex functions)
+
+All functions live in `convex/sessions.ts` unless noted. Auth: every function checks the caller is a club member (or moderator); host-only actions additionally check host identity.
+
+| Function | Type | Args | Behavior / Returns |
+|---|---|---|---|
+| `sessions.schedule` | mutation | `clubId, title, description?, scheduledFor, bookId?, chapterId?` | Permission-checked (moderator or `membersCanHostSessions`). Inserts a `liveSessions` row (`status: "scheduled"`), fans out `session_scheduled` notifications to club members. Returns `sessionId`. |
+| `sessions.startNow` | mutation | `clubId, title, description?, bookId?, chapterId?` | Convenience: schedule + immediately go `live`. Same permission check. |
+| `sessions.start` | mutation | `sessionId` | Host-only. Guards single-live-per-club. Sets `status: "live"`, `startedAt`. Inserts the host's `sessionParticipants` row (`role: "host"`). Fans out `session_starting` push to club members. |
+| `sessions.end` | mutation | `sessionId` | Host-only. Sets `status: "ended"`, `endedAt`; marks all participants `isPresent: false`. |
+| `sessions.cancel` | mutation | `sessionId` | Host-only, `scheduled` only. Sets `status: "cancelled"`. |
+| `sessions.join` | mutation | `sessionId` | Member-only, session must be `live`. Upserts a `sessionParticipants` row (`role: "listener"`, `isPresent: true`, `joinedAt`). Bumps `participantCount` / `peakParticipantCount`. |
+| `sessions.leave` | mutation | `sessionId` | Sets caller's participant `isPresent: false`, `leftAt`; decrements `participantCount`. If the host leaves, starts the 90s auto-end grace timer (scheduled function). |
+| `sessions.raiseHand` / `sessions.lowerHand` | mutation | `sessionId` | Toggles caller's `handRaised`. |
+| `sessions.setSpeaker` | mutation | `sessionId, userId, makeSpeaker` | Host-only. Promotes a hand-raiser to `speaker` (clears `handRaised`) or demotes back to `listener`. The client re-requests a LiveKit token reflecting new publish permissions. |
+| `sessions.setMuted` | mutation | `sessionId, userId, muted` | Self-mute always allowed; muting *others* is host-only. Mirrors mute state for UI. |
+| `sessions.removeParticipant` | mutation | `sessionId, userId` | Host-only. Force-removes (`isPresent: false`) and revokes their LiveKit grant. |
+| `sessions.postMessage` | mutation | `sessionId, type, text?, emoji?` | Member-only, session `live`. Inserts a `sessionMessages` row. Rate limit: **max 10 messages / 10s / user** (via `by_user_and_created`). |
+| `sessions.getLiveKitToken` | action | `sessionId` | Member-only. Looks up the caller's role, builds a LiveKit `AccessToken` (room = `sessionId`, `canPublish` = host/speaker, `canSubscribe` = always true) signed with `LIVEKIT_API_SECRET`, returns `{ token, wsUrl }`. **Action, not mutation** (uses Node crypto / LiveKit server SDK). |
+| `sessions.getForClub` | query | `clubId` | Returns the club's `live` session (if any) + upcoming `scheduled` sessions, ordered by `scheduledFor`. |
+| `sessions.get` | query | `sessionId` | Returns the session + live roster (present participants with role, handRaised, isMuted, joined-user profiles). Reactive — powers the live room UI. |
+| `sessions.listMessages` | query | `sessionId` | Reactive, paginated newest-last. Powers the live chat + reaction stream. |
+
+A scheduled (cron) Convex function `sessions.sendUpcomingReminders` runs every 5 min, finds `scheduled` sessions starting in the next ~10 min via `by_status_and_scheduled`, and sends `session_starting` reminders (honoring notification prefs).
+
+### 6A.5 Functional Requirements
+
+**FR-034: Schedule a live session**
+Priority: P1 (Phase 8)
+Description: A moderator — or a member with `membersCanHostSessions` — can schedule a session with a title, optional description, a start time, and an optional book/chapter anchor.
+Acceptance Criteria:
+- Permission enforced server-side in `sessions.schedule`.
+- `scheduledFor` must be ≥ now; past times rejected with inline error.
+- On success, club members receive a `session_scheduled` notification and the session appears in the club's "Upcoming" list.
+Related Stories: US-015
+
+**FR-035: Host a live session (go live)**
+Priority: P1 (Phase 8)
+Description: The host starts the session, opening the live audio room. At most one live session per club at a time.
+Acceptance Criteria:
+- `sessions.start` rejects if the club already has a `live` session.
+- On start, the host joins as a `speaker`/`host` with mic publish rights; `session_starting` push fans out to club members.
+- The session moves to the top of the club view with a "LIVE" indicator and current participant count.
+
+**FR-036: Join, listen, and leave**
+Priority: P1 (Phase 8)
+Description: Any club member can join a `live` session as a listener, hear the audio, and leave at any time.
+Acceptance Criteria:
+- Joining fetches a LiveKit token via `sessions.getLiveKitToken` and subscribes to audio (listener = subscribe-only).
+- The live roster updates in real time as people join/leave (reactive `sessions.get`).
+- Leaving (or backgrounding past a grace period) sets `isPresent: false` and decrements the count.
+
+**FR-037: Raise hand and speak**
+Priority: P1 (Phase 8)
+Description: A listener can raise a hand to request to speak; the host can promote them to speaker (granting mic) or demote them.
+Acceptance Criteria:
+- Raise/lower hand is reflected to the host in real time.
+- On promotion, the promoted user's client re-requests a token with `canPublish: true` and can be heard within a few seconds.
+- Speakers can self-mute/unmute; the host can mute or demote any speaker.
+
+**FR-038: Live text chat + reaction stream**
+Priority: P1 (Phase 8)
+Description: Alongside the audio, all present participants can post short text messages and emoji reactions that appear live for everyone in the room.
+Acceptance Criteria:
+- Messages render in real time via a reactive Convex query (same mechanism as margin reactions).
+- Curated emoji reactions float/stack as a lightweight stream; comments show name + text.
+- Rate limit: max 10 messages / 10s / user, enforced server-side.
+
+**FR-039: Host controls**
+Priority: P1 (Phase 8)
+Description: The host has a controls surface to manage speakers and end the session.
+Acceptance Criteria:
+- Host can promote/demote, mute, and remove participants; end the session.
+- Ending sets `status: ended`, closes the room, and returns everyone to the club view with a brief "Session ended" state.
+
+**FR-040: Session reminders & lifecycle notifications**
+Priority: P2 (Phase 8)
+Description: Members are reminded shortly before a scheduled session starts and notified when one goes live or is cancelled.
+Acceptance Criteria:
+- A cron sends `session_starting` reminders ~10 min before start (honoring `notificationPrefs`).
+- Going live sends a "live now" push; cancelling sends a cancellation notice. Deep links open the session (or the club).
+
+**FR-041: Session anchoring & history**
+Priority: P2 (Phase 8)
+Description: A session can be anchored to the book/chapter under review, and ended sessions remain visible in the club as history.
+Acceptance Criteria:
+- If anchored, the live room header shows the book/chapter and a tap opens it in the reader.
+- Ended sessions list under the club ("Past sessions") with title, host, date, and peak participant count.
+
+### 6A.6 User Stories
+
+**US-015: Moderator schedules and runs a review session**
+As a club moderator, I want to schedule a live review session and host it with audio, so my club can discuss the book together at a set time without leaving Flipbook.
+Acceptance Criteria:
+- [ ] Given I'm a moderator on a club, when I tap "Schedule session" and fill the form, then members get notified and the session shows under "Upcoming."
+- [ ] Given my scheduled session's time arrives, when I tap "Go live," then the audio room opens and members get a "live now" push.
+- [ ] Given I'm hosting, when a listener raises a hand, then I can promote them to speaker and hear them.
+
+**US-016: Member joins a live session**
+As a reader, I want to drop into a live session, listen, react, and chat, so I can be part of the conversation even when I don't want to talk.
+Acceptance Criteria:
+- [ ] Given a session is live in my club, when I tap "Join live," then I hear the audio and see who's in the room.
+- [ ] Given I'm in a session, when I send a chat message or emoji, then everyone in the room sees it live.
+- [ ] Given I want to talk, when I raise my hand and the host promotes me, then I can speak.
+
+**US-017: Member granted hosting rights**
+As a moderator, I want to let a trusted member host sessions, so I don't have to run every one myself.
+Acceptance Criteria:
+- [ ] Given I enable "Members can host sessions" in club settings, when a member opens the club, then they see the "Schedule session" action.
+- [ ] Given that permission is off, when a regular member opens the club, then they do not see hosting controls.
+
+### 6A.7 UI/UX Requirements
+
+**Club view additions.** A "Live now" banner (Vibrant Coral pulse) when a session is `live`, tappable to join. An "Upcoming sessions" row (cards: title, host avatar, relative start time, "Set reminder"). A "Past sessions" collapsed list. Moderators/permitted members see a "Schedule session" CTA.
+
+**Schedule sheet.** Bottom sheet (reuse `@gorhom/bottom-sheet`): title (required), optional description, date/time picker (default: next round half-hour), optional "Reviewing…" book/chapter selector, and a "Start now" shortcut. Inline validation; brand-voice copy.
+
+**Live room screen.** Full-screen, theme-aware (Light/Flip/Dark). Top: title + anchored book/chapter chip + live participant count + "Leave." Center: speaker grid (avatars with a speaking-ring animation driven by LiveKit audio levels; muted speakers show a small mute glyph). Below: listener avatars in a wrapped grid ("+N" overflow). Bottom: the live chat + floating emoji reactions, a message input, an emoji button, and a "Raise hand" button (becomes "Lower hand"; turns into mic mute/unmute once you're a speaker). Host sees an extra controls affordance (long-press a participant → promote/demote/mute/remove; an "End session" button).
+
+**States.** *Empty* (no sessions): "No live sessions yet. Schedule one and gather the club." *Connecting* (joining audio): skeleton room + "Tuning in…". *Permission denied* (mic not granted when promoted to speaker): prompt to enable mic in OS settings. *Reconnecting* (audio drop): non-blocking banner "Reconnecting…", chat stays usable. *Ended*: "Session ended" with a return-to-club button.
+
+**Anti-patterns (per Vision).** No follower-count/vanity surfaces; no streak/guilt mechanics; keep the room calm and library-grade, not a chaotic stage. Coral is the only "live" accent.
+
+### 6A.8 Non-Functional Requirements (session-specific)
+
+- **Audio join latency:** < 3s from tapping "Join live" to hearing audio (p95), on a good connection.
+- **Audio glitch-free playback:** rely on LiveKit's adaptive bitrate; target no sustained dropouts on a stable 4G/Wi-Fi connection.
+- **Chat round-trip:** p95 < 800ms in production (same bar as margin reactions — same Convex mechanism).
+- **Promotion-to-audible:** < 4s from host promoting a hand-raiser to that user being heard.
+- **Concurrency (MVP target):** comfortably support up to ~50 participants per room and ~100 concurrent participants across all rooms within the LiveKit Cloud free/build tier. Re-evaluate limits before scaling marketing.
+- **Token security:** LiveKit tokens are short-lived (TTL ≤ 1h), minted server-side in a Convex action; `LIVEKIT_API_SECRET` is never shipped to the client.
+- **Battery/data:** show a one-time note that live audio uses data; allow background audio (configure `expo-av`/CallKit-style audio session) so listeners can lock the screen.
+
+### 6A.9 Dependencies (session-specific)
+
+- **`@livekit/react-native`** + **`@livekit/react-native-webrtc`** — client audio. Requires a development build (config plugin; not Expo Go) — already true for this app (react-native-pdf). Add the LiveKit Expo config plugin and run `npx expo prebuild`.
+- **`livekit-server-sdk`** — used **only inside a Convex action** to mint access tokens. Node runtime action.
+- **LiveKit Cloud** account — free/build tier for MVP. Env: `LIVEKIT_URL` (wss://…), `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` (Convex env vars; secret server-only).
+- iOS: add `NSMicrophoneUsageDescription` + background audio mode; Android: `RECORD_AUDIO` permission. Request mic permission **lazily** — only when a user is promoted to speaker, never at app boot.
+
+### 6A.10 Edge Cases & Error Handling (session-specific)
+
+- **Host disconnects mid-session:** keep the room open 90s; if the host returns, resume; otherwise auto-end and notify participants ("The host dropped — session ended").
+- **Two hosts race to "Go live":** single-live-per-club guard in `sessions.start`; the loser gets "A session is already live in this club."
+- **Promoted speaker hasn't granted mic permission:** prompt to enable in OS settings; they stay a listener until granted.
+- **Member leaves club mid-session:** force-remove from any live session they're in.
+- **Network drop on a listener:** LiveKit auto-reconnects; chat (Convex) stays live; show a non-blocking "Reconnecting…" banner.
+- **Rate-limit abuse in chat:** server-side cap (10/10s); surface a gentle "Easy there — give it a sec."
+- **LiveKit outage / token mint failure:** fail gracefully to a **text-only** session (chat + reactions still work via Convex); banner: "Audio's having a moment — chat's still live."
+- **App backgrounded by a speaker:** auto-mute their mic on background; restore on foreground.
 
 -----
 
@@ -2157,6 +2419,9 @@ Users manage their subscription via the OS-native subscription page. Settings sc
 | Apple Developer Program | iOS distribution | $99/year | Apple ID + Team ID | n/a |
 | Google Play Console | Android distribution | $25 one-time | Service account JSON for EAS submit | n/a |
 | Branch.io (optional) | Deferred deep linking for invite URLs | Free up to 10k MAU | Branch key | n/a |
+| LiveKit Cloud (Phase 8) | Live-session audio (WebRTC SFU) | Free/build tier for MVP scale | `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` (secret server-only) | Tier-dependent; re-check before scale |
+
+**Phase 8 client packages** (added only in Phase 8): `@livekit/react-native`, `@livekit/react-native-webrtc` (client audio; dev-build only, config plugin + `expo-build-properties`), and `livekit-server-sdk` (used solely inside a Convex action to mint tokens). See § 6A.9.
 
 For MVP, deferred deep links (invite URLs that survive App Store install) can use Expo's built-in linking with `EXPO_PUBLIC_APP_URL` deep links + a simple landing page redirect. Branch.io is a Phase 2 optional enhancement.
 
@@ -2166,6 +2431,7 @@ For MVP, deferred deep links (invite URLs that survive App Store install) can us
 
 The following items are explicitly NOT covered by this PRD. Each is documented in `docs/product-vision.md` § Product Strategy > Explicitly Out of Scope with full reasoning. Summary:
 
+- **Live review sessions (audio + live text chat).** Specified in § 6A but **explicitly out of the launch MVP** — built as a fast-follow in Phase 8 immediately after closed-beta launch. Out of scope for Phases 0–7.
 - **Creator monetization (paid subscriptions, one-time chapter purchases).** Phase 2.
 - **Web companion / creator dashboard.** Phase 2.
 - **Licensed book catalog.** Year 2.
@@ -2210,6 +2476,12 @@ Apple requires Apple Sign-In if any other social login is offered on iOS. **Conf
 
 **Q9: Display name uniqueness.**
 Should display names be globally unique? **Recommended default:** No. Display names can collide; we identify users by Clerk ID internally. Only need uniqueness if we add @-handles (future).
+
+**Q10: Live-session audio provider (Phase 8).**
+Options: LiveKit Cloud, Agora, Daily, 100ms. Tradeoffs: all are managed WebRTC SFUs; the deciding factors for a solo, budget-tight founder are free-tier generosity, React Native SDK quality, and docs. **Recommended default:** **LiveKit Cloud** — open-source core (no lock-in; self-host later if costs grow), a strong `@livekit/react-native` SDK, server-side token minting that fits Convex actions cleanly, and a build-tier free allowance that covers MVP scale. Agora is the main alternative (10k free minutes/mo) if LiveKit's RN dev-build setup proves painful. Revisit once concurrency approaches the free-tier ceiling.
+
+**Q11: Should live sessions be recorded? (Phase 8)**
+Tradeoffs: recordings let members who missed it catch up (great retention), but add storage cost, egress, and consent/privacy obligations. **Recommended default:** **No recording at Phase 8 launch.** Ship live-only first; add opt-in, consent-gated recordings as a Phase 8.1 enhancement if members ask for it.
 
 **Q10: Analytics tooling for MVP.**
 Options: PostHog (free OSS, self-host or hosted), Amplitude (free up to 10M events), no analytics. **Recommended default:** PostHog hosted free tier — straightforward to integrate, Convex events easy to forward. Track: signup completion, first-club joined, first-reaction dropped, time-to-magic-moment, Pro conversion.

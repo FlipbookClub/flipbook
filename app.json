@@ -30,11 +30,48 @@
           "action": "VIEW",
           "autoVerify": true,
           "data": [
-            { "scheme": "flipbook" },
-            { "scheme": "https", "host": "flipbook.app", "pathPrefix": "/join" }
+            {
+              "scheme": "flipbook"
+            },
+            {
+              "scheme": "https",
+              "host": "flipbook.app",
+              "pathPrefix": "/join"
+            }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "flipbook"
+            },
+            {
+              "scheme": "https",
+              "host": "flipbook.app",
+              "pathPrefix": "/join"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
+      ],
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.DOWNLOAD_WITHOUT_NOTIFICATION",
+        "android.permission.ACCESS_NETWORK_STATE"
       ]
     },
     "web": {
@@ -52,6 +89,12 @@
       "eas": {
         "projectId": "81dc61a2-b202-456d-afc6-a974bce1254f"
       }
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/81dc61a2-b202-456d-afc6-a974bce1254f"
     }
   }
 }

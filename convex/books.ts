@@ -7,6 +7,7 @@ import { getCurrentUser } from "./users";
 
 const MAX_TITLE = 200;
 const MAX_AUTHOR = 100;
+const MAX_GENRE = 60;
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB — see FR-010
 
 const bookValidator = v.object({
@@ -14,6 +15,7 @@ const bookValidator = v.object({
   _creationTime: v.number(),
   title: v.string(),
   author: v.string(),
+  genre: v.optional(v.string()),
   pdfStorageId: v.id("_storage"),
   pdfPageCount: v.number(),
   coverImageUrl: v.optional(v.string()),
@@ -70,6 +72,7 @@ export const register = mutation({
     clubId: v.id("clubs"),
     title: v.string(),
     author: v.string(),
+    genre: v.optional(v.string()),
     pdfStorageId: v.id("_storage"),
     pdfPageCount: v.number(),
     fileSize: v.number(),
@@ -82,11 +85,15 @@ export const register = mutation({
 
     const title = args.title.trim();
     const author = args.author.trim();
+    const genre = args.genre?.trim() || undefined;
     if (!title || title.length > MAX_TITLE) {
       throw new ConvexError({ code: "invalid_title" });
     }
     if (!author || author.length > MAX_AUTHOR) {
       throw new ConvexError({ code: "invalid_author" });
+    }
+    if (genre && genre.length > MAX_GENRE) {
+      throw new ConvexError({ code: "invalid_genre" });
     }
     if (args.pdfPageCount <= 0) {
       throw new ConvexError({ code: "invalid_page_count" });
@@ -106,6 +113,7 @@ export const register = mutation({
     const bookId = await ctx.db.insert("books", {
       title,
       author,
+      genre,
       pdfStorageId: args.pdfStorageId,
       pdfPageCount: args.pdfPageCount,
       coverImageUrl: args.coverImageUrl,
@@ -255,6 +263,86 @@ export const setCurrentlyReading = mutation({
     const now = Date.now();
     await ctx.db.patch(args.bookId, { status: "current", currentlyReadingAt: now });
     await ctx.db.patch(book.clubId, { lastActivityAt: now });
+    return null;
+  },
+});
+
+// A book can be managed (edited / deleted) by the club moderator or by the
+// member who uploaded it. Returns the book + club for reuse by the caller.
+async function assertCanManageBook(
+  ctx: MutationCtx,
+  bookId: Id<"books">,
+  userId: Id<"users">,
+): Promise<{ book: Doc<"books">; club: Doc<"clubs"> }> {
+  const book = await ctx.db.get(bookId);
+  if (!book) throw new ConvexError({ code: "book_not_found" });
+  const club = await ctx.db.get(book.clubId);
+  if (!club) throw new ConvexError({ code: "club_not_found" });
+  const isModerator = club.moderatorId === userId;
+  const isUploader = book.uploadedByUserId === userId;
+  if (!isModerator && !isUploader) {
+    throw new ConvexError({ code: "not_allowed" });
+  }
+  return { book, club };
+}
+
+// Edit a book's title / author / genre. Moderator or the uploader.
+export const updateMetadata = mutation({
+  args: {
+    bookId: v.id("books"),
+    title: v.string(),
+    author: v.string(),
+    genre: v.optional(v.string()),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    await assertCanManageBook(ctx, args.bookId, me._id);
+
+    const title = args.title.trim();
+    const author = args.author.trim();
+    const genre = args.genre?.trim() || undefined;
+    if (!title || title.length > MAX_TITLE) {
+      throw new ConvexError({ code: "invalid_title" });
+    }
+    if (!author || author.length > MAX_AUTHOR) {
+      throw new ConvexError({ code: "invalid_author" });
+    }
+    if (genre && genre.length > MAX_GENRE) {
+      throw new ConvexError({ code: "invalid_genre" });
+    }
+    await ctx.db.patch(args.bookId, { title, author, genre });
+    return null;
+  },
+});
+
+// Permanently delete a book and its dependent rows (progress + reactions) and
+// the stored PDF. Moderator or the uploader. Irreversible — the client confirms.
+export const remove = mutation({
+  args: { bookId: v.id("books") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const { book } = await assertCanManageBook(ctx, args.bookId, me._id);
+
+    const progressRows = await ctx.db
+      .query("progress")
+      .withIndex("by_book", (q) => q.eq("bookId", args.bookId))
+      .collect();
+    for (const row of progressRows) {
+      await ctx.db.delete(row._id);
+    }
+
+    const reactionRows = await ctx.db
+      .query("reactions")
+      .withIndex("by_book_and_page", (q) => q.eq("bookId", args.bookId))
+      .collect();
+    for (const row of reactionRows) {
+      await ctx.db.delete(row._id);
+    }
+
+    await ctx.storage.delete(book.pdfStorageId);
+    await ctx.db.delete(args.bookId);
     return null;
   },
 });

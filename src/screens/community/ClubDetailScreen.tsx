@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert, Image, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
-import { BookPlus, ChevronLeft, Search, Settings, Share2 } from "lucide-react-native";
+import { BookPlus, ChevronLeft, MoreVertical, Search, Settings, Share2 } from "lucide-react-native";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { BookCover } from "@/components/features/BookCover";
 import { BookUploadSheet } from "@/components/features/BookUploadSheet";
+import { BookOptionsSheet } from "@/components/features/BookOptionsSheet";
 import { ChapterListItem } from "@/components/features/ChapterListItem";
 import { ClubModeratorSheet } from "@/components/features/ClubModeratorSheet";
 import { MAX_PDF_BYTES, pickPdf, type PickedPdf } from "@/lib/pdf";
@@ -21,6 +22,7 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
+import type { Doc } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "ClubDetail">;
@@ -37,8 +39,7 @@ function LibraryBookCard({
   author,
   pageCount,
   onOpen,
-  actionLabel,
-  onAction,
+  onOptions,
   started,
   progress,
 }: {
@@ -46,12 +47,11 @@ function LibraryBookCard({
   author: string;
   pageCount: number;
   onOpen: () => void;
-  actionLabel?: string;
-  onAction?: () => void;
+  onOptions?: () => void;
   started?: string;
   progress?: { label: string; pct: number };
 }) {
-  const { colors, buttons } = useTheme();
+  const { colors } = useTheme();
   const initial = title.trim().slice(0, 1).toUpperCase() || "?";
   return (
     <View
@@ -92,40 +92,10 @@ function LibraryBookCard({
           <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{pageCount} pages</Text>
         </View>
 
-        {started || actionLabel ? (
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: started ? "space-between" : "flex-start",
-            }}
-          >
-            {started ? (
-              <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-                Started <Text style={{ color: colors.textAccent }}>{started}</Text>
-              </Text>
-            ) : null}
-            {actionLabel && onAction ? (
-              <Pressable
-                onPress={onAction}
-                accessibilityRole="button"
-                accessibilityLabel={actionLabel}
-                hitSlop={spacing.s3}
-                style={{
-                  backgroundColor: colors.surfaceAccent,
-                  paddingHorizontal: spacing.s3,
-                  paddingVertical: spacing.s1,
-                  borderRadius: radius.sm,
-                }}
-              >
-                <Text
-                  style={{ fontFamily: "Raleway-Medium", fontSize: 10, color: buttons.secondary.default.text }}
-                >
-                  {actionLabel}
-                </Text>
-              </Pressable>
-            ) : null}
-          </View>
+        {started ? (
+          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+            Started <Text style={{ color: colors.textAccent }}>{started}</Text>
+          </Text>
         ) : null}
 
         {progress ? (
@@ -148,6 +118,18 @@ function LibraryBookCard({
           </View>
         ) : null}
       </View>
+
+      {onOptions ? (
+        <Pressable
+          onPress={onOptions}
+          hitSlop={spacing.s3}
+          accessibilityRole="button"
+          accessibilityLabel={`Options for ${title}`}
+          style={{ alignSelf: "flex-start", padding: spacing.s1 }}
+        >
+          <MoreVertical size={20} color={colors.textMuted} />
+        </Pressable>
+      ) : null}
     </View>
   );
 }
@@ -166,8 +148,6 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const currentBook = useQuery(api.books.currentForClub, { clubId });
   const libraryBooks = (books ?? []).filter((b) => b._id !== currentBook?._id);
   const latestChapter = chapters && chapters.length > 0 ? chapters[0] : null;
-  const setCurrentlyReading = useMutation(api.books.setCurrentlyReading);
-  const moveToLibrary = useMutation(api.books.moveToLibrary);
   const progressRows = useQuery(
     api.progress.listForClub,
     isCreatorClub
@@ -194,6 +174,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const [librarySearch, setLibrarySearch] = useState("");
   const [memberSearch, setMemberSearch] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
+  const [optionsBook, setOptionsBook] = useState<Doc<"books"> | null>(null);
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
 
   const isModerator = !!me && !!club && club.moderatorId === me._id;
@@ -540,15 +521,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
                       started={startedLabel}
                       progress={currentProgress}
-                      actionLabel={isModerator ? "Retire book" : undefined}
-                      onAction={
-                        isModerator
-                          ? () =>
-                              moveToLibrary({ bookId: currentBook._id }).catch(() =>
-                                Alert.alert("Couldn't update", "Please try again."),
-                              )
-                          : undefined
-                      }
+                      onOptions={() => setOptionsBook(currentBook)}
                     />
                   </View>
                 ) : isModerator ? (
@@ -576,15 +549,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         author={b.author}
                         pageCount={b.pdfPageCount}
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
-                        actionLabel={isModerator ? "Set as currently reading" : undefined}
-                        onAction={
-                          isModerator
-                            ? () =>
-                                setCurrentlyReading({ bookId: b._id }).catch(() =>
-                                  Alert.alert("Couldn't update", "Please try again."),
-                                )
-                            : undefined
-                        }
+                        onOptions={() => setOptionsBook(b)}
                       />
                     ))}
                   </View>
@@ -602,8 +567,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         author={b.author}
                         pageCount={b.pdfPageCount}
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
-                        actionLabel="Read again"
-                        onAction={() => navigation.navigate("Reader", { bookId: b._id })}
+                        onOptions={() => setOptionsBook(b)}
                       />
                     ))}
                   </View>
@@ -806,6 +770,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
                     started={startedLabel}
                     progress={currentProgress}
+                    onOptions={() => setOptionsBook(currentBook)}
                   />
                 </View>
               ) : null}
@@ -895,6 +860,27 @@ export function ClubDetailScreen({ navigation, route }: Props) {
         file={pickedFile}
         onClose={() => setPickedFile(null)}
         onUploaded={() => setPickedFile(null)}
+      />
+
+      <BookOptionsSheet
+        visible={optionsBook !== null}
+        book={
+          optionsBook
+            ? {
+                bookId: optionsBook._id,
+                title: optionsBook.title,
+                status: optionsBook.status,
+                hasBeenRead: optionsBook.currentlyReadingAt != null,
+              }
+            : null
+        }
+        isModerator={isModerator}
+        canManage={isModerator || (!!me && optionsBook?.uploadedByUserId === me._id)}
+        onClose={() => setOptionsBook(null)}
+        onOpenBook={() =>
+          optionsBook && navigation.navigate("Reader", { bookId: optionsBook._id })
+        }
+        onEdit={() => optionsBook && navigation.navigate("EditBook", { bookId: optionsBook._id })}
       />
     </SafeAreaView>
   );

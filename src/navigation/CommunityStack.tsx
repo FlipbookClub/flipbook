@@ -4,6 +4,7 @@ import { CommunityHomeScreen } from "@/screens/community/CommunityHomeScreen";
 import { ClubDetailScreen } from "@/screens/community/ClubDetailScreen";
 import { CreateCommunityScreen } from "@/screens/community/CreateCommunityScreen";
 import { EditCommunityScreen } from "@/screens/community/EditCommunityScreen";
+import { EditBookScreen } from "@/screens/community/EditBookScreen";
 import { InviteMembersScreen } from "@/screens/community/InviteMembersScreen";
 import { JoinCommunityScreen } from "@/screens/community/JoinCommunityScreen";
 import { InviteAcceptScreen } from "@/screens/community/InviteAcceptScreen";
@@ -22,6 +23,7 @@ export type CommunityStackParamList = {
   JoinCommunity: undefined;
   ClubDetail: { clubId: Id<"clubs"> };
   EditCommunity: { clubId: Id<"clubs"> };
+  EditBook: { bookId: Id<"books"> };
   InviteAccept: { inviteCode: string };
   PublishChapter: { clubId: Id<"clubs"> };
   Reader: {
@@ -42,6 +44,7 @@ export function CommunityStack() {
       <Stack.Screen name="JoinCommunity" component={JoinCommunityScreen} />
       <Stack.Screen name="ClubDetail" component={ClubDetailScreen} />
       <Stack.Screen name="EditCommunity" component={EditCommunityScreen} />
+      <Stack.Screen name="EditBook" component={EditBookScreen} />
       <Stack.Screen name="InviteAccept" component={InviteAcceptScreen} />
       <Stack.Screen name="PublishChapter" component={PublishChapterScreen} />
       <Stack.Screen name="Reader" component={ReaderScreen} options={{ animation: "slide_from_bottom" }} />

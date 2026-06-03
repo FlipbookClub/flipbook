@@ -1,103 +1,100 @@
-# Flipbook — Waitlist Landing Page Copy (v4 · Final)
+# Flipbook — Waitlist Landing Page Copy (v3 · Unified Final)
 
-**Voice:** Warm, generous, lightly clever. Never cute, never gamified. No exclamation points. Never the word *platform*.  
-**One action:** Get the beta. Every CTA on the page points here.  
-**Tone target:** Reading-room calm. White space. A well-edited literary magazine — not a SaaS funnel.  
-**Brand-native theme:** Flip (Deep Indigo background `#3b3a6d`, Warm Ivory text, Coral CTA `#ff6b6b`).
+**Voice:** Warm, generous, lightly clever. Never cute, never gamified. No exclamation points. Never the word *platform*.
+**One action:** Get the beta. Every CTA on the page points here.
+**Tone target:** Reading-room calm. White space. A well-edited literary magazine — not a SaaS funnel.
 
 ---
 
-## META / SEO
+## 🔍 META / SEO
 
-**Page title (≤60 chars)**  
+**Page title (≤60 chars)**
 `Flipbook — Read with the people who are reading right now`
 
-**Meta description (≤155 chars)**  
+**Meta description (≤155 chars)**
 `A social reading app where book clubs read together, with live reactions in the margins. Beta opens soon.`
 
-**Open Graph title**  
+**Open Graph title**
 `Flipbook — Read with the people who are reading right now`
 
-**Open Graph description**  
+**Open Graph description**
 `Share a book. See your friends' reactions in the margins. Finally finish what you started.`
 
-**Theme color:** `#3b3a6d`
+**Theme color:** `#3b3a6d` (Deep Indigo)
 
 ---
 
-## HERO
+## 🏆 HERO SECTION
 
-**Eyebrow** *(small caps, coral pulse dot)*  
+**Eyebrow (small caps, coral pulse dot)**
 `Closed beta — opens soon`
 
 **Headline (H1)**
+You used to finish books. You can again.
 
-> You used to finish books.
-> You can again.
+**Subheadline**
+Live reactions from your club appear in the margins of the very page you're both on. Their progress is visible. Yours is too. Turns out, that's the only accountability that actually gets you to the last page.
 
-**Subheadline**  
-Your friends and family are *this close* to reading the same book as you — they just need a reason to show up. Flipbook makes reading together as easy as a group chat, and as alive as the best book club you've ever been in.
-
-**Primary CTA**  
+**Primary CTA button**
 `Get the beta`
 
-**Microcopy under button**  
+**Microcopy under button**
 `One email. Pre-launch list, not a newsletter blast.`
 
-**Social proof line**  
-`A growing room of readers already on the list.`  
-*(Swap for a live count once you have >100 signups.)*
+**Social proof line**
+`A growing room of readers already on the list.`
+*(Swap "A growing room" for a live signup count once you have one.)*
 
 ---
 
 ### Hero visual caption
 *(Sits beneath the Magic Moment app demo loop)*
 
-`Creator publishes. The room opens. Reactions land in the margin.`
+`Creator publishes → the room opens → reactions land in the margin.`
 
 ---
 
-## MARQUEE STRIP
-*(Slow, decorative scroll — tone-setter, no functional load)*
+## 〰️ MARQUEE STRIP
+*(Slow, decorative scroll between hero and problem — sets tone, no functional load)*
 
-`Reading is a verb. · The book is the room. · Finish more of what you start. · Reactions live next to the paragraph. · No streaks. No shame. No leaderboards. · Three modes. One library.`
+`Reading is a verb. · The book is the room. · Finish more of what you start. · Reactions live next to the paragraph. · No streaks. No shame. No leaderboards. · Built in the open from Lagos. · Three modes. One library.`
 
 ---
 
-## PROBLEM SECTION
+## 😤 PROBLEM SECTION
 
-**Eyebrow**  
+**Eyebrow**
 `The honest part`
 
-**Headline (H2)**  
-You joined the book club because you wanted to be a reader again.
+**Headline (H2)**
+Most book clubs die in three weeks.
 
-**Body**  
-The intention was real — so was everyone else's. But without anything keeping you honest, the reading slipped quietly, then completely. By review time, half the group hadn't finished. The discussion fell to whoever talked loudest. The spirit left the room before the book did.
+**Body (≤45 words)**
+Someone falls behind. Someone reads ahead. The conversation happens once a month in a group chat that buries it by Tuesday. The book stops feeling shared — and then it stops feeling worth finishing.
 
 ---
 
-## THE SOLUTION — THREE PILLARS
+## ✅ THREE PILLARS — THE SOLUTION
 
-**Eyebrow**  
+**Eyebrow**
 `Why Flipbook`
 
-**Section headline (H2)**  
+**Section headline (H2)**
 Reading, the way it used to feel.
 
 ---
 
 **Pillar 01 — Finish more**
 
-Reading alongside other people — visibly, gently — is the difference between a book finished and a bookmark abandoned.
+`Reading alongside other people — visibly, gently — is the difference between a book finished and a bookmark abandoned.`
 
-No streaks. No nudges that shame you. The room is just ahead of you, and that turns out to be enough.
+No streaks. No nudges that shame. The room is just ahead of you, and that turns out to be enough.
 
 ---
 
 **Pillar 02 — Talk on the page**
 
-Every reaction, every reply lives next to the paragraph that prompted it.
+`Reactions and comments live next to the paragraph that prompted them.`
 
 No spoilers ahead. No ghost-town Discord. The conversation is right where you are in the book — and only what's safe to see from where you've read.
 
@@ -105,140 +102,138 @@ No spoilers ahead. No ghost-town Discord. The conversation is right where you ar
 
 **Pillar 03 — Follow the writers**
 
-Indie authors publish here and turn their readers into a room, not a mailing list.
+`Indie authors publish here and turn their readers into communities.`
 
-When a writer drops a chapter, you get a notification that actually means something: *the room is open.*
+When a writer drops a chapter, you're in the room — not on a mailing list. Not in a feed.
 
 ---
 
-## HOW IT WORKS
+## 🔄 HOW IT WORKS
 
-**Eyebrow**  
+**Eyebrow**
 `How a Flipbook club works`
 
-**Section headline (H2)**  
+**Section headline (H2)**
 Three steps, then you're reading.
 
-**Step 01 — Start a club like a group chat.**  
-Tap "Create," name it, share one link. Anyone who taps it is in. No friction. No app-wrangling. Pick the book you've all been meaning to read.
+**Step 01 — Start a club like a group chat.**
+Tap "Create," name it, share one link. Anyone who taps it is in — no friction, no app-wrangling. Pick the book you've all been meaning to read.
 
-**Step 02 — Open the book and read inside the app.**  
-Your moderator uploads the book as a PDF — private to your club. Long-press any paragraph. Drop a reaction. Watch the room reply.
+**Step 02 — Open the book and read inside the app.**
+Your moderator uploads the book as a PDF — private to your club. Open it in Flipbook's built-in reader. Long-press any paragraph. Drop a reaction. Watch the room reply.
 
-**Step 03 — Finish, together.**  
-A soft progress view shows where everyone is — close enough to feel together, never close enough to make you feel behind. When the room reaches the last page, the conversation stays for whoever shows up next.
+**Step 03 — Finish, together.**
+A soft, ambient progress view shows where everyone is — close enough to feel together, never close enough to make you feel behind. When the room reaches the last page, the conversation stays for whoever shows up next.
 
 ---
 
-## THREE MODES
+## 📱 THREE MODES
 
-**Eyebrow**  
+**Eyebrow**
 `A reader for every hour`
 
-**Section headline (H2)**  
+**Section headline (H2)**
 Three modes. One library.
 
-**Body**  
+**Body**
 Light for the morning commute. Flip — our brand-native indigo — for the late-night reading nook. Dark for everyone else. Reading is personal. Your reader should be too.
 
-**Mode labels**  
+**Mode labels**
 `Light` · `Flip` · `Dark`
 
 ---
 
-## FOUNDER NOTE
+## 📝 FOUNDER NOTE
 
-**Identifier**  
+**Identifier**
 `Moks — Designer, founder · Lagos`
 
-> "I've been in enough book clubs to know they almost never work. People join with the best intentions and quietly fall off — because reading alone isn't fun, and no one's keeping anyone honest. I wanted to read a book with my closest friends and family. Not review it. Not discuss it once a month. Actually read it — together, page by page. I built Flipbook because that experience didn't exist yet. It's for my people. And maybe yours too."
+> "I've been a product designer for five years and a member of more book clubs than I've finished books. I abandoned every reading app on the market. Flipbook is the one I wished existed — I'm building it from Lagos, in the open, all the way to launch."
 
-**Links row**  
+**Links row**
 `Follow the build` (X) · `Instagram` · `LinkedIn`
 
 ---
 
-## CREATOR CARD
+## ✍️ CREATOR CARD
 *(For the bottom 10% of audience — indie authors and serialized writers)*
 
-**Eyebrow**  
+**Eyebrow**
 `For creators`
 
-**Headline (H2)**  
+**Headline (H2)**
 Writing something serial?
 
-**Body**  
+**Body**
 Indie authors and serialized novelists get a private creator beta. Publish chapters to your readers, not to a feed. Keep the relationship. Keep the room.
 
 **Form fields**
 - Email — placeholder: `you@yourwriting.com`
 - Link to work — placeholder: `link to your work (substack, IG, blog…)`
 
-**CTA button**  
+**CTA button**
 `Join the creator list`
 
 ---
 
-## FAQ
+## ❓ FAQ
 
-**Eyebrow**  
+**Eyebrow**
 `The questions we keep getting`
 
-**Section headline (H2)**  
+**Section headline (H2)**
 Likely on your mind.
 
----
-
-**How is this different from Goodreads?**  
+**How is this different from Goodreads?**
 Goodreads is for the books you've finished. Flipbook is for the book you're reading right now. Different primitive, different room.
 
-**I tried Discord book clubs. They didn't stick.**  
-Same here. They die because the conversation isn't tied to the book. On Flipbook, reactions live on the page — they show up because you're already there.
+**I tried Discord book clubs. They didn't stick.**
+Same. They die in three weeks because the conversation isn't tied to the book. On Flipbook the reactions live on the page — they show up because you're already there.
 
-**I prefer reading alone.**  
+**I prefer reading alone.**
 You still can. Solo reading works. The clubs are there when you want them.
 
-**When does the beta open?**  
+**When does the beta open?**
 Soon. Design-partner clubs get in first; the rest of the waitlist follows the same day.
 
-**Is it free?**  
+**Is it free?**
 Yes — for the beta, and free forever for every founding club. A Pro tier comes later for the obsessed. It will never be a paywall on reading together.
 
-**iOS and Android?**  
+**iOS and Android?**
 Both, from day one. Mobile-first by design. A web companion comes later.
 
 ---
 
-## FINAL CTA
+## 🚀 FINAL CTA
 
-**Eyebrow**  
+**Eyebrow**
 `Closed beta — opens soon`
 
-**Section headline (H2)**  
-The room is forming.  
+**Section headline (H2)**
+The room is forming.
 *Pull up a chair.*
 
-*(Italic "Pull up a chair." in Coral)*
+*(Italic "Pull up a chair" in Coral)*
 
-**Body**  
+**Body**
 Drop your email. We'll send one welcome note, one question we'd love you to answer, and an invite the day the beta opens.
 
 **Form fields**
 - Email — placeholder: `you@reading.com`
 - Optional qualifier — placeholder: `(optional) what's the last book you finished?`
 
-**CTA button**  
+**CTA button**
 `Get the beta`
 
-**Microcopy under form**  
+**Microcopy under form**
 `No spam. About one update a fortnight while we're building. Unsubscribe with one tap.`
 
 ---
 
-## FOOTER
+## 🦶 FOOTER
 
-**Brand line**  
-`Flipbook`  
+**Brand line**
+`Flipbook`
 `Read together. Finish more. Talk on the page.`
 
 **Column 1 — The room**
@@ -257,15 +252,15 @@ Drop your email. We'll send one welcome note, one question we'd love you to answ
 - LinkedIn
 - `hello@getflipbook.com`
 
-**Bottom line (left)**  
+**Bottom line (left)**
 `© 2026 Flipbook. Built in Lagos, in the open.`
 
-**Bottom line (right, display italic)**  
+**Bottom line (right, display italic)**
 `A quiet vote of confidence in the reader.`
 
 ---
 
-## MICROCOPY LIBRARY
+## 💬 MICROCOPY LIBRARY
 *(Form states, errors, confirmation — for dev handoff)*
 
 ### Form button states
@@ -288,7 +283,7 @@ Drop your email. We'll send one welcome note, one question we'd love you to answ
 
 ---
 
-## CTAs — PRIORITY ORDER
+## 🎯 CTAs — PRIORITY ORDER
 *(For A/B testing and paid-traffic variants)*
 
 1. **`Get the beta`** — primary, used on all reader forms.
@@ -300,8 +295,8 @@ Avoid: *Sign Up · Submit · Learn More · Join Now · Start Free Trial* — all
 
 ---
 
-## HEADLINE ALTERNATES
-*(For ads, social cards, and A/B testing — not for the hero)*
+## 📣 HEADLINE ALTERNATES
+*(Keep for ads, social cards, and A/B testing — not for the hero)*
 
 - *Your book club, but the reactions live in the book.* — sharpest for paid social
 - *Read together. Finish more. Talk on the page.* — the tagline; use in footer, not hero
@@ -312,13 +307,13 @@ Avoid: *Sign Up · Submit · Learn More · Join Now · Start Free Trial* — all
 
 ---
 
-## BRAND VOICE GUARDRAILS
+## 🛡️ BRAND VOICE GUARDRAILS
 *(Run every future revision past this list)*
 
 - **Never** use *platform, leverage, synergy, solution, ecosystem, powered by, reimagined.*
 - **Never** end a sentence with an exclamation point in user-facing copy.
 - **Never** use streak language, leaderboards, or "you're falling behind" framing.
-- **Never** say *Welcome to your reading journey* or anything adjacent.
+- **Never** say *Welcome to your reading journey* or anything adjacent to it.
 - **Always** prefer specific over vague — name the chapter, name the friend, name the book.
 - **Always** keep the book as the hero — typographic, generous, restrained.
-- **Coral is rare on purpose.** More than 4 coral elements on the page means too many.
+- **Coral is rare on purpose.** If the page has more than 4 coral elements, it has too many.
