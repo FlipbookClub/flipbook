@@ -80,6 +80,11 @@ export default defineSchema({
     isPublic: v.boolean(),
     isRemoved: v.boolean(),
     fileSize: v.number(),
+    // Currently-reading vs library. A club's moderator sets one book as the
+    // active read; the rest sit in the library. Optional so pre-existing rows
+    // (and the moment before a current book is chosen) read as "library".
+    status: v.optional(v.union(v.literal("current"), v.literal("library"))),
+    currentlyReadingAt: v.optional(v.number()),
     createdAt: v.number(),
   })
     .index("by_club", ["clubId"])

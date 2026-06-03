@@ -22,6 +22,8 @@ const bookValidator = v.object({
   isPublic: v.boolean(),
   isRemoved: v.boolean(),
   fileSize: v.number(),
+  status: v.optional(v.union(v.literal("current"), v.literal("library"))),
+  currentlyReadingAt: v.optional(v.number()),
   createdAt: v.number(),
 });
 
@@ -112,6 +114,9 @@ export const register = mutation({
       isPublic: false, // Always false for MVP — DMCA exposure mitigation.
       isRemoved: false,
       fileSize: args.fileSize,
+      // New uploads land in the library; the moderator promotes one to the
+      // club's current read explicitly (see setCurrentlyReading).
+      status: "library",
       createdAt: now,
     });
     await ctx.db.patch(args.clubId, { lastActivityAt: now });
@@ -196,5 +201,76 @@ export const listForClub = query({
       .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
       .order("desc")
       .take(50);
+  },
+});
+
+// The club's current read (or null). Member-only.
+export const currentForClub = query({
+  args: { clubId: v.id("clubs") },
+  returns: v.union(v.null(), bookValidator),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return null;
+    const me = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!me) return null;
+    const membership = await membershipFor(ctx, args.clubId, me._id);
+    if (!membership) return null;
+
+    const books = await ctx.db
+      .query("books")
+      .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
+      .collect();
+    const current = books
+      .filter((b) => !b.isRemoved && b.status === "current")
+      .sort((a, b) => (b.currentlyReadingAt ?? 0) - (a.currentlyReadingAt ?? 0));
+    return current[0] ?? null;
+  },
+});
+
+// Moderator-only: promote a book to the club's current read. Any other current
+// book in the club is demoted to the library — one active read at a time.
+export const setCurrentlyReading = mutation({
+  args: { bookId: v.id("books") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const book = await ctx.db.get(args.bookId);
+    if (!book || book.isRemoved) throw new ConvexError({ code: "book_not_found" });
+    const club = await ctx.db.get(book.clubId);
+    if (!club) throw new ConvexError({ code: "club_not_found" });
+    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+
+    const clubBooks = await ctx.db
+      .query("books")
+      .withIndex("by_club", (q) => q.eq("clubId", book.clubId))
+      .collect();
+    for (const b of clubBooks) {
+      if (b._id !== args.bookId && b.status === "current") {
+        await ctx.db.patch(b._id, { status: "library" });
+      }
+    }
+    const now = Date.now();
+    await ctx.db.patch(args.bookId, { status: "current", currentlyReadingAt: now });
+    await ctx.db.patch(book.clubId, { lastActivityAt: now });
+    return null;
+  },
+});
+
+// Moderator-only: move a book out of "current" back to the library.
+export const moveToLibrary = mutation({
+  args: { bookId: v.id("books") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const book = await ctx.db.get(args.bookId);
+    if (!book) throw new ConvexError({ code: "book_not_found" });
+    const club = await ctx.db.get(book.clubId);
+    if (!club) throw new ConvexError({ code: "club_not_found" });
+    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    await ctx.db.patch(args.bookId, { status: "library" });
+    return null;
   },
 });
