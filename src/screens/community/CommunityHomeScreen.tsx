@@ -7,7 +7,6 @@ import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { ClubCard } from "@/components/features/ClubCard";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { isOnlineNow } from "@/lib/connectivity";
@@ -278,34 +277,32 @@ export function CommunityHomeScreen({ navigation }: Props) {
           </View>
         )}
 
-        <View style={{ gap: spacing.s2 }}>
-          <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
-            Popular communities
-          </Text>
-          {popularClubs === undefined ? (
-            <ClubSkeletons count={2} />
-          ) : popularClubs.length > 0 ? (
-            popularClubs.map((club) => (
-              <ClubCard
-                key={club._id}
-                club={{
-                  name: club.name,
-                  description: club.description,
-                  memberCount: club.memberCount,
-                  coverImageUrl: club.coverImageUrl,
-                  lastActivityAt: club.lastActivityAt,
-                }}
-                onPress={() => openClub(club._id)}
-              />
-            ))
-          ) : (
-            <EmptyState
-              compact
-              title="No public communities yet"
-              description="Be the first to share one."
-            />
-          )}
-        </View>
+        {/* Hidden entirely when no public communities exist — only shows once
+            there are some (or while the query is still loading). */}
+        {popularClubs === undefined || popularClubs.length > 0 ? (
+          <View style={{ gap: spacing.s2 }}>
+            <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+              Popular communities
+            </Text>
+            {popularClubs === undefined ? (
+              <ClubSkeletons count={2} />
+            ) : (
+              popularClubs.map((club) => (
+                <ClubCard
+                  key={club._id}
+                  club={{
+                    name: club.name,
+                    description: club.description,
+                    memberCount: club.memberCount,
+                    coverImageUrl: club.coverImageUrl,
+                    lastActivityAt: club.lastActivityAt,
+                  }}
+                  onPress={() => openClub(club._id)}
+                />
+              ))
+            )}
+          </View>
+        ) : null}
       </ScrollView>
 
       {/* Tap-out backdrop while the menu is open. */}
