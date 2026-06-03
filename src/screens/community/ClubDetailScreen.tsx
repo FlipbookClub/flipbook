@@ -110,10 +110,11 @@ function LibraryBookCard({
                 onPress={onAction}
                 accessibilityRole="button"
                 accessibilityLabel={actionLabel}
+                hitSlop={spacing.s3}
                 style={{
                   backgroundColor: colors.surfaceAccent,
-                  paddingHorizontal: spacing.s2,
-                  paddingVertical: 2,
+                  paddingHorizontal: spacing.s3,
+                  paddingVertical: spacing.s1,
                   borderRadius: radius.sm,
                 }}
               >
@@ -372,7 +373,12 @@ export function ClubDetailScreen({ navigation, route }: Props) {
         </View>
       </View>
 
-      <ScrollView contentContainerStyle={{ paddingBottom: spacing.s7 }}>
+      <ScrollView
+        contentContainerStyle={{ paddingBottom: spacing.s7 }}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="interactive"
+        automaticallyAdjustKeyboardInsets
+      >
         <View style={{ paddingHorizontal: spacing.s4, gap: spacing.s4 }}>
           <View
             style={{
