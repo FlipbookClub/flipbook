@@ -22,9 +22,11 @@ import {
   Compass01Icon,
   CreditCardIcon,
   Delete02Icon,
+  Home01Icon,
   ImageAdd01Icon,
   InboxIcon,
   Leaf01Icon,
+  LibrariesIcon,
   LinkSquare02Icon,
   Logout03Icon,
   Message01Icon,
@@ -33,7 +35,7 @@ import {
   MoreVerticalIcon,
   PencilEdit01Icon,
   PlusSignIcon,
-  RocketIcon,
+  Rocket01Icon,
   Search01Icon,
   Settings01Icon,
   Settings02Icon,
@@ -44,6 +46,8 @@ import {
   Sun03Icon,
   Tick02Icon,
   Upload01Icon,
+  User03Icon,
+  UserGroup02Icon,
   UserGroupIcon,
   UserIcon,
   ViewIcon,
@@ -93,7 +97,7 @@ export const Moon = make(Moon02Icon);
 export const MoreVertical = make(MoreVerticalIcon);
 export const Pencil = make(PencilEdit01Icon);
 export const Plus = make(PlusSignIcon);
-export const Rocket = make(RocketIcon);
+export const Rocket = make(Rocket01Icon);
 export const Search = make(Search01Icon);
 export const Settings = make(Settings01Icon);
 export const Settings2 = make(Settings02Icon);
@@ -107,3 +111,10 @@ export const Upload = make(Upload01Icon);
 export const User = make(UserIcon);
 export const Users = make(UserGroupIcon);
 export const X = make(Cancel01Icon);
+
+// App-specific glyphs (not Lucide names) — chosen per founder direction for the
+// nav tabs and community actions.
+export const Home = make(Home01Icon); // Community tab
+export const Libraries = make(LibrariesIcon); // Library tab
+export const UserProfile = make(User03Icon); // Profile tab
+export const UserGroup2 = make(UserGroup02Icon); // Join community

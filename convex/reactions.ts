@@ -50,22 +50,6 @@ async function membershipFor(
     .unique();
 }
 
-async function furthestPageFor(
-  ctx: QueryCtx,
-  userId: Id<"users">,
-  clubId: Id<"clubs">,
-  scope: { bookId?: Id<"books">; chapterId?: Id<"chapters"> },
-): Promise<number> {
-  const rows = await ctx.db
-    .query("progress")
-    .withIndex("by_user_and_club", (q) => q.eq("userId", userId).eq("clubId", clubId))
-    .collect();
-  const row = rows.find((r) =>
-    scope.bookId ? r.bookId === scope.bookId : r.chapterId === scope.chapterId,
-  );
-  return row?.furthestPageReached ?? 0;
-}
-
 async function enrichWithUsers(
   ctx: QueryCtx,
   rows: Doc<"reactions">[],
@@ -185,10 +169,10 @@ export const create = mutation({
   },
 });
 
-// FR-016 hot path. Reactions for a single page, gated by the caller's
-// furthestPageReached so we never leak spoilers (FR-018). Returns top-level
-// reactions only — replies are loaded separately via listReplies when the
-// details sheet opens.
+// FR-016 hot path. Reactions for a single page. Founder decision: reactions are
+// visible to all members regardless of reading progress (FR-018 spoiler gating
+// removed). Returns top-level reactions only — replies are loaded separately via
+// listReplies when the details sheet opens.
 export const listForPage = query({
   args: {
     clubId: v.id("clubs"),
@@ -211,12 +195,6 @@ export const listForPage = query({
     if (!me) return [];
     const membership = await membershipFor(ctx, args.clubId, me._id);
     if (!membership) return [];
-
-    const furthest = await furthestPageFor(ctx, me._id, args.clubId, {
-      bookId: args.bookId,
-      chapterId: args.chapterId,
-    });
-    if (args.page > furthest) return [];
 
     const rows = args.bookId
       ? await ctx.db
@@ -289,10 +267,6 @@ export const listForBook = query({
     const membership = await membershipFor(ctx, args.clubId, me._id);
     if (!membership) return [];
 
-    const furthest = await furthestPageFor(ctx, me._id, args.clubId, {
-      bookId: args.bookId,
-      chapterId: args.chapterId,
-    });
     const limit = Math.min(args.limit ?? 20, 50);
 
     const rows = args.bookId
@@ -306,10 +280,8 @@ export const listForBook = query({
           .withIndex("by_chapter_and_page", (q) => q.eq("chapterId", args.chapterId))
           .order("desc")
           .take(limit * 4);
-    const visible = rows
-      .filter((r) => !r.parentReactionId)
-      .filter((r) => r.page <= furthest)
-      .slice(0, limit);
+    // Founder decision: no spoiler gating — all members see every reaction.
+    const visible = rows.filter((r) => !r.parentReactionId).slice(0, limit);
     return await enrichWithUsers(ctx, visible);
   },
 });

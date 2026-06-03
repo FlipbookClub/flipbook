@@ -1,6 +1,6 @@
 import { useCallback, useState } from "react";
 import { Pressable, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { CircleDashed, Compass, Leaf, Plus, Rocket } from "@/lib/icons";
+import { Leaf, Plus, Rocket, UserGroup2 } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -248,7 +248,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
             />
             <ActionCard
               variant="secondary"
-              icon={<CircleDashed size={18} color={palette.textOnBrand} />}
+              icon={<UserGroup2 size={18} color={palette.textOnBrand} />}
               title="Join an existing community"
               subtitle="Search and join an existing Flipbook community."
               onPress={goJoin}
@@ -350,7 +350,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
               }}
             />
             <FabMenuRow
-              icon={<Compass size={16} color={fab.text} />}
+              icon={<UserGroup2 size={16} color={fab.text} />}
               label="Join a community"
               color={fab.text}
               onPress={() => {

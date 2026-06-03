@@ -1,5 +1,5 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { BookOpen, User, Users } from "@/lib/icons";
+import { Home, Libraries, UserProfile } from "@/lib/icons";
 
 import { CommunityStack } from "@/navigation/CommunityStack";
 import { LibraryStack } from "@/navigation/LibraryStack";
@@ -34,21 +34,21 @@ export function MainTabs() {
         name="Community"
         component={CommunityStack}
         options={{
-          tabBarIcon: ({ color, size }) => <Users color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
         }}
       />
       <Tab.Screen
         name="Library"
         component={LibraryStack}
         options={{
-          tabBarIcon: ({ color, size }) => <BookOpen color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <Libraries color={color} size={size} />,
         }}
       />
       <Tab.Screen
         name="Profile"
         component={ProfileStack}
         options={{
-          tabBarIcon: ({ color, size }) => <User color={color} size={size} />,
+          tabBarIcon: ({ color, size }) => <UserProfile color={color} size={size} />,
         }}
       />
     </Tab.Navigator>
