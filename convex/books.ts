@@ -117,6 +117,16 @@ export const register = mutation({
       ? ((await ctx.storage.getUrl(args.coverStorageId)) ?? undefined)
       : undefined;
 
+    // A club's first book becomes the current read automatically so the
+    // discussions feed + progress have something to track from the start.
+    // Once a current read exists, later uploads land in the library and the
+    // moderator promotes them explicitly (see setCurrentlyReading).
+    const clubBooks = await ctx.db
+      .query("books")
+      .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
+      .collect();
+    const hasCurrent = clubBooks.some((b) => !b.isRemoved && b.status === "current");
+
     const now = Date.now();
     const bookId = await ctx.db.insert("books", {
       title,
@@ -130,9 +140,8 @@ export const register = mutation({
       isPublic: false, // Always false for MVP — DMCA exposure mitigation.
       isRemoved: false,
       fileSize: args.fileSize,
-      // New uploads land in the library; the moderator promotes one to the
-      // club's current read explicitly (see setCurrentlyReading).
-      status: "library",
+      status: hasCurrent ? "library" : "current",
+      currentlyReadingAt: hasCurrent ? undefined : now,
       createdAt: now,
     });
     await ctx.db.patch(args.clubId, { lastActivityAt: now });
@@ -235,14 +244,21 @@ export const currentForClub = query({
     const membership = await membershipFor(ctx, args.clubId, me._id);
     if (!membership) return null;
 
-    const books = await ctx.db
-      .query("books")
-      .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
-      .collect();
+    const books = (
+      await ctx.db
+        .query("books")
+        .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
+        .collect()
+    ).filter((b) => !b.isRemoved);
     const current = books
-      .filter((b) => !b.isRemoved && b.status === "current")
+      .filter((b) => b.status === "current")
       .sort((a, b) => (b.currentlyReadingAt ?? 0) - (a.currentlyReadingAt ?? 0));
-    return current[0] ?? null;
+    if (current[0]) return current[0];
+    // Fallback so the feed never goes dark: if no book was ever explicitly
+    // promoted (legacy rows, or the current read was retired), treat the
+    // club's earliest book as the current read. Stable across later uploads.
+    const earliest = [...books].sort((a, b) => a.createdAt - b.createdAt);
+    return earliest[0] ?? null;
   },
 });
 
