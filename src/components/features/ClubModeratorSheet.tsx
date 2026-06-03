@@ -1,19 +1,8 @@
 import { useState } from "react";
-import {
-  Alert,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Alert, Modal, Pressable, Text, View } from "react-native";
 import { Pencil, Trash2, X } from "lucide-react-native";
 import { useMutation } from "convex/react";
 
-import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -26,55 +15,17 @@ interface Props {
   visible: boolean;
   club: Doc<"clubs">;
   onClose: () => void;
+  /** Open the full Edit Community page (editing is its own screen, not a sheet). */
+  onEdit: () => void;
   onDeleted: () => void;
 }
 
-type Pane = "menu" | "edit";
-
-export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props) {
+// Moderator actions sheet — a short menu only. Editing lives on its own page
+// (EditCommunityScreen) so the form gets full-screen space + clean keyboard
+// handling; this sheet just routes there or deletes.
+export function ClubModeratorSheet({ visible, club, onClose, onEdit, onDeleted }: Props) {
   const { colors } = useTheme();
-  const updateClub = useMutation(api.clubs.update);
   const removeClub = useMutation(api.clubs.remove);
-
-  const [pane, setPane] = useState<Pane>("menu");
-  const [name, setName] = useState(club.name);
-  const [description, setDescription] = useState(club.description ?? "");
-  const [submitting, setSubmitting] = useState(false);
-  const [formError, setFormError] = useState<string | null>(null);
-
-  const reset = () => {
-    setPane("menu");
-    setName(club.name);
-    setDescription(club.description ?? "");
-    setFormError(null);
-  };
-
-  const close = () => {
-    reset();
-    onClose();
-  };
-
-  const handleSaveEdit = async () => {
-    if (!name.trim()) return;
-    setFormError(null);
-    setSubmitting(true);
-    try {
-      await updateClub({
-        clubId: club._id as Id<"clubs">,
-        name: name.trim(),
-        description,
-      });
-      close();
-    } catch (err) {
-      const message =
-        (err as { data?: { code?: string } })?.data?.code ??
-        (err as { message?: string })?.message ??
-        "Couldn't save changes.";
-      setFormError(message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
 
   const handleDelete = () => {
     Alert.alert(
@@ -88,7 +39,7 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
           onPress: async () => {
             try {
               await removeClub({ clubId: club._id as Id<"clubs"> });
-              close();
+              onClose();
               onDeleted();
             } catch (err) {
               const message =
@@ -106,29 +57,25 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
       visible={visible}
       transparent
       animationType="slide"
-      onRequestClose={close}
+      onRequestClose={onClose}
       accessibilityViewIsModal
     >
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
-        style={{ flex: 1 }}
+      <Pressable
+        onPress={onClose}
+        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
+        accessibilityLabel="Dismiss sheet"
+      />
+      <View
+        style={{
+          backgroundColor: colors.surfacePrimary,
+          borderTopLeftRadius: radius.lg,
+          borderTopRightRadius: radius.lg,
+          paddingHorizontal: spacing.s4,
+          paddingTop: spacing.s3,
+          paddingBottom: spacing.s5,
+          gap: spacing.s4,
+        }}
       >
-        <Pressable
-          onPress={close}
-          style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
-          accessibilityLabel="Dismiss sheet"
-        />
-        <View
-          style={{
-            backgroundColor: colors.surfacePrimary,
-            borderTopLeftRadius: radius.lg,
-            borderTopRightRadius: radius.lg,
-            paddingHorizontal: spacing.s4,
-            paddingTop: spacing.s3,
-            paddingBottom: spacing.s5,
-            gap: spacing.s4,
-          }}
-        >
         <View
           style={{
             flexDirection: "row",
@@ -137,10 +84,10 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
           }}
         >
           <Text style={{ ...typography.headingMd, color: colors.textPrimary }}>
-            {pane === "menu" ? "Manage community" : "Edit community"}
+            Manage community
           </Text>
           <Pressable
-            onPress={close}
+            onPress={onClose}
             hitSlop={spacing.s3}
             accessibilityRole="button"
             accessibilityLabel="Close"
@@ -149,55 +96,23 @@ export function ClubModeratorSheet({ visible, club, onClose, onDeleted }: Props)
           </Pressable>
         </View>
 
-        {pane === "menu" ? (
-          <View style={{ gap: spacing.s2 }}>
-            <SheetRow
-              icon={<Pencil size={20} color={colors.textPrimary} />}
-              label="Edit community"
-              onPress={() => setPane("edit")}
-            />
-            <SheetRow
-              icon={<Trash2 size={20} color={palette.error} />}
-              label="Delete community"
-              labelColor={palette.error}
-              onPress={handleDelete}
-            />
-          </View>
-        ) : (
-          <ScrollView
-            style={{ maxHeight: 380 }}
-            contentContainerStyle={{ gap: spacing.s4 }}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            <Input
-              variant="underline"
-              placeholder="Club name"
-              value={name}
-              onChangeText={setName}
-              autoCapitalize="words"
-            />
-            <Input
-              variant="underline"
-              placeholder="Club description (optional)"
-              value={description}
-              onChangeText={setDescription}
-              multiline
-              numberOfLines={3}
-            />
-            {formError ? (
-              <Text style={{ ...typography.bodySm, color: palette.error }}>{formError}</Text>
-            ) : null}
-            <Button
-              label={submitting ? "Saving…" : "Save changes"}
-              fullWidth
-              disabled={submitting || !name.trim()}
-              onPress={handleSaveEdit}
-            />
-          </ScrollView>
-        )}
+        <View style={{ gap: spacing.s2 }}>
+          <SheetRow
+            icon={<Pencil size={20} color={colors.textPrimary} />}
+            label="Edit community"
+            onPress={() => {
+              onClose();
+              onEdit();
+            }}
+          />
+          <SheetRow
+            icon={<Trash2 size={20} color={palette.error} />}
+            label="Delete community"
+            labelColor={palette.error}
+            onPress={handleDelete}
+          />
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }

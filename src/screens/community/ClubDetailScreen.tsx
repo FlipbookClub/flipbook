@@ -596,6 +596,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
           visible={sheetOpen}
           club={club}
           onClose={() => setSheetOpen(false)}
+          onEdit={() => navigation.navigate("EditCommunity", { clubId })}
           onDeleted={() => navigation.popToTop()}
         />
       ) : null}

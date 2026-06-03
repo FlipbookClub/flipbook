@@ -202,12 +202,29 @@ export const listMine = query({
   },
 });
 
+// Moderator-only: get a one-shot upload URL for a new community emblem. The
+// client POSTs the image, then passes the returned storageId to `update`.
+export const generateEmblemUploadUrl = mutation({
+  args: { clubId: v.id("clubs") },
+  returns: v.string(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const club = await ctx.db.get(args.clubId);
+    if (!club) throw new ConvexError({ code: "club_not_found" });
+    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
 export const update = mutation({
   args: {
     clubId: v.id("clubs"),
     name: v.optional(v.string()),
     description: v.optional(v.string()),
     coverImageUrl: v.optional(v.string()),
+    // A freshly-uploaded emblem (via generateEmblemUploadUrl). Resolved to a
+    // serving URL server-side and stored as coverImageUrl.
+    emblemStorageId: v.optional(v.id("_storage")),
     visibility: v.optional(v.union(v.literal("private"), v.literal("public"))),
     permissions: v.optional(permissionsValidator),
   },
@@ -221,6 +238,10 @@ export const update = mutation({
     }
 
     const patch: Partial<Doc<"clubs">> = {};
+    if (args.emblemStorageId !== undefined) {
+      const url = await ctx.storage.getUrl(args.emblemStorageId);
+      if (url) patch.coverImageUrl = url;
+    }
     if (args.name !== undefined) {
       const name = args.name.trim();
       if (!name || name.length > MAX_NAME) throw new ConvexError({ code: "invalid_name" });

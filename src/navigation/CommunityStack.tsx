@@ -3,6 +3,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { CommunityHomeScreen } from "@/screens/community/CommunityHomeScreen";
 import { ClubDetailScreen } from "@/screens/community/ClubDetailScreen";
 import { CreateCommunityScreen } from "@/screens/community/CreateCommunityScreen";
+import { EditCommunityScreen } from "@/screens/community/EditCommunityScreen";
 import { InviteMembersScreen } from "@/screens/community/InviteMembersScreen";
 import { JoinCommunityScreen } from "@/screens/community/JoinCommunityScreen";
 import { InviteAcceptScreen } from "@/screens/community/InviteAcceptScreen";
@@ -20,6 +21,7 @@ export type CommunityStackParamList = {
   InviteMembers: { clubId: Id<"clubs">; inviteCode: string };
   JoinCommunity: undefined;
   ClubDetail: { clubId: Id<"clubs"> };
+  EditCommunity: { clubId: Id<"clubs"> };
   InviteAccept: { inviteCode: string };
   PublishChapter: { clubId: Id<"clubs"> };
   Reader: {
@@ -39,6 +41,7 @@ export function CommunityStack() {
       <Stack.Screen name="InviteMembers" component={InviteMembersScreen} />
       <Stack.Screen name="JoinCommunity" component={JoinCommunityScreen} />
       <Stack.Screen name="ClubDetail" component={ClubDetailScreen} />
+      <Stack.Screen name="EditCommunity" component={EditCommunityScreen} />
       <Stack.Screen name="InviteAccept" component={InviteAcceptScreen} />
       <Stack.Screen name="PublishChapter" component={PublishChapterScreen} />
       <Stack.Screen name="Reader" component={ReaderScreen} options={{ animation: "slide_from_bottom" }} />

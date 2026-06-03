@@ -11,6 +11,7 @@
 import type * as books from "../books.js";
 import type * as chapters from "../chapters.js";
 import type * as clubs from "../clubs.js";
+import type * as email from "../email.js";
 import type * as http from "../http.js";
 import type * as lib_admins from "../lib/admins.js";
 import type * as lib_inviteCode from "../lib/inviteCode.js";
@@ -31,6 +32,7 @@ declare const fullApi: ApiFromModules<{
   books: typeof books;
   chapters: typeof chapters;
   clubs: typeof clubs;
+  email: typeof email;
   http: typeof http;
   "lib/admins": typeof lib_admins;
   "lib/inviteCode": typeof lib_inviteCode;
