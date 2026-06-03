@@ -24,7 +24,7 @@ import type { CommunityStackParamList } from "@/navigation/CommunityStack";
 import { api } from "../../../convex/_generated/api";
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "ClubDetail">;
-type TabKey = "book" | "members" | "activity";
+type TabKey = "room" | "discussions" | "library";
 
 const DEEP_LINK_BASE = "flipbook://join";
 
@@ -66,7 +66,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   );
   const me = useQuery(api.users.me);
 
-  const [tab, setTab] = useState<TabKey>("book");
+  const [tab, setTab] = useState<TabKey>("room");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
 
@@ -83,6 +83,8 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   // the edit page (info only); the moderator gets the full manage sheet.
   const canEditInfo =
     isModerator || (isMember && !!club && club.permissions.membersCanUpdateInfo);
+  // Each member's progress on the current book, for the Room-lobby members list.
+  const progressByUser = new Map((progressRows ?? []).map((p) => [p.userId, p] as const));
   const inviteUrl = club ? `${DEEP_LINK_BASE}/${club.inviteCode}` : null;
   const joinByCode = useMutation(api.memberships.joinByCode);
   const [joining, setJoining] = useState(false);
@@ -105,9 +107,9 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   };
 
   const tabs: Array<{ key: TabKey; label: string }> = [
-    { key: "book", label: isCreatorClub ? "Chapters" : "Book" },
-    { key: "members", label: "Members" },
-    { key: "activity", label: "Activity" },
+    { key: "room", label: "Room lobby" },
+    { key: "discussions", label: "Discussions" },
+    { key: "library", label: isCreatorClub ? "Chapters" : "Library" },
   ];
 
   const handleAddBook = async () => {
@@ -300,7 +302,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
         </View>
 
         <View style={{ padding: spacing.s4 }}>
-          {tab === "book" ? (
+          {tab === "library" ? (
             isCreatorClub ? (
               chapters && chapters.length > 0 ? (
                 <View style={{ gap: spacing.s3 }}>
@@ -476,7 +478,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 </View>
               </Card>
             )
-          ) : tab === "activity" ? (
+          ) : tab === "discussions" ? (
             !isMember ? (
               // FR-075 / US-012: preview safety. Public clubs are visible to
               // non-members from Discovery, but reactions stay locked behind
@@ -638,58 +640,106 @@ export function ClubDetailScreen({ navigation, route }: Props) {
               </View>
             )
           ) : (
-            <View style={{ gap: spacing.s2 }}>
-              {members?.map((m) => (
-                <View
-                  key={m._id}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    gap: spacing.s3,
-                    paddingVertical: spacing.s2,
-                  }}
-                >
-                  <Avatar
-                    name={`${m.firstName} ${m.lastName}`.trim() || m.displayName}
-                    imageUri={m.avatarUrl}
-                    size="md"
-                  />
-                  <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={{ ...typography.bodyMd, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
-                      {m.displayName}
-                    </Text>
-                    <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-                      {`${m.firstName} ${m.lastName}`.trim()}
-                    </Text>
-                  </View>
-                  {m.role === "moderator" ? (
-                    <View
-                      style={{
-                        paddingVertical: 2,
-                        paddingHorizontal: spacing.s2,
-                        borderRadius: radius.pill,
-                        backgroundColor: palette.accent,
-                      }}
-                    >
+            // Room lobby: the current read at a glance + members' progress.
+            <View style={{ gap: spacing.s5 }}>
+              {currentBook ? (
+                <View style={{ gap: spacing.s2 }}>
+                  <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                    Currently reading
+                  </Text>
+                  <Pressable
+                    onPress={() => navigation.navigate("Reader", { bookId: currentBook._id })}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Open ${currentBook.title}`}
+                    style={{
+                      flexDirection: "row",
+                      gap: spacing.s4,
+                      padding: spacing.s3,
+                      borderRadius: radius.md,
+                      backgroundColor: colors.surfaceSecondary,
+                    }}
+                  >
+                    <BookCover
+                      title={currentBook.title}
+                      author={currentBook.author}
+                      pageCount={currentBook.pdfPageCount}
+                      size="sm"
+                    />
+                    <View style={{ flex: 1, gap: spacing.s1 }}>
                       <Text
-                        style={{
-                          ...typography.uiLabelMd,
-                          fontSize: 10,
-                          color: palette.textOnBrand,
-                          fontFamily: "Raleway-SemiBold",
-                        }}
+                        style={{ ...typography.bodyLg, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
+                        numberOfLines={2}
                       >
-                        MOD
+                        {currentBook.title}
                       </Text>
+                      <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+                        Author{" "}
+                        <Text style={{ color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
+                          {currentBook.author}
+                        </Text>
+                      </Text>
+                      {currentBook.currentlyReadingAt ? (
+                        <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
+                          Started {new Date(currentBook.currentlyReadingAt).toLocaleDateString()}
+                        </Text>
+                      ) : null}
                     </View>
-                  ) : null}
+                  </Pressable>
                 </View>
-              ))}
-              {members?.length === 0 ? (
-                <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
-                  No members yet.
-                </Text>
               ) : null}
+
+              <View style={{ gap: spacing.s2 }}>
+                <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                  Club members
+                </Text>
+                {members?.map((m) => {
+                  const p = progressByUser.get(m.userId);
+                  const pct =
+                    p && p.totalPages > 0
+                      ? Math.min(100, Math.round((p.currentPage / p.totalPages) * 100))
+                      : 0;
+                  return (
+                    <View
+                      key={m._id}
+                      style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3, paddingVertical: spacing.s2 }}
+                    >
+                      <Avatar
+                        name={`${m.firstName} ${m.lastName}`.trim() || m.displayName}
+                        imageUri={m.avatarUrl}
+                        size="md"
+                      />
+                      <View style={{ flex: 1, gap: 2 }}>
+                        <Text style={{ ...typography.bodyMd, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
+                          {m.displayName}
+                        </Text>
+                        {m.role === "moderator" ? (
+                          <Text style={{ ...typography.bodySm, color: colors.textAccent }}>Moderator</Text>
+                        ) : null}
+                      </View>
+                      <View style={{ width: 96, gap: 4, alignItems: "flex-end" }}>
+                        <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
+                          {p ? `${p.currentPage} of ${p.totalPages} pages` : "Not started"}
+                        </Text>
+                        <View style={{ height: 3, width: "100%", borderRadius: 2, backgroundColor: colors.surfaceSecondary }}>
+                          <View
+                            style={{
+                              width: `${pct}%`,
+                              height: 3,
+                              borderRadius: 2,
+                              backgroundColor: palette.accentStrong,
+                            }}
+                          />
+                        </View>
+                      </View>
+                    </View>
+                  );
+                })}
+                {members?.length === 0 ? (
+                  <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
+                    No members yet.
+                  </Text>
+                ) : null}
+              </View>
             </View>
           )}
         </View>
