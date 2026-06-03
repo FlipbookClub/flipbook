@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
   Dimensions,
@@ -19,7 +19,7 @@ import { MarginReactionsList } from "@/components/features/MarginReactionsList";
 import { ReactionDetailsSheet } from "@/components/features/ReactionDetailsSheet";
 import { ReactionComposer, type ReactionSubmission } from "@/screens/reader/ReactionComposer";
 import { palette } from "@/theme/palette";
-import { spacing } from "@/theme/spacing";
+import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { ensureCachedPdf, getCachedPdfPath } from "@/lib/pdf";
@@ -36,6 +36,7 @@ import {
   type ContentKind,
 } from "@/lib/bookMeta";
 import { analytics } from "@/lib/analytics";
+import { storage } from "@/lib/storage";
 import { useConnectivity } from "@/lib/connectivity";
 import { enqueueReaction } from "@/lib/reactionQueue";
 
@@ -227,6 +228,25 @@ export function ReaderScreen({ navigation, route }: Props) {
   // Set by the cache-resolution effect below once we know the storage ID.
   const [resolvedUri, setResolvedUri] = useState<string | null>(null);
   const [customizeOpen, setCustomizeOpen] = useState(false);
+
+  // Freeze the page we open at. `initialPage` recomputes whenever the live
+  // serverProgress query updates (including right after our own syncToServer
+  // write) — feeding that into the Pdf's controlled `page` prop made it jump
+  // back. Capture it once; onPageChanged drives everything after.
+  const openAtPageRef = useRef<number | null>(null);
+  if (openAtPageRef.current === null && initialPage !== null) {
+    openAtPageRef.current = initialPage;
+  }
+
+  // Reading view: page-by-page (horizontal paging) or continuous vertical
+  // scroll. Persisted so it sticks across books/sessions.
+  const [pageMode, setPageMode] = useState<"paged" | "scroll">(() =>
+    storage.getString("reader.pageMode") === "scroll" ? "scroll" : "paged",
+  );
+  const setReadingMode = useCallback((mode: "paged" | "scroll") => {
+    setPageMode(mode);
+    storage.set("reader.pageMode", mode);
+  }, []);
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
 
@@ -423,6 +443,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         onClose={() => navigation.goBack()}
         onSettings={() => setCustomizeOpen(true)}
       />
+      <View style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary }}>
         {loadError ? (
           <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center" }}>
@@ -437,13 +458,16 @@ export function ReaderScreen({ navigation, route }: Props) {
             <View style={{ flex: 1 }}>
               <Pdf
                 source={{ uri: resolvedUri, cache: true }}
-                horizontal
-                enablePaging
-                page={initialPage}
+                horizontal={pageMode === "paged"}
+                enablePaging={pageMode === "paged"}
+                page={openAtPageRef.current ?? initialPage}
                 onLoadComplete={(numberOfPages) => {
                   if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
                   setTotalPages(numberOfPages);
-                  const startPage = Math.min(Math.max(1, initialPage), numberOfPages);
+                  const startPage = Math.min(
+                    Math.max(1, openAtPageRef.current ?? initialPage),
+                    numberOfPages,
+                  );
                   setCurrentPage(startPage);
                   syncToServer(startPage, numberOfPages);
                 }}
@@ -459,16 +483,21 @@ export function ReaderScreen({ navigation, route }: Props) {
                 style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
                 trustAllCerts={false}
               />
-              {pageReactions && pageReactions.length > 0 ? (
-                <MarginReactionsList
-                  reactions={pageReactions}
-                  onSelectReaction={setSelectedReactionId}
-                  authorUserId={club?.type === "creator" ? club.moderatorId : null}
-                />
-              ) : null}
             </View>
           </GestureDetector>
         )}
+      </View>
+      {/* Reaction overlay — rendered as a SIBLING of the Pdf container (not a
+          child) so it draws above the native PDFKit view (the same trick the
+          React FAB uses). It sits inside this flex wrapper, below the header
+          and above the page indicator. */}
+      {pageReactions && pageReactions.length > 0 && !loadError && resolvedUri && initialPage !== null ? (
+        <MarginReactionsList
+          reactions={pageReactions}
+          onSelectReaction={setSelectedReactionId}
+          authorUserId={club?.type === "creator" ? club.moderatorId : null}
+        />
+      ) : null}
       </View>
       <View
         style={{
@@ -514,6 +543,8 @@ export function ReaderScreen({ navigation, route }: Props) {
       <ReaderCustomizationSheet
         visible={customizeOpen}
         onClose={() => setCustomizeOpen(false)}
+        pageMode={pageMode}
+        onChangeMode={setReadingMode}
       />
       <ReactionComposer
         visible={composerOpen}
@@ -600,11 +631,19 @@ function Header({ title, subtitle, onClose, onSettings, settingsDisabled }: Head
 function ReaderCustomizationSheet({
   visible,
   onClose,
+  pageMode,
+  onChangeMode,
 }: {
   visible: boolean;
   onClose: () => void;
+  pageMode: "paged" | "scroll";
+  onChangeMode: (mode: "paged" | "scroll") => void;
 }) {
   const { colors } = useTheme();
+  const options: Array<{ key: "paged" | "scroll"; label: string }> = [
+    { key: "paged", label: "Page by page" },
+    { key: "scroll", label: "Continuous scroll" },
+  ];
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <Pressable
@@ -620,14 +659,56 @@ function ReaderCustomizationSheet({
           paddingHorizontal: spacing.s5,
           paddingTop: spacing.s4,
           paddingBottom: spacing.s6,
-          gap: spacing.s3,
+          gap: spacing.s4,
         }}
       >
         <Text style={{ ...typography.headingMd, color: colors.textPrimary }}>
           Reading customization
         </Text>
-        <Text style={{ ...typography.bodyMd, color: colors.textSecondary }}>
-          Font, line height, and page background controls are coming with Pro in Phase 6.
+
+        <View style={{ gap: spacing.s2 }}>
+          <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>Reading view</Text>
+          <View
+            style={{
+              flexDirection: "row",
+              backgroundColor: colors.surfaceSecondary,
+              borderRadius: radius.pill,
+              padding: 4,
+            }}
+          >
+            {options.map((o) => {
+              const active = pageMode === o.key;
+              return (
+                <Pressable
+                  key={o.key}
+                  onPress={() => onChangeMode(o.key)}
+                  accessibilityRole="radio"
+                  accessibilityState={{ selected: active }}
+                  style={{
+                    flex: 1,
+                    paddingVertical: spacing.s2,
+                    alignItems: "center",
+                    borderRadius: radius.pill,
+                    backgroundColor: active ? colors.surfacePrimary : "transparent",
+                  }}
+                >
+                  <Text
+                    style={{
+                      ...typography.bodyMd,
+                      fontFamily: "Raleway-SemiBold",
+                      color: active ? colors.textPrimary : colors.textMuted,
+                    }}
+                  >
+                    {o.label}
+                  </Text>
+                </Pressable>
+              );
+            })}
+          </View>
+        </View>
+
+        <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+          Font, line height, and page background controls are coming with Pro.
         </Text>
       </View>
     </Modal>
