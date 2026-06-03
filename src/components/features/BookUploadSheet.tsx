@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, Text, View } from "react-native";
 import Pdf from "react-native-pdf";
-import { captureRef } from "react-native-view-shot";
 import { X } from "lucide-react-native";
 import { useMutation } from "convex/react";
 
@@ -13,6 +12,21 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { uploadBinary, uploadPdf, type PickedPdf } from "@/lib/pdf";
+
+// react-native-view-shot is a native module added after the current dev-client
+// binary was built — so we load it lazily and tolerate its absence. On an old
+// binary the require throws (RNViewShot not registered); we swallow it and skip
+// cover capture rather than crashing the whole app. After a rebuild it resolves
+// and covers start generating automatically.
+let captureRef:
+  | ((ref: unknown, opts: Record<string, unknown>) => Promise<string>)
+  | null = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  captureRef = require("react-native-view-shot").captureRef;
+} catch {
+  captureRef = null;
+}
 
 // Off-screen render size for the cover capture. Tall portrait ratio so the
 // page-1 thumbnail matches the 56x80 cards; rendered big enough to stay crisp.
@@ -264,9 +278,11 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
           onLoadComplete={(numberOfPages) => {
             setPageCount(numberOfPages);
             setPageDetectionError(null);
-            // Give PDFKit a beat to paint page 1, then snapshot it.
+            // Give PDFKit a beat to paint page 1, then snapshot it. Skipped
+            // entirely when view-shot isn't in the native binary yet.
+            if (!captureRef) return;
             setTimeout(() => {
-              captureRef(coverViewRef, { format: "jpg", quality: 0.7, result: "tmpfile" })
+              captureRef?.(coverViewRef, { format: "jpg", quality: 0.7, result: "tmpfile" })
                 .then((uri) => setCoverUri(uri))
                 .catch(() => {
                   /* best-effort — book uploads cover-less */
