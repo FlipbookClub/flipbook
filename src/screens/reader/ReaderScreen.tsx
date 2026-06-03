@@ -243,10 +243,16 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [pageMode, setPageMode] = useState<"paged" | "scroll">(() =>
     storage.getString("reader.pageMode") === "scroll" ? "scroll" : "paged",
   );
-  const setReadingMode = useCallback((mode: "paged" | "scroll") => {
+  // The page the Pdf is told to show. It stays put during normal swiping (so
+  // neither live progress nor a re-render yanks it) and is re-anchored to the
+  // *current* page only when the view mode changes — so switching continuous ⇄
+  // page-by-page keeps your place instead of snapping to the opened page.
+  const [targetPage, setTargetPage] = useState<number | null>(null);
+  const setReadingMode = (mode: "paged" | "scroll") => {
     setPageMode(mode);
     storage.set("reader.pageMode", mode);
-  }, []);
+    setTargetPage(currentPage);
+  };
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
 
@@ -460,7 +466,7 @@ export function ReaderScreen({ navigation, route }: Props) {
                 source={{ uri: resolvedUri, cache: true }}
                 horizontal={pageMode === "paged"}
                 enablePaging={pageMode === "paged"}
-                page={openAtPageRef.current ?? initialPage}
+                page={targetPage ?? openAtPageRef.current ?? initialPage}
                 onLoadComplete={(numberOfPages) => {
                   if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
                   setTotalPages(numberOfPages);
