@@ -5,11 +5,25 @@ import {
   useRef,
   useState,
 } from "react";
-import { ActivityIndicator, View } from "react-native";
-import { WebView, type WebViewMessageEvent } from "react-native-webview";
+import { ActivityIndicator, Text, View } from "react-native";
+import type { WebView as WebViewType, WebViewMessageEvent } from "react-native-webview";
 import { documentDirectory } from "expo-file-system/legacy";
 
+import { spacing } from "@/theme/spacing";
+import { typography } from "@/theme/typography";
 import { getReaderHtmlUri } from "@/screens/reader/pdfReaderHtml";
+
+// react-native-webview is a native module — only present in binaries built
+// after it was added. Load it with a guarded require so a stale/simulator
+// binary that lacks it never bricks the whole app at startup (the eager static
+// import did exactly that). The reader degrades to an "unavailable" notice.
+let WebView: typeof import("react-native-webview").WebView | null = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  WebView = require("react-native-webview").WebView;
+} catch {
+  WebView = null;
+}
 
 export interface HighlightRect {
   x: number;
@@ -54,7 +68,7 @@ export const PdfWebView = forwardRef<PdfWebViewHandle, Props>(function PdfWebVie
   { pdfUrl, startPage, bg, fg, onPage, onLoaded, onSelection, onSelectionCleared, onHighlightTap, onError },
   ref,
 ) {
-  const webRef = useRef<WebView>(null);
+  const webRef = useRef<WebViewType>(null);
   const [htmlUri, setHtmlUri] = useState<string | null>(null);
 
   useEffect(() => {
@@ -120,6 +134,25 @@ export const PdfWebView = forwardRef<PdfWebViewHandle, Props>(function PdfWebVie
         break;
     }
   };
+
+  // Binary doesn't include react-native-webview yet — don't crash, explain it.
+  if (!WebView) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center",
+          backgroundColor: bg,
+          padding: spacing.s5,
+        }}
+      >
+        <Text style={{ ...typography.bodyMd, color: fg, textAlign: "center" }}>
+          The reader needs an app rebuild on this device. Rebuild the dev client to read here.
+        </Text>
+      </View>
+    );
+  }
 
   if (!htmlUri) {
     return (
