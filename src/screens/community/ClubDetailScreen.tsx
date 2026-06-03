@@ -28,15 +28,19 @@ type TabKey = "room" | "discussions" | "library";
 
 const DEEP_LINK_BASE = "flipbook://join";
 
-// A book row in the Library tab: cover + title/author + an optional action
-// (Retire book / Set as currently reading / Read again).
-function LibraryBookRow({
+// A book card (Figma "Frame 3910"): a surfaceSecondary card with a cover-only
+// thumbnail, an uppercase title (textAlt), accent author + muted page count, an
+// optional accent action pill, and — for the current read — a started date +
+// progress bar. Text colors are mode-correct on the secondary surface.
+function LibraryBookCard({
   title,
   author,
   pageCount,
   onOpen,
   actionLabel,
   onAction,
+  started,
+  progress,
 }: {
   title: string;
   author: string;
@@ -44,27 +48,103 @@ function LibraryBookRow({
   onOpen: () => void;
   actionLabel?: string;
   onAction?: () => void;
+  started?: string;
+  progress?: { label: string; pct: number };
 }) {
-  const { colors } = useTheme();
+  const { colors, buttons } = useTheme();
+  const initial = title.trim().slice(0, 1).toUpperCase() || "?";
   return (
-    <View style={{ flexDirection: "row", gap: spacing.s4 }}>
-      <BookCover title={title} author={author} pageCount={pageCount} size="sm" onPress={onOpen} />
-      <View style={{ flex: 1, gap: spacing.s1 }}>
-        <Text
-          style={{ ...typography.bodyMd, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
-          numberOfLines={2}
-        >
+    <View
+      style={{
+        flexDirection: "row",
+        gap: spacing.s3,
+        padding: spacing.s3,
+        borderRadius: radius.sm,
+        backgroundColor: colors.surfaceSecondary,
+      }}
+    >
+      <Pressable
+        onPress={onOpen}
+        accessibilityRole="button"
+        accessibilityLabel={`Open ${title}`}
+        style={{
+          width: 56,
+          height: 80,
+          borderRadius: radius.sm,
+          backgroundColor: palette.brandPrimary,
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Text style={{ fontFamily: "Raleway-Bold", fontSize: 22, color: palette.textOnBrand }}>
+          {initial}
+        </Text>
+      </Pressable>
+
+      <View style={{ flex: 1, gap: spacing.s2, justifyContent: "center" }}>
+        <Text style={{ ...typography.overlineLg, color: colors.textAlt }} numberOfLines={2}>
           {title}
         </Text>
-        <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-          {author} · {pageCount} pages
-        </Text>
-        {actionLabel && onAction ? (
-          <Pressable onPress={onAction} hitSlop={spacing.s2} accessibilityRole="button">
-            <Text style={{ ...typography.bodySm, color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
-              {actionLabel}
+        <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
+          <Text style={{ ...typography.bodySm, color: colors.textAccent }} numberOfLines={1}>
+            {author}
+          </Text>
+          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{pageCount} pages</Text>
+        </View>
+
+        {started || actionLabel ? (
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: started ? "space-between" : "flex-start",
+            }}
+          >
+            {started ? (
+              <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+                Started <Text style={{ color: colors.textAccent }}>{started}</Text>
+              </Text>
+            ) : null}
+            {actionLabel && onAction ? (
+              <Pressable
+                onPress={onAction}
+                accessibilityRole="button"
+                accessibilityLabel={actionLabel}
+                style={{
+                  backgroundColor: colors.surfaceAccent,
+                  paddingHorizontal: spacing.s2,
+                  paddingVertical: 2,
+                  borderRadius: radius.sm,
+                }}
+              >
+                <Text
+                  style={{ fontFamily: "Raleway-Medium", fontSize: 10, color: buttons.secondary.default.text }}
+                >
+                  {actionLabel}
+                </Text>
+              </Pressable>
+            ) : null}
+          </View>
+        ) : null}
+
+        {progress ? (
+          <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
+            <View
+              style={{ flex: 1, height: 6, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary }}
+            >
+              <View
+                style={{
+                  width: `${Math.min(100, Math.max(0, progress.pct))}%`,
+                  height: 6,
+                  borderRadius: radius.sm,
+                  backgroundColor: colors.surfaceAccent,
+                }}
+              />
+            </View>
+            <Text style={{ ...typography.bodySm, color: colors.textSecondary }}>
+              {progress.label} <Text style={{ color: colors.textAccent }}>{progress.pct}%</Text>
             </Text>
-          </Pressable>
+          </View>
         ) : null}
       </View>
     </View>
@@ -111,6 +191,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
 
   const [tab, setTab] = useState<TabKey>("room");
   const [librarySearch, setLibrarySearch] = useState("");
+  const [memberSearch, setMemberSearch] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
 
@@ -138,6 +219,30 @@ export function ClubDetailScreen({ navigation, route }: Props) {
     b.author.toLowerCase().includes(librarySearchTerm);
   const upcomingBooks = libraryBooks.filter((b) => !b.currentlyReadingAt).filter(matchesLibrarySearch);
   const pastBooks = libraryBooks.filter((b) => b.currentlyReadingAt).filter(matchesLibrarySearch);
+
+  // The viewer's own progress on the current read, for the Currently-Reading card.
+  const myProgress = me ? progressByUser.get(me._id) : undefined;
+  const currentProgress =
+    myProgress && myProgress.totalPages > 0
+      ? {
+          label: `Pg ${myProgress.currentPage} | ${myProgress.totalPages}`,
+          pct: Math.round((myProgress.currentPage / myProgress.totalPages) * 100),
+        }
+      : undefined;
+  const startedLabel = currentBook?.currentlyReadingAt
+    ? new Date(currentBook.currentlyReadingAt).toLocaleDateString(undefined, {
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      })
+    : undefined;
+  const memberSearchTerm = memberSearch.trim().toLowerCase();
+  const filteredMembers = (members ?? []).filter(
+    (m) =>
+      !memberSearchTerm ||
+      m.displayName.toLowerCase().includes(memberSearchTerm) ||
+      `${m.firstName} ${m.lastName}`.toLowerCase().includes(memberSearchTerm),
+  );
   const inviteUrl = club ? `${DEEP_LINK_BASE}/${club.inviteCode}` : null;
   const joinByCode = useMutation(api.memberships.joinByCode);
   const [joining, setJoining] = useState(false);
@@ -400,10 +505,10 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 </Card>
               )
             ) : books && books.length > 0 ? (
-              <View style={{ gap: spacing.s5 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3 }}>
+              <View style={{ gap: spacing.s6 }}>
+                <View style={{ flexDirection: "row", alignItems: "flex-end", gap: spacing.s3 }}>
                   <Input
-                    variant="boxed"
+                    variant="underline"
                     placeholder="Search library.."
                     value={librarySearch}
                     onChangeText={setLibrarySearch}
@@ -418,15 +523,17 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 </View>
 
                 {currentBook ? (
-                  <View style={{ gap: spacing.s2 }}>
-                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                  <View style={{ gap: spacing.s4 }}>
+                    <Text style={{ ...typography.overlineLg, color: colors.textAccent }}>
                       Currently reading
                     </Text>
-                    <LibraryBookRow
+                    <LibraryBookCard
                       title={currentBook.title}
                       author={currentBook.author}
                       pageCount={currentBook.pdfPageCount}
                       onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
+                      started={startedLabel}
+                      progress={currentProgress}
                       actionLabel={isModerator ? "Retire book" : undefined}
                       onAction={
                         isModerator
@@ -452,12 +559,12 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 ) : null}
 
                 {upcomingBooks.length > 0 ? (
-                  <View style={{ gap: spacing.s3 }}>
-                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                  <View style={{ gap: spacing.s4 }}>
+                    <Text style={{ ...typography.overlineLg, color: colors.textAccent }}>
                       Upcoming reads
                     </Text>
                     {upcomingBooks.map((b) => (
-                      <LibraryBookRow
+                      <LibraryBookCard
                         key={b._id}
                         title={b.title}
                         author={b.author}
@@ -478,12 +585,12 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 ) : null}
 
                 {pastBooks.length > 0 ? (
-                  <View style={{ gap: spacing.s3 }}>
-                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                  <View style={{ gap: spacing.s4 }}>
+                    <Text style={{ ...typography.overlineLg, color: colors.textAccent }}>
                       Past reads
                     </Text>
                     {pastBooks.map((b) => (
-                      <LibraryBookRow
+                      <LibraryBookCard
                         key={b._id}
                         title={b.title}
                         author={b.author}
@@ -680,58 +787,40 @@ export function ClubDetailScreen({ navigation, route }: Props) {
             )
           ) : (
             // Room lobby: the current read at a glance + members' progress.
-            <View style={{ gap: spacing.s5 }}>
+            <View style={{ gap: spacing.s6 }}>
               {currentBook ? (
-                <View style={{ gap: spacing.s2 }}>
-                  <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                <View style={{ gap: spacing.s4 }}>
+                  <Text style={{ ...typography.overlineLg, color: colors.textAccent }}>
                     Currently reading
                   </Text>
-                  <Pressable
-                    onPress={() => navigation.navigate("Reader", { bookId: currentBook._id })}
-                    accessibilityRole="button"
-                    accessibilityLabel={`Open ${currentBook.title}`}
-                    style={{
-                      flexDirection: "row",
-                      gap: spacing.s4,
-                      padding: spacing.s3,
-                      borderRadius: radius.md,
-                      backgroundColor: colors.surfaceSecondary,
-                    }}
-                  >
-                    <BookCover
-                      title={currentBook.title}
-                      author={currentBook.author}
-                      pageCount={currentBook.pdfPageCount}
-                      size="sm"
-                    />
-                    <View style={{ flex: 1, gap: spacing.s1 }}>
-                      <Text
-                        style={{ ...typography.bodyLg, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
-                        numberOfLines={2}
-                      >
-                        {currentBook.title}
-                      </Text>
-                      <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-                        Author{" "}
-                        <Text style={{ color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
-                          {currentBook.author}
-                        </Text>
-                      </Text>
-                      {currentBook.currentlyReadingAt ? (
-                        <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
-                          Started {new Date(currentBook.currentlyReadingAt).toLocaleDateString()}
-                        </Text>
-                      ) : null}
-                    </View>
-                  </Pressable>
+                  <LibraryBookCard
+                    title={currentBook.title}
+                    author={currentBook.author}
+                    pageCount={currentBook.pdfPageCount}
+                    onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
+                    started={startedLabel}
+                    progress={currentProgress}
+                  />
                 </View>
               ) : null}
 
-              <View style={{ gap: spacing.s2 }}>
-                <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
-                  Club members
-                </Text>
-                {members?.map((m) => {
+              <View style={{ gap: spacing.s4 }}>
+                <View style={{ flexDirection: "row", alignItems: "flex-end", gap: spacing.s4 }}>
+                  <Text style={{ ...typography.overlineLg, color: colors.textAccent }}>
+                    Club members
+                  </Text>
+                  <Input
+                    variant="underline"
+                    placeholder="Search member.."
+                    value={memberSearch}
+                    onChangeText={setMemberSearch}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    rightIcon={<Search size={18} color={colors.textMuted} />}
+                    containerStyle={{ flex: 1 }}
+                  />
+                </View>
+                {filteredMembers.map((m) => {
                   const p = progressByUser.get(m.userId);
                   const pct =
                     p && p.totalPages > 0
@@ -755,7 +844,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                           <Text style={{ ...typography.bodySm, color: colors.textAccent }}>Moderator</Text>
                         ) : null}
                       </View>
-                      <View style={{ width: 96, gap: 4, alignItems: "flex-end" }}>
+                      <View style={{ width: 100, gap: 4, alignItems: "flex-end" }}>
                         <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
                           {p ? `${p.currentPage} of ${p.totalPages} pages` : "Not started"}
                         </Text>
@@ -765,7 +854,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                               width: `${pct}%`,
                               height: 3,
                               borderRadius: 2,
-                              backgroundColor: palette.accentStrong,
+                              backgroundColor: colors.textAccent,
                             }}
                           />
                         </View>
@@ -773,9 +862,9 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     </View>
                   );
                 })}
-                {members?.length === 0 ? (
+                {filteredMembers.length === 0 ? (
                   <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
-                    No members yet.
+                    {memberSearch.trim() ? "No members match that search." : "No members yet."}
                   </Text>
                 ) : null}
               </View>
