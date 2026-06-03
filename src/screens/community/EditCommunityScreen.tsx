@@ -61,8 +61,13 @@ export function EditCommunityScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
   const { clubId } = route.params;
   const club = useQuery(api.clubs.get, { clubId });
+  const me = useQuery(api.users.me);
   const generateEmblemUploadUrl = useMutation(api.clubs.generateEmblemUploadUrl);
   const updateClub = useMutation(api.clubs.update);
+
+  // Only the moderator sees governance controls (visibility + permissions);
+  // permitted members can edit info (emblem/name/description) only.
+  const isModerator = !!me && !!club && club.moderatorId === me._id;
 
   const [seeded, setSeeded] = useState(false);
   const [name, setName] = useState("");
@@ -229,43 +234,51 @@ export function EditCommunityScreen({ navigation, route }: Props) {
               numberOfLines={3}
             />
 
-            <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3 }}>
-              <Switch
-                value={isPrivate}
-                onValueChange={setIsPrivate}
-                trackColor={{ true: palette.brandPrimary, false: colors.border }}
-                thumbColor={palette.textOnBrand}
-                accessibilityLabel="Make this community private"
-              />
-              <Text style={{ ...typography.bodyMd, color: colors.textPrimary, flex: 1 }}>
-                Make this community private
-              </Text>
-            </View>
+            {isModerator ? (
+              <>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3 }}>
+                  <Switch
+                    value={isPrivate}
+                    onValueChange={setIsPrivate}
+                    trackColor={{ true: palette.brandPrimary, false: colors.border }}
+                    thumbColor={palette.textOnBrand}
+                    accessibilityLabel="Make this community private"
+                  />
+                  <Text style={{ ...typography.bodyMd, color: colors.textPrimary, flex: 1 }}>
+                    Make this community private
+                  </Text>
+                </View>
 
-            <View style={{ gap: spacing.s2 }}>
-              <Text
-                style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}
-              >
-                Community permissions
-              </Text>
-              <View style={{ gap: spacing.s1 }}>
-                <Checkbox
-                  label="Allow members to upload books"
-                  checked={perms.membersCanUploadBooks}
-                  onChange={(v) => setPerms((p) => ({ ...p, membersCanUploadBooks: v }))}
-                />
-                <Checkbox
-                  label="Allow members to invite others"
-                  checked={perms.membersCanInviteOthers}
-                  onChange={(v) => setPerms((p) => ({ ...p, membersCanInviteOthers: v }))}
-                />
-                <Checkbox
-                  label="Allow members to update community info"
-                  checked={perms.membersCanUpdateInfo}
-                  onChange={(v) => setPerms((p) => ({ ...p, membersCanUpdateInfo: v }))}
-                />
-              </View>
-            </View>
+                <View style={{ gap: spacing.s2 }}>
+                  <Text
+                    style={{
+                      ...typography.bodyLg,
+                      color: colors.textPrimary,
+                      fontFamily: "Raleway-SemiBold",
+                    }}
+                  >
+                    Community permissions
+                  </Text>
+                  <View style={{ gap: spacing.s1 }}>
+                    <Checkbox
+                      label="Allow members to upload books"
+                      checked={perms.membersCanUploadBooks}
+                      onChange={(v) => setPerms((p) => ({ ...p, membersCanUploadBooks: v }))}
+                    />
+                    <Checkbox
+                      label="Allow members to invite others"
+                      checked={perms.membersCanInviteOthers}
+                      onChange={(v) => setPerms((p) => ({ ...p, membersCanInviteOthers: v }))}
+                    />
+                    <Checkbox
+                      label="Allow members to update community info"
+                      checked={perms.membersCanUpdateInfo}
+                      onChange={(v) => setPerms((p) => ({ ...p, membersCanUpdateInfo: v }))}
+                    />
+                  </View>
+                </View>
+              </>
+            ) : null}
 
             {formError ? (
               <Text style={{ ...typography.bodySm, color: palette.error, textAlign: "center" }}>

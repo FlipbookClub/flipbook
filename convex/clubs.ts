@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 
-import { mutation, query, type QueryCtx } from "./_generated/server";
+import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { getCurrentUser } from "./users";
 import { generateInviteCode } from "./lib/inviteCode";
@@ -64,6 +64,24 @@ async function userCanSeeClub(
     .withIndex("by_club_and_user", (q) => q.eq("clubId", club._id).eq("userId", userId))
     .unique();
   return membership !== null;
+}
+
+// Who may edit community *info* (name/description/emblem): the moderator, or a
+// member when the moderator has granted membersCanUpdateInfo. Governance
+// (visibility/permissions/delete) stays moderator-only — enforced separately.
+async function assertCanEditInfo(
+  ctx: QueryCtx | MutationCtx,
+  club: Doc<"clubs">,
+  userId: Id<"users">,
+): Promise<void> {
+  if (club.moderatorId === userId) return;
+  const membership = await ctx.db
+    .query("memberships")
+    .withIndex("by_club_and_user", (q) => q.eq("clubId", club._id).eq("userId", userId))
+    .unique();
+  if (!membership || !club.permissions.membersCanUpdateInfo) {
+    throw new ConvexError({ code: "not_moderator" });
+  }
 }
 
 export const create = mutation({
@@ -211,7 +229,7 @@ export const generateEmblemUploadUrl = mutation({
     const me = await getCurrentUser(ctx);
     const club = await ctx.db.get(args.clubId);
     if (!club) throw new ConvexError({ code: "club_not_found" });
-    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    await assertCanEditInfo(ctx, club, me._id);
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -233,8 +251,13 @@ export const update = mutation({
     const me = await getCurrentUser(ctx);
     const club = await ctx.db.get(args.clubId);
     if (!club) throw new ConvexError({ code: "club_not_found" });
-    if (club.moderatorId !== me._id) {
-      throw new ConvexError({ code: "not_moderator" });
+    const isMod = club.moderatorId === me._id;
+    if (!isMod) {
+      await assertCanEditInfo(ctx, club, me._id);
+      // Permitted members edit info only — never governance.
+      if (args.visibility !== undefined || args.permissions !== undefined) {
+        throw new ConvexError({ code: "moderator_only_field" });
+      }
     }
 
     const patch: Partial<Doc<"clubs">> = {};

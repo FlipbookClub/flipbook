@@ -73,6 +73,10 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const canUpload =
     !isCreatorClub &&
     (isModerator || (!!club && club.permissions.membersCanUploadBooks));
+  // FR: members can edit community info when the moderator grants it. They get
+  // the edit page (info only); the moderator gets the full manage sheet.
+  const canEditInfo =
+    isModerator || (isMember && !!club && club.permissions.membersCanUpdateInfo);
   const inviteUrl = club ? `${DEEP_LINK_BASE}/${club.inviteCode}` : null;
   const joinByCode = useMutation(api.memberships.joinByCode);
   const [joining, setJoining] = useState(false);
@@ -185,9 +189,13 @@ export function ClubDetailScreen({ navigation, route }: Props) {
           >
             <Share2 size={22} color={colors.textPrimary} />
           </Pressable>
-          {isModerator ? (
+          {canEditInfo ? (
             <Pressable
-              onPress={() => setSheetOpen(true)}
+              onPress={() =>
+                isModerator
+                  ? setSheetOpen(true)
+                  : navigation.navigate("EditCommunity", { clubId })
+              }
               hitSlop={spacing.s3}
               accessibilityLabel="Club settings"
               accessibilityRole="button"
