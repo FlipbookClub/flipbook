@@ -38,6 +38,7 @@ function LibraryBookCard({
   title,
   author,
   pageCount,
+  coverUrl,
   onOpen,
   onOptions,
   started,
@@ -46,6 +47,7 @@ function LibraryBookCard({
   title: string;
   author: string;
   pageCount: number;
+  coverUrl?: string;
   onOpen: () => void;
   onOptions?: () => void;
   started?: string;
@@ -71,14 +73,19 @@ function LibraryBookCard({
           width: 56,
           height: 80,
           borderRadius: radius.sm,
+          overflow: "hidden",
           backgroundColor: palette.brandPrimary,
           alignItems: "center",
           justifyContent: "center",
         }}
       >
-        <Text style={{ fontFamily: "Raleway-Bold", fontSize: 22, color: palette.textOnBrand }}>
-          {initial}
-        </Text>
+        {coverUrl ? (
+          <Image source={{ uri: coverUrl }} style={{ width: "100%", height: "100%" }} resizeMode="cover" />
+        ) : (
+          <Text style={{ fontFamily: "Raleway-Bold", fontSize: 22, color: palette.textOnBrand }}>
+            {initial}
+          </Text>
+        )}
       </Pressable>
 
       <View style={{ flex: 1, gap: spacing.s2, justifyContent: "center" }}>
@@ -518,6 +525,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       title={currentBook.title}
                       author={currentBook.author}
                       pageCount={currentBook.pdfPageCount}
+                      coverUrl={currentBook.coverImageUrl}
                       onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
                       started={startedLabel}
                       progress={currentProgress}
@@ -548,6 +556,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         title={b.title}
                         author={b.author}
                         pageCount={b.pdfPageCount}
+                        coverUrl={b.coverImageUrl}
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
                         onOptions={() => setOptionsBook(b)}
                       />
@@ -566,6 +575,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         title={b.title}
                         author={b.author}
                         pageCount={b.pdfPageCount}
+                        coverUrl={b.coverImageUrl}
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
                         onOptions={() => setOptionsBook(b)}
                       />
@@ -767,6 +777,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     title={currentBook.title}
                     author={currentBook.author}
                     pageCount={currentBook.pdfPageCount}
+                    coverUrl={currentBook.coverImageUrl}
                     onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
                     started={startedLabel}
                     progress={currentProgress}

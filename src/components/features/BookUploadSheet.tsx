@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { KeyboardAvoidingView, Modal, Platform, Pressable, Text, View } from "react-native";
 import Pdf from "react-native-pdf";
+import { captureRef } from "react-native-view-shot";
 import { X } from "lucide-react-native";
 import { useMutation } from "convex/react";
 
@@ -11,7 +12,12 @@ import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
-import { uploadPdf, type PickedPdf } from "@/lib/pdf";
+import { uploadBinary, uploadPdf, type PickedPdf } from "@/lib/pdf";
+
+// Off-screen render size for the cover capture. Tall portrait ratio so the
+// page-1 thumbnail matches the 56x80 cards; rendered big enough to stay crisp.
+const COVER_W = 240;
+const COVER_H = 340;
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
@@ -39,6 +45,10 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
   const [progress, setProgress] = useState(0);
   const [stage, setStage] = useState<Stage>("metadata");
   const [error, setError] = useState<string | null>(null);
+  // Local uri of the captured first-page cover, once the off-screen Pdf has
+  // rendered. Best-effort: if capture fails the book just uploads cover-less.
+  const coverViewRef = useRef<View>(null);
+  const [coverUri, setCoverUri] = useState<string | null>(null);
 
   useEffect(() => {
     if (!visible) {
@@ -50,6 +60,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       setProgress(0);
       setStage("metadata");
       setError(null);
+      setCoverUri(null);
     }
   }, [visible]);
 
@@ -78,7 +89,21 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
     try {
       const uploadUrl = await generateUploadUrl({ clubId });
       const { storageId } = await uploadPdf(uploadUrl, file, setProgress);
+
+      // Upload the captured cover thumbnail, if we have one. Best-effort —
+      // never block the book upload on the cover.
       setStage("registering");
+      let coverStorageId: Id<"_storage"> | undefined;
+      if (coverUri) {
+        try {
+          const coverUploadUrl = await generateUploadUrl({ clubId });
+          const cover = await uploadBinary(coverUploadUrl, coverUri, "image/jpeg");
+          coverStorageId = cover.storageId as Id<"_storage">;
+        } catch {
+          // ignore — fall back to the colored initial
+        }
+      }
+
       const bookId = await registerBook({
         clubId,
         title: title.trim(),
@@ -87,6 +112,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         pdfStorageId: storageId as Id<"_storage">,
         pdfPageCount: pageCount,
         fileSize: file.size,
+        coverStorageId,
       });
       onUploaded(bookId);
       onClose();
@@ -213,25 +239,46 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         </View>
       </KeyboardAvoidingView>
 
-      {/* Hidden Pdf viewer to read pageCount via onLoadComplete without
-          rendering the file to the user yet. */}
+      {/* Off-screen Pdf used both to read pageCount (onLoadComplete) and to
+          capture the first page as a cover thumbnail. Rendered at a real size
+          far off-screen (not opacity:0 — view-shot can't capture invisible
+          views) so the user never sees it. */}
       <View
-        style={{ position: "absolute", width: 1, height: 1, opacity: 0, pointerEvents: "none" }}
+        ref={coverViewRef}
+        collapsable={false}
+        style={{
+          position: "absolute",
+          left: -10000,
+          top: 0,
+          width: COVER_W,
+          height: COVER_H,
+          backgroundColor: "#ffffff",
+        }}
         accessibilityElementsHidden
         importantForAccessibility="no-hide-descendants"
       >
         <Pdf
           source={{ uri: file.uri }}
+          singlePage
+          fitPolicy={2}
           onLoadComplete={(numberOfPages) => {
             setPageCount(numberOfPages);
             setPageDetectionError(null);
+            // Give PDFKit a beat to paint page 1, then snapshot it.
+            setTimeout(() => {
+              captureRef(coverViewRef, { format: "jpg", quality: 0.7, result: "tmpfile" })
+                .then((uri) => setCoverUri(uri))
+                .catch(() => {
+                  /* best-effort — book uploads cover-less */
+                });
+            }, 600);
           }}
           onError={(err) => {
             setPageDetectionError(
               typeof err === "string" ? err : "Couldn't read this PDF. Try a different file.",
             );
           }}
-          style={{ width: 1, height: 1 }}
+          style={{ width: COVER_W, height: COVER_H }}
           trustAllCerts={false}
         />
       </View>

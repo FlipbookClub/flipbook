@@ -1,4 +1,4 @@
-import { Pressable, Text, View } from "react-native";
+import { Image, Pressable, Text, View } from "react-native";
 
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
@@ -9,6 +9,7 @@ interface Props {
   title: string;
   author: string;
   pageCount?: number;
+  coverUrl?: string;
   size?: "sm" | "md" | "lg";
   onPress?: () => void;
 }
@@ -19,7 +20,7 @@ const DIMS = {
   lg: { width: 120, height: 168, fontSize: 44 },
 };
 
-export function BookCover({ title, author, pageCount, size = "md", onPress }: Props) {
+export function BookCover({ title, author, pageCount, coverUrl, size = "md", onPress }: Props) {
   const { colors } = useTheme();
   const dims = DIMS[size];
   const initial = title.trim().slice(0, 1).toUpperCase() || "?";
@@ -31,6 +32,7 @@ export function BookCover({ title, author, pageCount, size = "md", onPress }: Pr
           width: dims.width,
           height: dims.height,
           borderRadius: radius.md,
+          overflow: "hidden",
           backgroundColor: palette.brandPrimary,
           alignItems: "center",
           justifyContent: "center",
@@ -41,15 +43,19 @@ export function BookCover({ title, author, pageCount, size = "md", onPress }: Pr
           elevation: 3,
         }}
       >
-        <Text
-          style={{
-            fontFamily: "Raleway-Bold",
-            fontSize: dims.fontSize,
-            color: palette.textOnBrand,
-          }}
-        >
-          {initial}
-        </Text>
+        {coverUrl ? (
+          <Image source={{ uri: coverUrl }} style={{ width: "100%", height: "100%" }} resizeMode="cover" />
+        ) : (
+          <Text
+            style={{
+              fontFamily: "Raleway-Bold",
+              fontSize: dims.fontSize,
+              color: palette.textOnBrand,
+            }}
+          >
+            {initial}
+          </Text>
+        )}
       </View>
       <View style={{ width: dims.width, gap: 2 }}>
         <Text

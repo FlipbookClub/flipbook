@@ -106,6 +106,29 @@ export async function uploadPdf(
   return { storageId: body.storageId };
 }
 
+// Uploads an arbitrary local file (e.g. a generated cover thumbnail) to a
+// Convex upload URL and returns its storage ID. Streams from disk like
+// uploadPdf — used for small images, so no progress callback.
+export async function uploadBinary(
+  uploadUrl: string,
+  uri: string,
+  mimeType: string,
+): Promise<UploadResult> {
+  const task = createUploadTask(uploadUrl, uri, {
+    httpMethod: "POST",
+    uploadType: FileSystemUploadType.BINARY_CONTENT,
+    headers: { "Content-Type": mimeType },
+  });
+  const result = await task.uploadAsync();
+  if (!result) throw new Error("Upload was cancelled");
+  if (result.status < 200 || result.status >= 300) {
+    throw new Error(`Upload failed with status ${result.status}`);
+  }
+  const body = JSON.parse(result.body) as { storageId?: string };
+  if (!body.storageId) throw new Error("Upload succeeded but no storageId returned");
+  return { storageId: body.storageId };
+}
+
 // ---------------------------------------------------------------------------
 // FR-012: offline PDF cache
 // ---------------------------------------------------------------------------

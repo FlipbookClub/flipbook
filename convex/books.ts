@@ -76,7 +76,9 @@ export const register = mutation({
     pdfStorageId: v.id("_storage"),
     pdfPageCount: v.number(),
     fileSize: v.number(),
-    coverImageUrl: v.optional(v.string()),
+    // Optional cover thumbnail (first page of the PDF), uploaded separately by
+    // the client; we resolve it to a stable serving URL here.
+    coverStorageId: v.optional(v.id("_storage")),
   },
   returns: v.id("books"),
   handler: async (ctx, args) => {
@@ -109,6 +111,12 @@ export const register = mutation({
       throw new ConvexError({ code: "storage_object_missing" });
     }
 
+    // Resolve the optional cover thumbnail to a stable serving URL. Best-effort:
+    // a missing/expired storage id just leaves the book cover-less (initial).
+    const coverImageUrl = args.coverStorageId
+      ? ((await ctx.storage.getUrl(args.coverStorageId)) ?? undefined)
+      : undefined;
+
     const now = Date.now();
     const bookId = await ctx.db.insert("books", {
       title,
@@ -116,7 +124,7 @@ export const register = mutation({
       genre,
       pdfStorageId: args.pdfStorageId,
       pdfPageCount: args.pdfPageCount,
-      coverImageUrl: args.coverImageUrl,
+      coverImageUrl,
       uploadedByUserId: me._id,
       clubId: args.clubId,
       isPublic: false, // Always false for MVP — DMCA exposure mitigation.

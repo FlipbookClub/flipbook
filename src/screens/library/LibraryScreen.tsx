@@ -160,6 +160,7 @@ export function LibraryScreen({ navigation }: Props) {
                   title={item.book.title}
                   author={item.book.author}
                   pageCount={item.book.pdfPageCount}
+                  coverUrl={item.book.coverImageUrl}
                   size="sm"
                 />
                 <View style={{ flex: 1, gap: spacing.s1, paddingTop: spacing.s1 }}>
