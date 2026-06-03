@@ -13,6 +13,7 @@ import {
 } from "react-native";
 import { ChevronLeft, ImagePlus } from "lucide-react-native";
 import * as ImagePicker from "expo-image-picker";
+import { createUploadTask, FileSystemUploadType } from "expo-file-system/legacy";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -33,17 +34,27 @@ type Props = NativeStackScreenProps<CommunityStackParamList, "EditCommunity">;
 const MAX_NAME = 60;
 const MAX_DESCRIPTION = 500;
 
-// Upload a local image to a Convex upload URL; returns its storageId.
-async function uploadEmblem(uploadUrl: string, uri: string): Promise<Id<"_storage">> {
-  const fileRes = await fetch(uri);
-  const blob = await fileRes.blob();
-  const uploadRes = await fetch(uploadUrl, {
-    method: "POST",
-    headers: { "Content-Type": blob.type || "image/jpeg" },
-    body: blob,
+// Upload a local image to a Convex upload URL; returns its storageId. Streams
+// the file from disk (expo-file-system) rather than loading it into a JS blob,
+// which could spike memory and crash on large photos.
+async function uploadEmblem(
+  uploadUrl: string,
+  uri: string,
+  mimeType: string,
+): Promise<Id<"_storage">> {
+  const task = createUploadTask(uploadUrl, uri, {
+    httpMethod: "POST",
+    uploadType: FileSystemUploadType.BINARY_CONTENT,
+    headers: { "Content-Type": mimeType },
   });
-  const { storageId } = (await uploadRes.json()) as { storageId: Id<"_storage"> };
-  return storageId;
+  const result = await task.uploadAsync();
+  if (!result) throw new Error("Upload was cancelled");
+  if (result.status < 200 || result.status >= 300) {
+    throw new Error(`Emblem upload failed with status ${result.status}`);
+  }
+  const body = JSON.parse(result.body) as { storageId?: Id<"_storage"> };
+  if (!body.storageId) throw new Error("Upload succeeded but no storageId returned");
+  return body.storageId;
 }
 
 export function EditCommunityScreen({ navigation, route }: Props) {
@@ -64,6 +75,7 @@ export function EditCommunityScreen({ navigation, route }: Props) {
   });
   // null = keep existing; a local uri = a freshly-picked emblem to upload.
   const [newEmblemUri, setNewEmblemUri] = useState<string | null>(null);
+  const [newEmblemMime, setNewEmblemMime] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -88,6 +100,7 @@ export function EditCommunityScreen({ navigation, route }: Props) {
     });
     if (!result.canceled && result.assets[0]) {
       setNewEmblemUri(result.assets[0].uri);
+      setNewEmblemMime(result.assets[0].mimeType ?? "image/jpeg");
     }
   };
 
@@ -103,7 +116,11 @@ export function EditCommunityScreen({ navigation, route }: Props) {
       let emblemStorageId: Id<"_storage"> | undefined;
       if (newEmblemUri) {
         const uploadUrl = await generateEmblemUploadUrl({ clubId });
-        emblemStorageId = await uploadEmblem(uploadUrl, newEmblemUri);
+        emblemStorageId = await uploadEmblem(
+          uploadUrl,
+          newEmblemUri,
+          newEmblemMime ?? "image/jpeg",
+        );
       }
       await updateClub({
         clubId,
