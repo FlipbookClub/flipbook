@@ -36,16 +36,22 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const books = useQuery(api.books.listForClub, { clubId });
   const chapters = useQuery(api.chapters.list, { clubId });
   const isCreatorClub = club?.type === "creator";
-  const activeBook = books && books.length > 0 ? books[0] : null;
+  // The club's active read drives progress + the activity feed. It changes only
+  // when the moderator sets it — so uploading a new (library) book no longer
+  // makes the feed vanish, and library books don't count toward the feed.
+  const currentBook = useQuery(api.books.currentForClub, { clubId });
+  const libraryBooks = (books ?? []).filter((b) => b._id !== currentBook?._id);
   const latestChapter = chapters && chapters.length > 0 ? chapters[0] : null;
+  const setCurrentlyReading = useMutation(api.books.setCurrentlyReading);
+  const moveToLibrary = useMutation(api.books.moveToLibrary);
   const progressRows = useQuery(
     api.progress.listForClub,
     isCreatorClub
       ? latestChapter
         ? { clubId, chapterId: latestChapter._id }
         : "skip"
-      : activeBook
-        ? { clubId, bookId: activeBook._id }
+      : currentBook
+        ? { clubId, bookId: currentBook._id }
         : "skip",
   );
   const activity = useQuery(
@@ -54,8 +60,8 @@ export function ClubDetailScreen({ navigation, route }: Props) {
       ? latestChapter
         ? { clubId, chapterId: latestChapter._id, limit: 20 }
         : "skip"
-      : activeBook
-        ? { clubId, bookId: activeBook._id, limit: 20 }
+      : currentBook
+        ? { clubId, bookId: currentBook._id, limit: 20 }
         : "skip",
   );
   const me = useQuery(api.users.me);
@@ -339,30 +345,112 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 </Card>
               )
             ) : books && books.length > 0 ? (
-              <View style={{ gap: spacing.s4 }}>
-                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.s4 }}>
-                  {books.map((b) => (
-                    <BookCover
-                      key={b._id}
-                      title={b.title}
-                      author={b.author}
-                      pageCount={b.pdfPageCount}
-                      onPress={() => navigation.navigate("Reader", { bookId: b._id })}
+              <View style={{ gap: spacing.s5 }}>
+                {currentBook ? (
+                  <View style={{ gap: spacing.s3 }}>
+                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                      Currently reading
+                    </Text>
+                    <View style={{ flexDirection: "row", gap: spacing.s4 }}>
+                      <BookCover
+                        title={currentBook.title}
+                        author={currentBook.author}
+                        pageCount={currentBook.pdfPageCount}
+                        size="sm"
+                        onPress={() => navigation.navigate("Reader", { bookId: currentBook._id })}
+                      />
+                      <View style={{ flex: 1, gap: spacing.s1 }}>
+                        <Text
+                          style={{ ...typography.bodyLg, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
+                          numberOfLines={2}
+                        >
+                          {currentBook.title}
+                        </Text>
+                        <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+                          {currentBook.author}
+                        </Text>
+                        {isModerator ? (
+                          <Pressable
+                            onPress={() =>
+                              moveToLibrary({ bookId: currentBook._id }).catch(() =>
+                                Alert.alert("Couldn't update", "Please try again."),
+                              )
+                            }
+                            hitSlop={spacing.s2}
+                            accessibilityRole="button"
+                          >
+                            <Text style={{ ...typography.bodySm, color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
+                              Move to library
+                            </Text>
+                          </Pressable>
+                        ) : null}
+                      </View>
+                    </View>
+                    <ProgressVisualization
+                      rows={progressRows?.map((p) => ({
+                        userId: p.userId,
+                        displayName: p.user.displayName,
+                        avatarUrl: p.user.avatarUrl,
+                        currentPage: p.currentPage,
+                        totalPages: p.totalPages,
+                      }))}
+                      bookTitle={currentBook.title}
                     />
-                  ))}
-                </View>
-                {activeBook ? (
-                  <ProgressVisualization
-                    rows={progressRows?.map((p) => ({
-                      userId: p.userId,
-                      displayName: p.user.displayName,
-                      avatarUrl: p.user.avatarUrl,
-                      currentPage: p.currentPage,
-                      totalPages: p.totalPages,
-                    }))}
-                    bookTitle={activeBook.title}
-                  />
+                  </View>
+                ) : isModerator ? (
+                  <Card>
+                    <View style={{ gap: spacing.s2, paddingVertical: spacing.s2 }}>
+                      <Text style={{ ...typography.bodyMd, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
+                        No current read
+                      </Text>
+                      <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+                        Pick a book from the library below and set it as currently reading.
+                      </Text>
+                    </View>
+                  </Card>
                 ) : null}
+
+                {libraryBooks.length > 0 ? (
+                  <View style={{ gap: spacing.s3 }}>
+                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>Library</Text>
+                    {libraryBooks.map((b) => (
+                      <View key={b._id} style={{ flexDirection: "row", gap: spacing.s4 }}>
+                        <BookCover
+                          title={b.title}
+                          author={b.author}
+                          pageCount={b.pdfPageCount}
+                          size="sm"
+                          onPress={() => navigation.navigate("Reader", { bookId: b._id })}
+                        />
+                        <View style={{ flex: 1, gap: spacing.s1 }}>
+                          <Text
+                            style={{ ...typography.bodyMd, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
+                            numberOfLines={2}
+                          >
+                            {b.title}
+                          </Text>
+                          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{b.author}</Text>
+                          {isModerator ? (
+                            <Pressable
+                              onPress={() =>
+                                setCurrentlyReading({ bookId: b._id }).catch(() =>
+                                  Alert.alert("Couldn't update", "Please try again."),
+                                )
+                              }
+                              hitSlop={spacing.s2}
+                              accessibilityRole="button"
+                            >
+                              <Text style={{ ...typography.bodySm, color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
+                                Set as currently reading
+                              </Text>
+                            </Pressable>
+                          ) : null}
+                        </View>
+                      </View>
+                    ))}
+                  </View>
+                ) : null}
+
                 {canUpload ? (
                   <Button label="Add another book" variant="primary" fullWidth onPress={handleAddBook} />
                 ) : null}
@@ -472,7 +560,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                   </View>
                 </Card>
               </View>
-            ) : !(isCreatorClub ? latestChapter : activeBook) ? (
+            ) : !(isCreatorClub ? latestChapter : currentBook) ? (
               <Card>
                 <View style={{ gap: spacing.s2, alignItems: "center", paddingVertical: spacing.s3 }}>
                   <Text style={{ ...typography.bodyLg, color: colors.textPrimary, fontFamily: "Raleway-SemiBold" }}>
@@ -506,8 +594,8 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         "Reader",
                         isCreatorClub && latestChapter
                           ? { chapterId: latestChapter._id, jumpToPage: r.page }
-                          : activeBook
-                            ? { bookId: activeBook._id, jumpToPage: r.page }
+                          : currentBook
+                            ? { bookId: currentBook._id, jumpToPage: r.page }
                             : { jumpToPage: r.page },
                       )
                     }
