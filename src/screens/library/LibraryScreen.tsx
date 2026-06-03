@@ -5,7 +5,7 @@ import { useQuery } from "convex/react";
 import { isOnlineNow } from "@/lib/connectivity";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { BookCover } from "@/components/features/BookCover";
+import { BookListCard } from "@/components/features/BookListCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { palette } from "@/theme/palette";
@@ -24,22 +24,27 @@ const TABS: Array<{ key: TabKey; label: string }> = [
   { key: "finished", label: "Finished" },
 ];
 
-// Placeholder rows that match the book-row layout while the library query loads.
+// Placeholder cards that match the BookListCard layout while the query loads.
 function LibrarySkeletons() {
+  const { colors } = useTheme();
   return (
     <>
       {Array.from({ length: 3 }).map((_, i) => (
-        <View key={i} style={{ flexDirection: "row", gap: spacing.s4 }}>
-          <Skeleton width={52} height={72} borderRadius={radius.sm} />
-          <View style={{ flex: 1, gap: spacing.s2, paddingTop: spacing.s1 }}>
-            <Skeleton width="70%" height={16} />
+        <View
+          key={i}
+          style={{
+            flexDirection: "row",
+            gap: spacing.s3,
+            padding: spacing.s3,
+            borderRadius: radius.sm,
+            backgroundColor: colors.surfaceSecondary,
+          }}
+        >
+          <Skeleton width={56} height={80} borderRadius={radius.sm} />
+          <View style={{ flex: 1, gap: spacing.s2, justifyContent: "center" }}>
+            <Skeleton width="70%" height={14} />
             <Skeleton width="45%" height={12} />
-            <Skeleton
-              width="100%"
-              height={4}
-              borderRadius={2}
-              style={{ marginTop: spacing.s2 }}
-            />
+            <Skeleton width="100%" height={6} borderRadius={radius.sm} style={{ marginTop: spacing.s1 }} />
           </View>
         </View>
       ))}
@@ -145,53 +150,21 @@ export function LibraryScreen({ navigation }: Props) {
           visible.map((item) => {
             const pct = Math.round((item.currentPage / item.totalPages) * 100);
             return (
-              <Pressable
+              <BookListCard
                 key={item._id}
-                onPress={() => navigation.navigate("Reader", { bookId: item.book._id })}
-                accessibilityRole="button"
-                accessibilityLabel={`Open ${item.book.title}`}
-                style={{
-                  flexDirection: "row",
-                  gap: spacing.s4,
-                  alignItems: "flex-start",
-                }}
-              >
-                <BookCover
-                  title={item.book.title}
-                  author={item.book.author}
-                  pageCount={item.book.pdfPageCount}
-                  coverUrl={item.book.coverImageUrl}
-                  size="sm"
-                />
-                <View style={{ flex: 1, gap: spacing.s1, paddingTop: spacing.s1 }}>
-                  <Text
-                    style={{
-                      ...typography.bodyLg,
-                      color: colors.textPrimary,
-                      fontFamily: "Raleway-SemiBold",
-                    }}
-                    numberOfLines={2}
-                  >
-                    {item.book.title}
-                  </Text>
-                  <Text style={{ ...typography.bodySm, color: colors.textMuted }} numberOfLines={1}>
-                    {item.book.author} · {item.club.name}
-                  </Text>
-                  <View style={{ height: 4, borderRadius: 2, backgroundColor: colors.surfaceSecondary, marginTop: spacing.s2 }}>
-                    <View
-                      style={{
-                        width: `${pct}%`,
-                        height: 4,
-                        borderRadius: 2,
-                        backgroundColor: palette.accentStrong,
-                      }}
-                    />
-                  </View>
-                  <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
-                    {item.finishedAt ? "Finished" : `Page ${item.currentPage} of ${item.totalPages} · ${pct}%`}
-                  </Text>
-                </View>
-              </Pressable>
+                title={item.book.title}
+                author={item.book.author}
+                pageCount={item.book.pdfPageCount}
+                coverUrl={item.book.coverImageUrl}
+                subtitle={item.club.name}
+                surface={item.finishedAt ? "primary" : "secondary"}
+                progress={
+                  item.finishedAt
+                    ? undefined
+                    : { label: `Page ${item.currentPage} of ${item.totalPages}`, pct }
+                }
+                onOpen={() => navigation.navigate("Reader", { bookId: item.book._id })}
+              />
             );
           })
         )}

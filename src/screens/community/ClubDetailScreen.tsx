@@ -10,7 +10,7 @@ import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
-import { BookCover } from "@/components/features/BookCover";
+import { BookListCard } from "@/components/features/BookListCard";
 import { BookUploadSheet } from "@/components/features/BookUploadSheet";
 import { BookOptionsSheet } from "@/components/features/BookOptionsSheet";
 import { ChapterListItem } from "@/components/features/ChapterListItem";
@@ -30,116 +30,6 @@ type TabKey = "room" | "discussions" | "library";
 
 const DEEP_LINK_BASE = "flipbook://join";
 
-// A book card (Figma "Frame 3910"): a surfaceSecondary card with a cover-only
-// thumbnail, an uppercase title (textAlt), accent author + muted page count, an
-// optional accent action pill, and — for the current read — a started date +
-// progress bar. Text colors are mode-correct on the secondary surface.
-function LibraryBookCard({
-  title,
-  author,
-  pageCount,
-  coverUrl,
-  onOpen,
-  onOptions,
-  started,
-  progress,
-}: {
-  title: string;
-  author: string;
-  pageCount: number;
-  coverUrl?: string;
-  onOpen: () => void;
-  onOptions?: () => void;
-  started?: string;
-  progress?: { label: string; pct: number };
-}) {
-  const { colors } = useTheme();
-  const initial = title.trim().slice(0, 1).toUpperCase() || "?";
-  return (
-    <View
-      style={{
-        flexDirection: "row",
-        gap: spacing.s3,
-        padding: spacing.s3,
-        borderRadius: radius.sm,
-        backgroundColor: colors.surfaceSecondary,
-      }}
-    >
-      <Pressable
-        onPress={onOpen}
-        accessibilityRole="button"
-        accessibilityLabel={`Open ${title}`}
-        style={{
-          width: 56,
-          height: 80,
-          borderRadius: radius.sm,
-          overflow: "hidden",
-          backgroundColor: palette.brandPrimary,
-          alignItems: "center",
-          justifyContent: "center",
-        }}
-      >
-        {coverUrl ? (
-          <Image source={{ uri: coverUrl }} style={{ width: "100%", height: "100%" }} resizeMode="cover" />
-        ) : (
-          <Text style={{ fontFamily: "Raleway-Bold", fontSize: 22, color: palette.textOnBrand }}>
-            {initial}
-          </Text>
-        )}
-      </Pressable>
-
-      <View style={{ flex: 1, gap: spacing.s2, justifyContent: "center" }}>
-        <Text style={{ ...typography.overlineLg, color: colors.textAlt }} numberOfLines={2}>
-          {title}
-        </Text>
-        <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
-          <Text style={{ ...typography.bodySm, color: colors.textAccent }} numberOfLines={1}>
-            {author}
-          </Text>
-          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{pageCount} pages</Text>
-        </View>
-
-        {started ? (
-          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-            Started <Text style={{ color: colors.textAccent }}>{started}</Text>
-          </Text>
-        ) : null}
-
-        {progress ? (
-          <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
-            <View
-              style={{ flex: 1, height: 6, borderRadius: radius.sm, backgroundColor: colors.surfacePrimary }}
-            >
-              <View
-                style={{
-                  width: `${Math.min(100, Math.max(0, progress.pct))}%`,
-                  height: 6,
-                  borderRadius: radius.sm,
-                  backgroundColor: colors.surfaceAccent,
-                }}
-              />
-            </View>
-            <Text style={{ ...typography.bodySm, color: colors.textSecondary }}>
-              {progress.label} <Text style={{ color: colors.textAccent }}>{progress.pct}%</Text>
-            </Text>
-          </View>
-        ) : null}
-      </View>
-
-      {onOptions ? (
-        <Pressable
-          onPress={onOptions}
-          hitSlop={spacing.s3}
-          accessibilityRole="button"
-          accessibilityLabel={`Options for ${title}`}
-          style={{ alignSelf: "flex-start", padding: spacing.s1 }}
-        >
-          <MoreVertical size={20} color={colors.textMuted} />
-        </Pressable>
-      ) : null}
-    </View>
-  );
-}
 
 export function ClubDetailScreen({ navigation, route }: Props) {
   const { colors, mode } = useTheme();
@@ -521,7 +411,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     <Text style={{ ...typography.overlineLg, color: colors.textAccent }}>
                       Currently reading
                     </Text>
-                    <LibraryBookCard
+                    <BookListCard
                       title={currentBook.title}
                       author={currentBook.author}
                       pageCount={currentBook.pdfPageCount}
@@ -551,7 +441,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       Upcoming reads
                     </Text>
                     {upcomingBooks.map((b) => (
-                      <LibraryBookCard
+                      <BookListCard
                         key={b._id}
                         title={b.title}
                         author={b.author}
@@ -570,12 +460,13 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       Past reads
                     </Text>
                     {pastBooks.map((b) => (
-                      <LibraryBookCard
+                      <BookListCard
                         key={b._id}
                         title={b.title}
                         author={b.author}
                         pageCount={b.pdfPageCount}
                         coverUrl={b.coverImageUrl}
+                        surface="primary"
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
                         onOptions={() => setOptionsBook(b)}
                       />
@@ -773,7 +664,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                   <Text style={{ ...typography.overlineLg, color: colors.textAccent }}>
                     Currently reading
                   </Text>
-                  <LibraryBookCard
+                  <BookListCard
                     title={currentBook.title}
                     author={currentBook.author}
                     pageCount={currentBook.pdfPageCount}
