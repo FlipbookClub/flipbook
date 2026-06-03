@@ -134,6 +134,15 @@ export default defineSchema({
     // 0-indexed within page; nullable when paragraph detection isn't
     // available (we anchor page-level in that case — see FR-016 edge case).
     paragraphIndex: v.optional(v.number()),
+    // Text-anchored reactions (PDF.js reader): the selected text + its
+    // rectangles normalized 0..1 to the page box, so the highlight can be
+    // repainted. Absent for plain page-level reactions.
+    highlightQuote: v.optional(v.string()),
+    highlightRects: v.optional(
+      v.array(
+        v.object({ x: v.number(), y: v.number(), w: v.number(), h: v.number() }),
+      ),
+    ),
     userId: v.id("users"),
     type: v.union(v.literal("emoji"), v.literal("comment")),
     emoji: v.optional(v.string()),

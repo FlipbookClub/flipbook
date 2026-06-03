@@ -16,6 +16,8 @@ export interface QueuedReaction {
   emoji?: string;
   text?: string;
   parentReactionId?: string;
+  highlightQuote?: string;
+  highlightRects?: { x: number; y: number; w: number; h: number }[];
   queuedAt: number;
   // Attempt counter — server-rejection (rate limit, validation) drops the
   // item rather than retrying forever.

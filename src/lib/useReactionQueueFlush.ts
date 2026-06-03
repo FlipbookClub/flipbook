@@ -73,5 +73,7 @@ async function callCreate(
     emoji: item.emoji,
     text: item.text,
     parentReactionId: item.parentReactionId as Id<"reactions"> | undefined,
+    highlightQuote: item.highlightQuote,
+    highlightRects: item.highlightRects,
   });
 }

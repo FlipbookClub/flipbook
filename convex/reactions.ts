@@ -25,7 +25,18 @@ const reactionValidator = v.object({
   emoji: v.optional(v.string()),
   text: v.optional(v.string()),
   parentReactionId: v.optional(v.id("reactions")),
+  highlightQuote: v.optional(v.string()),
+  highlightRects: v.optional(
+    v.array(v.object({ x: v.number(), y: v.number(), w: v.number(), h: v.number() })),
+  ),
   createdAt: v.number(),
+});
+
+const rectValidator = v.object({
+  x: v.number(),
+  y: v.number(),
+  w: v.number(),
+  h: v.number(),
 });
 
 const reactionWithUserValidator = v.object({
@@ -84,6 +95,8 @@ export const create = mutation({
     emoji: v.optional(v.string()),
     text: v.optional(v.string()),
     parentReactionId: v.optional(v.id("reactions")),
+    highlightQuote: v.optional(v.string()),
+    highlightRects: v.optional(v.array(rectValidator)),
   },
   returns: v.id("reactions"),
   handler: async (ctx, args) => {
@@ -152,6 +165,9 @@ export const create = mutation({
       emoji: args.type === "emoji" ? args.emoji : undefined,
       text: args.type === "comment" ? args.text?.trim() : undefined,
       parentReactionId: args.parentReactionId,
+      // Text anchor only on top-level reactions (not replies).
+      highlightQuote: args.parentReactionId ? undefined : args.highlightQuote,
+      highlightRects: args.parentReactionId ? undefined : args.highlightRects,
       createdAt: now,
     });
 
@@ -283,6 +299,47 @@ export const listForBook = query({
     // Founder decision: no spoiler gating — all members see every reaction.
     const visible = rows.filter((r) => !r.parentReactionId).slice(0, limit);
     return await enrichWithUsers(ctx, visible);
+  },
+});
+
+// All text-anchored highlights for a book/chapter, so the reader can paint
+// them across every page. Lightweight (id + page + rects only). Member-only,
+// no spoiler gating (reactions are visible to all — see listForBook).
+export const listHighlights = query({
+  args: {
+    clubId: v.id("clubs"),
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
+  },
+  returns: v.array(
+    v.object({ id: v.id("reactions"), page: v.number(), rects: v.array(rectValidator) }),
+  ),
+  handler: async (ctx, args) => {
+    if ((args.bookId && args.chapterId) || (!args.bookId && !args.chapterId)) {
+      return [];
+    }
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+    const me = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!me) return [];
+    const membership = await membershipFor(ctx, args.clubId, me._id);
+    if (!membership) return [];
+
+    const rows = args.bookId
+      ? await ctx.db
+          .query("reactions")
+          .withIndex("by_book_and_page", (q) => q.eq("bookId", args.bookId))
+          .take(500)
+      : await ctx.db
+          .query("reactions")
+          .withIndex("by_chapter_and_page", (q) => q.eq("chapterId", args.chapterId))
+          .take(500);
+    return rows
+      .filter((r) => !r.parentReactionId && r.highlightRects && r.highlightRects.length > 0)
+      .map((r) => ({ id: r._id, page: r.page, rects: r.highlightRects! }));
   },
 });
 

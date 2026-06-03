@@ -1,21 +1,23 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ActivityIndicator,
-  Dimensions,
   Modal,
   Pressable,
   SafeAreaView,
   Text,
   View,
 } from "react-native";
-import Pdf from "react-native-pdf";
 import { Settings2, Smile, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
-import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, type RouteProp } from "@react-navigation/native";
 
 import { MarginReactionsList } from "@/components/features/MarginReactionsList";
+import {
+  PdfWebView,
+  type PdfWebViewHandle,
+  type SelectionPayload,
+} from "@/components/features/PdfWebView";
 import { ReactionDetailsSheet } from "@/components/features/ReactionDetailsSheet";
 import { ReactionComposer, type ReactionSubmission } from "@/screens/reader/ReactionComposer";
 import { palette } from "@/theme/palette";
@@ -243,18 +245,18 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [pageMode, setPageMode] = useState<"paged" | "scroll">(() =>
     storage.getString("reader.pageMode") === "scroll" ? "scroll" : "paged",
   );
-  // The page the Pdf is told to show. It stays put during normal swiping (so
-  // neither live progress nor a re-render yanks it) and is re-anchored to the
-  // *current* page only when the view mode changes — so switching continuous ⇄
-  // page-by-page keeps your place instead of snapping to the opened page.
-  const [targetPage, setTargetPage] = useState<number | null>(null);
   const setReadingMode = (mode: "paged" | "scroll") => {
     setPageMode(mode);
     storage.set("reader.pageMode", mode);
-    setTargetPage(currentPage);
   };
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
+  const webViewRef = useRef<PdfWebViewHandle>(null);
+  // Live text selection from the WebView, and the anchor captured when the user
+  // opens the composer for it (held separately so it survives the selection
+  // clearing while the composer is open).
+  const [selection, setSelection] = useState<SelectionPayload | null>(null);
+  const [pendingHighlight, setPendingHighlight] = useState<SelectionPayload | null>(null);
 
   // Build the scope payload once — used in three places (reactions query,
   // reaction submit, reaction details sheet).
@@ -272,16 +274,40 @@ export function ReaderScreen({ navigation, route }: Props) {
       : "skip",
   );
 
+  // All text-anchored highlights for this content, painted across pages in the
+  // WebView. Kept in a ref so we can re-push on (re)load when the bridge exists.
+  const highlights = useQuery(
+    api.reactions.listHighlights,
+    effective && !effective.isRemoved && scopePayload
+      ? { clubId: effective.clubId, ...scopePayload }
+      : "skip",
+  );
+  const highlightsRef = useRef(highlights);
+  highlightsRef.current = highlights;
+  useEffect(() => {
+    if (highlights) webViewRef.current?.setHighlights(highlights);
+  }, [highlights]);
+
   const handleReactionSubmit = async (payload: ReactionSubmission) => {
     if (!effective || !scopePayload) return;
+    // Anchor to the captured text selection if the composer was opened for one;
+    // otherwise it's a plain page-level reaction on the current page.
+    const anchor = pendingHighlight;
     const args = {
       clubId: effective.clubId,
       ...scopePayload,
-      page: currentPage,
+      page: anchor ? anchor.page : currentPage,
       type: payload.type,
       emoji: payload.emoji,
       text: payload.text,
+      highlightQuote: anchor?.quote,
+      highlightRects: anchor?.rects,
     };
+    if (anchor) {
+      setPendingHighlight(null);
+      setSelection(null);
+      webViewRef.current?.clearSelection();
+    }
     // FR-013 / FR-016 edge case: offline reactions queue locally and sync
     // on reconnect. The flush worker in RootNavigator drains the queue.
     if (!isOnline) {
@@ -293,6 +319,8 @@ export function ReaderScreen({ navigation, route }: Props) {
         type: args.type,
         emoji: args.emoji,
         text: args.text,
+        highlightQuote: args.highlightQuote,
+        highlightRects: args.highlightRects,
       });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
       return;
@@ -314,19 +342,12 @@ export function ReaderScreen({ navigation, route }: Props) {
           type: args.type,
           emoji: args.emoji,
           text: args.text,
+          highlightQuote: args.highlightQuote,
+          highlightRects: args.highlightRects,
         });
       }
     }
   };
-
-  // FR-014: 400ms long-press opens the picker (the floating Smile FAB is the
-  // reliable entry on iOS where PDFKit consumes touches before JS can see).
-  const longPress = Gesture.LongPress()
-    .minDuration(400)
-    .onStart(() => {
-      setComposerOpen(true);
-    })
-    .runOnJS(true);
 
   const syncToServer = useThrottledCallback(
     (page: number, total: number) => {
@@ -381,8 +402,6 @@ export function ReaderScreen({ navigation, route }: Props) {
       cancelled = true;
     };
   }, [effective]);
-
-  const { width, height } = Dimensions.get("window");
 
   if (!kind) {
     return (
@@ -460,37 +479,29 @@ export function ReaderScreen({ navigation, route }: Props) {
         ) : initialPage === null || resolvedUri === null ? (
           <LoadingState bg={colors.surfaceSecondary} fg={colors.textPrimary} />
         ) : (
-          <GestureDetector gesture={longPress}>
-            <View style={{ flex: 1 }}>
-              <Pdf
-                source={{ uri: resolvedUri, cache: true }}
-                horizontal={pageMode === "paged"}
-                enablePaging={pageMode === "paged"}
-                page={targetPage ?? openAtPageRef.current ?? initialPage}
-                onLoadComplete={(numberOfPages) => {
-                  if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
-                  setTotalPages(numberOfPages);
-                  const startPage = Math.min(
-                    Math.max(1, openAtPageRef.current ?? initialPage),
-                    numberOfPages,
-                  );
-                  setCurrentPage(startPage);
-                  syncToServer(startPage, numberOfPages);
-                }}
-                onPageChanged={(page, total) => handlePageChanged(page, total)}
-                onError={(err) => {
-                  setLoadError(
-                    typeof err === "string"
-                      ? err
-                      : "The pages aren't loading. Mind trying again in a moment?",
-                  );
-                }}
-                renderActivityIndicator={() => <ActivityIndicator color={colors.textPrimary} />}
-                style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
-                trustAllCerts={false}
-              />
-            </View>
-          </GestureDetector>
+          <PdfWebView
+            ref={webViewRef}
+            pdfUrl={resolvedUri}
+            startPage={Math.max(1, openAtPageRef.current ?? initialPage)}
+            bg={colors.surfaceSecondary}
+            fg={colors.textPrimary}
+            onLoaded={(total) => {
+              if (!Number.isFinite(total) || total < 1) return;
+              setTotalPages(total);
+              const startPage = Math.min(Math.max(1, openAtPageRef.current ?? initialPage), total);
+              setCurrentPage(startPage);
+              syncToServer(startPage, total);
+              // Bridge exists now — (re)paint highlights that resolved earlier.
+              if (highlightsRef.current) webViewRef.current?.setHighlights(highlightsRef.current);
+            }}
+            onPage={(page, total) => handlePageChanged(page, total)}
+            onSelection={(s) => setSelection(s)}
+            onSelectionCleared={() => setSelection(null)}
+            onHighlightTap={(id) => setSelectedReactionId(id as Id<"reactions">)}
+            onError={(message) =>
+              setLoadError(message || "The pages aren't loading. Mind trying again in a moment?")
+            }
+          />
         )}
       </View>
       {/* Reaction overlay — rendered as a SIBLING of the Pdf container (not a
@@ -517,11 +528,52 @@ export function ReaderScreen({ navigation, route }: Props) {
           {totalPages !== null ? ` of ${totalPages}` : ""}
         </Text>
       </View>
+      {/* When text is selected in the reader, offer to anchor a reaction to it.
+          Sits above the page-level FAB. */}
+      {selection && !loadError ? (
+        <Pressable
+          onPress={() => {
+            setPendingHighlight(selection);
+            setComposerOpen(true);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="React to the selected text"
+          style={{
+            position: "absolute",
+            left: spacing.s4,
+            right: spacing.s4 + 64,
+            bottom: spacing.s6 + 8,
+            flexDirection: "row",
+            alignItems: "center",
+            gap: spacing.s2,
+            paddingVertical: spacing.s3,
+            paddingHorizontal: spacing.s4,
+            borderRadius: radius.pill,
+            backgroundColor: palette.brandPrimary,
+            shadowColor: "#000",
+            shadowOpacity: 0.25,
+            shadowOffset: { width: 0, height: 4 },
+            shadowRadius: 8,
+            elevation: 6,
+          }}
+        >
+          <Smile size={20} color={palette.textOnBrand} />
+          <Text
+            style={{ ...typography.bodyMd, color: palette.textOnBrand, fontFamily: "Raleway-SemiBold", flex: 1 }}
+            numberOfLines={1}
+          >
+            React to “{selection.quote}”
+          </Text>
+        </Pressable>
+      ) : null}
       {/* Floating React button — sibling of the Pdf area, not a child, so
-          it's guaranteed to overlay the native PDFKit view. */}
+          it's guaranteed to overlay the WebView. Page-level reaction. */}
       {resolvedUri && !loadError && initialPage !== null ? (
         <Pressable
-          onPress={() => setComposerOpen(true)}
+          onPress={() => {
+            setPendingHighlight(null);
+            setComposerOpen(true);
+          }}
           accessibilityRole="button"
           accessibilityLabel="React to this page"
           hitSlop={spacing.s3}
@@ -556,7 +608,10 @@ export function ReaderScreen({ navigation, route }: Props) {
       />
       <ReactionComposer
         visible={composerOpen}
-        onClose={() => setComposerOpen(false)}
+        onClose={() => {
+          setComposerOpen(false);
+          setPendingHighlight(null);
+        }}
         onSubmit={handleReactionSubmit}
       />
       {effective && !effective.isRemoved && scopePayload ? (
