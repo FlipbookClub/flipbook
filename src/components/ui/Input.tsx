@@ -1,4 +1,4 @@
-import { forwardRef, useState } from "react";
+import { forwardRef, useState, type ReactNode } from "react";
 import {
   Pressable,
   Text,
@@ -23,6 +23,9 @@ export interface InputProps extends Omit<TextInputProps, "style"> {
   errorText?: string;
   variant?: InputVariant;
   containerStyle?: StyleProp<ViewStyle>;
+  /** Decorative trailing icon (e.g. a search or lock glyph), right-aligned.
+   *  Ignored for secure fields (those show the eye toggle instead). */
+  rightIcon?: ReactNode;
 }
 
 const ACCESSORY_WIDTH = 36;
@@ -35,6 +38,7 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
     variant = "boxed",
     secureTextEntry,
     containerStyle,
+    rightIcon,
     onFocus,
     onBlur,
     ...rest
@@ -81,7 +85,8 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           backgroundColor: colors.surfacePrimary,
         };
 
-  const inputStyle = showSecureToggle
+  const showAccessory = showSecureToggle || !!rightIcon;
+  const inputStyle = showAccessory
     ? { ...baseStyle, paddingRight: ACCESSORY_WIDTH }
     : baseStyle;
 
@@ -136,6 +141,21 @@ export const Input = forwardRef<TextInput, InputProps>(function Input(
           >
             <ToggleIcon size={20} color={colors.textMuted} />
           </Pressable>
+        ) : !showSecureToggle && rightIcon ? (
+          <View
+            pointerEvents="none"
+            style={{
+              position: "absolute",
+              right: variant === "boxed" ? spacing.s3 : 0,
+              top: 0,
+              bottom: variant === "underline" ? 4 : 0,
+              width: ACCESSORY_WIDTH,
+              alignItems: "flex-end",
+              justifyContent: "center",
+            }}
+          >
+            {rightIcon}
+          </View>
         ) : null}
       </View>
       {errorText ? (

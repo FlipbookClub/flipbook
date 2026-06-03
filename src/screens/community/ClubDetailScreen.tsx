@@ -356,7 +356,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                   />
                 ) : null}
                 {canUpload ? (
-                  <Button label="Add another book" variant="secondary" fullWidth onPress={handleAddBook} />
+                  <Button label="Add another book" variant="primary" fullWidth onPress={handleAddBook} />
                 ) : null}
               </View>
             ) : (

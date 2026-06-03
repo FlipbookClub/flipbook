@@ -9,7 +9,7 @@ import {
   Text,
   View,
 } from "react-native";
-import { ChevronLeft, Search, ShieldCheck } from "lucide-react-native";
+import { ChevronLeft, Lock, Search, ShieldCheck } from "lucide-react-native";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -128,6 +128,7 @@ export function JoinCommunityScreen({ navigation }: Props) {
                 maxLength={CODE_LENGTH}
                 value={inviteCode}
                 onChangeText={(text) => setInviteCode(text.replace(/\s/g, "").toUpperCase())}
+                rightIcon={<Lock size={18} color={colors.textMuted} />}
                 helperText={
                   !formError && normalizedCode.length === CODE_LENGTH
                     ? "Looks good — tap Join community."
@@ -139,29 +140,15 @@ export function JoinCommunityScreen({ navigation }: Props) {
               />
             </View>
           ) : (
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                gap: spacing.s2,
-                paddingHorizontal: spacing.s3,
-                borderRadius: radius.sm,
-                borderWidth: 1,
-                borderColor: colors.border,
-                height: 44,
-              }}
-            >
-              <Search size={18} color={colors.textMuted} />
-              <Input
-                variant="underline"
-                placeholder="Search public communities"
-                autoCapitalize="none"
-                autoCorrect={false}
-                value={searchTerm}
-                onChangeText={setSearchTerm}
-                containerStyle={{ flex: 1, marginLeft: 0 }}
-              />
-            </View>
+            <Input
+              variant="underline"
+              placeholder="Search public communities"
+              autoCapitalize="none"
+              autoCorrect={false}
+              value={searchTerm}
+              onChangeText={setSearchTerm}
+              rightIcon={<Search size={18} color={colors.textMuted} />}
+            />
           )}
 
           <View
@@ -186,9 +173,12 @@ export function JoinCommunityScreen({ navigation }: Props) {
             </Text>
           </View>
 
-          {!privateMode ? (
+          {/* Popular communities — hidden entirely when there are none and the
+              user isn't searching; only surfaces once public clubs exist. */}
+          {!privateMode &&
+          (popular === undefined || popular.length > 0 || searchTerm.trim().length > 0) ? (
             <View style={{ gap: spacing.s2 }}>
-              <Text style={{ ...typography.overlineLg, color: colors.textMuted }}>
+              <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
                 Popular communities
               </Text>
               {popular === undefined ? (
@@ -212,16 +202,8 @@ export function JoinCommunityScreen({ navigation }: Props) {
               ) : (
                 <EmptyState
                   compact
-                  title={
-                    searchTerm.trim()
-                      ? "No communities match that search"
-                      : "No public communities yet"
-                  }
-                  description={
-                    searchTerm.trim()
-                      ? "Try a different name, or join with a private code."
-                      : undefined
-                  }
+                  title="No communities match that search"
+                  description="Try a different name, or join with a private code."
                 />
               )}
             </View>

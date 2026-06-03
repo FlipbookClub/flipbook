@@ -519,7 +519,10 @@ export function ReaderScreen({ navigation, route }: Props) {
           accessibilityRole="button"
           accessibilityLabel="React to this page"
           hitSlop={spacing.s3}
-          style={({ pressed }) => ({
+          // Static style (not the `({pressed}) => …` callback form): under
+          // reanimated 4 the callback silently drops backgroundColor, which
+          // left the FAB invisible (white icon only) — notably in light mode.
+          style={{
             position: "absolute",
             right: spacing.s4,
             bottom: spacing.s6,
@@ -534,8 +537,7 @@ export function ReaderScreen({ navigation, route }: Props) {
             shadowOffset: { width: 0, height: 4 },
             shadowRadius: 8,
             elevation: 6,
-            opacity: pressed ? 0.85 : 1,
-          })}
+          }}
         >
           <Smile size={28} color={palette.textOnBrand} />
         </Pressable>
