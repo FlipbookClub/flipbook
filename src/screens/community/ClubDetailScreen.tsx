@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Alert, Image, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
-import { BookPlus, ChevronLeft, Settings, Share2 } from "lucide-react-native";
+import { BookPlus, ChevronLeft, Search, Settings, Share2 } from "lucide-react-native";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -9,11 +9,11 @@ import { BlurView } from "expo-blur";
 import { Avatar } from "@/components/ui/Avatar";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Input } from "@/components/ui/Input";
 import { BookCover } from "@/components/features/BookCover";
 import { BookUploadSheet } from "@/components/features/BookUploadSheet";
 import { ChapterListItem } from "@/components/features/ChapterListItem";
 import { ClubModeratorSheet } from "@/components/features/ClubModeratorSheet";
-import { ProgressVisualization } from "@/components/features/ProgressVisualization";
 import { MAX_PDF_BYTES, pickPdf, type PickedPdf } from "@/lib/pdf";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
@@ -27,6 +27,49 @@ type Props = NativeStackScreenProps<CommunityStackParamList, "ClubDetail">;
 type TabKey = "room" | "discussions" | "library";
 
 const DEEP_LINK_BASE = "flipbook://join";
+
+// A book row in the Library tab: cover + title/author + an optional action
+// (Retire book / Set as currently reading / Read again).
+function LibraryBookRow({
+  title,
+  author,
+  pageCount,
+  onOpen,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  author: string;
+  pageCount: number;
+  onOpen: () => void;
+  actionLabel?: string;
+  onAction?: () => void;
+}) {
+  const { colors } = useTheme();
+  return (
+    <View style={{ flexDirection: "row", gap: spacing.s4 }}>
+      <BookCover title={title} author={author} pageCount={pageCount} size="sm" onPress={onOpen} />
+      <View style={{ flex: 1, gap: spacing.s1 }}>
+        <Text
+          style={{ ...typography.bodyMd, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
+          numberOfLines={2}
+        >
+          {title}
+        </Text>
+        <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
+          {author} · {pageCount} pages
+        </Text>
+        {actionLabel && onAction ? (
+          <Pressable onPress={onAction} hitSlop={spacing.s2} accessibilityRole="button">
+            <Text style={{ ...typography.bodySm, color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
+              {actionLabel}
+            </Text>
+          </Pressable>
+        ) : null}
+      </View>
+    </View>
+  );
+}
 
 export function ClubDetailScreen({ navigation, route }: Props) {
   const { colors, mode } = useTheme();
@@ -67,6 +110,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const me = useQuery(api.users.me);
 
   const [tab, setTab] = useState<TabKey>("room");
+  const [librarySearch, setLibrarySearch] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
 
@@ -85,6 +129,15 @@ export function ClubDetailScreen({ navigation, route }: Props) {
     isModerator || (isMember && !!club && club.permissions.membersCanUpdateInfo);
   // Each member's progress on the current book, for the Room-lobby members list.
   const progressByUser = new Map((progressRows ?? []).map((p) => [p.userId, p] as const));
+  // Library split: upcoming = never been current; past = was current before
+  // (currentlyReadingAt set). Filtered by the library search box.
+  const librarySearchTerm = librarySearch.trim().toLowerCase();
+  const matchesLibrarySearch = (b: { title: string; author: string }) =>
+    !librarySearchTerm ||
+    b.title.toLowerCase().includes(librarySearchTerm) ||
+    b.author.toLowerCase().includes(librarySearchTerm);
+  const upcomingBooks = libraryBooks.filter((b) => !b.currentlyReadingAt).filter(matchesLibrarySearch);
+  const pastBooks = libraryBooks.filter((b) => b.currentlyReadingAt).filter(matchesLibrarySearch);
   const inviteUrl = club ? `${DEEP_LINK_BASE}/${club.inviteCode}` : null;
   const joinByCode = useMutation(api.memberships.joinByCode);
   const [joining, setJoining] = useState(false);
@@ -348,55 +401,41 @@ export function ClubDetailScreen({ navigation, route }: Props) {
               )
             ) : books && books.length > 0 ? (
               <View style={{ gap: spacing.s5 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3 }}>
+                  <Input
+                    variant="boxed"
+                    placeholder="Search library.."
+                    value={librarySearch}
+                    onChangeText={setLibrarySearch}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    rightIcon={<Search size={18} color={colors.textMuted} />}
+                    containerStyle={{ flex: 1 }}
+                  />
+                  {canUpload ? (
+                    <Button label="Add book" variant="secondary" size="sm" onPress={handleAddBook} />
+                  ) : null}
+                </View>
+
                 {currentBook ? (
-                  <View style={{ gap: spacing.s3 }}>
+                  <View style={{ gap: spacing.s2 }}>
                     <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
                       Currently reading
                     </Text>
-                    <View style={{ flexDirection: "row", gap: spacing.s4 }}>
-                      <BookCover
-                        title={currentBook.title}
-                        author={currentBook.author}
-                        pageCount={currentBook.pdfPageCount}
-                        size="sm"
-                        onPress={() => navigation.navigate("Reader", { bookId: currentBook._id })}
-                      />
-                      <View style={{ flex: 1, gap: spacing.s1 }}>
-                        <Text
-                          style={{ ...typography.bodyLg, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
-                          numberOfLines={2}
-                        >
-                          {currentBook.title}
-                        </Text>
-                        <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-                          {currentBook.author}
-                        </Text>
-                        {isModerator ? (
-                          <Pressable
-                            onPress={() =>
+                    <LibraryBookRow
+                      title={currentBook.title}
+                      author={currentBook.author}
+                      pageCount={currentBook.pdfPageCount}
+                      onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
+                      actionLabel={isModerator ? "Retire book" : undefined}
+                      onAction={
+                        isModerator
+                          ? () =>
                               moveToLibrary({ bookId: currentBook._id }).catch(() =>
                                 Alert.alert("Couldn't update", "Please try again."),
                               )
-                            }
-                            hitSlop={spacing.s2}
-                            accessibilityRole="button"
-                          >
-                            <Text style={{ ...typography.bodySm, color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
-                              Move to library
-                            </Text>
-                          </Pressable>
-                        ) : null}
-                      </View>
-                    </View>
-                    <ProgressVisualization
-                      rows={progressRows?.map((p) => ({
-                        userId: p.userId,
-                        displayName: p.user.displayName,
-                        avatarUrl: p.user.avatarUrl,
-                        currentPage: p.currentPage,
-                        totalPages: p.totalPages,
-                      }))}
-                      bookTitle={currentBook.title}
+                          : undefined
+                      }
                     />
                   </View>
                 ) : isModerator ? (
@@ -406,55 +445,55 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         No current read
                       </Text>
                       <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-                        Pick a book from the library below and set it as currently reading.
+                        Set one from your upcoming reads below.
                       </Text>
                     </View>
                   </Card>
                 ) : null}
 
-                {libraryBooks.length > 0 ? (
+                {upcomingBooks.length > 0 ? (
                   <View style={{ gap: spacing.s3 }}>
-                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>Library</Text>
-                    {libraryBooks.map((b) => (
-                      <View key={b._id} style={{ flexDirection: "row", gap: spacing.s4 }}>
-                        <BookCover
-                          title={b.title}
-                          author={b.author}
-                          pageCount={b.pdfPageCount}
-                          size="sm"
-                          onPress={() => navigation.navigate("Reader", { bookId: b._id })}
-                        />
-                        <View style={{ flex: 1, gap: spacing.s1 }}>
-                          <Text
-                            style={{ ...typography.bodyMd, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
-                            numberOfLines={2}
-                          >
-                            {b.title}
-                          </Text>
-                          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{b.author}</Text>
-                          {isModerator ? (
-                            <Pressable
-                              onPress={() =>
+                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                      Upcoming reads
+                    </Text>
+                    {upcomingBooks.map((b) => (
+                      <LibraryBookRow
+                        key={b._id}
+                        title={b.title}
+                        author={b.author}
+                        pageCount={b.pdfPageCount}
+                        onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
+                        actionLabel={isModerator ? "Set as currently reading" : undefined}
+                        onAction={
+                          isModerator
+                            ? () =>
                                 setCurrentlyReading({ bookId: b._id }).catch(() =>
                                   Alert.alert("Couldn't update", "Please try again."),
                                 )
-                              }
-                              hitSlop={spacing.s2}
-                              accessibilityRole="button"
-                            >
-                              <Text style={{ ...typography.bodySm, color: colors.textAccent, fontFamily: "Raleway-SemiBold" }}>
-                                Set as currently reading
-                              </Text>
-                            </Pressable>
-                          ) : null}
-                        </View>
-                      </View>
+                            : undefined
+                        }
+                      />
                     ))}
                   </View>
                 ) : null}
 
-                {canUpload ? (
-                  <Button label="Add another book" variant="primary" fullWidth onPress={handleAddBook} />
+                {pastBooks.length > 0 ? (
+                  <View style={{ gap: spacing.s3 }}>
+                    <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
+                      Past reads
+                    </Text>
+                    {pastBooks.map((b) => (
+                      <LibraryBookRow
+                        key={b._id}
+                        title={b.title}
+                        author={b.author}
+                        pageCount={b.pdfPageCount}
+                        onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
+                        actionLabel="Read again"
+                        onAction={() => navigation.navigate("Reader", { bookId: b._id })}
+                      />
+                    ))}
+                  </View>
                 ) : null}
               </View>
             ) : (
