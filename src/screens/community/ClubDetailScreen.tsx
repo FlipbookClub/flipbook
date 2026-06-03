@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Alert, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
+import { Alert, Image, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
 import { BookPlus, ChevronLeft, Settings, Share2 } from "lucide-react-native";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -212,16 +212,24 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 width: 84,
                 height: 84,
                 borderRadius: radius.md,
+                overflow: "hidden",
                 backgroundColor: colors.surfaceSecondary,
                 alignItems: "center",
                 justifyContent: "center",
               }}
             >
-              {/* Emblem box is surfaceSecondary, so the initial uses textAlt
-                  (the on-secondary token) — readable in Light/Flip/Dark. */}
-              <Text style={{ fontFamily: "Raleway-Bold", fontSize: 28, color: colors.textAlt }}>
-                {club.name.slice(0, 1).toUpperCase()}
-              </Text>
+              {club.coverImageUrl ? (
+                <Image
+                  source={{ uri: club.coverImageUrl }}
+                  style={{ width: "100%", height: "100%" }}
+                />
+              ) : (
+                // Emblem box is surfaceSecondary, so the initial uses textAlt
+                // (the on-secondary token) — readable in Light/Flip/Dark.
+                <Text style={{ fontFamily: "Raleway-Bold", fontSize: 28, color: colors.textAlt }}>
+                  {club.name.slice(0, 1).toUpperCase()}
+                </Text>
+              )}
             </View>
             <View style={{ flex: 1, gap: spacing.s1 }}>
               <Text style={{ ...typography.headingLg, color: colors.textPrimary }} numberOfLines={2}>
