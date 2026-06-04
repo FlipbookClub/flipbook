@@ -38,14 +38,18 @@ type FontScalable = { defaultProps?: { maxFontSizeMultiplier?: number } };
 // dev builds. Safe to call at module scope — no-op outside of OAuth flows.
 WebBrowser.maybeCompleteAuthSession();
 
-// Initialise analytics once at module load (no-op until PostHog is wired).
+// Initialise analytics + crash reporting once at module load. Both are no-ops
+// until configured (PostHog / Sentry DSN), so this is safe on any binary.
 initAnalytics();
+initMonitoring();
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { RootNavigator } from "@/navigation/RootNavigator";
 import { initAnalytics } from "@/lib/analytics";
+import { initMonitoring } from "@/lib/monitoring";
 import { useAnalyticsIdentity } from "@/lib/useAnalyticsIdentity";
 import { CLERK_PUBLISHABLE_KEY, tokenCache } from "@/lib/clerk";
 import { convex } from "@/lib/convex";
@@ -73,19 +77,21 @@ export default function App() {
   }
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
-          <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-            <ThemeProvider>
-              <BottomSheetModalProvider>
-                <ThemedShell />
-              </BottomSheetModalProvider>
-            </ThemeProvider>
-          </ConvexProviderWithClerk>
-        </ClerkProvider>
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
+            <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+              <ThemeProvider>
+                <BottomSheetModalProvider>
+                  <ThemedShell />
+                </BottomSheetModalProvider>
+              </ThemeProvider>
+            </ConvexProviderWithClerk>
+          </ClerkProvider>
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }
 
