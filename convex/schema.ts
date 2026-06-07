@@ -186,6 +186,26 @@ export default defineSchema({
     .index("by_audience_created", ["audience", "createdAt"])
     .index("by_created", ["createdAt"]),
 
+  // Beta access invite codes. Minted from waitlist signups (one per email) or
+  // manually for testers; emailed via Resend; validated at the WelcomeScreen and
+  // redeemed (tied to a user) at account creation. Gated by the
+  // BETA_INVITE_REQUIRED Convex env flag — when unset, the app doesn't require a
+  // code (dev/pre-beta). Distinct from clubs.inviteCode (which joins a club).
+  inviteCodes: defineTable({
+    code: v.string(),
+    codeUpper: v.string(),
+    // Who it was minted for (waitlist email), if any.
+    email: v.optional(v.string()),
+    emailLower: v.optional(v.string()),
+    source: v.union(v.literal("waitlist"), v.literal("manual")),
+    sentAt: v.optional(v.number()),
+    redeemedByUserId: v.optional(v.id("users")),
+    redeemedAt: v.optional(v.number()),
+    createdAt: v.number(),
+  })
+    .index("by_code", ["codeUpper"])
+    .index("by_email", ["emailLower"]),
+
   notifications: defineTable({
     userId: v.id("users"),
     type: v.union(

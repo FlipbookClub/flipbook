@@ -7,6 +7,8 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 import { Button } from "@/components/ui/Button";
 import { analytics } from "@/lib/analytics";
 import { GENRES } from "@/lib/genres";
+import { storage } from "@/lib/storage";
+import { PENDING_INVITE_KEY } from "@/screens/auth/WelcomeScreen";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -43,20 +45,28 @@ export function GenrePreferencesScreen({ route }: Props) {
     setFormError(null);
     setSubmitting(true);
     try {
-      await createUser({ displayName, firstName, lastName, genres });
+      // The beta invite validated at the WelcomeScreen is redeemed here, atomically
+      // with user creation (no-op when beta gating is off — see convex/invites.ts).
+      const inviteCode = storage.getString(PENDING_INVITE_KEY) ?? undefined;
+      await createUser({ displayName, firstName, lastName, genres, inviteCode });
+      storage.delete(PENDING_INVITE_KEY);
       analytics.track("profile_completed", { genres: genres.length });
       // RootNavigator's auth gate sees users.me become non-null and routes to
       // MainTabs automatically — no explicit navigation here.
     } catch (err) {
-      const message =
+      const code =
         (err as { data?: { code?: string }; message?: string })?.data?.code ??
         (err as { message?: string })?.message ??
         "Couldn't save your profile. Mind trying again?";
-      setFormError(
-        message === "display_name_taken"
+      const message =
+        code === "display_name_taken"
           ? `"${displayName}" is taken. Tap back to try another.`
-          : message,
-      );
+          : code === "invite_invalid" || code === "invite_required"
+            ? "Your invite code couldn't be verified. Go back to the welcome screen and re-enter it."
+            : code === "invite_already_used"
+              ? "That invite code has already been used."
+              : code;
+      setFormError(message);
       setSubmitting(false);
     }
   };

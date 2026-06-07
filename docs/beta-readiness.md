@@ -63,6 +63,30 @@ This is the big lever: most beta bugs are JS and can be hot-fixed OTA.
 
 ---
 
+## 2b. Beta access — invite codes
+
+Entry is gated by **invite codes** minted from waitlist signups. Gating is OFF
+until you set the Convex env flag, so dev/pre-beta needs no codes.
+
+**Turn it on (when the beta opens):**
+```
+npx convex env set BETA_INVITE_REQUIRED 1   # prod: add --prod
+```
+With it set: the WelcomeScreen validates the code (public `invites.check`), and
+`users.create` redeems it atomically — no valid code, no account. Existing users
+just sign in (no code needed).
+
+**Mint + email codes to the waitlist** (from the Convex dashboard → Functions →
+run, or CLI). Requires `RESEND_API_KEY` (already used for the welcome email):
+```
+# email a batch of waitlist signups their codes:
+internal.invites.mintAndSendInvites({ limit: 50 })
+# hand-made codes for testers not on the waitlist (returns the codes):
+internal.invites.createManualCodes({ count: 10 })
+```
+Codes are 8-char Crockford base32 (no ambiguous chars), one per waitlist email,
+idempotent (re-running won't double-mint or double-email).
+
 ## 3. Build + distribute
 
 **iOS (TestFlight):**

@@ -13,6 +13,7 @@ import type * as chapters from "../chapters.js";
 import type * as clubs from "../clubs.js";
 import type * as email from "../email.js";
 import type * as http from "../http.js";
+import type * as invites from "../invites.js";
 import type * as lib_admins from "../lib/admins.js";
 import type * as lib_inviteCode from "../lib/inviteCode.js";
 import type * as memberships from "../memberships.js";
@@ -34,6 +35,7 @@ declare const fullApi: ApiFromModules<{
   clubs: typeof clubs;
   email: typeof email;
   http: typeof http;
+  invites: typeof invites;
   "lib/admins": typeof lib_admins;
   "lib/inviteCode": typeof lib_inviteCode;
   memberships: typeof memberships;

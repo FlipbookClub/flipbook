@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
+import { isBetaInviteRequired, normalizeCode, redeemForUser } from "./invites";
 
 const MAX_DISPLAY_NAME = 50;
 const MAX_BIO = 200;
@@ -99,12 +100,21 @@ export const create = mutation({
     lastName: v.string(),
     avatarUrl: v.optional(v.string()),
     genres: v.array(v.string()),
+    // Beta access code from the WelcomeScreen. Required + redeemed only when
+    // BETA_INVITE_REQUIRED is set (see convex/invites.ts); ignored otherwise.
+    inviteCode: v.optional(v.string()),
   },
   returns: v.id("users"),
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
       throw new ConvexError({ code: "unauthorized" });
+    }
+    // Validate the invite up front so a bad code fails before we do any work
+    // (final redemption happens after insert, in the same transaction).
+    if (isBetaInviteRequired()) {
+      const codeUpper = normalizeCode(args.inviteCode ?? "");
+      if (!codeUpper) throw new ConvexError({ code: "invite_required" });
     }
 
     const displayName = args.displayName.trim();
@@ -128,7 +138,7 @@ export const create = mutation({
     }
 
     const now = Date.now();
-    return await ctx.db.insert("users", {
+    const userId = await ctx.db.insert("users", {
       clerkId: identity.subject,
       displayName,
       firstName: args.firstName.trim(),
@@ -139,6 +149,10 @@ export const create = mutation({
       createdAt: now,
       lastActiveAt: now,
     });
+    // Redeem the beta code in the same transaction — if it's missing/used this
+    // throws and the whole mutation (incl. the insert above) rolls back.
+    await redeemForUser(ctx, args.inviteCode, userId);
+    return userId;
   },
 });
 
