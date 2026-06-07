@@ -47,22 +47,29 @@ const noopBackend: AnalyticsBackend = {
 
 let backend: AnalyticsBackend = noopBackend;
 
-// Called once at app boot. No-op until the PostHog backend is enabled below.
+// Called once at app boot. Stays on the no-op backend unless
+// EXPO_PUBLIC_POSTHOG_KEY is set — fully dormant (no native calls, safe on a
+// binary that doesn't bundle the PostHog SDK) until you configure a key and
+// ship a build that includes it. The module is lazy-`require`d only when a key
+// exists. See docs/beta-readiness.md.
 export function initAnalytics(): void {
-  // --- PostHog activation (uncomment after step 1–2 above) -----------------
-  // const key = process.env.EXPO_PUBLIC_POSTHOG_KEY;
-  // if (!key) return; // stay on no-op if no key (e.g. local dev)
-  // const PostHog = require("posthog-react-native").default;
-  // const client = new PostHog(key, {
-  //   host: process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
-  // });
-  // backend = {
-  //   identify: (id, traits) => client.identify(id, traits),
-  //   capture: (event, props) => client.capture(event, props),
-  //   screen: (name, props) => client.screen(name, props),
-  //   reset: () => client.reset(),
-  // };
-  // -------------------------------------------------------------------------
+  const key = process.env.EXPO_PUBLIC_POSTHOG_KEY;
+  if (!key) return; // stay on no-op (local dev / not configured)
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    const PostHog = require("posthog-react-native").default;
+    const client = new PostHog(key, {
+      host: process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
+    });
+    backend = {
+      identify: (id, traits) => client.identify(id, traits),
+      capture: (event, props) => client.capture(event, props),
+      screen: (name, props) => client.screen(name, props),
+      reset: () => client.reset(),
+    };
+  } catch (e) {
+    devLog("PostHog init failed; staying on no-op", e);
+  }
 }
 
 export const analytics = {

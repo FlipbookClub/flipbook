@@ -32,6 +32,20 @@ dev-environment failure modes we hit during development. The golden rule:
 
 Until step 3, the app behaves exactly as today — Sentry is dormant.
 
+> **Note:** `expo install @sentry/react-native` auto-added the `@sentry/react-native`
+> config plugin to `app.json`; it was removed to keep builds clean while Sentry is
+> dormant. Re-add it (with `organization`/`project` + a `SENTRY_AUTH_TOKEN` build
+> secret) at step 5 for source-map symbolication.
+
+### Turn on PostHog analytics (product usage)
+Same gated pattern (`src/lib/analytics.ts`) — dormant until a key is set.
+1. Create a PostHog project → copy the **Project API Key**.
+2. Set EAS env vars: `EXPO_PUBLIC_POSTHOG_KEY` (and optional
+   `EXPO_PUBLIC_POSTHOG_HOST`, default `https://us.i.posthog.com`).
+3. Ship a fresh EAS build (the native SDK autolinks). Events already instrumented
+   across the app (`sign_up`, `club_created`, `book_opened`, `reaction_added`, …)
+   start flowing automatically; identity syncs with auth.
+
 ---
 
 ## 2. Over-the-air (OTA) fixes during beta
