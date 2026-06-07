@@ -87,6 +87,16 @@ internal.invites.createManualCodes({ count: 10 })
 Codes are 8-char Crockford base32 (no ambiguous chars), one per waitlist email,
 idempotent (re-running won't double-mint or double-email).
 
+## 2c. Seed first-impression content [TASK-095]
+
+So testers don't open an empty room: create a **public** "Flipbook Welcome"
+club, upload 1–2 books, then seed each with demo members + reactions:
+```
+internal.seed.seedReactionsForBook({ bookId: "<book id>" })
+```
+Creates ~4 demo readers (with reading progress) + a spread of emoji/comment
+reactions across the early pages. Idempotent. Run once per showcase book.
+
 ## 3. Build + distribute
 
 **iOS (TestFlight):**
