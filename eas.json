@@ -12,8 +12,9 @@
       }
     },
     "preview": {
-      "distribution": "internal",
-      "channel": "preview"
+      "distribution": "store",
+      "channel": "preview",
+      "autoIncrement": true
     },
     "production": {
       "autoIncrement": true,
