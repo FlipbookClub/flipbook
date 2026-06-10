@@ -14,11 +14,13 @@
     "preview": {
       "distribution": "store",
       "channel": "preview",
+      "environment": "preview",
       "autoIncrement": true
     },
     "production": {
       "autoIncrement": true,
-      "channel": "production"
+      "channel": "production",
+      "environment": "production"
     }
   },
   "submit": {
