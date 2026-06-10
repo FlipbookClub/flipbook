@@ -111,31 +111,39 @@ export function WaitlistForm({
             transition={{ duration: 0.3 }}
             className="space-y-3"
           >
-            <div className="flex flex-col gap-3 sm:flex-row">
-              <label className="flex-1">
-                <span className="sr-only">Email address</span>
-                <input
-                  type="email"
-                  inputMode="email"
-                  autoComplete="email"
-                  required
-                  placeholder="you@reading.com"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (status.kind === "error") setStatus({ kind: "idle" });
-                  }}
+            <div className="relative">
+              {/* Soft accent halo so the form reads as a deliberate "join"
+                  module, not a bare input. Intensifies on focus. */}
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -inset-x-3 -inset-y-2 -z-10 rounded-[28px] bg-accent/[0.07] blur-2xl transition-opacity duration-500"
+              />
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <label className="flex-1">
+                  <span className="sr-only">Email address</span>
+                  <input
+                    type="email"
+                    inputMode="email"
+                    autoComplete="email"
+                    required
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (status.kind === "error") setStatus({ kind: "idle" });
+                    }}
+                    disabled={isLoading}
+                    className="h-12 w-full rounded-full border border-line bg-bg-elevated/60 px-5 text-[15px] text-text shadow-sm placeholder:text-text-subtle focus:border-accent focus:outline-none focus:ring-0"
+                  />
+                </label>
+                <button
+                  type="submit"
                   disabled={isLoading}
-                  className="h-12 w-full rounded-full border border-line bg-bg-elevated/40 px-5 text-[15px] text-text placeholder:text-text-subtle focus:border-accent focus:outline-none focus:ring-0"
-                />
-              </label>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="group inline-flex h-12 items-center justify-center rounded-full bg-accent px-7 text-[14px] font-semibold tracking-wide text-white shadow-lg shadow-accent/25 transition-all duration-300 hover:bg-accent-strong hover:shadow-accent/35 active:scale-[0.98] disabled:opacity-70 disabled:shadow-none"
-              >
-                {buttonLabel}
-              </button>
+                  className="group inline-flex h-12 items-center justify-center rounded-full bg-accent px-7 text-[14px] font-semibold tracking-wide text-white shadow-lg shadow-accent/25 transition-all duration-300 hover:bg-accent-strong hover:shadow-accent/40 active:scale-[0.98] disabled:opacity-70 disabled:shadow-none"
+                >
+                  {buttonLabel}
+                </button>
+              </div>
             </div>
             {qualifier && (
               <label className="block">
@@ -155,6 +163,19 @@ export function WaitlistForm({
                 ? "No spam. About one update a fortnight while we're building. Unsubscribe with one tap."
                 : "One email. Pre-launch list, not a newsletter blast."}
             </p>
+            {/* Quietly route writers to the dedicated creator beta. */}
+            <a
+              href="#creators"
+              className="group inline-flex items-center gap-1.5 rounded-full border border-line bg-bg-elevated/30 px-3.5 py-1.5 text-[13px] text-text-muted transition-colors hover:border-accent/40 hover:text-text"
+            >
+              <span aria-hidden className="text-accent">✍</span>
+              <span>
+                Writing something serial?{" "}
+                <span className="font-medium text-accent underline-offset-4 group-hover:underline">
+                  There&apos;s a creator beta&nbsp;→
+                </span>
+              </span>
+            </a>
           </motion.div>
         )}
       </AnimatePresence>

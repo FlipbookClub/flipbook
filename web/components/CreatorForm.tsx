@@ -84,7 +84,7 @@ export function CreatorForm() {
               type="email"
               required
               autoComplete="email"
-              placeholder="you@yourwriting.com"
+              placeholder="Enter your email"
               value={email}
               onChange={(e) => {
                 setEmail(e.target.value);

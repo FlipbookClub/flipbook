@@ -2,6 +2,7 @@
 
 import { motion, useReducedMotion } from "framer-motion";
 
+import { AvatarStack } from "@/components/AvatarStack";
 import { Eyebrow } from "@/components/Eyebrow";
 import { SignupCount } from "@/components/SignupCount";
 import { WaitlistForm } from "@/components/WaitlistForm";
@@ -52,9 +53,12 @@ export function Hero() {
             <WaitlistForm variant="hero" source="hero" />
           </motion.div>
 
-          <motion.p {...fade(0.6)} className="mt-6 text-[13px] text-text-subtle">
-            <SignupCount />
-          </motion.p>
+          <motion.div {...fade(0.6)} className="mt-6 flex items-center gap-3">
+            <AvatarStack />
+            <p className="text-[13px] text-text-subtle">
+              <SignupCount />
+            </p>
+          </motion.div>
         </div>
 
         <motion.div
