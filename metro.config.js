@@ -1,5 +1,6 @@
 const { getDefaultConfig } = require("expo/metro-config");
 const { withNativeWind } = require("nativewind/metro");
+const path = require("path");
 
 const config = getDefaultConfig(__dirname);
 
@@ -11,4 +12,10 @@ config.transformer.babelTransformerPath = require.resolve(
 config.resolver.assetExts = config.resolver.assetExts.filter((ext) => ext !== "svg");
 config.resolver.sourceExts.push("svg");
 
-module.exports = withNativeWind(config, { input: "./global.css" });
+// Resolve NativeWind's input + tailwind config from THIS file's directory, not
+// the process cwd — otherwise launching Metro from a subfolder (e.g. web/) makes
+// NativeWind look for `web/tailwind.config` and crash.
+module.exports = withNativeWind(config, {
+  input: path.resolve(__dirname, "global.css"),
+  configPath: path.resolve(__dirname, "tailwind.config"),
+});
