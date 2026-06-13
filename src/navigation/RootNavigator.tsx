@@ -147,6 +147,8 @@ function DiagnosticSplash({
         Clerk loaded: no{"\n"}
         Clerk key present: {hasClerkKey ? "yes" : "NO"}{"\n"}
         Convex URL present: {hasConvexUrl ? "yes" : "NO"}{"\n"}
+        crypto.getRandomValues:{" "}
+        {typeof globalThis.crypto?.getRandomValues === "function" ? "present" : "MISSING"}{"\n"}
         Reachability: {probe}
       </Text>
     </View>
