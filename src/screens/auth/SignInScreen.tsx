@@ -70,6 +70,23 @@ export function SignInScreen({ navigation }: Props) {
           return;
         }
       }
+      // Attack Protection: a password sign-in from a NEW device returns
+      // needs_client_trust. Clerk emails a one-time code that must be verified
+      // (as a second factor) to finish signing in. Route to the shared code
+      // screen in client_trust mode rather than dead-ending on an error.
+      // `needs_client_trust` is returned at runtime by Clerk's Attack Protection,
+      // but this @clerk/types version's SignInStatus union doesn't include it yet
+      // — compare as a string so TS doesn't flag the (real) status as impossible.
+      if ((attempt.status as string) === "needs_client_trust") {
+        const emailFactor = attempt.supportedSecondFactors?.find(
+          (f) => f.strategy === "email_code",
+        );
+        if (emailFactor) {
+          await signIn.prepareSecondFactor({ strategy: "email_code" });
+          navigation.navigate("VerifyEmail", { email: email.trim(), flow: "client_trust" });
+          return;
+        }
+      }
       setFormError(`Sign-in incomplete (${attempt.status}). Try again or contact support.`);
     } catch (err) {
       // Clerk reports session_exists when a valid session is still cached
@@ -124,6 +141,19 @@ export function SignInScreen({ navigation }: Props) {
           onSubmitEditing={handleSignIn}
         />
       </View>
+
+      <Text
+        onPress={() => navigation.navigate("ForgotPassword")}
+        style={{
+          ...typography.bodySm,
+          color: linkColor,
+          fontFamily: "Raleway-SemiBold",
+          textAlign: "right",
+          marginTop: spacing.s2,
+        }}
+      >
+        Forgot password?
+      </Text>
 
       <View style={{ marginTop: spacing.s5, gap: spacing.s3 }}>
         <Text

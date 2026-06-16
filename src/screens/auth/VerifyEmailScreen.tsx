@@ -30,7 +30,8 @@ export function VerifyEmailScreen({ route }: Props) {
   const { signIn, setActive: setActiveSignIn, isLoaded: signInLoaded } = useSignIn();
   const email = route.params.email;
   const flow = route.params.flow ?? "signup";
-  const isLoaded = flow === "signin" ? signInLoaded : signUpLoaded;
+  // signup uses useSignUp; signin + client_trust both use useSignIn.
+  const isLoaded = flow === "signup" ? signUpLoaded : signInLoaded;
 
   const [code, setCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -45,7 +46,17 @@ export function VerifyEmailScreen({ route }: Props) {
     setFormError(null);
     setSubmitting(true);
     try {
-      if (flow === "signin") {
+      if (flow === "client_trust") {
+        // Attack-Protection new-device verification: the email code is a SECOND
+        // factor on the in-flight sign-in, so attempt it via attemptSecondFactor.
+        if (!signInLoaded || !signIn || !setActiveSignIn) return;
+        const result = await signIn.attemptSecondFactor({ strategy: "email_code", code });
+        if (result.status === "complete") {
+          await setActiveSignIn({ session: result.createdSessionId });
+        } else {
+          setFormError("Verification incomplete. Check the code and try again.");
+        }
+      } else if (flow === "signin") {
         if (!signInLoaded || !signIn || !setActiveSignIn) return;
         const result = await signIn.attemptFirstFactor({ strategy: "email_code", code });
         if (result.status === "complete") {
@@ -78,7 +89,10 @@ export function VerifyEmailScreen({ route }: Props) {
     setResentNotice(null);
     setResending(true);
     try {
-      if (flow === "signin") {
+      if (flow === "client_trust") {
+        if (!signInLoaded || !signIn) return;
+        await signIn.prepareSecondFactor({ strategy: "email_code" });
+      } else if (flow === "signin") {
         if (!signInLoaded || !signIn) return;
         // Re-derive the email_code factor's emailAddressId from the in-flight
         // sign-in attempt. SignInScreen already kicked off prepareFirstFactor
