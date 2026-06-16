@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: projectRoot,
   },
+  // The Apple App Site Association file is extensionless, so it must be served
+  // explicitly as JSON for iOS universal-link verification to accept it.
+  async headers() {
+    return [
+      {
+        source: "/.well-known/apple-app-site-association",
+        headers: [{ key: "Content-Type", value: "application/json" }],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

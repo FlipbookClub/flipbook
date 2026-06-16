@@ -24,7 +24,11 @@ import { api } from "../../../convex/_generated/api";
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "InviteMembers">;
 
-const DEEP_LINK_BASE = "flipbook://join";
+// https universal link (not flipbook://) so it's tappable in messaging apps and
+// works for recipients without the app. useflipbook.com/join/<code> opens the
+// app directly when app links are verified, else shows a landing page that
+// deep-links in. See web/app/join/[code]/page.tsx.
+const DEEP_LINK_BASE = "https://useflipbook.com/join";
 
 export function InviteMembersScreen({ navigation, route }: Props) {
   const { colors } = useTheme();

@@ -6,7 +6,7 @@ import { storage } from "@/lib/storage";
 
 // Deep-link configuration.
 //   flipbook://join/ABC123                         — invite (custom scheme)
-//   https://flipbook.app/join/ABC123               — invite (universal link)
+//   https://useflipbook.com/join/ABC123            — invite (universal link)
 //   flipbook://clubs/<clubId>/chapters/<chapterId> — chapter-drop push (FR-029)
 //   flipbook://clubs/<clubId>/books/<bookId>       — book deep link
 //
@@ -44,7 +44,7 @@ export const linkingConfig: LinkingOptions<ReactNavigation.RootParamList>["confi
 export const linkingPrefixes = [
   Linking.createURL("/"),
   "flipbook://",
-  "https://flipbook.app",
+  "https://useflipbook.com",
 ];
 
 // Notification payloads from convex/notifications.ts always include a

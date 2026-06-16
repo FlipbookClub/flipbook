@@ -39,7 +39,7 @@
             },
             {
               "scheme": "https",
-              "host": "flipbook.app",
+              "host": "useflipbook.com",
               "pathPrefix": "/join"
             }
           ],

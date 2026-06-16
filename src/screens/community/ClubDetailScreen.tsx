@@ -28,7 +28,9 @@ import { api } from "../../../convex/_generated/api";
 type Props = NativeStackScreenProps<CommunityStackParamList, "ClubDetail">;
 type TabKey = "room" | "discussions" | "library";
 
-const DEEP_LINK_BASE = "flipbook://join";
+// https universal link (not flipbook://) so it's tappable in messaging apps and
+// works for recipients without the app. See web/app/join/[code]/page.tsx.
+const DEEP_LINK_BASE = "https://useflipbook.com/join";
 
 
 export function ClubDetailScreen({ navigation, route }: Props) {

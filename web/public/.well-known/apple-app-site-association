@@ -1,0 +1,15 @@
+{
+  "applinks": {
+    "details": [
+      {
+        "appIDs": ["6BMD56VSX7.com.flipbook.club"],
+        "components": [
+          {
+            "/": "/join/*",
+            "comment": "Community invite links open the Flipbook iOS app"
+          }
+        ]
+      }
+    ]
+  }
+}
