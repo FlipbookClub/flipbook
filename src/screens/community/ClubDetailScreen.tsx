@@ -573,11 +573,6 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
                       Reactions and replies unlock when you become a member.
                     </Text>
-                    <Button
-                      label={joining ? "Joining…" : "Join community"}
-                      onPress={handleJoinFromPreview}
-                      disabled={joining}
-                    />
                   </View>
                 </Card>
               </View>
@@ -747,6 +742,28 @@ export function ClubDetailScreen({ navigation, route }: Props) {
           )}
         </View>
       </ScrollView>
+
+      {/* Persistent Join CTA for anyone previewing a club they haven't joined —
+          visible on every tab, not just buried in the Discussions blur. */}
+      {!isMember ? (
+        <View
+          style={{
+            paddingHorizontal: spacing.s4,
+            paddingTop: spacing.s3,
+            paddingBottom: spacing.s4,
+            borderTopWidth: 1,
+            borderTopColor: colors.border,
+            backgroundColor: colors.surfacePrimary,
+          }}
+        >
+          <Button
+            label={joining ? "Joining…" : "Join community"}
+            fullWidth
+            disabled={joining}
+            onPress={handleJoinFromPreview}
+          />
+        </View>
+      ) : null}
 
       {isModerator ? (
         <ClubModeratorSheet
