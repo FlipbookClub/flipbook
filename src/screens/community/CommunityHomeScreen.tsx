@@ -1,5 +1,12 @@
 import { useCallback, useState } from "react";
-import { Pressable, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Leaf, Plus, Rocket, UserGroup2 } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { CompositeScreenProps } from "@react-navigation/native";

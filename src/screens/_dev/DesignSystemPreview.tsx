@@ -1,6 +1,12 @@
 import { useRef } from "react";
 import type { BottomSheetModal } from "@gorhom/bottom-sheet";
-import { Pressable, SafeAreaView, ScrollView, Text, View } from "react-native";
+import {
+  Pressable,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { Avatar } from "@/components/ui/Avatar";
 import { BottomSheet } from "@/components/ui/BottomSheet";

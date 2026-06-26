@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import {
   Alert,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Text,
   View,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Pdf from "react-native-pdf";
 import { ChevronLeft, Upload } from "@/lib/icons";
 import { useMutation } from "convex/react";
@@ -128,7 +128,7 @@ export function PublishChapterScreen({ navigation, route }: Props) {
         </Pressable>
       </View>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <ScrollView

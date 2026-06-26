@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Alert, Linking, Platform, Pressable, SafeAreaView, ScrollView, Switch, Text, View } from "react-native";
+import {
+  Alert,
+  Linking,
+  Platform,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import {
   Bell,
   ChevronLeft,

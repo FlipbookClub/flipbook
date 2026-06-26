@@ -2,15 +2,15 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Switch,
   Text,
   View,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { ChevronLeft, ImagePlus } from "@/lib/icons";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation, useQuery } from "convex/react";
@@ -157,7 +157,7 @@ export function EditCommunityScreen({ navigation, route }: Props) {
         </View>
       ) : (
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
           <ScrollView
