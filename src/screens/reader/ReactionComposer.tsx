@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import {
-  KeyboardAvoidingView,
   Modal,
-  Platform,
   Pressable,
   Text,
   TextInput,
   View,
+  Platform,
 } from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { MessageSquare, X } from "@/lib/icons";
 
 import { Button } from "@/components/ui/Button";
@@ -93,7 +93,7 @@ export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false
         accessibilityLabel="Dismiss reaction picker"
       />
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}
       >
         <View
