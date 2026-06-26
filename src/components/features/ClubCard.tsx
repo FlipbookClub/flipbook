@@ -16,6 +16,9 @@ export interface ClubCardData {
   coverImageUrl?: string | null;
   isMember?: boolean;
   lastActivityAt?: number;
+  // Random sample of up to 3 members for the avatar stack. When absent the
+  // stack renders placeholder initials (legacy fallback).
+  memberSample?: Array<{ displayName: string; avatarUrl?: string }>;
 }
 
 function formatActivity(ts: number): string {
@@ -129,14 +132,13 @@ export function ClubCard({ club, onPress, contained }: ClubCardProps) {
         ) : null}
         <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s2 }}>
           <View style={{ flexDirection: "row" }}>
-            {/* Placeholder avatar stack — wires to real member avatars later. */}
-            <Avatar name="A B" size="sm" />
-            <View style={{ marginLeft: -10 }}>
-              <Avatar name="C D" size="sm" />
-            </View>
-            <View style={{ marginLeft: -10 }}>
-              <Avatar name="E F" size="sm" />
-            </View>
+            {(club.memberSample ?? [{ displayName: "A B" }, { displayName: "C D" }, { displayName: "E F" }])
+              .slice(0, 3)
+              .map((m, i) => (
+                <View key={i} style={i > 0 ? { marginLeft: -10 } : undefined}>
+                  <Avatar name={m.displayName} imageUri={m.avatarUrl} size="sm" />
+                </View>
+              ))}
           </View>
           <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
             {club.memberCount.toLocaleString()} members

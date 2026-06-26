@@ -144,3 +144,61 @@ export const listClubMembers = query({
     return enriched;
   },
 });
+
+// Lightweight query for community card avatar stacks. Returns a random sample
+// of up to `limit` members (default 3) showing only the fields a card needs.
+// Applies the same private-club visibility guard as listClubMembers so non-
+// members can't discover who's in a private club from a card in discovery.
+export const sampleClubMembers = query({
+  args: {
+    clubId: v.id("clubs"),
+    limit: v.optional(v.number()),
+  },
+  returns: v.array(
+    v.object({ displayName: v.string(), avatarUrl: v.optional(v.string()) }),
+  ),
+  handler: async (ctx, args) => {
+    const cap = Math.min(args.limit ?? 3, 3);
+    const club = await ctx.db.get(args.clubId);
+    if (!club) return [];
+
+    if (club.visibility === "private") {
+      const identity = await ctx.auth.getUserIdentity();
+      if (!identity) return [];
+      const me = await ctx.db
+        .query("users")
+        .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+        .unique();
+      if (!me) return [];
+      const membership = await ctx.db
+        .query("memberships")
+        .withIndex("by_club_and_user", (q) =>
+          q.eq("clubId", args.clubId).eq("userId", me._id),
+        )
+        .unique();
+      if (!membership) return [];
+    }
+
+    // Read up to 50 members so the shuffle has a meaningful pool for larger
+    // clubs without scanning unbounded data.
+    const memberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_club", (q) => q.eq("clubId", args.clubId))
+      .take(50);
+
+    // Fisher-Yates shuffle (in-place) then take cap.
+    for (let i = memberships.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [memberships[i], memberships[j]] = [memberships[j], memberships[i]];
+    }
+
+    const sample = memberships.slice(0, cap);
+    const result = [];
+    for (const m of sample) {
+      const user = await ctx.db.get(m.userId);
+      if (!user) continue;
+      result.push({ displayName: user.displayName, avatarUrl: user.avatarUrl });
+    }
+    return result;
+  },
+});

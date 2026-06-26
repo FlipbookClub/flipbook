@@ -321,3 +321,76 @@ export const update = mutation({
     return null;
   },
 });
+
+// Trimmed public profile — only fields appropriate to show on another user's
+// read-only profile card. Intentionally excludes PII (clerkId, firstName,
+// lastName, email, pushToken) and status surfaces (proSubscriptionStatus,
+// notificationPrefs) per the no-follower-graph product principle.
+const publicUserValidator = v.object({
+  _id: v.id("users"),
+  _creationTime: v.number(),
+  displayName: v.string(),
+  avatarUrl: v.optional(v.string()),
+  bio: v.optional(v.string()),
+  genres: v.array(v.string()),
+});
+
+export const getById = query({
+  args: { userId: v.id("users") },
+  returns: v.union(v.null(), publicUserValidator),
+  handler: async (ctx, args) => {
+    const user = await ctx.db.get(args.userId);
+    if (!user) return null;
+    return {
+      _id: user._id,
+      _creationTime: user._creationTime,
+      displayName: user.displayName,
+      avatarUrl: user.avatarUrl,
+      bio: user.bio,
+      genres: user.genres,
+    };
+  },
+});
+
+// Returns clubs both the viewer and the target user are members of.
+// Only shows clubs the VIEWER is a member of (prevents leaking private club
+// membership for clubs the viewer doesn't belong to).
+export const mutualClubs = query({
+  args: { userId: v.id("users") },
+  returns: v.array(
+    v.object({
+      _id: v.id("clubs"),
+      name: v.string(),
+      coverImageUrl: v.optional(v.string()),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return [];
+    const me = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!me || me._id === args.userId) return [];
+
+    const myMemberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_user", (q) => q.eq("userId", me._id))
+      .take(50);
+    const myClubIds = new Set(myMemberships.map((m) => m.clubId));
+
+    const theirMemberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .take(50);
+
+    const result = [];
+    for (const m of theirMemberships) {
+      if (!myClubIds.has(m.clubId)) continue;
+      const club = await ctx.db.get(m.clubId);
+      if (!club) continue;
+      result.push({ _id: club._id, name: club.name, coverImageUrl: club.coverImageUrl });
+    }
+    return result;
+  },
+});

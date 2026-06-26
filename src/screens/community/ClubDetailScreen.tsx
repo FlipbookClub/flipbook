@@ -636,11 +636,17 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       backgroundColor: pressed ? colors.surfaceSecondary : "transparent",
                     })}
                   >
-                    <Avatar
-                      name={r.user.displayName}
-                      imageUri={r.user.avatarUrl}
-                      size="md"
-                    />
+                    <Pressable
+                      onPress={() => navigation.navigate("ViewProfile", { userId: r.user._id })}
+                      accessibilityRole="button"
+                      accessibilityLabel={`View ${r.user.displayName}'s profile`}
+                    >
+                      <Avatar
+                        name={r.user.displayName}
+                        imageUri={r.user.avatarUrl}
+                        size="md"
+                      />
+                    </Pressable>
                     <View style={{ flex: 1, gap: 2 }}>
                       <Text
                         style={{
@@ -706,8 +712,11 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       ? Math.min(100, Math.round((p.currentPage / p.totalPages) * 100))
                       : 0;
                   return (
-                    <View
+                    <Pressable
                       key={m._id}
+                      onPress={() => navigation.navigate("ViewProfile", { userId: m.userId })}
+                      accessibilityRole="button"
+                      accessibilityLabel={`View ${m.displayName}'s profile`}
                       style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3, paddingVertical: spacing.s2 }}
                     >
                       <Avatar
@@ -738,7 +747,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                           />
                         </View>
                       </View>
-                    </View>
+                    </Pressable>
                   );
                 })}
                 {filteredMembers.length === 0 ? (

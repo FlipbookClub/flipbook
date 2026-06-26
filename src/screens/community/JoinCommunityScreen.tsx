@@ -14,7 +14,7 @@ import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Button } from "@/components/ui/Button";
-import { ClubCard } from "@/components/features/ClubCard";
+import { ClubCard, type ClubCardData } from "@/components/features/ClubCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Input } from "@/components/ui/Input";
 import { Skeleton } from "@/components/ui/Skeleton";
@@ -25,7 +25,26 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
+import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+
+function ClubCardWithAvatars({
+  clubId,
+  club,
+  onPress,
+}: {
+  clubId: Id<"clubs">;
+  club: ClubCardData;
+  onPress?: () => void;
+}) {
+  const sample = useQuery(api.memberships.sampleClubMembers, { clubId });
+  return (
+    <ClubCard
+      club={{ ...club, memberSample: sample ?? undefined }}
+      onPress={onPress}
+    />
+  );
+}
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "JoinCommunity">;
 
@@ -188,8 +207,9 @@ export function JoinCommunityScreen({ navigation }: Props) {
                 </>
               ) : popular.length > 0 ? (
                 popular.map((club) => (
-                  <ClubCard
+                  <ClubCardWithAvatars
                     key={club._id}
+                    clubId={club._id}
                     club={{
                       name: club.name,
                       description: club.description,
