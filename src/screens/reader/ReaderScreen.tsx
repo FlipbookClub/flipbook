@@ -9,7 +9,7 @@ import {
   View,
 } from "react-native";
 import Pdf from "react-native-pdf";
-import { Settings2, Smile, X } from "@/lib/icons";
+import { Bookmark, BookmarkFilled, Settings2, Smile, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -256,6 +256,29 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
 
+  // Bookmarks: query which pages are saved; mutation to toggle the current page.
+  const toggleBookmark = useMutation(api.bookmarks.toggle);
+  const bookmarkedPages = useQuery(
+    api.bookmarks.listForContent,
+    effective
+      ? effective.kind === "book"
+        ? { bookId: effective.contentId as Id<"books"> }
+        : { chapterId: effective.contentId as Id<"chapters"> }
+      : "skip",
+  );
+  const isBookmarked = (bookmarkedPages ?? []).includes(currentPage);
+
+  const handleToggleBookmark = async () => {
+    if (!effective) return;
+    await toggleBookmark({
+      clubId: effective.clubId,
+      ...(effective.kind === "book"
+        ? { bookId: effective.contentId as Id<"books"> }
+        : { chapterId: effective.contentId as Id<"chapters"> }),
+      page: currentPage,
+    });
+  };
+
   // Build the scope payload once — used in three places (reactions query,
   // reaction submit, reaction details sheet).
   const scopePayload = effective
@@ -448,6 +471,8 @@ export function ReaderScreen({ navigation, route }: Props) {
         subtitle={effective.clubName}
         onClose={() => navigation.goBack()}
         onSettings={() => setCustomizeOpen(true)}
+        isBookmarked={isBookmarked}
+        onBookmark={handleToggleBookmark}
       />
       <View style={{ flex: 1 }}>
       <View style={{ flex: 1, backgroundColor: colors.surfaceSecondary }}>
@@ -581,10 +606,13 @@ interface HeaderProps {
   onClose: () => void;
   onSettings: () => void;
   settingsDisabled?: boolean;
+  isBookmarked?: boolean;
+  onBookmark?: () => void;
 }
 
-function Header({ title, subtitle, onClose, onSettings, settingsDisabled }: HeaderProps) {
+function Header({ title, subtitle, onClose, onSettings, settingsDisabled, isBookmarked, onBookmark }: HeaderProps) {
   const { colors } = useTheme();
+  const BookmarkIcon = isBookmarked ? BookmarkFilled : Bookmark;
   return (
     <View
       style={{
@@ -619,19 +647,34 @@ function Header({ title, subtitle, onClose, onSettings, settingsDisabled }: Head
           </Text>
         ) : null}
       </View>
-      <Pressable
-        onPress={onSettings}
-        hitSlop={spacing.s3}
-        disabled={settingsDisabled}
-        accessibilityRole="button"
-        accessibilityLabel="Reader settings"
-        style={{ width: 40, alignItems: "flex-end" }}
-      >
-        <Settings2
-          size={22}
-          color={settingsDisabled ? colors.textMuted : colors.textPrimary}
-        />
-      </Pressable>
+      <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
+        {onBookmark ? (
+          <Pressable
+            onPress={onBookmark}
+            hitSlop={spacing.s3}
+            accessibilityRole="button"
+            accessibilityLabel={isBookmarked ? "Remove bookmark" : "Bookmark this page"}
+          >
+            <BookmarkIcon
+              size={22}
+              color={isBookmarked ? palette.accent : colors.textPrimary}
+            />
+          </Pressable>
+        ) : null}
+        <Pressable
+          onPress={onSettings}
+          hitSlop={spacing.s3}
+          disabled={settingsDisabled}
+          accessibilityRole="button"
+          accessibilityLabel="Reader settings"
+          style={{ width: 36, alignItems: "flex-end" }}
+        >
+          <Settings2
+            size={22}
+            color={settingsDisabled ? colors.textMuted : colors.textPrimary}
+          />
+        </Pressable>
+      </View>
     </View>
   );
 }

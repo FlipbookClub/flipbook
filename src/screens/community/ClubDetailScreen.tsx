@@ -24,6 +24,7 @@ import { BookUploadSheet } from "@/components/features/BookUploadSheet";
 import { BookOptionsSheet } from "@/components/features/BookOptionsSheet";
 import { ChapterListItem } from "@/components/features/ChapterListItem";
 import { ClubModeratorSheet } from "@/components/features/ClubModeratorSheet";
+import { MemberActionSheet } from "@/components/features/MemberActionSheet";
 import { MAX_PDF_BYTES, pickPdf, type PickedPdf } from "@/lib/pdf";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
@@ -84,6 +85,8 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [optionsBook, setOptionsBook] = useState<Doc<"books"> | null>(null);
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
+  type MemberTarget = { userId: string; displayName: string } | null;
+  const [memberActionTarget, setMemberActionTarget] = useState<MemberTarget>(null);
 
   const isModerator = !!me && !!club && club.moderatorId === me._id;
   // FR-075: when previewing a public club from Discovery without having
@@ -715,6 +718,11 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     <Pressable
                       key={m._id}
                       onPress={() => navigation.navigate("ViewProfile", { userId: m.userId })}
+                      onLongPress={
+                        isModerator && m.userId !== club.moderatorId
+                          ? () => setMemberActionTarget({ userId: m.userId, displayName: m.displayName })
+                          : undefined
+                      }
                       accessibilityRole="button"
                       accessibilityLabel={`View ${m.displayName}'s profile`}
                       style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3, paddingVertical: spacing.s2 }}
@@ -800,6 +808,17 @@ export function ClubDetailScreen({ navigation, route }: Props) {
         onClose={() => setPickedFile(null)}
         onUploaded={() => setPickedFile(null)}
       />
+
+      {memberActionTarget ? (
+        <MemberActionSheet
+          visible
+          clubId={clubId}
+          userId={memberActionTarget.userId as import("../../../convex/_generated/dataModel").Id<"users">}
+          displayName={memberActionTarget.displayName}
+          onClose={() => setMemberActionTarget(null)}
+          onActionDone={() => setMemberActionTarget(null)}
+        />
+      ) : null}
 
       <BookOptionsSheet
         visible={optionsBook !== null}

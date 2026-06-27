@@ -39,6 +39,13 @@ export const joinByCode = mutation({
       .unique();
     if (existing) return club._id;
 
+    // Moderator may have blocked this user from rejoining.
+    const block = await ctx.db
+      .query("clubBlocks")
+      .withIndex("by_club_and_user", (q) => q.eq("clubId", club._id).eq("userId", me._id))
+      .unique();
+    if (block) throw new ConvexError({ code: "blocked" });
+
     // FR-027: free users are capped at 3 club memberships total. The client
     // catches this code and routes to the Pro upgrade flow with the invite
     // code preserved so the join completes after subscribing.
@@ -200,5 +207,107 @@ export const sampleClubMembers = query({
       result.push({ displayName: user.displayName, avatarUrl: user.avatarUrl });
     }
     return result;
+  },
+});
+
+// ─────────────────────────────────────────────────────────────────
+// MODERATION: remove member + block from rejoining
+// ─────────────────────────────────────────────────────────────────
+
+// Remove a member from the club. The membership row is deleted and memberCount
+// is decremented. Guards: caller must be the moderator; cannot remove self
+// (use `leave` instead); cannot remove the moderator/owner.
+export const removeMember = mutation({
+  args: { clubId: v.id("clubs"), userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const club = await ctx.db.get(args.clubId);
+    if (!club) throw new ConvexError({ code: "club_not_found" });
+    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    if (args.userId === me._id) throw new ConvexError({ code: "cannot_remove_self" });
+    if (args.userId === club.moderatorId) throw new ConvexError({ code: "cannot_remove_moderator" });
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_club_and_user", (q) =>
+        q.eq("clubId", args.clubId).eq("userId", args.userId),
+      )
+      .unique();
+    if (!membership) throw new ConvexError({ code: "not_member" });
+
+    await ctx.db.delete(membership._id);
+    await ctx.db.patch(args.clubId, {
+      memberCount: Math.max(0, club.memberCount - 1),
+      lastActivityAt: Date.now(),
+    });
+    return null;
+  },
+});
+
+// Remove a member AND prevent them from rejoining via any invite code.
+export const blockMember = mutation({
+  args: { clubId: v.id("clubs"), userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const club = await ctx.db.get(args.clubId);
+    if (!club) throw new ConvexError({ code: "club_not_found" });
+    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    if (args.userId === me._id) throw new ConvexError({ code: "cannot_block_self" });
+    if (args.userId === club.moderatorId) throw new ConvexError({ code: "cannot_block_moderator" });
+
+    // Remove membership if present.
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_club_and_user", (q) =>
+        q.eq("clubId", args.clubId).eq("userId", args.userId),
+      )
+      .unique();
+    if (membership) {
+      await ctx.db.delete(membership._id);
+      await ctx.db.patch(args.clubId, {
+        memberCount: Math.max(0, club.memberCount - 1),
+        lastActivityAt: Date.now(),
+      });
+    }
+
+    // Add to block list (idempotent — skip if already blocked).
+    const existing = await ctx.db
+      .query("clubBlocks")
+      .withIndex("by_club_and_user", (q) =>
+        q.eq("clubId", args.clubId).eq("userId", args.userId),
+      )
+      .unique();
+    if (!existing) {
+      await ctx.db.insert("clubBlocks", {
+        clubId: args.clubId,
+        userId: args.userId,
+        blockedByUserId: me._id,
+        createdAt: Date.now(),
+      });
+    }
+    return null;
+  },
+});
+
+// Lift a block — the user can rejoin via invite code again.
+export const unblockMember = mutation({
+  args: { clubId: v.id("clubs"), userId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const club = await ctx.db.get(args.clubId);
+    if (!club) throw new ConvexError({ code: "club_not_found" });
+    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+
+    const block = await ctx.db
+      .query("clubBlocks")
+      .withIndex("by_club_and_user", (q) =>
+        q.eq("clubId", args.clubId).eq("userId", args.userId),
+      )
+      .unique();
+    if (block) await ctx.db.delete(block._id);
+    return null;
   },
 });

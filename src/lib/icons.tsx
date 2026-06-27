@@ -10,6 +10,8 @@ import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react-native";
 import {
   ArrowLeft01Icon,
   ArrowRight01Icon,
+  Bookmark01Icon,
+  Bookmark02Icon,
   BookmarkCheck01Icon,
   BookOpen01Icon,
   BookPlusIcon,
@@ -74,6 +76,8 @@ function make(icon: IconSvgElement): ComponentType<IconProps> {
 export const Bell = make(Notification03Icon);
 export const BookOpen = make(BookOpen01Icon);
 export const BookPlus = make(BookPlusIcon);
+export const Bookmark = make(Bookmark01Icon);      // outline — not bookmarked
+export const BookmarkFilled = make(Bookmark02Icon); // filled — bookmarked
 export const BookmarkCheck = make(BookmarkCheck01Icon);
 export const Check = make(Tick02Icon);
 export const CheckCircle2 = make(CheckmarkCircle02Icon);
