@@ -18,6 +18,14 @@ But the bigger reason Moks is the right person to build this isn't the design ba
 
 Flipbook is the collision of those two worlds: applying serious product craft to a community he deeply understands. Five years of healthcare product design taught him how to ship with restraint and care. Years of being a reader taught him what restraint and care should be in service of. This is the app he wished existed, finally being built by someone qualified to build it well.
 
+### Founding Team
+
+Flipbook is built by two complementary cofounders. **Moks** sets product direction, vision, strategy, and champions growth — the design-and-product mind and the reader who lived the problem. **Ayodeji** runs operations and process, and is the team's relationship engine: a former Programs Manager at a gaming company with a deep network, a gift for pitching, and a knack for getting Flipbook into rooms a heads-down designer never could. The dynamic is deliberate — an introverted product-and-vision founder paired with an extroverted operations-and-network founder, each covering the other's blind spot.
+
+Two parts of Ayodeji's background matter strategically. First, the network and the pitch turn business development and partnerships into a real, ownable growth engine (reflected in `go-to-market.md` § Channel Strategy) rather than something a solo introvert has to force. Second, his hands-on experience with age-gating, parental controls, and child-safety operations inside a gaming company directly de-risks the Phase 9/10 minor-safety work — the hardest compliance surface on the roadmap is exactly the territory he already knows.
+
+For planning, the team holds the conservative assumption: still part-time around day jobs (~10–15 hours/week each). The second pair of hands is treated as upside and resilience, not a reason to compress timelines yet.
+
 ### Core Values
 
 **Read alongside, not at each other.** Every product decision has to make reading-with-people feel natural, not performative. We don't add features that turn reading into a status game (streaks, leaderboards, follower counts). We add features that make it easier for two strangers reading the same chapter to feel like they're in the same room.
@@ -197,6 +205,16 @@ In scope. Buildable in 6–8 weeks of focused part-time work with Claude Code.
 
 **Each MVP feature ties to either the magic moment or the moderator's ability to start a club. Anything that doesn't is out of scope.**
 
+### Safety & Age Segmentation (required before public launch)
+
+Flipbook intends to host **children's book clubs** — minors reading and discussing inside the app. The moment minors are present, onboarding stops being a growth funnel and becomes a **safety and compliance gate**. This is a strategic constraint, not a feature: it reshapes onboarding, discovery, invites, analytics, and live audio.
+
+**The legal floor** (not legal advice — counsel review required before public/minor launch). Global App Store distribution from a Nigeria base means we inherit several regimes at once: **US COPPA** draws a hard line at **age 13** — no collection of a child's personal information without **verifiable parental consent (VPC)**, under the FTC's amended rule now in force (full-compliance deadline April 22, 2026). The **UK Children's Code** covers **everyone under 18** whenever minors are *likely to access* the service, demanding high-privacy defaults, data minimization, geolocation off, and no engagement nudges. The **EU** adds a 13–16 consent threshold. The defensible posture is to contain risk *structurally* rather than moderate it after the fact.
+
+**The model.** A neutral date-of-birth gate forks new users into three lanes — **under-13**, **13–17**, **18+**. Adults flow through the normal onboarding. **Every minor is adult-provisioned into a walled garden**: a vetted guardian/educator places the child into one specific, private, moderated club, and the child lives entirely inside that boundary — no public discovery, no stranger contact, no open audio, display-name only, high-privacy defaults forced on. The two minor lanes differ only in consent depth (under-13 = full VPC; 13–17 = lighter guardian consent + Children's Code defaults). The core magic moment (live margin reactions) works identically and safely inside a closed club, so our differentiator never depends on the risky open surfaces.
+
+**Sequencing.** The closed adult beta needs none of this. But the **age gate + 18/13-17 segmentation must ship before we open to the public**, because the Children's Code applies the instant minors are *likely to access* a public app. **Under-13 + VPC + children's-club tooling is staged** behind a kids-safety vendor (KWS or k-ID) and legal review, rolling out alongside the children's book-club push. See `prd.md` § 6B and `product-roadmap.md` Phases 9–10.
+
 ### Explicitly Out of Scope
 
 **Creator monetization (paid subscriptions, one-time purchases).** Tempting because it's the long-term marketplace business. Why deferred: the magic moment works with free creator drops; building Apple/Google IAP plus Stripe Connect creator payouts is a 4-week distraction that doesn't make MVP better. **Reconsider:** Phase 2, after we've validated reader retention and creator interest. Likely months 3–4 post-MVP.
@@ -238,6 +256,8 @@ In scope. Buildable in 6–8 weeks of focused part-time work with Claude Code.
 
 **Should Have (P1 — MVP launch if time permits, otherwise immediately post-launch).**
 
+- **Age gate + age-tier segmentation (under-13 / 13–17 / 18+) — REQUIRED before public launch.** Neutral DOB gate, "minor mode" defaults (high-privacy, non-discoverable, no stranger contact), and minor-aware guards on invites, discovery, and analytics. Not needed for the closed adult beta; a hard gate on opening to the public. See `prd.md` § 6B, roadmap Phase 9.
+- Streamlined adult onboarding — drop the real first/last-name step (display name only; data-minimization + less friction) and route new adults into first-club matchmaking instead of an empty home.
 - In-app onboarding genre selection (3 questions max) for first-club suggestions
 - Highlight (text selection on PDF) + reaction
 - Reactions reveal animation as user reaches the page
@@ -247,6 +267,7 @@ In scope. Buildable in 6–8 weeks of focused part-time work with Claude Code.
 **Could Have (P2 — Phase 2 or later).**
 
 - **Live review sessions (Phase 8 — fast-follow, the first thing after MVP launch).** Clubs schedule and hold live, Twitter Spaces–style review sessions: a host (the moderator, or a member granted hosting rights) goes live with real-time audio, members join to listen or request to speak (raise-hand), and a synchronized live text chat + reaction stream runs alongside the voice. Deliberately *not* in the launch MVP — it adds real-time audio infrastructure (a WebRTC provider on top of Convex) that would delay launch — but it's the highest-priority post-launch addition because it turns the async, page-keyed conversation into a scheduled synchronous ritual the community shows up for. Spec'd in full in `prd.md` (§ Live Review Sessions) and `product-roadmap.md` (Phase 8).
+- **Children's book clubs + under-13 support (Phase 10 — staged).** Child-safe club type, guardian/educator provisioning, verifiable parental consent via a kids-safety vendor (KWS / k-ID), and under-13 enablement. Deliberately staged after the 13+ age gate (Phase 9) ships and after legal review — it's the heaviest compliance surface and shouldn't block public launch. The highest-intent reason to build it: it's what lets children's clubs hold activities safely inside Flipbook.
 - Web companion (invite landing page, creator dashboard)
 - Creator monetization (paid subscriptions, one-time purchases) via Polar / Stripe Connect
 - System-theme auto-switching (the "Match system" toggle that maps OS dark mode to either Flip or Dark)
@@ -320,7 +341,7 @@ Success criteria: 60% of subscribers open a chapter notification within 24 hours
 
 **Legal risk: Private PDF uploads attract DMCA takedowns at scale.** Likelihood: medium. Impact: medium — manageable if handled cleanly (DMCA process), existential if mishandled (platform shutdowns, App Store removal). Mitigation: implement DMCA takedown flow before public launch; private-by-default reduces exposure; never index user uploads in search.
 
-**Execution risk: Solo founder burnout.** 10–15 hr/week + day job + Nigerian financial constraints + ambitious 6-month vision. Likelihood: medium-high. Impact: high. Mitigation: ruthless MVP scoping (this doc); each phase produces a demoable increment so the founder gets motivation hits along the way; explicit Phase 2 deferrals; CodeRabbit + Claude Code reduce review burden.
+**Execution risk: Founder burnout / bandwidth.** ~10–15 hr/week each + day jobs + Nigerian financial constraints + ambitious 6-month vision. Likelihood: medium (reduced from prior solo-founder estimate). Impact: high. Mitigation: the two-cofounder split is the primary mitigation — Moks owns product/vision/growth, Ayodeji owns operations/process/BD, so neither carries the whole load and the extroverted networking work no longer falls on an introverted designer. Plus: ruthless MVP scoping (this doc); each phase produces a demoable increment for motivation hits; explicit Phase 2 deferrals; CodeRabbit + Claude Code reduce review burden. Residual risk: a two-person team has no slack if one cofounder is unavailable — keep scope honest and timelines conservative.
 
 **Market risk: Apple/Google rules shift on creator monetization.** App Store rules around what's monetizable in-app evolve. Likelihood: low-medium. Impact: medium for Phase 2. Mitigation: route creator monetization via web checkout (Polar / Stripe) to avoid Apple/Google's 30% on creator revenue. Standard pattern (Patreon, Spotify, Substack).
 
