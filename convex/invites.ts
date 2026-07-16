@@ -54,6 +54,14 @@ export async function redeemForUser(
   await ctx.db.patch(row._id, { redeemedByUserId: userId, redeemedAt: Date.now() });
 }
 
+// Public, unauthenticated — lets WelcomeScreen decide whether to even show
+// the invite-code field. Mirrors isBetaInviteRequired() for the client.
+export const gatingEnabled = query({
+  args: {},
+  returns: v.boolean(),
+  handler: async () => isBetaInviteRequired(),
+});
+
 // Public, unauthenticated — the WelcomeScreen calls this before sign-up. Returns
 // whether a code is usable. When gating is off, everything is valid.
 export const check = query({
@@ -193,6 +201,35 @@ export const mintAndSendInvites = internalAction({
   },
 });
 
+// Follow-up broadcast op: mint (idempotently) + send the invite email to an
+// explicit list of addresses, regardless of whether they're on the waitlist.
+// Unlike mintAndSendInvites this ALWAYS sends (it's a deliberate re-send /
+// follow-up), it just avoids minting a second code for anyone who already
+// has one. Run from the Convex dashboard or CLI:
+//   mintAndSendInvitesForEmails({ emails: ["a@example.com", ...] })
+export const mintAndSendInvitesForEmails = internalAction({
+  args: { emails: v.array(v.string()) },
+  returns: v.object({ sent: v.number(), failed: v.array(v.string()) }),
+  handler: async (ctx, args) => {
+    let sent = 0;
+    const failed: string[] = [];
+    for (const rawEmail of args.emails) {
+      const email = rawEmail.trim();
+      if (!email) continue;
+      try {
+        const { code } = await ctx.runMutation(internal.invites.mintForEmail, { email });
+        await ctx.runAction(internal.invites.sendInviteEmail, { email, code });
+        await ctx.runMutation(internal.invites.markSent, { code });
+        sent += 1;
+      } catch (err) {
+        console.error(`[invite-email] Failed for ${email}:`, err);
+        failed.push(email);
+      }
+    }
+    return { sent, failed };
+  },
+});
+
 // Sends a single beta-invite email via Resend (same setup as the welcome email).
 export const sendInviteEmail = internalAction({
   args: { email: v.string(), code: v.string() },
@@ -206,7 +243,8 @@ export const sendInviteEmail = internalAction({
     const from = process.env.WAITLIST_FROM_EMAIL ?? "Moks at Flipbook <hello@useflipbook.com>";
     const subject = "Your Flipbook beta invite is here";
     const iosLink = "https://testflight.apple.com/join/DYP5aNv5";
-    const androidLink = "https://play.google.com/apps/internaltest/4701478982405329917";
+    const androidLink = "https://play.google.com/store/apps/details?id=com.flipbook.club";
+    const androidWebTestLink = "https://play.google.com/apps/testing/com.flipbook.club";
     const siteUrl = process.env.CONVEX_SITE_URL ?? "";
     const logoUrl = `${siteUrl}/assets/logo-full-light.png`;
     const appStoreBadgeUrl = `${siteUrl}/assets/badges/app-store.png`;
@@ -217,13 +255,22 @@ Your invite code:
 
   ${args.code}
 
-Getting started takes two minutes:
+GETTING STARTED
 
-1. Install the app
-   iPhone (App Store / TestFlight): ${iosLink}
-   Android (Google Play): ${androidLink}
-2. Open the app, tap "Let me in", and enter your code on the welcome screen.
-3. Build your first reading community, and bring a friend along. Books are better shared.
+iPhone:
+1. Install "TestFlight" from the App Store if you don't already have it.
+2. Open this link on your iPhone: ${iosLink}
+3. Tap Accept, then Install (or "View in TestFlight" -> Install).
+4. Open Flipbook, tap "Let me in", and enter your code above.
+
+Android:
+1. Before you tap anything: check which Google Account is active on your phone (open the Play Store app and tap your profile picture, top right) and make sure it matches the email that received this invite. If it doesn't, switch to the right account first, otherwise Google won't recognize you as a tester.
+2. Open this link: ${androidLink}
+   If that doesn't show an install option, use the web opt-in link instead: ${androidWebTestLink}
+3. Tap "Become a tester" if prompted, then "Download it on Google Play" / Install.
+4. Open Flipbook, tap "Let me in", and enter your code above.
+
+Once you're in, start your own reading room and invite your circle, a book club, a group chat, whoever you already read with. Each person you invite will need their own quick invite code to get past the door (this is a small closed beta), so just reply to this email with names or a headcount and I'll send more codes your way immediately. Don't let that be the thing that stops you: reply first, invite after.
 
 You're one of the first people inside, so anything that feels off, confusing, or delightful, I want to hear it. Just hit reply. I read every message.
 
@@ -240,39 +287,36 @@ Designer & Co-founder, Flipbook`;
 
           <p style="margin:0 0 4px;font-size:16px;line-height:1.3;">Hellooooo, Moks here. The Flipbook beta is open, and you're in.</p>
           <p style="margin:0 0 16px;font-size:16px;line-height:1.3;">Your invite code:</p>
-          <p style="margin:0 0 20px;font-size:20px;line-height:1.1;font-weight:600;letter-spacing:1px;">${args.code}</p>
+          <p style="margin:0 0 28px;font-size:20px;line-height:1.1;font-weight:600;letter-spacing:1px;">${args.code}</p>
 
-          <p style="margin:0 0 12px;font-size:16px;line-height:1.3;">Getting started takes two minutes:</p>
+          <p style="margin:0 0 6px;font-size:16px;line-height:1.3;font-weight:600;">📱 On iPhone</p>
+          <ol style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.5;">
+            <li>Install <strong>TestFlight</strong> from the App Store if you don't already have it.</li>
+            <li>On your iPhone, open <a href="${iosLink}" style="color:#3b3a6d;">this TestFlight link</a>.</li>
+            <li>Tap <strong>Accept</strong>, then <strong>Install</strong>.</li>
+            <li>Open Flipbook, tap "Let me in", and enter your code above.</li>
+          </ol>
 
-          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 12px;">
-            <tr>
-              <td style="font-size:16px;line-height:1.3;vertical-align:top;padding-right:6px;">1.</td>
-              <td style="font-size:16px;line-height:1.3;">Install the app</td>
-            </tr>
-          </table>
-          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+          <p style="margin:0 0 6px;font-size:16px;line-height:1.3;font-weight:600;">🤖 On Android</p>
+          <ol style="margin:0 0 8px;padding-left:20px;font-size:15px;line-height:1.5;">
+            <li><strong>Before you tap anything:</strong> open the Play Store app and tap your profile picture (top right) to check which Google Account is active. It needs to match the email that received this invite, or Google won't recognize you as a tester — switch accounts first if it doesn't match.</li>
+            <li>Open <a href="${androidLink}" style="color:#3b3a6d;">this Play Store link</a>. If it doesn't show an install option, use the <a href="${androidWebTestLink}" style="color:#3b3a6d;">web opt-in link</a> instead.</li>
+            <li>Tap <strong>"Become a tester"</strong> if prompted, then Install.</li>
+            <li>Open Flipbook, tap "Let me in", and enter your code above.</li>
+          </ol>
+
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
             <tr>
               <td style="padding-right:8px;">
                 <a href="${iosLink}"><img src="${appStoreBadgeUrl}" alt="Download on the App Store" width="120" height="40" style="display:block;border:0;" /></a>
               </td>
               <td>
-                <a href="${androidLink}"><img src="${googlePlayBadgeUrl}" alt="Get it on Google Play" width="135" height="40" style="display:block;border:0;" /></a>
+                <a href="${androidLink}"><img src="${googlePlayBadgeUrl}" alt="Get it on Google Play" width="103" height="40" style="display:block;border:0;" /></a>
               </td>
             </tr>
           </table>
 
-          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
-            <tr>
-              <td style="font-size:16px;line-height:1.3;vertical-align:top;padding-right:6px;">2.</td>
-              <td style="font-size:16px;line-height:1.3;">Open the app, tap "Let me in", and enter your code on the welcome screen.</td>
-            </tr>
-          </table>
-          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
-            <tr>
-              <td style="font-size:16px;line-height:1.3;vertical-align:top;padding-right:6px;">3.</td>
-              <td style="font-size:16px;line-height:1.3;">Build your first reading community, and bring a friend along. Books are better shared.</td>
-            </tr>
-          </table>
+          <p style="margin:0 0 20px;font-size:16px;line-height:1.4;">Once you're in, <strong>start your own reading room and invite your circle</strong> — a book club, a group chat, whoever you already read with. Each person you invite will need their own quick invite code to get past the door (this is a small closed beta), so just <strong>reply to this email with names or a headcount and I'll send more codes your way immediately</strong>. Don't let that be the thing that stops you — reply first, invite after.</p>
 
           <p style="margin:0 0 20px;font-size:16px;line-height:1.3;">You're one of the first people inside, so anything that feels off, confusing, or delightful, I want to hear it. Just hit reply. I read every message.</p>
 
