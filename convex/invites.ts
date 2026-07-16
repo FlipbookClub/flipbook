@@ -205,28 +205,83 @@ export const sendInviteEmail = internalAction({
     }
     const from = process.env.WAITLIST_FROM_EMAIL ?? "Moks at Flipbook <hello@useflipbook.com>";
     const subject = "Your Flipbook beta invite is here";
-    const text = `Hey 👋, Moks here.
+    const iosLink = "https://testflight.apple.com/join/DYP5aNv5";
+    const androidLink = "https://play.google.com/apps/internaltest/4701478982405329917";
+    const siteUrl = process.env.CONVEX_SITE_URL ?? "";
+    const logoUrl = `${siteUrl}/assets/logo-full-light.png`;
+    const appStoreBadgeUrl = `${siteUrl}/assets/badges/app-store.png`;
+    const googlePlayBadgeUrl = `${siteUrl}/assets/badges/google-play.png`;
 
-The Flipbook beta is open and you're in. Your invite code:
+    const text = `Hellooooo, Moks here. The Flipbook beta is open, and you're in.
+Your invite code:
 
   ${args.code}
 
-Open the app, tap "Let me in", and enter it on the welcome screen. Then build your first reading community and bring a friend.
+Getting started takes two minutes:
 
-Can't wait to hear what you think — just hit reply.
+1. Install the app
+   iPhone (App Store / TestFlight): ${iosLink}
+   Android (Google Play): ${androidLink}
+2. Open the app, tap "Let me in", and enter your code on the welcome screen.
+3. Build your first reading community, and bring a friend along. Books are better shared.
 
+You're one of the first people inside, so anything that feels off, confusing, or delightful, I want to hear it. Just hit reply. I read every message.
+
+Happy reading,
 Victory Moks
 Designer & Co-founder, Flipbook`;
-    const html = `<!doctype html><html><body style="margin:0;padding:0;background:#f7f3e3;">
-  <div style="max-width:520px;margin:0 auto;padding:40px 28px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#3b3a6d;">
-    <img src="https://www.useflipbook.com/logo/wordmark-light.png" alt="Flipbook" width="150" height="36" style="display:block;width:150px;height:auto;margin-bottom:28px;border:0;" />
-    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Hey 👋, Moks here. The Flipbook beta is open — and you're in.</p>
-    <p style="margin:0 0 12px;font-size:16px;line-height:1.6;">Your invite code:</p>
-    <p style="margin:0 0 24px;font-size:26px;line-height:1.2;font-weight:700;letter-spacing:2px;color:#3b3a6d;">${args.code}</p>
-    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Open the app, tap <strong>"Let me in"</strong>, and enter it on the welcome screen. Then build your first reading community and bring a friend.</p>
-    <p style="margin:0 0 20px;font-size:16px;line-height:1.6;">Can't wait to hear what you think — just hit reply.</p>
-    <p style="margin:28px 0 0;font-size:16px;line-height:1.5;">Victory Moks<br/><span style="color:#6b6a93;font-size:14px;">Designer &amp; Co-founder, Flipbook</span></p>
-  </div></body></html>`;
+
+    const html = `<!doctype html><html><body style="margin:0;padding:0;background:#3b3a6d;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#3b3a6d;padding:45px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fdfdfd;border-radius:32px;">
+        <tr><td style="padding:40px 32px;font-family:Raleway,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#3b3a6d;">
+          <img src="${logoUrl}" alt="Flipbook" width="140" height="34" style="display:block;width:140px;height:auto;margin-bottom:28px;border:0;" />
+
+          <p style="margin:0 0 4px;font-size:16px;line-height:1.3;">Hellooooo, Moks here. The Flipbook beta is open, and you're in.</p>
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.3;">Your invite code:</p>
+          <p style="margin:0 0 20px;font-size:20px;line-height:1.1;font-weight:600;letter-spacing:1px;">${args.code}</p>
+
+          <p style="margin:0 0 12px;font-size:16px;line-height:1.3;">Getting started takes two minutes:</p>
+
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 12px;">
+            <tr>
+              <td style="font-size:16px;line-height:1.3;vertical-align:top;padding-right:6px;">1.</td>
+              <td style="font-size:16px;line-height:1.3;">Install the app</td>
+            </tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+            <tr>
+              <td style="padding-right:8px;">
+                <a href="${iosLink}"><img src="${appStoreBadgeUrl}" alt="Download on the App Store" width="120" height="40" style="display:block;border:0;" /></a>
+              </td>
+              <td>
+                <a href="${androidLink}"><img src="${googlePlayBadgeUrl}" alt="Get it on Google Play" width="135" height="40" style="display:block;border:0;" /></a>
+              </td>
+            </tr>
+          </table>
+
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 8px;">
+            <tr>
+              <td style="font-size:16px;line-height:1.3;vertical-align:top;padding-right:6px;">2.</td>
+              <td style="font-size:16px;line-height:1.3;">Open the app, tap "Let me in", and enter your code on the welcome screen.</td>
+            </tr>
+          </table>
+          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 20px;">
+            <tr>
+              <td style="font-size:16px;line-height:1.3;vertical-align:top;padding-right:6px;">3.</td>
+              <td style="font-size:16px;line-height:1.3;">Build your first reading community, and bring a friend along. Books are better shared.</td>
+            </tr>
+          </table>
+
+          <p style="margin:0 0 20px;font-size:16px;line-height:1.3;">You're one of the first people inside, so anything that feels off, confusing, or delightful, I want to hear it. Just hit reply. I read every message.</p>
+
+          <p style="margin:0;font-size:16px;line-height:1.3;">Happy reading,<br/>Victory Moks<br/><span style="color:#6b6a93;">Designer &amp; Co-founder, Flipbook</span></p>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+  </body></html>`;
 
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -234,7 +289,7 @@ Designer & Co-founder, Flipbook`;
       body: JSON.stringify({
         from,
         to: [args.email],
-        reply_to: "useflipbook@gmail.com",
+        reply_to: "hello@useflipbook.com",
         subject,
         text,
         html,

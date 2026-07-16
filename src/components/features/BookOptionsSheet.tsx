@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { BookOpen, BookmarkCheck, Inbox, Pencil, Trash2, X } from "@/lib/icons";
 import { useMutation } from "convex/react";
 
@@ -47,6 +48,7 @@ export function BookOptionsSheet({
   onDeleted,
 }: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const setCurrentlyReading = useMutation(api.books.setCurrentlyReading);
   const moveToLibrary = useMutation(api.books.moveToLibrary);
   const removeBook = useMutation(api.books.remove);
@@ -107,7 +109,7 @@ export function BookOptionsSheet({
           borderTopRightRadius: radius.lg,
           paddingHorizontal: spacing.s4,
           paddingTop: spacing.s3,
-          paddingBottom: spacing.s5,
+          paddingBottom: spacing.s5 + insets.bottom,
           gap: spacing.s4,
         }}
       >

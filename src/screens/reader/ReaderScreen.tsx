@@ -4,10 +4,10 @@ import {
   Dimensions,
   Modal,
   Pressable,
-  SafeAreaView,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import Pdf from "react-native-pdf";
 import { Bookmark, BookmarkFilled, Settings2, Smile, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
@@ -691,6 +691,7 @@ function ReaderCustomizationSheet({
   onChangeMode: (mode: "paged" | "scroll") => void;
 }) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const options: Array<{ key: "paged" | "scroll"; label: string }> = [
     { key: "paged", label: "Page by page" },
     { key: "scroll", label: "Continuous scroll" },
@@ -709,7 +710,7 @@ function ReaderCustomizationSheet({
           borderTopRightRadius: 16,
           paddingHorizontal: spacing.s5,
           paddingTop: spacing.s4,
-          paddingBottom: spacing.s6,
+          paddingBottom: spacing.s6 + insets.bottom,
           gap: spacing.s4,
         }}
       >

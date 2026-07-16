@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useMutation } from "convex/react";
 
 import { palette } from "@/theme/palette";
@@ -33,6 +34,7 @@ export function MemberActionSheet({
   onActionDone,
 }: MemberActionSheetProps) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const removeMember = useMutation(api.memberships.removeMember);
   const blockMember = useMutation(api.memberships.blockMember);
   const [acting, setActing] = useState(false);
@@ -105,7 +107,9 @@ export function MemberActionSheet({
             backgroundColor: colors.surfacePrimary,
             borderTopLeftRadius: radius.lg,
             borderTopRightRadius: radius.lg,
-            padding: spacing.s5,
+            paddingHorizontal: spacing.s5,
+            paddingTop: spacing.s5,
+            paddingBottom: spacing.s5 + insets.bottom,
             gap: spacing.s2,
           }}
           onPress={(e) => e.stopPropagation()}

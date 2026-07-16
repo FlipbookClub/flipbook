@@ -87,6 +87,41 @@ export function SignInScreen({ navigation }: Props) {
           return;
         }
       }
+      // Real 2FA on the account (authenticator app, SMS, or email code as a
+      // second factor). Prefer TOTP (no round-trip needed to "send" a code),
+      // then phone, then email — whichever the account actually has enabled.
+      if (attempt.status === "needs_second_factor") {
+        const factors = attempt.supportedSecondFactors ?? [];
+        const totp = factors.find((f) => f.strategy === "totp");
+        const phone = factors.find((f) => f.strategy === "phone_code");
+        const emailFactor = factors.find((f) => f.strategy === "email_code");
+        if (totp) {
+          navigation.navigate("VerifyEmail", {
+            email: email.trim(),
+            flow: "second_factor",
+            secondFactorStrategy: "totp",
+          });
+          return;
+        }
+        if (phone) {
+          await signIn.prepareSecondFactor({ strategy: "phone_code" });
+          navigation.navigate("VerifyEmail", {
+            email: email.trim(),
+            flow: "second_factor",
+            secondFactorStrategy: "phone_code",
+          });
+          return;
+        }
+        if (emailFactor) {
+          await signIn.prepareSecondFactor({ strategy: "email_code" });
+          navigation.navigate("VerifyEmail", {
+            email: email.trim(),
+            flow: "second_factor",
+            secondFactorStrategy: "email_code",
+          });
+          return;
+        }
+      }
       setFormError(`Sign-in incomplete (${attempt.status}). Try again or contact support.`);
     } catch (err) {
       // Clerk reports session_exists when a valid session is still cached

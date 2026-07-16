@@ -16,10 +16,8 @@ import { internalAction } from "./_generated/server";
 // Copy is from docs/waitlist-landing-page-copy-v4.md ("Welcome email (T+0)").
 
 const DEFAULT_FROM = "Moks at Flipbook <hello@useflipbook.com>";
-// Replies route to a real inbox: useflipbook.com has no MX/mailbox yet, so
-// hello@ can send but can't receive. Temporary until the Zoho hello@ mailbox
-// is live — then switch this back to hello@useflipbook.com.
-const REPLY_TO = "useflipbook@gmail.com";
+// hello@useflipbook.com is live via Cloudflare Email Routing.
+const REPLY_TO = "hello@useflipbook.com";
 const SUBJECT = "You're on the list — one quick question";
 
 function buildText(audience: "reader" | "creator"): string {

@@ -5,9 +5,9 @@ import {
   Text,
   TextInput,
   View,
-  Platform,
 } from "react-native";
-import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { KeyboardStickyView } from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MessageSquare, X } from "@/lib/icons";
 
 import { Button } from "@/components/ui/Button";
@@ -40,6 +40,7 @@ interface Props {
 
 export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false }: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [stage, setStage] = useState<Stage>(replyMode ? "comment" : "picker");
   const [text, setText] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -86,14 +87,20 @@ export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false
   };
 
   return (
-    <Modal visible={visible} transparent animationType="fade" onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      transparent
+      animationType="fade"
+      onRequestClose={onClose}
+      statusBarTranslucent
+      navigationBarTranslucent
+    >
       <Pressable
         onPress={onClose}
         style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.45)" }}
         accessibilityLabel="Dismiss reaction picker"
       />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      <KeyboardStickyView
         style={{ position: "absolute", left: 0, right: 0, bottom: 0 }}
       >
         <View
@@ -103,7 +110,7 @@ export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false
             borderTopRightRadius: radius.lg,
             paddingHorizontal: spacing.s5,
             paddingTop: spacing.s4,
-            paddingBottom: spacing.s5,
+            paddingBottom: spacing.s5 + insets.bottom,
             gap: spacing.s4,
           }}
         >
@@ -240,7 +247,7 @@ export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false
             </View>
           )}
         </View>
-      </KeyboardAvoidingView>
+      </KeyboardStickyView>
     </Modal>
   );
 }
