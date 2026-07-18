@@ -43,10 +43,12 @@ export default async function JoinPage({
           <span className="pulse-dot" aria-hidden /> Community invite
         </span>
 
-        <h1 className="display text-3xl">You&rsquo;re invited to read together</h1>
+        <h1 className="display text-3xl">Almost there.</h1>
 
         <p className="text-balance text-text-muted">
-          Someone invited you to their community on Flipbook. Open the app to join.
+          Looks like someone invited you to a Reading Room. Install Flipbook
+          first, then come back and tap this link again to join the
+          conversation.
         </p>
 
         <div className="w-full rounded-xl bg-[var(--code-bg)] px-4 py-3 font-mono text-lg tracking-[0.2em] text-text">
@@ -60,13 +62,20 @@ export default async function JoinPage({
           Open in Flipbook
         </a>
 
-        <p className="text-sm text-text-subtle">
-          Don&rsquo;t have the app yet? Flipbook is in private beta —{" "}
-          <a href="/" className="text-accent underline-offset-4 hover:underline">
-            join the waitlist
+        <div className="flex w-full flex-col gap-3 sm:flex-row">
+          <a
+            href="https://testflight.apple.com/join/DYP5aNv5"
+            className="flex-1 rounded-full border border-line px-6 py-3 text-center text-sm font-semibold text-text transition-colors hover:border-accent hover:text-accent"
+          >
+            Get Flipbook for iPhone
           </a>
-          .
-        </p>
+          <a
+            href="https://groups.google.com/g/flipbook-test/"
+            className="flex-1 rounded-full border border-line px-6 py-3 text-center text-sm font-semibold text-text transition-colors hover:border-accent hover:text-accent"
+          >
+            Get Flipbook for Android
+          </a>
+        </div>
       </div>
     </main>
   );

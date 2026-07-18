@@ -21,16 +21,25 @@ const items: Array<{ q: string; a: React.ReactNode }> = [
     a: "You still can. Solo reading works. The clubs are there when you want them.",
   },
   {
-    q: "When does the beta open?",
-    a: "Soon. Design-partner clubs get in first; the rest of the waitlist follows the same day.",
+    q: "Do I need an invite code?",
+    a: "No. Flipbook is now open in beta. Just install the app, tap \"Let me in,\" and start reading. No invite code required.",
   },
   {
     q: "Is it free?",
     a: "Yes — for the beta, and free forever for every founding club. A Pro tier comes later for the obsessed. It will never be a paywall on reading together.",
   },
   {
-    q: "iOS and Android?",
-    a: "Both, from day one. Mobile-first by design. A web companion comes later.",
+    q: "How do I get Flipbook?",
+    a: (
+      <>
+        Both iOS and Android, from day one. Mobile-first by design, with a
+        web companion later. Download links are on our{" "}
+        <a href="/get-flipbook" className="text-accent underline-offset-4 hover:underline">
+          Get Flipbook
+        </a>{" "}
+        page.
+      </>
+    ),
   },
 ];
 

@@ -2,9 +2,9 @@ import { Nav } from "@/components/Nav";
 import { Comparison } from "@/components/sections/Comparison";
 import { CreatorCard } from "@/components/sections/CreatorCard";
 import { Faq } from "@/components/sections/Faq";
-import { FinalCta } from "@/components/sections/FinalCta";
 import { Footer } from "@/components/sections/Footer";
 import { FounderNote } from "@/components/sections/FounderNote";
+import { GetFlipbook } from "@/components/sections/GetFlipbook";
 import { Hero } from "@/components/sections/Hero";
 import { HowItWorks } from "@/components/sections/HowItWorks";
 import { Marquee } from "@/components/sections/Marquee";
@@ -27,7 +27,7 @@ export default function Page() {
         <FounderNote />
         <CreatorCard />
         <Faq />
-        <FinalCta />
+        <GetFlipbook />
       </main>
       <Footer />
     </>

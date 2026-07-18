@@ -7,7 +7,7 @@ import { ThemeToggle } from "./ThemeToggle";
 import { Wordmark } from "./Wordmark";
 
 // Top nav. Reading-room calm: brand wordmark left, theme toggle + a single
-// "Get the beta" CTA right. The page itself is the menu, so there's no link
+// "Get Flipbook" CTA right. The page itself is the menu, so there's no link
 // list — just the one action the whole page points to. A faint background +
 // hairline fades in once you've scrolled past the hero so the bar stays
 // legible over content.
@@ -39,10 +39,10 @@ export function Nav() {
         <div className="flex items-center gap-3 md:gap-4">
           <ThemeToggle />
           <Link
-            href="#get-the-beta"
+            href="/get-flipbook"
             className="hidden h-10 items-center rounded-full bg-accent px-5 text-[13px] font-semibold tracking-wide text-white transition-colors duration-300 hover:bg-accent-strong sm:inline-flex"
           >
-            Get the beta
+            Get Flipbook
           </Link>
         </div>
       </div>
