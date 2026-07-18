@@ -296,12 +296,35 @@ export default defineSchema({
   users: defineTable({
     clerkId: v.string(),                 // Stable Clerk user ID
     displayName: v.string(),             // Required, max 50 chars — the public-facing handle
-    firstName: v.string(),               // From Figma onboarding step "User details"
-    lastName: v.string(),                // From Figma onboarding step "User details"
+    // Phase 9: real name is no longer collected at onboarding (data
+    // minimization + friction). Optional/legacy only.
+    firstName: v.optional(v.string()),
+    lastName: v.optional(v.string()),
     avatarUrl: v.optional(v.string()),   // Storage URL or external (Clerk, social)
     bio: v.optional(v.string()),         // Max 200 chars
     genres: v.array(v.string()),         // From onboarding; predefined enum list
     pushToken: v.optional(v.string()),   // Expo push token; updated on app launch
+    // ---- Phase 9: age segmentation & minor safety ----
+    // Age tier drives "minor mode" across the app. Optional so existing
+    // (pre-Phase-9) adult accounts remain valid; backfill to "adult".
+    ageTier: v.optional(v.union(
+      v.literal("under13"),              // Staged (Phase 10) — blocked at signup until VPC ships
+      v.literal("teen"),                 // 13–17 — restricted "minor mode"
+      v.literal("adult"),                // 18+ — full experience
+    )),
+    // Year only (data minimization — we don't retain full DOB after gating;
+    // store the derived tier + birthYear for re-derivation at birthdays).
+    birthYear: v.optional(v.number()),
+    accountType: v.optional(v.union(
+      v.literal("standard"),             // Self-serve adult
+      v.literal("minor"),                // Adult-provisioned under-18 account
+      v.literal("guardian"),             // An adult who manages/consents for minors
+    )),
+    guardianUserId: v.optional(v.id("users")),     // The vetted adult who provisioned a minor
+    guardianContact: v.optional(v.string()),       // Guardian email/phone for consent + notices
+    // Minor-mode flags. Enforced server-side; never trust the client.
+    isMinor: v.optional(v.boolean()),              // Derived from ageTier; denormalized for fast guards
+    isDiscoverable: v.optional(v.boolean()),       // false for all minors (Children's Code default)
     proSubscriptionStatus: v.union(
       v.literal("free"),
       v.literal("active"),
@@ -312,7 +335,8 @@ export default defineSchema({
     lastActiveAt: v.number(),
   })
     .index("by_clerk_id", ["clerkId"])
-    .index("by_last_active", ["lastActiveAt"]),
+    .index("by_last_active", ["lastActiveAt"])
+    .index("by_guardian", ["guardianUserId"]),     // Phase 9/10 — list a guardian's managed minors
 
   clubs: defineTable({
     name: v.string(),                    // Required, max 60 chars
@@ -337,6 +361,14 @@ export default defineSchema({
       membersCanHostSessions: v.optional(v.boolean()),
     }),
     bookId: v.optional(v.id("books")),   // Currently-reading book; null for creator clubs that drop chapters
+    // ---- Phase 9/10: child-safe clubs ----
+    // "adult" = normal club (default). "childSafe" = a moderated walled garden
+    // for minors; forces minor-mode interaction rules on ALL members, is never
+    // surfaced in public discovery, and may only be created by a verified
+    // guardian/educator. Optional → undefined means "adult".
+    audience: v.optional(v.union(v.literal("adult"), v.literal("childSafe"))),
+    minAge: v.optional(v.number()),      // For child-safe clubs (e.g. 13). Informational + enforcement hint.
+    guardianModeratorVerified: v.optional(v.boolean()),  // The moderator passed guardian/educator verification
     inviteCode: v.string(),              // Unique short code for invite URLs
     memberCount: v.number(),             // Denormalized for fast list rendering
     createdAt: v.number(),
@@ -516,6 +548,35 @@ export default defineSchema({
   })
     .index("by_session_and_created", ["sessionId", "createdAt"])
     .index("by_user_and_created", ["userId", "createdAt"]),   // Rate-limit lookup
+
+  // ---- Phase 9/10: parental-consent + age-assurance audit trail ----
+  // COPPA/GDPR-K require retaining a record of how/when consent was obtained.
+  // For 13–17 this captures guardian acknowledgement; for under-13 (Phase 10)
+  // it captures the vendor-verified VPC event. The actual verification is done
+  // by the kids-safety vendor (KWS / k-ID) — we store the result + reference,
+  // never raw ID documents.
+  parentalConsents: defineTable({
+    minorUserId: v.id("users"),
+    guardianContact: v.string(),         // Email/phone the consent request went to
+    guardianUserId: v.optional(v.id("users")),
+    purpose: v.union(
+      v.literal("teen_onboarding"),      // 13–17 guardian consent/notice
+      v.literal("under13_vpc"),          // Under-13 verifiable parental consent (Phase 10)
+    ),
+    status: v.union(
+      v.literal("pending"),
+      v.literal("granted"),
+      v.literal("denied"),
+      v.literal("revoked"),
+    ),
+    method: v.optional(v.string()),      // Vendor method, e.g. "kws_text_plus", "kid_face_match_id"
+    vendor: v.optional(v.string()),      // "kws" | "k-id" | "manual"
+    vendorReference: v.optional(v.string()),  // Opaque vendor transaction/consent ID
+    requestedAt: v.number(),
+    resolvedAt: v.optional(v.number()),
+  })
+    .index("by_minor", ["minorUserId"])
+    .index("by_status", ["status"]),
 });
 ```
 
@@ -535,8 +596,11 @@ export default defineSchema({
 - **`liveSessions` 1:N `sessionParticipants`** (Phase 8) — A session has many participants, each with a role (host/speaker/listener) and presence state.
 - **`liveSessions` 1:N `sessionMessages`** (Phase 8) — A session has many live-chat messages and emoji reactions.
 - **`liveSessions` 0:1 `books`/`chapters`** (Phase 8) — A session may optionally be anchored to the book or chapter under review.
+- **`users` (guardian) 1:N `users` (minors)** (Phase 9/10) — A guardian account can manage multiple minor accounts via `guardianUserId`.
+- **`users` (minor) 1:N `parentalConsents`** (Phase 9/10) — A minor has one or more consent records (onboarding consent, later re-consent/revocation).
+- **`clubs` (childSafe) — restricted membership** (Phase 9/10) — A child-safe club's members are minors plus their vetted guardian/educator moderator; adult strangers cannot join.
 
-**Cascade behavior.** Convex doesn't have foreign-key cascades — implement manually. When a club is deleted: delete memberships, books (and storage), chapters (and storage), reactions, progress entries, live sessions (and their participants + messages), for that club. When a user is deleted: anonymize their reactions and session messages (set `userId` to a "deleted" sentinel), remove their memberships and session-participant rows, delete their progress, delete their notifications. When a live session ends: keep the row (status `ended`) and its messages for history; mark all participants `isPresent: false`.
+**Cascade behavior.** Convex doesn't have foreign-key cascades — implement manually. When a club is deleted: delete memberships, books (and storage), chapters (and storage), reactions, progress entries, live sessions (and their participants + messages), for that club. When a user is deleted: anonymize their reactions and session messages (set `userId` to a "deleted" sentinel), remove their memberships and session-participant rows, delete their progress, delete their notifications. When a **guardian** is deleted or revokes consent (Phase 9/10): their managed **minor** accounts are deactivated (a minor cannot exist on the platform without an active consenting guardian) and the `parentalConsents` record is marked `revoked` but **retained** for the legally required audit period. When a live session ends: keep the row (status `ended`) and its messages for history; mark all participants `isPresent: false`.
 
 ### Indexes
 
@@ -558,6 +622,9 @@ The indexes defined inline in the schema above cover all common query patterns:
 - `liveSessions.by_status_and_scheduled` (Phase 8) — upcoming-session reminders (cron) + "live now" surfacing
 - `sessionParticipants.by_session_present` (Phase 8) — render the live roster (speakers + listeners)
 - `sessionMessages.by_session_and_created` (Phase 8) — load the live chat in order
+- `users.by_guardian` (Phase 9/10) — list the minors a guardian manages
+- `parentalConsents.by_minor` (Phase 9/10) — a minor's consent history
+- `parentalConsents.by_status` (Phase 9/10) — find pending consents (reminders) / revoked (enforcement)
 
 -----
 
@@ -1333,7 +1400,7 @@ A live review session is a **Twitter Spaces–style live audio room scoped to a 
 
 **Architecture split (important).** Audio media is carried by **LiveKit Cloud** (a managed WebRTC SFU — see § Dependencies). **Convex owns everything else**: scheduling, session lifecycle/state machine, participant roster + roles, raise-hand, presence, and the live text chat (which rides Convex's existing reactivity, exactly like margin reactions). The LiveKit room name **is** the session's Convex document `_id`, so the two systems never drift. Clients get a short-lived LiveKit access token from a Convex action that signs it with the LiveKit API secret server-side — the secret never reaches the device.
 
-**Why this split:** the founder is solo, part-time, and budget-constrained. Building custom WebRTC audio is out of the question; a managed SFU with a generous free tier (LiveKit Cloud) gives production-grade audio with a documented React Native SDK, while Convex — already in the stack and already reactive — handles the parts it's best at for free.
+**Why this split:** the team is small, part-time, and budget-constrained. Building custom WebRTC audio is out of the question; a managed SFU with a generous free tier (LiveKit Cloud) gives production-grade audio with a documented React Native SDK, while Convex — already in the stack and already reactive — handles the parts it's best at for free.
 
 ### 6A.2 Session State Machine
 
@@ -1498,6 +1565,131 @@ Acceptance Criteria:
 - **Rate-limit abuse in chat:** server-side cap (10/10s); surface a gentle "Easy there — give it a sec."
 - **LiveKit outage / token mint failure:** fail gracefully to a **text-only** session (chat + reactions still work via Convex); banner: "Audio's having a moment — chat's still live."
 - **App backgrounded by a speaker:** auto-mute their mic on background; restore on foreground.
+
+-----
+
+## 6B. Onboarding, Age Segmentation & Minor Safety (Phases 9–10)
+
+> **Not legal advice.** This section specifies the build. Flipbook must obtain a legal review of its COPPA / UK Children's Code / EU GDPR-K / Nigeria NDPR obligations before opening to the public or admitting any minor. The amended FTC COPPA Rule is in force with a full-compliance deadline of **April 22, 2026**.
+>
+> **Phasing.** **Phase 9** (age gate + 13–17/18+ segmentation + minor-mode guards) is a **hard prerequisite for public launch** — but is NOT needed for the closed adult beta. **Phase 10** (child-safe clubs, guardian provisioning, verifiable parental consent via a vendor, under-13 enablement) is **staged** and gated behind a kids-safety vendor integration + legal sign-off.
+
+### 6B.1 Goal & Model
+
+Onboarding must **segment, protect, and cater to minors** without breaking the WhatsApp-easy adult flow. The model: a **neutral date-of-birth gate** forks every new user into three age lanes — **under-13 / 13–17 / 18+** — and **all under-18 users enter as an adult-provisioned walled garden** (a vetted guardian/educator places them into one specific, private, moderated club). The age tier governs *consent depth* and *capabilities*, not the entry door. Minors are never discoverable, never in contact with strangers, and only in **supervised, club-internal** live audio.
+
+**Risk is contained structurally** (minors can't reach the dangerous surfaces) rather than via after-the-fact moderation.
+
+### 6B.2 The Age Gate (all users, Phase 9)
+
+- A **neutral DOB screen** appears immediately after Welcome, *before* account creation. Ask for date of birth — never "Are you over 18?" (a non-neutral gate nudges lying and is disfavored under the Children's Code).
+- Compute the age tier; **store `birthYear` + derived `ageTier` only** (data minimization — do not retain the full DOB beyond what's needed).
+- **Anti-retry:** persist the gate result on-device (and server-side once an account exists) so a user can't re-answer to "age up." If a user fails the gate (e.g., under-13 while under-13 is staged off), do not let them silently retry with a new birthdate.
+- The gate forks to: **18+ → adult onboarding**; **13–17 → minor provisioning flow**; **under-13 → blocked in Phase 9** with a friendly "ask a grown-up" message; **enabled via VPC in Phase 10**.
+
+### 6B.3 Adult Lane (18+, Phase 9)
+
+Streamlines the current flow: **remove the real first/last-name step** (display name only — minimization + less friction), keep genre selection (≤3), then route into **first-club matchmaking** (suggested active public clubs by genre, the inviting club if they arrived via link, or "paste an invite") instead of dumping them on an empty home. Adults are the only accounts that can create clubs; creating a **child-safe** club requires passing guardian/educator verification (Phase 10).
+
+### 6B.4 Minor Lanes (13–17 now, under-13 staged; adult-provisioned)
+
+A minor cannot self-provision. When the gate detects a minor:
+
+1. Onboarding pivots from "create your account" to **"a grown-up needs to set this up."**
+2. It collects a **guardian email/phone** and creates a `pending` `parentalConsents` record.
+3. The guardian receives a consent request and completes it: **13–17 → guardian acknowledgement/consent** (lighter); **under-13 → full verifiable parental consent** via the vendor (Phase 10).
+4. On `granted`, the minor account activates **inside the specific club they were invited to**, with **minor-mode** defaults locked on. On `denied`/timeout, the account is not created.
+
+Minors get **display-name only** (no real name, no precise location, minimal profile), high-privacy defaults, and are **non-discoverable**.
+
+### 6B.5 "Minor Mode" — Enforced Rules (server-side, Phase 9)
+
+When `isMinor === true`, the platform enforces, in Convex (never client-trusted):
+
+- **No public discovery** — minors can't browse the discovery feed and don't appear in it (`isDiscoverable: false`).
+- **No self-join / no stranger contact** — minors can only be in clubs an adult provisioned them into; **invite-link auto-join is disabled for minors** (an invite tapped by a minor routes to the guardian-provisioning flow, never an auto-add).
+- **Child-safe clubs only** — a minor can only be a member of `audience: "childSafe"` clubs; adult-only clubs reject minor membership and vice-versa for strangers.
+- **No open audio** — minors may join **only** club-internal live sessions hosted by their vetted adult (see § 6A); never public/mixed rooms.
+- **No third-party data sharing / no minor analytics** — analytics and any third-party SDKs (e.g., the PostHog integration, TASK-091) **must not fire on minor accounts** without separate consent. Treat minors as analytics-excluded by default.
+- **Data minimization & retention** — collect only what's necessary; honor deletion; retain consent records for the required audit window only.
+
+### 6B.6 Functional Requirements
+
+**FR-042: Neutral age gate**
+Priority: P1 (Phase 9 — required before public launch)
+Description: A neutral DOB gate after Welcome computes an age tier (under13/teen/adult), stores `birthYear` + `ageTier`, and forks onboarding accordingly. Anti-retry enforced.
+Acceptance Criteria:
+- The gate asks for date of birth, not a yes/no age question.
+- Under-13 is blocked with an "ask a grown-up" message while Phase 10 is off.
+- A user cannot change their answer to bypass the gate (persisted result).
+
+**FR-043: Streamlined adult onboarding**
+Priority: P1 (Phase 9)
+Description: 18+ users complete display name + genres (no real name) and are routed into first-club matchmaking.
+Acceptance Criteria:
+- No first/last-name screen in the new-user flow.
+- After setup, the adult lands on suggested clubs / inviting club / paste-invite — not an empty home.
+
+**FR-044: Minor provisioning + guardian consent (13–17)**
+Priority: P1 (Phase 9)
+Description: A detected 13–17 user routes to a guardian-provisioning flow that collects guardian contact, records a `parentalConsents` row, and activates the minor account only after guardian consent.
+Acceptance Criteria:
+- No minor account is active before consent status is `granted`.
+- The activated account has `isMinor: true`, `isDiscoverable: false`, `accountType: "minor"`, and a `guardianUserId`/`guardianContact`.
+
+**FR-045: Minor-mode enforcement**
+Priority: P0 for any build that admits minors (Phase 9)
+Description: All minor-mode rules in § 6B.5 are enforced server-side.
+Acceptance Criteria:
+- A minor cannot appear in or query the discovery feed.
+- An invite link tapped by a minor never auto-joins; it routes to guardian provisioning.
+- A minor cannot join an `audience: "adult"` club; analytics SDKs do not fire for minors.
+
+**FR-046: Child-safe club type**
+Priority: P1 (Phase 10)
+Description: A verified guardian/educator can create an `audience: "childSafe"` club that forces minor-mode interaction rules on all members and is excluded from public discovery.
+Acceptance Criteria:
+- Creating a child-safe club requires `guardianModeratorVerified: true`.
+- Child-safe clubs never surface in discovery; their live sessions are host-supervised and club-internal only.
+
+**FR-047: Verifiable parental consent for under-13 (vendor)**
+Priority: P1 (Phase 10 — gated on legal sign-off)
+Description: Under-13 onboarding completes a verifiable-parental-consent flow via a kids-safety vendor (KWS or k-ID); the result is recorded in `parentalConsents` with vendor reference. Note: facial age *estimation* is NOT an FTC-approved VPC method — use an approved method (text-plus, face-match-to-ID, knowledge-based auth, card).
+Acceptance Criteria:
+- No under-13 personal information is collected/retained before VPC is `granted`.
+- The consent record stores method, vendor, and `vendorReference` (never raw ID documents).
+- Consent revocation deactivates the child account and is honored end-to-end.
+
+**FR-048: Guardian controls & re-consent**
+Priority: P2 (Phase 10)
+Description: A guardian can view the minors they manage, see/limit their clubs, and revoke consent (which deactivates the minor account).
+Acceptance Criteria:
+- Guardian can list managed minors (`users.by_guardian`) and revoke; revocation cascades per § Data Model.
+
+### 6B.7 Non-Functional / Compliance Requirements (onboarding-specific)
+
+- **Privacy-by-default:** minor accounts ship with the most protective settings; no nudges to weaken them.
+- **Data minimization:** store `birthYear` + `ageTier`, not full DOB; display-name only for minors; no geolocation.
+- **Auditability:** every consent event is recorded with method, vendor reference, and timestamps; retained for the required period, then purged.
+- **Server-authoritative safety:** every minor-mode rule is enforced in Convex; the client only reflects state.
+- **App-store posture:** complete Apple/Google age-rating and data-safety declarations honestly; if listing in a kids/family context, comply with the stricter store program rules (no non-consented third-party analytics/ads on minors).
+- **Jurisdiction:** assume COPPA (US, <13), Children's Code (UK, <18), GDPR-K (EU, 13–16), and NDPR (Nigeria) all apply; design to the strictest applicable default.
+
+### 6B.8 Dependencies (onboarding/safety-specific)
+
+- **Kids-safety vendor (Phase 10):** **Kids Web Services (KWS)** by SuperAwesome — purpose-built VPC + age assurance for COPPA/GDPR-K, mobile SDKs, free to developers (recommended for budget). **k-ID** is the alternative for the broadest multi-jurisdiction coverage and newest COPPA-2026 tooling. Integrated server-side (Convex action) + a thin client SDK for the consent UI.
+- **Age-assurance vs. consent distinction:** estimation may assist the *gate*; the *under-13 consent* step must use an FTC-approved VPC method (handled by the vendor).
+- **Legal review:** external counsel sign-off before public launch (Phase 9) and before under-13 enablement (Phase 10).
+
+### 6B.9 Edge Cases & Error Handling (onboarding-specific)
+
+- **User lies about age:** anti-retry gate + (Phase 10) vendor age assurance reduce this; if a minor is later detected on an adult account, downgrade to minor mode and trigger guardian consent.
+- **Guardian never completes consent:** minor account stays inactive; send one reminder, then expire the `pending` record. No usable account is created.
+- **Guardian email is the minor's own / invalid:** validate guardian contact is distinct; vendor flow adds verification in Phase 10.
+- **Minor taps an adult club's invite link:** route to guardian provisioning / show "this club isn't available for your account" — never auto-join.
+- **Minor turns 18 / 13:** re-derive `ageTier` from `birthYear` on a scheduled job; transition capabilities at the birthday boundary.
+- **Consent revoked mid-use:** immediately deactivate the minor account and end any session they're in; retain the audit record as `revoked`.
+- **Vendor outage (Phase 10):** under-13 onboarding cannot complete without VPC — fail closed (block, queue, and notify), never admit an under-13 without consent.
 
 -----
 
@@ -2420,6 +2612,7 @@ Users manage their subscription via the OS-native subscription page. Settings sc
 | Google Play Console | Android distribution | $25 one-time | Service account JSON for EAS submit | n/a |
 | Branch.io (optional) | Deferred deep linking for invite URLs | Free up to 10k MAU | Branch key | n/a |
 | LiveKit Cloud (Phase 8) | Live-session audio (WebRTC SFU) | Free/build tier for MVP scale | `LIVEKIT_URL`, `LIVEKIT_API_KEY`, `LIVEKIT_API_SECRET` (secret server-only) | Tier-dependent; re-check before scale |
+| Kids Web Services (KWS) / k-ID (Phase 10) | Verifiable parental consent + age assurance (COPPA / GDPR-K) | KWS free to developers; k-ID quote-based | Vendor API key + project ID (server-only) | Vendor-dependent |
 
 **Phase 8 client packages** (added only in Phase 8): `@livekit/react-native`, `@livekit/react-native-webrtc` (client audio; dev-build only, config plugin + `expo-build-properties`), and `livekit-server-sdk` (used solely inside a Convex action to mint tokens). See § 6A.9.
 
@@ -2432,6 +2625,8 @@ For MVP, deferred deep links (invite URLs that survive App Store install) can us
 The following items are explicitly NOT covered by this PRD. Each is documented in `docs/product-vision.md` § Product Strategy > Explicitly Out of Scope with full reasoning. Summary:
 
 - **Live review sessions (audio + live text chat).** Specified in § 6A but **explicitly out of the launch MVP** — built as a fast-follow in Phase 8 immediately after closed-beta launch. Out of scope for Phases 0–7.
+- **Age gate + minor segmentation (under-13 / 13–17 / 18+).** Specified in § 6B. Out of scope for the closed adult beta, but a **hard prerequisite for public launch** (Phase 9). Do not open to the public without it.
+- **Children's clubs + under-13 verifiable parental consent.** Specified in § 6B; **staged to Phase 10**, gated behind a kids-safety vendor (KWS / k-ID) and legal sign-off. Under-13 signup is blocked until then.
 - **Creator monetization (paid subscriptions, one-time chapter purchases).** Phase 2.
 - **Web companion / creator dashboard.** Phase 2.
 - **Licensed book catalog.** Year 2.
@@ -2481,7 +2676,19 @@ Should display names be globally unique? **Recommended default:** No. Display na
 Options: LiveKit Cloud, Agora, Daily, 100ms. Tradeoffs: all are managed WebRTC SFUs; the deciding factors for a solo, budget-tight founder are free-tier generosity, React Native SDK quality, and docs. **Recommended default:** **LiveKit Cloud** — open-source core (no lock-in; self-host later if costs grow), a strong `@livekit/react-native` SDK, server-side token minting that fits Convex actions cleanly, and a build-tier free allowance that covers MVP scale. Agora is the main alternative (10k free minutes/mo) if LiveKit's RN dev-build setup proves painful. Revisit once concurrency approaches the free-tier ceiling.
 
 **Q11: Should live sessions be recorded? (Phase 8)**
-Tradeoffs: recordings let members who missed it catch up (great retention), but add storage cost, egress, and consent/privacy obligations. **Recommended default:** **No recording at Phase 8 launch.** Ship live-only first; add opt-in, consent-gated recordings as a Phase 8.1 enhancement if members ask for it.
+Tradeoffs: recordings let members who missed it catch up (great retention), but add storage cost, egress, and consent/privacy obligations. **Recommended default:** **No recording at Phase 8 launch.** Ship live-only first; add opt-in, consent-gated recordings as a Phase 8.1 enhancement if members ask for it. (Note: recording sessions that include minors raises significant additional consent obligations — keep child-safe sessions un-recorded.)
+
+**Q12: Kids-safety / consent vendor (Phase 10).**
+Options: Kids Web Services (KWS, SuperAwesome), k-ID, Privo, build-in-house. **Recommended default:** **KWS** — purpose-built VPC + age assurance for COPPA/GDPR-K, mobile SDKs, free to developers (decisive at this budget). **k-ID** if broad multi-jurisdiction coverage and the newest COPPA-2026 tooling matter more. Do not build in-house — you'd own the compliance + audit risk.
+
+**Q13: Minimum age & under-13 timing.**
+**Confirmed decision:** Launch with **minimum age 13** (13–17 restricted + 18+). Design all three tiers now; enable **under-13 in Phase 10** only after the vendor integration and legal review land. Sidesteps COPPA's heaviest VPC burden at launch.
+
+**Q14: Educator/school consent path.**
+Should teachers/librarians be able to consent on behalf of children (COPPA's narrow school-consent exception), or always require a parent/guardian? **Recommended default:** **Always require a parent/guardian for v1** (simpler, safer, jurisdiction-portable). Revisit a school-consent model later if education becomes a real channel.
+
+**Q15: Age-assurance strength at the gate.**
+Self-declared DOB + adult-provisioning is the Phase 9 baseline. Do we add stronger age estimation (e.g., vendor) where adults and minors could mix? **Recommended default:** Self-declared + adult provisioning for the strict walled garden at Phase 9; layer vendor age assurance in Phase 10 alongside VPC. Re-evaluate if any surface lets adults and minors mix without a vetted moderator.
 
 **Q10: Analytics tooling for MVP.**
 Options: PostHog (free OSS, self-host or hosted), Amplitude (free up to 10M events), no analytics. **Recommended default:** PostHog hosted free tier — straightforward to integrate, Convex events easy to forward. Track: signup completion, first-club joined, first-reaction dropped, time-to-magic-moment, Pro conversion.

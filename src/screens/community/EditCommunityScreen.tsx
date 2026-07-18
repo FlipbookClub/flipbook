@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import {
   ActivityIndicator,
   Image,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Switch,
   Text,
   View,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { ChevronLeft, ImagePlus } from "@/lib/icons";
 import * as ImagePicker from "expo-image-picker";
-import { createUploadTask, FileSystemUploadType } from "expo-file-system/legacy";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
+import { uploadImageToConvex } from "@/lib/uploads";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -33,29 +33,6 @@ type Props = NativeStackScreenProps<CommunityStackParamList, "EditCommunity">;
 
 const MAX_NAME = 60;
 const MAX_DESCRIPTION = 500;
-
-// Upload a local image to a Convex upload URL; returns its storageId. Streams
-// the file from disk (expo-file-system) rather than loading it into a JS blob,
-// which could spike memory and crash on large photos.
-async function uploadEmblem(
-  uploadUrl: string,
-  uri: string,
-  mimeType: string,
-): Promise<Id<"_storage">> {
-  const task = createUploadTask(uploadUrl, uri, {
-    httpMethod: "POST",
-    uploadType: FileSystemUploadType.BINARY_CONTENT,
-    headers: { "Content-Type": mimeType },
-  });
-  const result = await task.uploadAsync();
-  if (!result) throw new Error("Upload was cancelled");
-  if (result.status < 200 || result.status >= 300) {
-    throw new Error(`Emblem upload failed with status ${result.status}`);
-  }
-  const body = JSON.parse(result.body) as { storageId?: Id<"_storage"> };
-  if (!body.storageId) throw new Error("Upload succeeded but no storageId returned");
-  return body.storageId;
-}
 
 export function EditCommunityScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
@@ -121,7 +98,7 @@ export function EditCommunityScreen({ navigation, route }: Props) {
       let emblemStorageId: Id<"_storage"> | undefined;
       if (newEmblemUri) {
         const uploadUrl = await generateEmblemUploadUrl({ clubId });
-        emblemStorageId = await uploadEmblem(
+        emblemStorageId = await uploadImageToConvex(
           uploadUrl,
           newEmblemUri,
           newEmblemMime ?? "image/jpeg",
@@ -180,7 +157,7 @@ export function EditCommunityScreen({ navigation, route }: Props) {
         </View>
       ) : (
         <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
           style={{ flex: 1 }}
         >
           <ScrollView

@@ -1,11 +1,11 @@
 "use client";
 
+import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
 
 import { AvatarStack } from "@/components/AvatarStack";
 import { Eyebrow } from "@/components/Eyebrow";
 import { SignupCount } from "@/components/SignupCount";
-import { WaitlistForm } from "@/components/WaitlistForm";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -26,7 +26,7 @@ export function Hero() {
       <div className="mx-auto grid max-w-7xl items-center gap-16 px-6 md:grid-cols-[1.05fr_0.95fr] md:px-10">
         <div>
           <motion.div {...fade(0.05)}>
-            <Eyebrow>Closed beta — opens soon</Eyebrow>
+            <Eyebrow>Now in open beta</Eyebrow>
           </motion.div>
 
           <motion.h1
@@ -42,15 +42,19 @@ export function Hero() {
             {...fade(0.3)}
             className="mt-8 max-w-xl text-[17px] leading-[1.6] text-text-muted md:text-[18px]"
           >
-            Your friends and family are{" "}
-            <em className="italic text-text">this close</em> to reading the same book
-            as you — they just need a reason to show up. Flipbook makes reading
-            together as easy as a group chat, and as alive as the best book club
-            you&apos;ve ever been in.
+            Reading is easier when you&apos;re not doing it alone. Flipbook helps
+            you stay consistent with friends, book clubs, and communities that
+            keep you turning the page.
           </motion.p>
 
-          <motion.div {...fade(0.45)}>
-            <WaitlistForm variant="hero" source="hero" />
+          <motion.div {...fade(0.45)} className="mt-10 flex flex-col items-start gap-3">
+            <Link
+              href="/get-flipbook"
+              className="inline-flex h-12 items-center justify-center rounded-full bg-accent px-8 text-[14px] font-semibold tracking-wide text-white shadow-lg shadow-accent/25 transition-all duration-300 hover:bg-accent-strong hover:shadow-accent/40 active:scale-[0.98]"
+            >
+              Get Flipbook
+            </Link>
+            <p className="text-[13px] text-text-muted">Free to join. No invite code.</p>
           </motion.div>
 
           <motion.div {...fade(0.6)} className="mt-6 flex items-center gap-3">

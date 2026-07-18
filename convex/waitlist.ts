@@ -2,6 +2,38 @@ import { ConvexError, v } from "convex/values";
 
 import { internalMutation, query } from "./_generated/server";
 
+// Admin op: delete waitlist rows (and any invite code minted for them) by
+// email. For clearing out test/junk signups. Run from the Convex dashboard
+// or CLI (npx convex run waitlist:purgeEmails).
+export const purgeEmails = internalMutation({
+  args: { emails: v.array(v.string()) },
+  returns: v.object({ waitlistDeleted: v.number(), inviteCodesDeleted: v.number() }),
+  handler: async (ctx, args) => {
+    let waitlistDeleted = 0;
+    let inviteCodesDeleted = 0;
+    for (const email of args.emails) {
+      const emailLower = email.trim().toLowerCase();
+      const waitlistRow = await ctx.db
+        .query("waitlist")
+        .withIndex("by_email", (q) => q.eq("emailLower", emailLower))
+        .unique();
+      if (waitlistRow) {
+        await ctx.db.delete(waitlistRow._id);
+        waitlistDeleted += 1;
+      }
+      const inviteRow = await ctx.db
+        .query("inviteCodes")
+        .withIndex("by_email", (q) => q.eq("emailLower", emailLower))
+        .first();
+      if (inviteRow) {
+        await ctx.db.delete(inviteRow._id);
+        inviteCodesDeleted += 1;
+      }
+    }
+    return { waitlistDeleted, inviteCodesDeleted };
+  },
+});
+
 // RFC-5322-ish; intentionally permissive — we'd rather accept a valid edge
 // case than drop a real signup. Real validation happens on the confirmation
 // email bouncing.

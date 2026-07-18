@@ -91,6 +91,9 @@ export const create = mutation({
     type: v.union(v.literal("standard"), v.literal("creator")),
     visibility: v.union(v.literal("private"), v.literal("public")),
     coverImageUrl: v.optional(v.string()),
+    // A freshly-uploaded emblem (via generateEmblemUploadUrl with no clubId).
+    // Resolved to a serving URL server-side and stored as coverImageUrl.
+    emblemStorageId: v.optional(v.id("_storage")),
     permissions: v.optional(permissionsValidator),
   },
   returns: v.object({ clubId: v.id("clubs"), inviteCode: v.string() }),
@@ -118,6 +121,14 @@ export const create = mutation({
       }
     }
 
+    // Resolve a freshly-uploaded emblem to its serving URL (falls back to any
+    // coverImageUrl passed directly).
+    let coverImageUrl = args.coverImageUrl;
+    if (args.emblemStorageId) {
+      const url = await ctx.storage.getUrl(args.emblemStorageId);
+      if (url) coverImageUrl = url;
+    }
+
     const inviteCode = await uniqueInviteCode(ctx);
     const now = Date.now();
 
@@ -127,7 +138,7 @@ export const create = mutation({
       type: args.type,
       visibility: args.visibility,
       moderatorId: me._id,
-      coverImageUrl: args.coverImageUrl,
+      coverImageUrl,
       permissions: args.permissions ?? {
         membersCanUploadBooks: false,
         membersCanInviteOthers: false,
@@ -220,16 +231,20 @@ export const listMine = query({
   },
 });
 
-// Moderator-only: get a one-shot upload URL for a new community emblem. The
-// client POSTs the image, then passes the returned storageId to `update`.
+// Get a one-shot upload URL for a community emblem. With a clubId it's an edit
+// (moderator / permitted member only); without one it's the create flow — any
+// signed-in user may stage an emblem before the club exists. The client POSTs
+// the image, then passes the returned storageId to `update` or `create`.
 export const generateEmblemUploadUrl = mutation({
-  args: { clubId: v.id("clubs") },
+  args: { clubId: v.optional(v.id("clubs")) },
   returns: v.string(),
   handler: async (ctx, args) => {
     const me = await getCurrentUser(ctx);
-    const club = await ctx.db.get(args.clubId);
-    if (!club) throw new ConvexError({ code: "club_not_found" });
-    await assertCanEditInfo(ctx, club, me._id);
+    if (args.clubId) {
+      const club = await ctx.db.get(args.clubId);
+      if (!club) throw new ConvexError({ code: "club_not_found" });
+      await assertCanEditInfo(ctx, club, me._id);
+    }
     return await ctx.storage.generateUploadUrl();
   },
 });

@@ -14,7 +14,7 @@ const columns: Array<{ title: string; links: Array<{ label: string; href: string
   {
     title: "For people",
     links: [
-      { label: "Reader beta", href: "#get-the-beta" },
+      { label: "Get Flipbook", href: "/get-flipbook" },
       { label: "Creator list", href: "#creators" },
       { label: "FAQ", href: "#faq" },
     ],
@@ -68,7 +68,19 @@ export function Footer() {
         </div>
 
         <div className="mt-16 flex flex-col gap-3 border-t border-line pt-8 text-[13px] text-text-subtle sm:flex-row sm:items-center sm:justify-between">
-          <p>&copy; {year} Flipbook. Built in Lagos, in the open.</p>
+          <p>
+            &copy; {year} Flipbook. Built in Lagos, in the open. ·{" "}
+            <a href="/privacy" className="underline-offset-4 hover:text-accent hover:underline">
+              Privacy
+            </a>{" "}
+            ·{" "}
+            <a
+              href="/delete-account"
+              className="underline-offset-4 hover:text-accent hover:underline"
+            >
+              Delete your account
+            </a>
+          </p>
           <p className="font-display italic text-text-muted">
             A quiet vote of confidence in the reader.
           </p>

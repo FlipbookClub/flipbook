@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useQuery } from "convex/react";
 import { useAuth } from "@clerk/clerk-expo";
 import { NavigationContainer, DarkTheme, DefaultTheme } from "@react-navigation/native";
@@ -6,9 +7,11 @@ import { ActivityIndicator, View } from "react-native";
 import { AuthStack } from "./AuthStack";
 import { MainTabs } from "./MainTabs";
 import { OnboardingStack } from "./OnboardingStack";
+import { OnboardingModal, ONBOARDING_SEEN_KEY } from "@/components/features/OnboardingModal";
 import { getInitialURL, linkingConfig, linkingPrefixes, subscribeToURL } from "@/lib/deeplinks";
 import { usePushTokenRegistration } from "@/lib/notifications";
 import { useReactionQueueFlush } from "@/lib/useReactionQueueFlush";
+import { storage } from "@/lib/storage";
 import { useTheme } from "@/theme/ThemeContext";
 import { api } from "../../convex/_generated/api";
 
@@ -28,6 +31,10 @@ export function RootNavigator() {
   // an unauthenticated identity and throws. "skip" is Convex's documented way
   // to defer a query until inputs are ready.
   const me = useQuery(api.users.me, isLoaded && isSignedIn ? {} : "skip");
+  // Show the education modal once, to every user who has fully onboarded.
+  // MMKV flag persists across app restarts; re-openable later via a help link.
+  const [modalDismissed, setModalDismissed] = useState(false);
+  const showModal = !!me && !modalDismissed && storage.getString(ONBOARDING_SEEN_KEY) !== "1";
 
   // FR-028: register a push token once an onboarded user exists. Permission
   // prompt fires here (post-onboarding) rather than at first sign-in.
@@ -59,7 +66,14 @@ export function RootNavigator() {
   } else if (me === null) {
     content = <OnboardingStack />;
   } else {
-    content = <MainTabs />;
+    content = (
+      <>
+        <MainTabs />
+        {showModal ? (
+          <OnboardingModal onDismiss={() => setModalDismissed(true)} />
+        ) : null}
+      </>
+    );
   }
 
   return (

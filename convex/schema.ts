@@ -64,10 +64,40 @@ export default defineSchema({
     lastReadAt: v.optional(v.number()),
     // For creator clubs (subscriber semantics) — `false` for standard clubs.
     isFollowing: v.boolean(),
+    // Optional so existing rows implicitly read as "active". Set to "removed"
+    // by moderator removal actions (the row is deleted, not flipped, but this
+    // field future-proofs soft-delete auditing if ever needed).
+    status: v.optional(v.union(v.literal("active"), v.literal("removed"))),
   })
     .index("by_club", ["clubId"])
     .index("by_user", ["userId"])
     .index("by_club_and_user", ["clubId", "userId"]),
+
+  // Moderator-controlled block list that prevents a removed user from rejoining
+  // a club via any invite code. Survives membership deletion (separate table).
+  clubBlocks: defineTable({
+    clubId: v.id("clubs"),
+    userId: v.id("users"),
+    blockedByUserId: v.id("users"),
+    createdAt: v.number(),
+  })
+    .index("by_club_and_user", ["clubId", "userId"])
+    .index("by_club", ["clubId"]),
+
+  // Per-user, per-book (or chapter) page bookmarks. Separate from progress so
+  // bookmark writes don't contend with the high-frequency progress update path,
+  // and so a user can bookmark multiple pages per book.
+  bookmarks: defineTable({
+    userId: v.id("users"),
+    clubId: v.id("clubs"),
+    bookId: v.optional(v.id("books")),
+    chapterId: v.optional(v.id("chapters")),
+    page: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_user_and_book", ["userId", "bookId"])
+    .index("by_user_and_chapter", ["userId", "chapterId"])
+    .index("by_user_and_club", ["userId", "clubId"]),
 
   books: defineTable({
     title: v.string(),

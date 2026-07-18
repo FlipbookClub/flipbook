@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://useflipbook.com"),
   title: "Flipbook — Read with the people who are reading right now",
   description:
-    "A social reading app where book clubs read together, with live reactions in the margins. Beta opens soon.",
+    "Finish more books with friends. Join reading rooms, share live reactions, and stay accountable together. Free, open beta. No invite code required.",
   openGraph: {
     title: "Flipbook — Read with the people who are reading right now",
     description:

@@ -1,12 +1,12 @@
 import { useState, type ReactNode } from "react";
 import {
-  KeyboardAvoidingView,
   Platform,
   Pressable,
-  SafeAreaView,
   Text,
   View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { ChevronLeft, Moon, Sparkles, Sun } from "@/lib/icons";
 import { useAuth } from "@clerk/clerk-expo";
 import { useNavigation } from "@react-navigation/native";
@@ -45,7 +45,7 @@ export function AuthLayout({ children }: { children: ReactNode }) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <View

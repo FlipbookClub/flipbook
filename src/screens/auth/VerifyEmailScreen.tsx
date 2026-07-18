@@ -30,7 +30,8 @@ export function VerifyEmailScreen({ route }: Props) {
   const { signIn, setActive: setActiveSignIn, isLoaded: signInLoaded } = useSignIn();
   const email = route.params.email;
   const flow = route.params.flow ?? "signup";
-  // signup uses useSignUp; signin + client_trust both use useSignIn.
+  const secondFactorStrategy = route.params.secondFactorStrategy;
+  // signup uses useSignUp; every other flow uses useSignIn.
   const isLoaded = flow === "signup" ? signUpLoaded : signInLoaded;
 
   const [code, setCode] = useState("");
@@ -51,6 +52,16 @@ export function VerifyEmailScreen({ route }: Props) {
         // factor on the in-flight sign-in, so attempt it via attemptSecondFactor.
         if (!signInLoaded || !signIn || !setActiveSignIn) return;
         const result = await signIn.attemptSecondFactor({ strategy: "email_code", code });
+        if (result.status === "complete") {
+          await setActiveSignIn({ session: result.createdSessionId });
+        } else {
+          setFormError("Verification incomplete. Check the code and try again.");
+        }
+      } else if (flow === "second_factor") {
+        // Real 2FA on the account — same attemptSecondFactor API as
+        // client_trust, but the strategy is whatever the account has enabled.
+        if (!signInLoaded || !signIn || !setActiveSignIn || !secondFactorStrategy) return;
+        const result = await signIn.attemptSecondFactor({ strategy: secondFactorStrategy, code });
         if (result.status === "complete") {
           await setActiveSignIn({ session: result.createdSessionId });
         } else {
@@ -92,6 +103,12 @@ export function VerifyEmailScreen({ route }: Props) {
       if (flow === "client_trust") {
         if (!signInLoaded || !signIn) return;
         await signIn.prepareSecondFactor({ strategy: "email_code" });
+      } else if (flow === "second_factor") {
+        if (!signInLoaded || !signIn) return;
+        // TOTP/backup codes aren't "sent" — nothing to resend for those.
+        if (secondFactorStrategy === "phone_code" || secondFactorStrategy === "email_code") {
+          await signIn.prepareSecondFactor({ strategy: secondFactorStrategy });
+        }
       } else if (flow === "signin") {
         if (!signInLoaded || !signIn) return;
         // Re-derive the email_code factor's emailAddressId from the in-flight
@@ -121,10 +138,28 @@ export function VerifyEmailScreen({ route }: Props) {
     }
   };
 
+  const canResend = !(
+    flow === "second_factor" &&
+    secondFactorStrategy !== "phone_code" &&
+    secondFactorStrategy !== "email_code"
+  );
+  const title =
+    flow === "second_factor" && secondFactorStrategy === "totp"
+      ? "Enter your authenticator code"
+      : flow === "second_factor" && secondFactorStrategy === "phone_code"
+        ? "Check your phone"
+        : "Check your email";
+  const subtitle =
+    flow === "second_factor" && secondFactorStrategy === "totp"
+      ? `Open your authenticator app and enter the ${CODE_LENGTH}-digit code for this account.`
+      : flow === "second_factor" && secondFactorStrategy === "phone_code"
+        ? `We texted a ${CODE_LENGTH}-digit code to your phone on file. Enter it below.`
+        : `We sent a ${CODE_LENGTH}-digit code to ${email}. Enter it below.`;
+
   return (
     <AuthLayout>
       <Text style={{ ...typography.headingMd, color: colors.textPrimary }}>
-        Check your email
+        {title}
       </Text>
       <Text
         style={{
@@ -133,7 +168,7 @@ export function VerifyEmailScreen({ route }: Props) {
           marginTop: spacing.s1,
         }}
       >
-        We sent a {CODE_LENGTH}-digit code to {email}. Enter it below.
+        {subtitle}
       </Text>
 
       <View style={{ marginTop: spacing.s5 }}>
@@ -153,16 +188,18 @@ export function VerifyEmailScreen({ route }: Props) {
       </View>
 
       <View style={{ marginTop: spacing.s3 }}>
-        <Text
-          onPress={handleResend}
-          style={{
-            ...typography.bodyMd,
-            color: resending ? colors.textMuted : colors.textPrimary,
-            fontFamily: "Raleway-SemiBold",
-          }}
-        >
-          {resending ? "Sending…" : "Resend code"}
-        </Text>
+        {canResend ? (
+          <Text
+            onPress={handleResend}
+            style={{
+              ...typography.bodyMd,
+              color: resending ? colors.textMuted : colors.textPrimary,
+              fontFamily: "Raleway-SemiBold",
+            }}
+          >
+            {resending ? "Sending…" : "Resend code"}
+          </Text>
+        ) : null}
         {resentNotice ? (
           <Text
             style={{

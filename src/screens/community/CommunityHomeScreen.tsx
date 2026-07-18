@@ -1,12 +1,19 @@
 import { useCallback, useState } from "react";
-import { Pressable, RefreshControl, SafeAreaView, ScrollView, Text, View } from "react-native";
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { Leaf, Plus, Rocket, UserGroup2 } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
-import { ClubCard } from "@/components/features/ClubCard";
+import { ClubCard, type ClubCardData } from "@/components/features/ClubCard";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { Wordmark } from "@/components/ui/Wordmark";
 import { isOnlineNow } from "@/lib/connectivity";
@@ -18,8 +25,32 @@ import { typography } from "@/theme/typography";
 import type { ThemeMode } from "@/theme/themes";
 
 import { api } from "../../../convex/_generated/api";
+import type { Id } from "../../../convex/_generated/dataModel";
 import type { MainTabsParamList } from "@/navigation/MainTabs";
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
+
+// Self-contained wrapper that fetches the avatar sample for one club so each
+// card subscribes independently and Convex de-dupes the network subscriptions.
+function ClubCardWithAvatars({
+  clubId,
+  club,
+  onPress,
+  contained,
+}: {
+  clubId: Id<"clubs">;
+  club: ClubCardData;
+  onPress?: () => void;
+  contained?: boolean;
+}) {
+  const sample = useQuery(api.memberships.sampleClubMembers, { clubId });
+  return (
+    <ClubCard
+      club={{ ...club, memberSample: sample ?? undefined }}
+      onPress={onPress}
+      contained={contained}
+    />
+  );
+}
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<CommunityStackParamList, "CommunityHome">,
@@ -260,8 +291,9 @@ export function CommunityHomeScreen({ navigation }: Props) {
               My communities
             </Text>
             {myClubs.map((club) => (
-              <ClubCard
+              <ClubCardWithAvatars
                 key={club._id}
+                clubId={club._id}
                 contained
                 club={{
                   name: club.name,
@@ -288,8 +320,9 @@ export function CommunityHomeScreen({ navigation }: Props) {
               <ClubSkeletons count={2} />
             ) : (
               popularClubs.map((club) => (
-                <ClubCard
+                <ClubCardWithAvatars
                   key={club._id}
+                  clubId={club._id}
                   club={{
                     name: club.name,
                     description: club.description,

@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as bookmarks from "../bookmarks.js";
 import type * as books from "../books.js";
 import type * as chapters from "../chapters.js";
 import type * as clubs from "../clubs.js";
@@ -15,6 +16,7 @@ import type * as email from "../email.js";
 import type * as http from "../http.js";
 import type * as invites from "../invites.js";
 import type * as lib_admins from "../lib/admins.js";
+import type * as lib_emailAssets from "../lib/emailAssets.js";
 import type * as lib_inviteCode from "../lib/inviteCode.js";
 import type * as memberships from "../memberships.js";
 import type * as notifications from "../notifications.js";
@@ -31,6 +33,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  bookmarks: typeof bookmarks;
   books: typeof books;
   chapters: typeof chapters;
   clubs: typeof clubs;
@@ -38,6 +41,7 @@ declare const fullApi: ApiFromModules<{
   http: typeof http;
   invites: typeof invites;
   "lib/admins": typeof lib_admins;
+  "lib/emailAssets": typeof lib_emailAssets;
   "lib/inviteCode": typeof lib_inviteCode;
   memberships: typeof memberships;
   notifications: typeof notifications;

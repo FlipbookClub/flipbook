@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { Alert, Image, Pressable, SafeAreaView, ScrollView, Share, Text, View } from "react-native";
+import {
+  Alert,
+  Image,
+  Pressable,
+  ScrollView,
+  Share,
+  Text,
+  View,
+} from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { BookPlus, ChevronLeft, MoreVertical, Search, Settings, Share2 } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -14,7 +23,8 @@ import { BookListCard } from "@/components/features/BookListCard";
 import { BookUploadSheet } from "@/components/features/BookUploadSheet";
 import { BookOptionsSheet } from "@/components/features/BookOptionsSheet";
 import { ChapterListItem } from "@/components/features/ChapterListItem";
-import { ClubModeratorSheet } from "@/components/features/ClubModeratorSheet";
+import { ClubOptionsSheet } from "@/components/features/ClubOptionsSheet";
+import { MemberActionSheet } from "@/components/features/MemberActionSheet";
 import { MAX_PDF_BYTES, pickPdf, type PickedPdf } from "@/lib/pdf";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
@@ -75,6 +85,8 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [optionsBook, setOptionsBook] = useState<Doc<"books"> | null>(null);
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
+  type MemberTarget = { userId: string; displayName: string } | null;
+  const [memberActionTarget, setMemberActionTarget] = useState<MemberTarget>(null);
 
   const isModerator = !!me && !!club && club.moderatorId === me._id;
   // FR-075: when previewing a public club from Discovery without having
@@ -227,30 +239,30 @@ export function ClubDetailScreen({ navigation, route }: Props) {
         >
           <ChevronLeft size={24} color={colors.textPrimary} />
         </Pressable>
-        <View style={{ flexDirection: "row", gap: spacing.s3 }}>
-          <Pressable
-            onPress={handleShare}
-            hitSlop={spacing.s3}
-            accessibilityLabel="Share invite link"
-            accessibilityRole="button"
-          >
-            <Share2 size={22} color={colors.textPrimary} />
-          </Pressable>
-          {canEditInfo ? (
+        {isMember ? (
+          <View style={{ flexDirection: "row", gap: spacing.s3 }}>
             <Pressable
-              onPress={() =>
-                isModerator
-                  ? setSheetOpen(true)
-                  : navigation.navigate("EditCommunity", { clubId })
-              }
+              onPress={handleShare}
               hitSlop={spacing.s3}
-              accessibilityLabel="Club settings"
+              accessibilityLabel="Share invite link"
               accessibilityRole="button"
             >
-              <Settings size={22} color={colors.textPrimary} />
+              <Share2 size={22} color={colors.textPrimary} />
             </Pressable>
-          ) : null}
-        </View>
+            <Pressable
+              onPress={() => setSheetOpen(true)}
+              hitSlop={spacing.s3}
+              accessibilityLabel="Community options"
+              accessibilityRole="button"
+            >
+              {canEditInfo ? (
+                <Settings size={22} color={colors.textPrimary} />
+              ) : (
+                <MoreVertical size={22} color={colors.textPrimary} />
+              )}
+            </Pressable>
+          </View>
+        ) : null}
       </View>
 
       <ScrollView
@@ -573,11 +585,6 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     <Text style={{ ...typography.bodySm, color: colors.textMuted, textAlign: "center" }}>
                       Reactions and replies unlock when you become a member.
                     </Text>
-                    <Button
-                      label={joining ? "Joining…" : "Join community"}
-                      onPress={handleJoinFromPreview}
-                      disabled={joining}
-                    />
                   </View>
                 </Card>
               </View>
@@ -632,11 +639,17 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       backgroundColor: pressed ? colors.surfaceSecondary : "transparent",
                     })}
                   >
-                    <Avatar
-                      name={r.user.displayName}
-                      imageUri={r.user.avatarUrl}
-                      size="md"
-                    />
+                    <Pressable
+                      onPress={() => navigation.navigate("ViewProfile", { userId: r.user._id })}
+                      accessibilityRole="button"
+                      accessibilityLabel={`View ${r.user.displayName}'s profile`}
+                    >
+                      <Avatar
+                        name={r.user.displayName}
+                        imageUri={r.user.avatarUrl}
+                        size="md"
+                      />
+                    </Pressable>
                     <View style={{ flex: 1, gap: 2 }}>
                       <Text
                         style={{
@@ -702,8 +715,16 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       ? Math.min(100, Math.round((p.currentPage / p.totalPages) * 100))
                       : 0;
                   return (
-                    <View
+                    <Pressable
                       key={m._id}
+                      onPress={() => navigation.navigate("ViewProfile", { userId: m.userId })}
+                      onLongPress={
+                        isModerator && m.userId !== club.moderatorId
+                          ? () => setMemberActionTarget({ userId: m.userId, displayName: m.displayName })
+                          : undefined
+                      }
+                      accessibilityRole="button"
+                      accessibilityLabel={`View ${m.displayName}'s profile`}
                       style={{ flexDirection: "row", alignItems: "center", gap: spacing.s3, paddingVertical: spacing.s2 }}
                     >
                       <Avatar
@@ -734,7 +755,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                           />
                         </View>
                       </View>
-                    </View>
+                    </Pressable>
                   );
                 })}
                 {filteredMembers.length === 0 ? (
@@ -748,15 +769,38 @@ export function ClubDetailScreen({ navigation, route }: Props) {
         </View>
       </ScrollView>
 
-      {isModerator ? (
-        <ClubModeratorSheet
-          visible={sheetOpen}
-          club={club}
-          onClose={() => setSheetOpen(false)}
-          onEdit={() => navigation.navigate("EditCommunity", { clubId })}
-          onDeleted={() => navigation.popToTop()}
-        />
+      {/* Persistent Join CTA for anyone previewing a club they haven't joined —
+          visible on every tab, not just buried in the Discussions blur. */}
+      {!isMember ? (
+        <View
+          style={{
+            paddingHorizontal: spacing.s4,
+            paddingTop: spacing.s3,
+            paddingBottom: spacing.s4,
+            borderTopWidth: 1,
+            borderTopColor: colors.border,
+            backgroundColor: colors.surfacePrimary,
+          }}
+        >
+          <Button
+            label={joining ? "Joining…" : "Join community"}
+            fullWidth
+            disabled={joining}
+            onPress={handleJoinFromPreview}
+          />
+        </View>
       ) : null}
+
+      <ClubOptionsSheet
+        visible={sheetOpen}
+        club={club}
+        isModerator={isModerator}
+        canEditInfo={canEditInfo}
+        onClose={() => setSheetOpen(false)}
+        onEdit={() => navigation.navigate("EditCommunity", { clubId })}
+        onDeleted={() => navigation.popToTop()}
+        onLeft={() => navigation.goBack()}
+      />
 
       <BookUploadSheet
         visible={pickedFile !== null}
@@ -765,6 +809,17 @@ export function ClubDetailScreen({ navigation, route }: Props) {
         onClose={() => setPickedFile(null)}
         onUploaded={() => setPickedFile(null)}
       />
+
+      {memberActionTarget ? (
+        <MemberActionSheet
+          visible
+          clubId={clubId}
+          userId={memberActionTarget.userId as import("../../../convex/_generated/dataModel").Id<"users">}
+          displayName={memberActionTarget.displayName}
+          onClose={() => setMemberActionTarget(null)}
+          onActionDone={() => setMemberActionTarget(null)}
+        />
+      ) : null}
 
       <BookOptionsSheet
         visible={optionsBook !== null}

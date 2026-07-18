@@ -1,13 +1,13 @@
 import { useState } from "react";
 import {
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  SafeAreaView,
   Share,
   Text,
   View,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { ChevronLeft, ExternalLink, ShieldCheck } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -58,7 +58,7 @@ export function InviteMembersScreen({ navigation, route }: Props) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <View

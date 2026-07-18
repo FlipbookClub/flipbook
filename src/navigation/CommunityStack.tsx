@@ -10,6 +10,7 @@ import { JoinCommunityScreen } from "@/screens/community/JoinCommunityScreen";
 import { InviteAcceptScreen } from "@/screens/community/InviteAcceptScreen";
 import { PublishChapterScreen } from "@/screens/community/PublishChapterScreen";
 import { ReaderScreen } from "@/screens/reader/ReaderScreen";
+import { UserProfileScreen } from "@/screens/profile/UserProfileScreen";
 
 import type { Id } from "../../convex/_generated/dataModel";
 
@@ -31,6 +32,8 @@ export type CommunityStackParamList = {
     chapterId?: Id<"chapters">;
     jumpToPage?: number;
   };
+  // Read-only profile card — pushable from member lists, reaction authors, etc.
+  ViewProfile: { userId: Id<"users"> };
 };
 
 const Stack = createNativeStackNavigator<CommunityStackParamList>();
@@ -48,6 +51,7 @@ export function CommunityStack() {
       <Stack.Screen name="InviteAccept" component={InviteAcceptScreen} />
       <Stack.Screen name="PublishChapter" component={PublishChapterScreen} />
       <Stack.Screen name="Reader" component={ReaderScreen} options={{ animation: "slide_from_bottom" }} />
+      <Stack.Screen name="ViewProfile" component={UserProfileScreen} />
     </Stack.Navigator>
   );
 }

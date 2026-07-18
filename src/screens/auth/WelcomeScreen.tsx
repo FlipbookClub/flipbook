@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Text, View } from "react-native";
-import { useConvex } from "convex/react";
+import { useConvex, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { AuthLayout } from "@/components/auth/AuthLayout";
@@ -28,6 +28,8 @@ export function WelcomeScreen({ navigation }: Props) {
   const [inviteCode, setInviteCode] = useState("");
   const [checking, setChecking] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // undefined while loading — don't flash the field then hide it.
+  const gatingEnabled = useQuery(api.invites.gatingEnabled);
 
   // Link/accent text color matches the wordmark per mode: coral in Light + Flip,
   // GoldenSand in Dark. Figma's Text/Accent-text variable resolves to muted-plum
@@ -35,9 +37,8 @@ export function WelcomeScreen({ navigation }: Props) {
   // Figma frame — using palette.accent here matches the design intent.
   const linkColor = mode === "dark" ? palette.highlight : palette.accent;
 
-  // Validate the beta invite code (public query; no-op when gating is off), then
-  // stash it for redemption at account creation. Sign-in (existing users) skips
-  // this entirely.
+  // Validate the beta invite code, then stash it for redemption at account
+  // creation. Sign-in (existing users) skips this entirely.
   const handleSubmit = async () => {
     const code = inviteCode.trim();
     if (!code || checking) return;
@@ -61,6 +62,8 @@ export function WelcomeScreen({ navigation }: Props) {
       setChecking(false);
     }
   };
+  // Gating is off — no code to check or stash, straight to account creation.
+  const handleContinue = () => navigation.navigate("CreateAccount");
   const handleSignIn = () => navigation.navigate("SignIn");
 
   return (
@@ -69,30 +72,34 @@ export function WelcomeScreen({ navigation }: Props) {
         <Text style={{ ...typography.headingLg, color: colors.textPrimary }}>
           Welcome to Flipbook
         </Text>
-        <Text style={{ ...typography.paragraphMd, color: colors.textSecondary }}>
-          Enter your special invite code.
-        </Text>
-      </View>
-
-      <View style={{ marginTop: spacing.s5, gap: spacing.s2 }}>
-        <Input
-          variant="underline"
-          placeholder="Invite code"
-          autoCapitalize="characters"
-          autoCorrect={false}
-          value={inviteCode}
-          onChangeText={(t) => {
-            setInviteCode(t);
-            if (error) setError(null);
-          }}
-          returnKeyType="go"
-          onSubmitEditing={handleSubmit}
-          editable={!checking}
-        />
-        {error ? (
-          <Text style={{ ...typography.bodySm, color: palette.error }}>{error}</Text>
+        {gatingEnabled ? (
+          <Text style={{ ...typography.paragraphMd, color: colors.textSecondary }}>
+            Enter your special invite code.
+          </Text>
         ) : null}
       </View>
+
+      {gatingEnabled ? (
+        <View style={{ marginTop: spacing.s5, gap: spacing.s2 }}>
+          <Input
+            variant="underline"
+            placeholder="Invite code"
+            autoCapitalize="characters"
+            autoCorrect={false}
+            value={inviteCode}
+            onChangeText={(t) => {
+              setInviteCode(t);
+              if (error) setError(null);
+            }}
+            returnKeyType="go"
+            onSubmitEditing={handleSubmit}
+            editable={!checking}
+          />
+          {error ? (
+            <Text style={{ ...typography.bodySm, color: palette.error }}>{error}</Text>
+          ) : null}
+        </View>
+      ) : null}
 
       <View style={{ flex: 1 }} />
 
@@ -119,8 +126,8 @@ export function WelcomeScreen({ navigation }: Props) {
         <Button
           label={checking ? "Checking…" : "Let me in"}
           fullWidth
-          disabled={!inviteCode.trim() || checking}
-          onPress={handleSubmit}
+          disabled={gatingEnabled === undefined || (gatingEnabled ? !inviteCode.trim() || checking : false)}
+          onPress={gatingEnabled ? handleSubmit : handleContinue}
         />
       </View>
     </AuthLayout>

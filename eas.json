@@ -27,6 +27,9 @@
     "preview": {
       "ios": {
         "ascAppId": "6778644424"
+      },
+      "android": {
+        "track": "alpha"
       }
     },
     "production": {

@@ -13,7 +13,13 @@ export type AuthStackParamList = {
   SignIn: undefined;
   // `client_trust` = Attack-Protection email code required for a password
   // sign-in from a new device (Clerk needs_client_trust); reuses VerifyEmail.
-  VerifyEmail: { email: string; flow?: "signup" | "signin" | "client_trust" };
+  // `second_factor` = the account has real 2FA enabled (needs_second_factor);
+  // secondFactorStrategy tells VerifyEmail which method + how to word the copy.
+  VerifyEmail: {
+    email: string;
+    flow?: "signup" | "signin" | "client_trust" | "second_factor";
+    secondFactorStrategy?: "totp" | "phone_code" | "email_code" | "backup_code";
+  };
   ForgotPassword: undefined;
   ResetPassword: { email: string };
 };

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Alert, Modal, Pressable, Text, View } from "react-native";
-import { Pencil, Trash2, X } from "@/lib/icons";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { LogOut, Pencil, Trash2, X } from "@/lib/icons";
 import { useMutation } from "convex/react";
 
 import { palette } from "@/theme/palette";
@@ -15,17 +16,32 @@ interface Props {
   visible: boolean;
   club: Doc<"clubs">;
   onClose: () => void;
+  isModerator: boolean;
+  // True for the moderator, or a member whose club grants membersCanUpdateInfo.
+  canEditInfo: boolean;
   /** Open the full Edit Community page (editing is its own screen, not a sheet). */
   onEdit: () => void;
   onDeleted: () => void;
+  onLeft: () => void;
 }
 
-// Moderator actions sheet — a short menu only. Editing lives on its own page
-// (EditCommunityScreen) so the form gets full-screen space + clean keyboard
-// handling; this sheet just routes there or deletes.
-export function ClubModeratorSheet({ visible, club, onClose, onEdit, onDeleted }: Props) {
+// Unified club options sheet reached from the bottom action tray's gear icon.
+// Row set adapts by role: moderator gets Edit + Delete; a member with edit
+// permission gets Edit + Leave; a plain member gets Leave only.
+export function ClubOptionsSheet({
+  visible,
+  club,
+  onClose,
+  isModerator,
+  canEditInfo,
+  onEdit,
+  onDeleted,
+  onLeft,
+}: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const removeClub = useMutation(api.clubs.remove);
+  const leaveClub = useMutation(api.memberships.leave);
 
   const handleDelete = () => {
     Alert.alert(
@@ -45,6 +61,29 @@ export function ClubModeratorSheet({ visible, club, onClose, onEdit, onDeleted }
               const message =
                 (err as { message?: string })?.message ?? "Couldn't delete the community.";
               Alert.alert("Couldn't delete", message);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleLeave = () => {
+    Alert.alert(
+      "Leave this community?",
+      "You'll need a new invite to rejoin. Your past reactions and progress stay put.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Leave",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await leaveClub({ clubId: club._id as Id<"clubs"> });
+              onClose();
+              onLeft();
+            } catch {
+              Alert.alert("Couldn't leave", "Please check your connection and try again.");
             }
           },
         },
@@ -72,7 +111,7 @@ export function ClubModeratorSheet({ visible, club, onClose, onEdit, onDeleted }
           borderTopRightRadius: radius.lg,
           paddingHorizontal: spacing.s4,
           paddingTop: spacing.s3,
-          paddingBottom: spacing.s5,
+          paddingBottom: spacing.s5 + insets.bottom,
           gap: spacing.s4,
         }}
       >
@@ -84,7 +123,7 @@ export function ClubModeratorSheet({ visible, club, onClose, onEdit, onDeleted }
           }}
         >
           <Text style={{ ...typography.headingMd, color: colors.textPrimary }}>
-            Manage community
+            Community options
           </Text>
           <Pressable
             onPress={onClose}
@@ -97,20 +136,31 @@ export function ClubModeratorSheet({ visible, club, onClose, onEdit, onDeleted }
         </View>
 
         <View style={{ gap: spacing.s2 }}>
-          <SheetRow
-            icon={<Pencil size={20} color={colors.textPrimary} />}
-            label="Edit community"
-            onPress={() => {
-              onClose();
-              onEdit();
-            }}
-          />
-          <SheetRow
-            icon={<Trash2 size={20} color={palette.error} />}
-            label="Delete community"
-            labelColor={palette.error}
-            onPress={handleDelete}
-          />
+          {canEditInfo ? (
+            <SheetRow
+              icon={<Pencil size={20} color={colors.textPrimary} />}
+              label="Edit community"
+              onPress={() => {
+                onClose();
+                onEdit();
+              }}
+            />
+          ) : null}
+          {isModerator ? (
+            <SheetRow
+              icon={<Trash2 size={20} color={palette.error} />}
+              label="Delete community"
+              labelColor={palette.error}
+              onPress={handleDelete}
+            />
+          ) : (
+            <SheetRow
+              icon={<LogOut size={20} color={palette.error} />}
+              label="Leave community"
+              labelColor={palette.error}
+              onPress={handleLeave}
+            />
+          )}
         </View>
       </View>
     </Modal>

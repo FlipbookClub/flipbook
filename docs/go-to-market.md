@@ -12,13 +12,20 @@
 
 This is the campaign brief and the operating manual. Sections 1-6 are strategy (read once, refer back). Section 7 is the week-by-week you'll actually live in. Sections 8-15 are the playbooks you open as the week demands them. Section 16 is the punch list for the next 7 days.
 
-The plan is deliberately built around what a solo, part-time founder with a $15-30/mo software budget can sustain. Anywhere you see a tactic that would be "nice to have but takes 5 hours a week," it's marked *(stretch)*.
+The plan is deliberately built around what a **two-person, part-time founding team** with a $15-30/mo software budget can sustain — Moks on content/build, Ayodeji on BD/relationships (see § 1). Anywhere you see a tactic that would be "nice to have but takes 5 hours a week," it's marked *(stretch)*.
 
 The design isn't cast in stone — same applies here. Treat this as a working brief: ship the week, review on Sundays, adjust.
 
 ---
 
-## 1. The frame — 8 weeks to beta, build-in-public as the engine
+## 1. The frame — 8 weeks to beta, two engines: build-in-public + relationship-led BD
+
+**Founder split (new — drives this whole plan).** Flipbook now has two cofounders with complementary strengths, and the GTM is built around both:
+
+- **Moks** — product, vision, strategy, growth narrative. Owns the **build-in-public engine**: the design teardowns, the "today I shipped" cadence, the brand storytelling. This is the introvert's superpower — visible craft, no schmoozing required.
+- **Ayodeji** — operations, process, and the **relationship engine**: business development, partnerships, and getting Flipbook into rooms. A former Programs Manager at a gaming company with a deep network, a strong pitch, and real child-safety/age-gating operational experience (which matters for the Segment D children's-club channel later). This is the extrovert's superpower — and it means the heavy relationship work no longer falls on a heads-down designer.
+
+The two engines compound: Moks' public build gives Ayodeji warm, credible material to pitch with; Ayodeji's rooms put that material in front of people Moks would never reach. Neither founder is a single point of failure for distribution.
 
 You're shipping code already. The campaign needs to do three things in parallel:
 
@@ -26,9 +33,11 @@ You're shipping code already. The campaign needs to do three things in parallel:
 2. **Earn trust before launch** so when the beta link drops, people show up because they've watched you build it.
 3. **Recruit 30 design-partner clubs** who will load real books, invite real friends, and stress-test the product the day it opens.
 
-Build-in-public is the spine. Every screen you design, every Convex query you ship, every brand decision (why Deep Indigo? why Flip mode?) is content. You're a designer — your work is already visual, opinionated, and shareable. The campaign is mostly about *not letting any of that work go unseen*.
+Build-in-public is **one** spine (Moks). Every screen designed, every Convex query shipped, every brand decision (why Deep Indigo? why Flip mode?) is content — visual, opinionated, shareable. The campaign makes sure none of that work goes unseen.
 
-Everything else — the waitlist, the launch week stunt, the BookTok pushes — is layered on top of that spine.
+**Relationship-led BD is the second spine (Ayodeji).** Direct outreach and partnerships — book-club organizers, BookTok/Bookstagram creators, indie authors, and (post-safety-stack) educators and librarians — are now a top-tier engine, not a footnote. For a product whose growth is fundamentally word-of-mouth (one organizer brings a whole club), a founder who can win organizers and partners in conversation is worth more than any number of impressions. This is the single biggest change the cofounder makes to the plan.
+
+Everything else — the waitlist, the launch-week stunt, the BookTok pushes — is layered on top of those two spines.
 
 ### Why this works for Flipbook specifically
 
@@ -99,7 +108,7 @@ The waitlist number is the **single number** to fixate on. Everything else is le
 
 ## 4. Audience segments
 
-Three segments, each with a different hook. Don't write one piece of copy for "readers." Always write *for* one of these three.
+Three core segments for the pre-launch sprint, plus one expansion segment (D) that stays dormant until the minor-safety stack ships. Don't write one piece of copy for "readers." Always write *for* one specific segment.
 
 ### Segment A — Book club members & organizers (primary, 70% of effort)
 
@@ -131,13 +140,34 @@ Three segments, each with a different hook. Don't write one piece of copy for "r
 
 **What converts them.** Concrete pricing/economics conversation in Phase 2. Pre-launch they want to be on the *creator waitlist*, which is a separate signup with one extra field ("link to your work").
 
+### Segment D — Guardians & educators running children's book clubs (expansion — DO NOT activate until safety ships)
+
+**Who they are.** Parents running a kids' reading group, elementary/middle-school teachers, school librarians, and homeschool-co-op organizers who want a *safe, screen-calm* place for children to read and discuss together. They are not the reader or the creator — they're the **vetted adult** who provisions children into a closed, moderated club and stays responsible for it. High trust bar, high word-of-mouth (one teacher tells the whole grade level; one librarian tells the district).
+
+**Hook.** "A reading club for your kids — walled-garden safe, no strangers, no feed, no ads." Lead with safety and calm, never with growth/engagement language.
+
+**Where to reach them.** Teacher communities (r/Teachers, edu Facebook groups, We Are Teachers), school-librarian networks (AASL/state library associations), homeschool co-ops and parenting newsletters, Bookstagram accounts that focus on kidlit/middle-grade. These are *trust-first* communities — show up as a builder who cares about child safety, not a marketer.
+
+**What converts them.** Demonstrable safety architecture, not promises: the walled garden (no public discovery, no stranger contact, supervised audio only), the parental-consent flow, honest data practices, and a real privacy posture. They will ask "is this COPPA-compliant?" — you need a credible, counsel-backed answer before you say a word in these channels.
+
+**⚠️ Hard sequencing rule.** This segment is **off-limits until Phase 9 (age gate + segmentation) ships AND Phase 10 (children's clubs + verifiable parental consent) is built and legally reviewed.** Marketing a kids' product before the safety + consent machinery exists is both a legal and a reputational landmine. This is an **expansion channel for after the adult product is live and the safety stack is done** — *not* part of the 8-week pre-launch sprint below. Everything in §§5–11 of this plan stays adult-reader-focused.
+
 ---
 
-## 5. Channel strategy — tiered for a part-time founder
+## 5. Channel strategy — split across two founders
 
-Five channels is too many to do well. Tier them so you protect your time budget (~8-10 focused hours/week on marketing, on top of building).
+Two engines, two owners. **Moks owns the content channels** (build-in-public, brand, narrative). **Ayodeji owns the relationship channels** (BD, partnerships, organizer recruitment). This split is what lets a part-time team run more surface area than a solo founder could — neither is doing the other's least-favorite work.
 
-### Tier 1 — Primary (~5 hrs/wk)
+### Tier 1 — Relationship-led BD & partnerships *(Ayodeji, ~4-5 hrs/wk — co-equal primary)*
+
+**This is the new top-tier engine.** Flipbook grows when a trusted organizer brings a whole club — so a founder who can win organizers and partners in conversation is the highest-leverage channel we have. Ayodeji runs a lightweight pipeline (a simple CRM/Notion board: target → contacted → call → committed).
+
+- **Book-club organizers** — the 30 design-partner clubs (see § 10) are *his* primary KPI to close, not a cold-DM afterthought. Warm intros first, then 2-hops-out, then targeted cold outreach.
+- **Creators & indie authors** — BookTok/Bookstagram creators and Substack novelists for early access + seeded public clubs (feeds Segment C and the launch). Relationship-first, deal-light pre-launch.
+- **Strategic partners** — bookish newsletters, indie bookstores, reading communities, and (only *after* the Phase 9/10 safety stack ships) schools, libraries, and parent/educator networks for the children's-club channel (Segment D). His gaming-industry child-safety background is a credibility asset in those rooms.
+- Cadence: 8-12 meaningful conversations/week; **North star: 30 design-partner clubs committed + 5-8 creator/partner relationships warm by week 8.**
+
+### Tier 1 — Content / build-in-public *(Moks, ~5 hrs/wk — co-equal primary)*
 
 **X / Twitter** — your build-in-public home. Designers, indie hackers, #BookTwitter, and indie authors all live here. Lowest production cost per post, highest leverage for an articulate designer-founder.
 
@@ -162,11 +192,11 @@ Five channels is too many to do well. Tier them so you protect your time budget 
 - North star: 500 followers, one video with 10k+ views.
 - **Honest assessment:** if you don't enjoy being on camera, skip this until you have a beta to show. The opportunity cost vs. one extra X thread is real.
 
-### Tier 3 — Direct (~1 hr/wk, highest ROI)
+### Tier 3 — Direct messaging *(Ayodeji — the delivery layer for the BD engine)*
 
-**WhatsApp** — your seed community engine. The 30 design-partner clubs come from here, not from X.
+**WhatsApp** — the seed-community closing tool. The 30 design-partner clubs are recruited here, as the delivery layer for Ayodeji's Tier 1 BD pipeline (not from X). This is now *his* channel, folded into the relationship engine above rather than a separate solo-founder task.
 
-- Cadence: 5-10 direct outreaches per week to club organizers in your network and 2 hops out (their friends-of-friends).
+- Cadence: 5-10 direct outreaches per week to club organizers in the network and 2 hops out (friends-of-friends).
 - North star: 30 design-partner clubs committed, in a dedicated WhatsApp broadcast list called "Flipbook design partners."
 
 ### Weekly time budget summary
@@ -180,7 +210,7 @@ Five channels is too many to do well. Tier them so you protect your time budget 
 | WhatsApp outreach | 1.0 | n/a |
 | **Total** | **9.0** | — |
 
-If you find yourself running over 10 hours/week on marketing, cut TikTok first, then halve LinkedIn cadence. Protect the build time.
+This table is **Moks' content budget** (~9 hrs/wk on top of building). **Ayodeji's BD engine (Tier 1 relationships, ~4-5 hrs/wk) runs in parallel** — the two tracks don't compete for the same hours because they're owned by different people. If Moks' content runs over 10 hrs/week, cut TikTok first, then halve LinkedIn cadence. Protect the build time.
 
 ---
 
@@ -564,13 +594,16 @@ Within your stated $15-30/mo cap, here's a default allocation. Skip any line you
 
 | Risk | Likelihood | Impact | Mitigation |
 |---|---|---|---|
-| You burn out at week 4 from posting cadence | High | Kills campaign | Tier 3 (WhatsApp) is the lifeboat — if all else fails, 30 design-partner clubs alone can make the beta work. Drop TikTok first, halve LinkedIn second, never drop X or IG. |
+| Moks burns out on posting cadence | Medium (down from High — cofounder absorbs the BD load) | Slows content engine | Content is now only *half* the job, not all of it — Ayodeji owns BD/relationships, so Moks isn't also carrying organizer recruitment. If content still overloads: drop TikTok first, halve LinkedIn second, never drop X or IG. The 30 design-partner clubs (Ayodeji's pipeline) can carry the beta even if content goes quiet. |
+| Founder concentration — too much depends on one of the two | Medium | Stalls a whole engine if one is out | Two-person teams have no bench. Keep both engines documented and lightweight; cross-brief weekly so either can cover the other's basics for a short stretch. Don't let BD live only in Ayodeji's head — log it in the shared pipeline board. |
 | Beta product isn't ready on July 15 | Medium-high | Damages launch impression | Pre-commit week 7's "if not ready, slip 5 days" rule. Slipping is fine if announced 4 days early. Shipping broken is not. |
 | Waitlist plateaus around 400-500 | Medium | Below KPI but not fatal | Messaging is wrong. Rewrite H1. Switch hero post format. |
 | You can't recruit 30 clubs from your network | Medium | Beta cohort too thin | Expand source mix earlier — start cold-DMing Bookstagram organizers in week 3, not week 5. |
 | #BookTok / Bookstagram doesn't bite | Medium | Channel underperforms | Don't catastrophize — X + LinkedIn + WhatsApp are the load-bearing channels. IG/TikTok are upside. |
 | A competitor launches something similar in the window | Low | Distraction, not extinction | Your wedge (reactions in margins + creator publishing) is specific. Don't pivot to chase them. Lean harder into the differentiator. |
 | Hate / brigading on a viral post | Low | Energy drain | Don't engage. Mute, screenshot, move on. Pin a "what is Flipbook" tweet so new visitors can self-orient. |
+| Marketing the kids' / children's-club angle (Segment D) before safety ships | Medium | Legal + reputational landmine | Hard rule: no children's-club messaging, no edu/parent-channel outreach, and no "safe for kids" claims until Phase 9 (age gate) ships, Phase 10 (VPC) is built, and counsel has signed off. Keep the whole pre-launch sprint adult-reader-focused. |
+| Minors show up organically once the app is public | Medium | Compliance exposure | The Children's Code applies the moment minors are *likely to access* a public app — Phase 9's age gate must be live before public launch regardless of whether you market to kids. Don't open to the public without it. |
 
 ---
 
@@ -615,13 +648,14 @@ In priority order. Time estimates assume your part-time bandwidth.
 - **Magic Moment** — defined in `product-vision.md` § 1; the campaign's hero demo is built around this exact 15-second clip.
 - **Permissions object** in `clubs` table — this is the foundation for the "your club, your rules" creator-narrative posts in week 5. (`prd.md` § Data Model.)
 - **Phase 2 monetization** — referenced in the creator pillar; pre-launch, you're only *signaling* it exists, not selling.
+- **Age gate & minor safety** — Segment D (children's clubs) is gated on `prd.md` § 6B and roadmap Phases 9–10. Treat it as a post-launch expansion channel; the onboarding lanes themselves are spec'd in `onboarding-flows.md`.
 
 ---
 
 ## Appendix B — A short note about your situation
 
-You're a solo, part-time, designer-founder building from Lagos on $20/month of software spend. Most launch playbooks online are written by 4-person teams in San Francisco with $50k pre-launch budgets. This plan is deliberately the opposite: it leans on the one thing those teams *can't fake* — that you are visibly, specifically, the person building this thing, in public, week after week.
+You're a two-person, part-time founding team building from Lagos on ~$20/month of software spend — a designer-founder (Moks) and an operations-and-network cofounder (Ayodeji). Most launch playbooks online are written by 4-person teams in San Francisco with $50k pre-launch budgets. This plan is deliberately the opposite: it leans on the two things those teams *can't fake* — that Moks is visibly, specifically, the person building this thing in public week after week, and that Ayodeji can actually get Flipbook into the rooms and relationships that turn into clubs.
 
-The compounding asset isn't the waitlist size. It's the **archive of build-in-public posts that, by week 8, looks like a documentary**. People will scroll back through your feed before they sign up. The plan's job is to make sure that what they find when they scroll back is good.
+Two compounding assets, not one. The first is the **archive of build-in-public posts that, by week 8, looks like a documentary** — people scroll back through the feed before they sign up, so make what they find good. The second is the **network of warm relationships** Ayodeji builds: organizers, creators, and partners who show up at launch because a real person earned their trust, not because an ad found them. The introvert builds the artifact; the extrovert opens the doors. Play to both.
 
 — end of doc.

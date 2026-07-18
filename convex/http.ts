@@ -2,8 +2,36 @@ import { httpRouter } from "convex/server";
 
 import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
+import { LOGO_FULL_LIGHT_PNG_BASE64 } from "./lib/emailAssets";
 
 const http = httpRouter();
+
+function base64ToBytes(b64: string): Uint8Array<ArrayBuffer> {
+  const bin = atob(b64);
+  const bytes = new Uint8Array(new ArrayBuffer(bin.length));
+  for (let i = 0; i < bin.length; i += 1) bytes[i] = bin.charCodeAt(i);
+  return bytes;
+}
+
+// Static PNG assets for HTML emails (logo lockup) — served from Convex so
+// they have a stable URL independent of the marketing site's Vercel deploy.
+// Long cache since these never change.
+function servePng(base64: string): () => Promise<Response> {
+  return async () =>
+    new Response(new Blob([base64ToBytes(base64)]), {
+      status: 200,
+      headers: {
+        "Content-Type": "image/png",
+        "Cache-Control": "public, max-age=31536000, immutable",
+      },
+    });
+}
+
+http.route({
+  path: "/assets/logo-full-light.png",
+  method: "GET",
+  handler: httpAction(servePng(LOGO_FULL_LIGHT_PNG_BASE64)),
+});
 
 // CORS — the marketing site is hosted off-Convex (Vercel/Cloudflare). Allow
 // any origin for the waitlist endpoint since it's intentionally public.

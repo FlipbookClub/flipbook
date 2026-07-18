@@ -1,15 +1,15 @@
 import { useState } from "react";
 import {
   Image,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
-  SafeAreaView,
   ScrollView,
   Switch,
   Text,
   View,
+  Platform,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { ImagePlus, ShieldCheck, X } from "@/lib/icons";
 import * as ImagePicker from "expo-image-picker";
 import { useMutation } from "convex/react";
@@ -19,12 +19,14 @@ import { Button } from "@/components/ui/Button";
 import { Checkbox } from "@/components/ui/Checkbox";
 import { Input } from "@/components/ui/Input";
 import { analytics } from "@/lib/analytics";
+import { uploadImageToConvex } from "@/lib/uploads";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
+import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "CreateCommunity">;
@@ -35,12 +37,14 @@ const MAX_DESCRIPTION = 500;
 export function CreateCommunityScreen({ navigation }: Props) {
   const { colors } = useTheme();
   const createClub = useMutation(api.clubs.create);
+  const generateEmblemUploadUrl = useMutation(api.clubs.generateEmblemUploadUrl);
 
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [isPrivate, setIsPrivate] = useState(true);
   const [clubType, setClubType] = useState<"standard" | "creator">("standard");
   const [emblemUri, setEmblemUri] = useState<string | null>(null);
+  const [emblemMime, setEmblemMime] = useState<string | null>(null);
   const [perms, setPerms] = useState({
     membersCanUploadBooks: false,
     membersCanInviteOthers: false,
@@ -63,6 +67,7 @@ export function CreateCommunityScreen({ navigation }: Props) {
     });
     if (!result.canceled && result.assets[0]) {
       setEmblemUri(result.assets[0].uri);
+      setEmblemMime(result.assets[0].mimeType ?? "image/jpeg");
     }
   };
 
@@ -71,14 +76,24 @@ export function CreateCommunityScreen({ navigation }: Props) {
     setFormError(null);
     setSubmitting(true);
     try {
+      // Stage the picked emblem to storage before creating the club, then hand
+      // the storageId to `create`, which resolves it to a serving URL. (Earlier
+      // this was dropped on the floor, so emblems set at creation never stuck.)
+      let emblemStorageId: Id<"_storage"> | undefined;
+      if (emblemUri) {
+        const uploadUrl = await generateEmblemUploadUrl({});
+        emblemStorageId = await uploadImageToConvex(
+          uploadUrl,
+          emblemUri,
+          emblemMime ?? "image/jpeg",
+        );
+      }
       const { clubId, inviteCode } = await createClub({
         name: trimmedName,
         description: description.trim() || undefined,
         type: clubType,
         visibility: isPrivate ? "private" : "public",
-        // Emblem URI is a local file path — real upload pipeline lands in
-        // TASK-034 (books storage). For now we just don't persist it; the
-        // moderator can update later via Edit Club (TASK-032).
+        emblemStorageId,
         permissions: perms,
       });
       analytics.track("club_created", {
@@ -100,7 +115,7 @@ export function CreateCommunityScreen({ navigation }: Props) {
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <View

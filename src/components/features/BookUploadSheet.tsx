@@ -1,5 +1,12 @@
 import { useEffect, useRef, useState } from "react";
-import { KeyboardAvoidingView, Modal, Platform, Pressable, Text, View } from "react-native";
+import {
+  Modal,
+  Pressable,
+  Text,
+  View,
+  Platform,
+} from "react-native";
+import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Pdf from "react-native-pdf";
 import { X } from "@/lib/icons";
 import { useMutation } from "convex/react";
@@ -158,7 +165,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       accessibilityViewIsModal
     >
       <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={{ flex: 1 }}
       >
         <Pressable
