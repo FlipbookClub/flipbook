@@ -241,40 +241,46 @@ export const sendInviteEmail = internalAction({
       return null;
     }
     const from = process.env.WAITLIST_FROM_EMAIL ?? "Moks at Flipbook <hello@useflipbook.com>";
-    const subject = "Your Flipbook beta invite is here";
+    const subject = "Flipbook is open — no code needed, just tap and go";
     const iosLink = "https://testflight.apple.com/join/DYP5aNv5";
+    const androidGroupLink = "https://groups.google.com/g/flipbook-test/";
     const androidLink = "https://play.google.com/store/apps/details?id=com.flipbook.club";
     const androidWebTestLink = "https://play.google.com/apps/testing/com.flipbook.club";
     const siteUrl = process.env.CONVEX_SITE_URL ?? "";
     const logoUrl = `${siteUrl}/assets/logo-full-light.png`;
-    const appStoreBadgeUrl = `${siteUrl}/assets/badges/app-store.png`;
-    const googlePlayBadgeUrl = `${siteUrl}/assets/badges/google-play.png`;
 
-    const text = `Hellooooo, Moks here. The Flipbook beta is open, and you're in.
-Your invite code:
+    const text = `Hey there,
 
-  ${args.code}
+Moks here again.
 
-GETTING STARTED
+A little while ago, I sent you an invite to the Flipbook beta. Since then, we've made getting started much simpler, so I wanted to send you a quick update.
 
-iPhone:
-1. Install "TestFlight" from the App Store if you don't already have it.
-2. Open this link on your iPhone: ${iosLink}
-3. Tap Accept, then Install (or "View in TestFlight" -> Install).
-4. Open Flipbook, tap "Let me in", and enter your code above.
+The good news: you no longer need an invite code. Just install the app, tap "Let me in," and you're in.
 
-Android:
-1. Before you tap anything: check which Google Account is active on your phone (open the Play Store app and tap your profile picture, top right) and make sure it matches the email that received this invite. If it doesn't, switch to the right account first, otherwise Google won't recognize you as a tester.
-2. Open this link: ${androidLink}
-   If that doesn't show an install option, use the web opt-in link instead: ${androidWebTestLink}
-3. Tap "Become a tester" if prompted, then "Download it on Google Play" / Install.
-4. Open Flipbook, tap "Let me in", and enter your code above.
+ON IPHONE
 
-Once you're in, start your own reading room and invite your circle, a book club, a group chat, whoever you already read with. Each person you invite will need their own quick invite code to get past the door (this is a small closed beta), so just reply to this email with names or a headcount and I'll send more codes your way immediately. Don't let that be the thing that stops you: reply first, invite after.
+1. Install TestFlight from the App Store if you don't already have it.
+2. Open this TestFlight link: ${iosLink}
+3. Tap Accept, then Install.
+4. Open Flipbook and tap "Let me in."
 
-You're one of the first people inside, so anything that feels off, confusing, or delightful, I want to hear it. Just hit reply. I read every message.
+ON ANDROID
 
-Happy reading,
+1. Join our tester group (this only takes about 10 seconds): ${androidGroupLink}
+2. Tap "Join group."
+3. Then open the Play Store here: ${androidLink}
+4. If you don't see an Install button right away, use this opt-in link instead: ${androidWebTestLink}
+5. Install Flipbook, open it, and tap "Let me in."
+
+Once you're inside, create your first Reading Room and invite the people you already love reading with, your book club, friends, classmates, colleagues, or family. Anyone can join using the same links above, so feel free to forward this email or simply share the links. After all, books are better when they're shared.
+
+As one of our earliest beta testers, you're helping shape Flipbook from the ground up. If you notice something confusing, run into a bug, or have an idea that could make the experience better, I'd love to hear it. Just reply to this email. Every message comes straight to me, and I read every single one.
+
+Thank you for believing in Flipbook before launch. It means more than you know, and I can't wait to see the Reading Rooms and communities that grow from here.
+
+See you inside.
+
+Warmly,
 Victory Moks
 Designer & Co-founder, Flipbook`;
 
@@ -285,42 +291,37 @@ Designer & Co-founder, Flipbook`;
         <tr><td style="padding:40px 32px;font-family:Raleway,-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:#3b3a6d;">
           <img src="${logoUrl}" alt="Flipbook" width="140" height="34" style="display:block;width:140px;height:auto;margin-bottom:28px;border:0;" />
 
-          <p style="margin:0 0 4px;font-size:16px;line-height:1.3;">Hellooooo, Moks here. The Flipbook beta is open, and you're in.</p>
-          <p style="margin:0 0 16px;font-size:16px;line-height:1.3;">Your invite code:</p>
-          <p style="margin:0 0 28px;font-size:20px;line-height:1.1;font-weight:600;letter-spacing:1px;">${args.code}</p>
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.4;">Hey there,</p>
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.4;">Moks here again.</p>
+          <p style="margin:0 0 16px;font-size:16px;line-height:1.4;">A little while ago, I sent you an invite to the Flipbook beta. Since then, we've made getting started much simpler, so I wanted to send you a quick update.</p>
+          <p style="margin:0 0 28px;font-size:16px;line-height:1.4;"><strong>The good news:</strong> you no longer need an invite code. Just install the app, tap <strong>"Let me in,"</strong> and you're in.</p>
 
           <p style="margin:0 0 6px;font-size:16px;line-height:1.3;font-weight:600;">📱 On iPhone</p>
           <ol style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.5;">
             <li>Install <strong>TestFlight</strong> from the App Store if you don't already have it.</li>
-            <li>On your iPhone, open <a href="${iosLink}" style="color:#3b3a6d;">this TestFlight link</a>.</li>
+            <li>Open this <a href="${iosLink}" style="color:#3b3a6d;">TestFlight link</a>.</li>
             <li>Tap <strong>Accept</strong>, then <strong>Install</strong>.</li>
-            <li>Open Flipbook, tap "Let me in", and enter your code above.</li>
+            <li>Open Flipbook and tap <strong>"Let me in."</strong></li>
           </ol>
 
           <p style="margin:0 0 6px;font-size:16px;line-height:1.3;font-weight:600;">🤖 On Android</p>
-          <ol style="margin:0 0 8px;padding-left:20px;font-size:15px;line-height:1.5;">
-            <li><strong>Before you tap anything:</strong> open the Play Store app and tap your profile picture (top right) to check which Google Account is active. It needs to match the email that received this invite, or Google won't recognize you as a tester — switch accounts first if it doesn't match.</li>
-            <li>Open <a href="${androidLink}" style="color:#3b3a6d;">this Play Store link</a>. If it doesn't show an install option, use the <a href="${androidWebTestLink}" style="color:#3b3a6d;">web opt-in link</a> instead.</li>
-            <li>Tap <strong>"Become a tester"</strong> if prompted, then Install.</li>
-            <li>Open Flipbook, tap "Let me in", and enter your code above.</li>
+          <ol style="margin:0 0 24px;padding-left:20px;font-size:15px;line-height:1.5;">
+            <li>Join our <a href="${androidGroupLink}" style="color:#3b3a6d;">tester group</a> (this only takes about 10 seconds).</li>
+            <li>Tap <strong>"Join group."</strong></li>
+            <li>Then open the <a href="${androidLink}" style="color:#3b3a6d;">Play Store here</a>.</li>
+            <li>If you don't see an Install button right away, use this <a href="${androidWebTestLink}" style="color:#3b3a6d;">opt-in link</a> instead.</li>
+            <li>Install Flipbook, open it, and tap <strong>"Let me in."</strong></li>
           </ol>
 
-          <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
-            <tr>
-              <td style="padding-right:8px;">
-                <a href="${iosLink}"><img src="${appStoreBadgeUrl}" alt="Download on the App Store" width="120" height="40" style="display:block;border:0;" /></a>
-              </td>
-              <td>
-                <a href="${androidLink}"><img src="${googlePlayBadgeUrl}" alt="Get it on Google Play" width="103" height="40" style="display:block;border:0;" /></a>
-              </td>
-            </tr>
-          </table>
+          <p style="margin:0 0 20px;font-size:16px;line-height:1.4;">Once you're inside, create your first Reading Room and invite the people you already love reading with, your book club, friends, classmates, colleagues, or family. Anyone can join using the same links above, so feel free to forward this email or simply share the links. After all, books are better when they're shared.</p>
 
-          <p style="margin:0 0 20px;font-size:16px;line-height:1.4;">Once you're in, <strong>start your own reading room and invite your circle</strong> — a book club, a group chat, whoever you already read with. Each person you invite will need their own quick invite code to get past the door (this is a small closed beta), so just <strong>reply to this email with names or a headcount and I'll send more codes your way immediately</strong>. Don't let that be the thing that stops you — reply first, invite after.</p>
+          <p style="margin:0 0 20px;font-size:16px;line-height:1.4;">As one of our earliest beta testers, you're helping shape Flipbook from the ground up. If you notice something confusing, run into a bug, or have an idea that could make the experience better, I'd love to hear it. Just reply to this email. Every message comes straight to me, and I read every single one.</p>
 
-          <p style="margin:0 0 20px;font-size:16px;line-height:1.3;">You're one of the first people inside, so anything that feels off, confusing, or delightful, I want to hear it. Just hit reply. I read every message.</p>
+          <p style="margin:0 0 20px;font-size:16px;line-height:1.4;">Thank you for believing in Flipbook before launch. It means more than you know, and I can't wait to see the Reading Rooms and communities that grow from here.</p>
 
-          <p style="margin:0;font-size:16px;line-height:1.3;">Happy reading,<br/>Victory Moks<br/><span style="color:#6b6a93;">Designer &amp; Co-founder, Flipbook</span></p>
+          <p style="margin:0 0 20px;font-size:16px;line-height:1.4;">See you inside.</p>
+
+          <p style="margin:0;font-size:16px;line-height:1.3;">Warmly,<br/><strong>Victory Moks</strong><br/><span style="color:#6b6a93;">Designer &amp; Co-founder, Flipbook</span></p>
         </td></tr>
       </table>
     </td></tr>

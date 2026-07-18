@@ -2,11 +2,7 @@ import { httpRouter } from "convex/server";
 
 import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
-import {
-  APP_STORE_BADGE_PNG_BASE64,
-  GOOGLE_PLAY_BADGE_PNG_BASE64,
-  LOGO_FULL_LIGHT_PNG_BASE64,
-} from "./lib/emailAssets";
+import { LOGO_FULL_LIGHT_PNG_BASE64 } from "./lib/emailAssets";
 
 const http = httpRouter();
 
@@ -17,9 +13,9 @@ function base64ToBytes(b64: string): Uint8Array<ArrayBuffer> {
   return bytes;
 }
 
-// Static PNG assets for HTML emails (App Store / Play Store badges, logo
-// lockup) — served from Convex so they have a stable URL independent of the
-// marketing site's Vercel deploy. Long cache since these never change.
+// Static PNG assets for HTML emails (logo lockup) — served from Convex so
+// they have a stable URL independent of the marketing site's Vercel deploy.
+// Long cache since these never change.
 function servePng(base64: string): () => Promise<Response> {
   return async () =>
     new Response(new Blob([base64ToBytes(base64)]), {
@@ -30,18 +26,6 @@ function servePng(base64: string): () => Promise<Response> {
       },
     });
 }
-
-http.route({
-  path: "/assets/badges/app-store.png",
-  method: "GET",
-  handler: httpAction(servePng(APP_STORE_BADGE_PNG_BASE64)),
-});
-
-http.route({
-  path: "/assets/badges/google-play.png",
-  method: "GET",
-  handler: httpAction(servePng(GOOGLE_PLAY_BADGE_PNG_BASE64)),
-});
 
 http.route({
   path: "/assets/logo-full-light.png",
