@@ -46,9 +46,17 @@ export function ForgotPasswordScreen({ navigation }: Props) {
       });
       navigation.navigate("ResetPassword", { email: email.trim() });
     } catch (err) {
+      const errors = (err as { errors?: { code?: string; message?: string }[] })?.errors;
+      // Same OAuth-only-account case as SignInScreen: no password exists to
+      // reset, so give an actionable message instead of Clerk's raw text.
+      if (errors?.[0]?.code === "strategy_for_user_invalid") {
+        setFormError(
+          "This email is signed up with Apple or Google — there's no password to reset. Use one of those buttons on the sign-in screen instead.",
+        );
+        return;
+      }
       const message =
-        (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Couldn't start a password reset. Check the email and try again.";
+        errors?.[0]?.message ?? "Couldn't start a password reset. Check the email and try again.";
       setFormError(message);
     } finally {
       setSubmitting(false);

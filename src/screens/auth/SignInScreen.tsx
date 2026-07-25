@@ -135,6 +135,16 @@ export function SignInScreen({ navigation }: Props) {
         setFormError(null);
         return;
       }
+      // This account was created via Apple/Google, so it has no password —
+      // Clerk rejects the password strategy outright rather than returning a
+      // needs_first_factor status we could route around. Point the user back
+      // at the social buttons instead of surfacing Clerk's raw error text.
+      if (code === "strategy_for_user_invalid") {
+        setFormError(
+          "This email is signed up with Apple or Google, not a password. Use one of the buttons below instead.",
+        );
+        return;
+      }
       setFormError(errors?.[0]?.message ?? "Sign-in failed. Please try again.");
     } finally {
       setSubmitting(false);
