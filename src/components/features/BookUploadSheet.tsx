@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  Alert,
   Modal,
   Pressable,
   Text,
@@ -147,6 +148,25 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
     }
   };
 
+  // Closing mid-upload doesn't cancel the in-flight uploadAsync task — it just
+  // keeps going with no visible UI, which is exactly how a couple of uploads
+  // went silently incomplete. Gate every dismissal path (backdrop tap, Android
+  // back button) behind a confirmation once we're past the metadata stage.
+  const handleRequestClose = () => {
+    if (stage === "metadata") {
+      onClose();
+      return;
+    }
+    Alert.alert(
+      "Upload in progress",
+      "This book hasn't finished uploading yet. Leave anyway? It may not finish.",
+      [
+        { text: "Keep waiting", style: "cancel" },
+        { text: "Leave anyway", style: "destructive", onPress: onClose },
+      ],
+    );
+  };
+
   const stageLabel =
     stage === "uploading"
       ? `Uploading… ${Math.round(progress * 100)}%`
@@ -161,7 +181,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       visible={visible}
       transparent
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleRequestClose}
       accessibilityViewIsModal
     >
       <KeyboardAvoidingView
@@ -169,7 +189,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         style={{ flex: 1 }}
       >
         <Pressable
-          onPress={stage === "metadata" ? onClose : undefined}
+          onPress={handleRequestClose}
           style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
           accessibilityLabel="Dismiss sheet"
         />
@@ -251,6 +271,10 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
           <Text style={{ ...typography.bodySm, color: palette.error }}>{error}</Text>
         ) : null}
 
+        {stage !== "metadata" ? (
+          <UploadProgressBar progress={stage === "registering" ? 1 : progress} />
+        ) : null}
+
         <Button
           label={stageLabel}
           fullWidth
@@ -306,5 +330,35 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         />
       </View>
     </Modal>
+  );
+}
+
+// A real, visible progress indicator — previously the only feedback during
+// upload was the (disabled, muted-colored) submit button's label text, which
+// read as inert rather than "actively working," and led to a few users
+// closing out mid-upload thinking nothing was happening.
+function UploadProgressBar({ progress }: { progress: number }) {
+  const { colors } = useTheme();
+  const pct = Math.max(0, Math.min(1, progress));
+  return (
+    <View
+      style={{
+        height: 6,
+        borderRadius: radius.pill,
+        backgroundColor: colors.border,
+        overflow: "hidden",
+      }}
+      accessibilityRole="progressbar"
+      accessibilityValue={{ min: 0, max: 100, now: Math.round(pct * 100) }}
+    >
+      <View
+        style={{
+          width: `${pct * 100}%`,
+          height: "100%",
+          borderRadius: radius.pill,
+          backgroundColor: palette.accent,
+        }}
+      />
+    </View>
   );
 }
