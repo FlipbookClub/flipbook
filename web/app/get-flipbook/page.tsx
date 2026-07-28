@@ -132,7 +132,7 @@ function ActionLink({ href, children }: { href: string; children: React.ReactNod
       href={href}
       target="_blank"
       rel="noreferrer"
-      className="font-medium text-accent underline-offset-4 hover:underline"
+      className="font-medium text-accent underline underline-offset-4 hover:text-accent-strong"
     >
       {children}
     </a>

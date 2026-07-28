@@ -34,7 +34,10 @@ const items: Array<{ q: string; a: React.ReactNode }> = [
       <>
         Both iOS and Android, from day one. Mobile-first by design, with a
         web companion later. Download links are on our{" "}
-        <a href="/get-flipbook" className="text-accent underline-offset-4 hover:underline">
+        <a
+          href="/get-flipbook"
+          className="text-accent underline underline-offset-4 hover:text-accent-strong"
+        >
           Get Flipbook
         </a>{" "}
         page.
