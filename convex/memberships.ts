@@ -2,6 +2,7 @@ import { ConvexError, v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 import { getCurrentUser } from "./users";
+import { assertIsModerator } from "./clubs";
 
 const memberWithProgressValidator = v.object({
   _id: v.id("memberships"),
@@ -224,7 +225,6 @@ export const removeMember = mutation({
     const me = await getCurrentUser(ctx);
     const club = await ctx.db.get(args.clubId);
     if (!club) throw new ConvexError({ code: "club_not_found" });
-    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
     if (args.userId === me._id) throw new ConvexError({ code: "cannot_remove_self" });
     if (args.userId === club.moderatorId) throw new ConvexError({ code: "cannot_remove_moderator" });
 
@@ -235,6 +235,14 @@ export const removeMember = mutation({
       )
       .unique();
     if (!membership) throw new ConvexError({ code: "not_member" });
+
+    // Any moderator (owner or delegate) may remove a regular member; removing
+    // a delegated moderator stays owner-only.
+    if (membership.role === "moderator") {
+      if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    } else {
+      await assertIsModerator(ctx, club, me._id);
+    }
 
     await ctx.db.delete(membership._id);
     await ctx.db.patch(args.clubId, {
@@ -253,7 +261,6 @@ export const blockMember = mutation({
     const me = await getCurrentUser(ctx);
     const club = await ctx.db.get(args.clubId);
     if (!club) throw new ConvexError({ code: "club_not_found" });
-    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
     if (args.userId === me._id) throw new ConvexError({ code: "cannot_block_self" });
     if (args.userId === club.moderatorId) throw new ConvexError({ code: "cannot_block_moderator" });
 
@@ -264,6 +271,15 @@ export const blockMember = mutation({
         q.eq("clubId", args.clubId).eq("userId", args.userId),
       )
       .unique();
+
+    // Any moderator (owner or delegate) may block a regular member (or a
+    // non-member); blocking a delegated moderator stays owner-only.
+    if (membership?.role === "moderator") {
+      if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    } else {
+      await assertIsModerator(ctx, club, me._id);
+    }
+
     if (membership) {
       await ctx.db.delete(membership._id);
       await ctx.db.patch(args.clubId, {
@@ -287,6 +303,47 @@ export const blockMember = mutation({
         createdAt: Date.now(),
       });
     }
+    return null;
+  },
+});
+
+// Promote a member to moderator, or demote a moderator back to member.
+// Promotion is open to any current moderator (owner or delegate). Demotion is
+// owner-only — a delegated moderator can't demote anyone, including another
+// delegated moderator, and the club's original owner can never be demoted
+// here (there's no ownership-transfer feature yet, so `moderatorId` itself
+// never changes via this mutation).
+export const setMemberRole = mutation({
+  args: {
+    clubId: v.id("clubs"),
+    userId: v.id("users"),
+    role: v.union(v.literal("moderator"), v.literal("member")),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const me = await getCurrentUser(ctx);
+    const club = await ctx.db.get(args.clubId);
+    if (!club) throw new ConvexError({ code: "club_not_found" });
+    if (args.userId === club.moderatorId) {
+      throw new ConvexError({ code: "cannot_change_owner_role" });
+    }
+
+    if (args.role === "moderator") {
+      await assertIsModerator(ctx, club, me._id);
+    } else if (club.moderatorId !== me._id) {
+      throw new ConvexError({ code: "not_moderator" });
+    }
+
+    const membership = await ctx.db
+      .query("memberships")
+      .withIndex("by_club_and_user", (q) =>
+        q.eq("clubId", args.clubId).eq("userId", args.userId),
+      )
+      .unique();
+    if (!membership) throw new ConvexError({ code: "not_member" });
+    if (membership.role === args.role) return null;
+
+    await ctx.db.patch(membership._id, { role: args.role });
     return null;
   },
 });

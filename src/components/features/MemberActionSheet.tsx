@@ -7,7 +7,7 @@ import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
-import { Trash2, X } from "@/lib/icons";
+import { ShieldCheck, Trash2, X } from "@/lib/icons";
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
@@ -17,19 +17,29 @@ interface MemberActionSheetProps {
   clubId: Id<"clubs">;
   userId: Id<"users">;
   displayName: string;
+  // The target member's current role, and whether the viewer opening this
+  // sheet is the club's original owner (not just any moderator) — governs
+  // which rows render. See handlePromote/handleDemote below and the
+  // corresponding server-side guards in convex/memberships.ts.
+  targetRole: "moderator" | "member";
+  viewerIsOwner: boolean;
   onClose: () => void;
   onActionDone: () => void;
 }
 
-// Moderator-only action sheet for a club member. Offers two escalating actions:
-// remove (they can rejoin via invite) and remove+block (they can't rejoin).
-// Past reactions/progress/bookmarks are retained on both paths — block governs
-// rejoin, not erasure, in keeping with the "never make the user feel blamed" voice.
+// Moderator-only action sheet for a club member. Any moderator (owner or
+// delegate) can promote a regular member or remove/block them. Demoting,
+// removing, or blocking another MODERATOR is owner-only — enforced both here
+// (row visibility) and server-side (the real guard). Past reactions/progress/
+// bookmarks are retained on every path — block governs rejoin, not erasure,
+// in keeping with the "never make the user feel blamed" voice.
 export function MemberActionSheet({
   visible,
   clubId,
   userId,
   displayName,
+  targetRole,
+  viewerIsOwner,
   onClose,
   onActionDone,
 }: MemberActionSheetProps) {
@@ -37,7 +47,59 @@ export function MemberActionSheet({
   const insets = useSafeAreaInsets();
   const removeMember = useMutation(api.memberships.removeMember);
   const blockMember = useMutation(api.memberships.blockMember);
+  const setMemberRole = useMutation(api.memberships.setMemberRole);
   const [acting, setActing] = useState(false);
+
+  const handlePromote = () => {
+    Alert.alert(
+      `Make ${displayName} a moderator?`,
+      "They'll be able to manage regular members and upload books, same as you.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Make moderator",
+          onPress: async () => {
+            setActing(true);
+            try {
+              await setMemberRole({ clubId, userId, role: "moderator" });
+              onActionDone();
+              onClose();
+            } catch {
+              Alert.alert("Couldn't update their role. Try again.");
+            } finally {
+              setActing(false);
+            }
+          },
+        },
+      ],
+    );
+  };
+
+  const handleDemote = () => {
+    Alert.alert(
+      `Remove ${displayName} as moderator?`,
+      "They'll go back to being a regular member.",
+      [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Remove moderator",
+          style: "destructive",
+          onPress: async () => {
+            setActing(true);
+            try {
+              await setMemberRole({ clubId, userId, role: "member" });
+              onActionDone();
+              onClose();
+            } catch {
+              Alert.alert("Couldn't update their role. Try again.");
+            } finally {
+              setActing(false);
+            }
+          },
+        },
+      ],
+    );
+  };
 
   const handleRemove = () => {
     Alert.alert(
@@ -123,20 +185,40 @@ export function MemberActionSheet({
             </Pressable>
           </View>
 
-          <SheetRow
-            icon={<Trash2 size={20} color={palette.error} />}
-            label="Remove from community"
-            labelColor={palette.error}
-            disabled={acting}
-            onPress={handleRemove}
-          />
-          <SheetRow
-            icon={<Trash2 size={20} color={palette.error} />}
-            label="Remove & block from rejoining"
-            labelColor={palette.error}
-            disabled={acting}
-            onPress={handleBlock}
-          />
+          {targetRole === "member" ? (
+            <SheetRow
+              icon={<ShieldCheck size={20} color={colors.textPrimary} />}
+              label="Make moderator"
+              disabled={acting}
+              onPress={handlePromote}
+            />
+          ) : null}
+          {targetRole === "moderator" && viewerIsOwner ? (
+            <SheetRow
+              icon={<ShieldCheck size={20} color={colors.textPrimary} />}
+              label="Remove moderator status"
+              disabled={acting}
+              onPress={handleDemote}
+            />
+          ) : null}
+          {targetRole === "member" || viewerIsOwner ? (
+            <>
+              <SheetRow
+                icon={<Trash2 size={20} color={palette.error} />}
+                label="Remove from community"
+                labelColor={palette.error}
+                disabled={acting}
+                onPress={handleRemove}
+              />
+              <SheetRow
+                icon={<Trash2 size={20} color={palette.error} />}
+                label="Remove & block from rejoining"
+                labelColor={palette.error}
+                disabled={acting}
+                onPress={handleBlock}
+              />
+            </>
+          ) : null}
         </Pressable>
       </Pressable>
     </Modal>
