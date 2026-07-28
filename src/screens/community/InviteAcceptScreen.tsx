@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Image,
   Pressable,
   Text,
   View,
@@ -56,7 +57,10 @@ export function InviteAcceptScreen({ navigation, route }: Props) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
+    <SafeAreaView
+      edges={["top", "left", "right"]}
+      style={{ flex: 1, backgroundColor: colors.surfacePrimary }}
+    >
       <View
         style={{
           flexDirection: "row",
@@ -117,28 +121,37 @@ export function InviteAcceptScreen({ navigation, route }: Props) {
               backgroundColor: palette.accentDeep,
               padding: spacing.s4,
               borderRadius: radius.md,
-              gap: spacing.s2,
+              flexDirection: "row",
+              gap: spacing.s3,
             }}
           >
-            <Text
-              style={{
-                ...typography.bodyLg,
-                color: palette.textOnBrand,
-                fontFamily: "Raleway-Bold",
-                textTransform: "uppercase",
-                letterSpacing: 0.5,
-              }}
-            >
-              {club.name}
-            </Text>
-            {club.description ? (
-              <Text style={{ ...typography.bodySm, color: palette.textOnBrand, opacity: 0.9 }}>
-                {club.description}
-              </Text>
+            {club.coverImageUrl ? (
+              <Image
+                source={{ uri: club.coverImageUrl }}
+                style={{ width: 48, height: 48, borderRadius: radius.sm }}
+              />
             ) : null}
-            <Text style={{ ...typography.bodySm, color: palette.textOnBrand, opacity: 0.85 }}>
-              {club.memberCount.toLocaleString()} {club.memberCount === 1 ? "member" : "members"}
-            </Text>
+            <View style={{ flex: 1, gap: spacing.s2 }}>
+              <Text
+                style={{
+                  ...typography.bodyLg,
+                  color: palette.textOnBrand,
+                  fontFamily: "Raleway-Bold",
+                  textTransform: "uppercase",
+                  letterSpacing: 0.5,
+                }}
+              >
+                {club.name}
+              </Text>
+              {club.description ? (
+                <Text style={{ ...typography.bodySm, color: palette.textOnBrand, opacity: 0.9 }}>
+                  {club.description}
+                </Text>
+              ) : null}
+              <Text style={{ ...typography.bodySm, color: palette.textOnBrand, opacity: 0.85 }}>
+                {club.memberCount.toLocaleString()} {club.memberCount === 1 ? "member" : "members"}
+              </Text>
+            </View>
           </View>
         )}
 
