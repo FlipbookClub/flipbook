@@ -1,0 +1,14 @@
+{
+  "name": "native-highlight-pdf",
+  "version": "0.1.0",
+  "description": "Native PDF text-selection + highlight annotation view (PDFKit on iOS, androidx.pdf on Android)",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "license": "UNLICENSED",
+  "dependencies": {},
+  "peerDependencies": {
+    "expo": "*",
+    "react": "*",
+    "react-native": "*"
+  }
+}
