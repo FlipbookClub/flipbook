@@ -13,9 +13,9 @@ import type { Id } from "./_generated/dataModel";
 
 const PERSONAS = [
   { slug: "ada", displayName: "Ada", firstName: "Ada", lastName: "O.", genres: ["Fiction", "Romance"] },
-  { slug: "tunde", displayName: "Tunde", firstName: "Tunde", lastName: "A.", genres: ["Sci-Fi/Fantasy"] },
-  { slug: "mara", displayName: "Mara", firstName: "Mara", lastName: "K.", genres: ["Mystery/Thriller"] },
-  { slug: "deji", displayName: "Deji", firstName: "Deji", lastName: "B.", genres: ["Nonfiction", "History"] },
+  { slug: "tunde", displayName: "Tunde", firstName: "Tunde", lastName: "A.", genres: ["Fantasy"] },
+  { slug: "mara", displayName: "Mara", firstName: "Mara", lastName: "K.", genres: ["Mystery", "Thriller"] },
+  { slug: "deji", displayName: "Deji", firstName: "Deji", lastName: "B.", genres: ["Biography & Memoir", "History"] },
 ];
 
 const EMOJIS = ["🔥", "❤️", "😭", "🤯", "💀", "✨"] as const;
