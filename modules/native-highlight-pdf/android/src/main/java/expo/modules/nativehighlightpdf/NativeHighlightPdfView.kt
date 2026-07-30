@@ -5,7 +5,6 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.os.ParcelFileDescriptor
-import android.util.Log
 import android.view.MotionEvent
 import expo.modules.kotlin.AppContext
 import expo.modules.kotlin.viewevent.EventDispatcher
@@ -87,18 +86,12 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     if (w > 0 && h > 0) renderCurrentPage()
   }
 
-  override fun onTouchEvent(event: MotionEvent): Boolean {
-    Log.d("NativeHighlightPdf", "onTouchEvent action=${event.actionMasked} x=${event.x} y=${event.y}")
-    return handleTouch(event)
-  }
+  override fun onTouchEvent(event: MotionEvent): Boolean = handleTouch(event)
 
   // A ViewGroup normally sends touches to children and only calls its own
   // onTouchEvent if none consume it. Since we have no children, force every
   // touch straight to our own onTouchEvent.
-  override fun onInterceptTouchEvent(event: MotionEvent): Boolean {
-    Log.d("NativeHighlightPdf", "onInterceptTouchEvent action=${event.actionMasked}")
-    return true
-  }
+  override fun onInterceptTouchEvent(event: MotionEvent): Boolean = true
 
   private fun drawRects(canvas: Canvas, rects: List<NormRect>, paint: Paint) {
     val w = width.toFloat()
@@ -196,25 +189,25 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
 
   // MARK: - Touch -> text selection
 
-  // PdfiumAndroid's character hit-testing expects page-point coordinates in
-  // the same top-left-origin space the bitmap is rendered into (matching
-  // renderPageBitmap's own convention) — NOT PDF's native bottom-left origin.
+  // Confirmed against PdfiumAndroid's source (PdfTextPageU.textPageGetCharIndexAtPos):
+  // it forwards x/y straight to FPDFText_GetCharIndexAtPos with no transform,
+  // which expects PDF-native page coordinates — bottom-left origin, y
+  // increasing upward. renderPageBitmap handles the flip to bitmap/device
+  // space internally, but the raw text APIs do not, so we flip here.
   private fun viewToPagePoint(x: Float, y: Float): Pair<Double, Double> {
     val w = width.toFloat().coerceAtLeast(1f)
     val h = height.toFloat().coerceAtLeast(1f)
-    return Pair((x / w * pageWidthPt).toDouble(), (y / h * pageHeightPt).toDouble())
+    val pdfX = (x / w * pageWidthPt).toDouble()
+    val pdfY = (pageHeightPt - y / h * pageHeightPt).toDouble()
+    return Pair(pdfX, pdfY)
   }
 
   private fun handleTouch(event: MotionEvent): Boolean {
-    val textPage = currentTextPage ?: run {
-      Log.d("NativeHighlightPdf", "handleTouch: no currentTextPage")
-      return false
-    }
+    val textPage = currentTextPage ?: return false
     val (ptX, ptY) = viewToPagePoint(event.x, event.y)
     return when (event.actionMasked) {
       MotionEvent.ACTION_DOWN -> {
         val idx = textPage.textPageGetCharIndexAtPos(ptX, ptY, 12.0, 12.0)
-        Log.d("NativeHighlightPdf", "DOWN pt=($ptX,$ptY) pageWH=($pageWidthPt,$pageHeightPt) idx=$idx")
         if (idx < 0) return false
         dragAnchorChar = idx
         selStartChar = idx
@@ -259,19 +252,24 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     val lines = mutableListOf<Line>()
     for (i in start..end) {
       val box = textPage.textPageGetCharBox(i) ?: continue
-      if (box.width() <= 0f || box.height() <= 0f) continue
-      val midY = box.top + box.height() / 2f
+      // Confirmed against PdfiumAndroid's source: box.top/box.bottom hold the
+      // raw PDF-native values unflipped (box.top is numerically the LARGER,
+      // visually-higher y — the opposite of Android's usual top<bottom
+      // convention). Flip into top-left-origin (visualTop < visualBottom,
+      // distance from the page's top edge) before grouping/normalizing.
+      val visualTop = pageHeightPt - box.top
+      val visualBottom = pageHeightPt - box.bottom
+      val height = visualBottom - visualTop
+      if (box.width() <= 0f || height <= 0f) continue
+      val midY = visualTop + height / 2f
       val line = lines.lastOrNull()?.takeIf { midY in it.minY..it.maxY }
       if (line != null) {
         line.minX = min(line.minX, box.left)
         line.maxX = max(line.maxX, box.right)
       } else {
-        lines.add(Line(box.left, box.right, box.top, box.bottom))
+        lines.add(Line(box.left, box.right, visualTop, visualBottom))
       }
     }
-    // PdfiumAndroid's char boxes are top-left-origin in the same page-point
-    // space as our hit-testing above (not PDF's native bottom-left origin),
-    // so normalizing is a plain divide — no y-flip needed here, unlike iOS.
     return lines.map { l ->
       NormRect(
         x = (l.minX / pageWidthPt).toDouble(),
