@@ -544,14 +544,9 @@ export function ReaderScreen({ navigation, route }: Props) {
                   }}
                   onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
                   onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
-                  onHighlightCreated={(e) => {
-                    setPendingHighlight({
-                      page: e.nativeEvent.page,
-                      quote: e.nativeEvent.quote,
-                      rects: e.nativeEvent.rects,
-                    });
-                    setComposerOpen(true);
-                  }}
+                  onHighlightTapped={(e) =>
+                    setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
+                  }
                   onLoadError={(e) => setLoadError(e.nativeEvent.message)}
                 />
               ) : (
@@ -648,7 +643,12 @@ export function ReaderScreen({ navigation, route }: Props) {
           actions (react to the page vs. highlight the selected text). */}
       {useNativeHighlightReader && hasSelection ? (
         <Pressable
-          onPress={() => pdfRef.current?.createHighlightFromSelection()}
+          onPress={async () => {
+            const captured = await pdfRef.current?.captureSelection();
+            if (!captured) return;
+            setPendingHighlight(captured);
+            setComposerOpen(true);
+          }}
           accessibilityRole="button"
           accessibilityLabel="Highlight selection"
           hitSlop={spacing.s3}
@@ -680,9 +680,14 @@ export function ReaderScreen({ navigation, route }: Props) {
       />
       <ReactionComposer
         visible={composerOpen}
+        quote={pendingHighlight?.quote}
         onClose={() => {
           setComposerOpen(false);
           setPendingHighlight(null);
+          // Covers the cancel-without-capturing path (captureSelection
+          // already clears on the native side once it succeeds) — harmless
+          // no-op when there's nothing selected.
+          pdfRef.current?.clearSelection();
         }}
         onSubmit={handleReactionSubmit}
       />

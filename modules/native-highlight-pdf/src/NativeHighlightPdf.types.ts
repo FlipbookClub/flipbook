@@ -12,12 +12,16 @@ export type ExistingHighlight = {
 export type DocumentLoadedEventPayload = { totalPages: number };
 export type PageChangedEventPayload = { page: number; totalPages: number };
 export type SelectionChangedEventPayload = { hasSelection: boolean };
-export type HighlightCreatedEventPayload = {
+export type HighlightTappedEventPayload = { reactionId: string };
+export type LoadErrorEventPayload = { message: string };
+
+// What captureSelection() resolves to — null if there was nothing (valid)
+// selected at call time.
+export type CapturedSelection = {
   page: number;
   quote: string;
   rects: HighlightRect[];
 };
-export type LoadErrorEventPayload = { message: string };
 
 export type NativeHighlightPdfViewProps = {
   style?: StyleProp<ViewStyle>;
@@ -27,7 +31,7 @@ export type NativeHighlightPdfViewProps = {
   onDocumentLoaded?: (event: { nativeEvent: DocumentLoadedEventPayload }) => void;
   onPageChanged?: (event: { nativeEvent: PageChangedEventPayload }) => void;
   onSelectionChanged?: (event: { nativeEvent: SelectionChangedEventPayload }) => void;
-  onHighlightCreated?: (event: { nativeEvent: HighlightCreatedEventPayload }) => void;
+  onHighlightTapped?: (event: { nativeEvent: HighlightTappedEventPayload }) => void;
   onLoadError?: (event: { nativeEvent: LoadErrorEventPayload }) => void;
 };
 
@@ -35,5 +39,11 @@ export type NativeHighlightPdfViewProps = {
 export interface NativeHighlightPdfViewRef {
   jumpToPage(page: number): Promise<void>;
   clearSelection(): Promise<void>;
-  createHighlightFromSelection(): Promise<void>;
+  // Captures the current selection's {page, quote, rects} without painting
+  // an annotation — see NativeHighlightPdfView.swift's captureSelection()
+  // doc comment. iOS-only for now: the Android Kotlin module still exposes
+  // the older createHighlightFromSelection/onHighlightCreated shape and
+  // hasn't been updated to match this interface (it's not wired into
+  // ReaderScreen yet either — see the Android page-turn-gesture gap).
+  captureSelection(): Promise<CapturedSelection | null>;
 }

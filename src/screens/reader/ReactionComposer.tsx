@@ -11,6 +11,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MessageSquare, X } from "@/lib/icons";
 
 import { Button } from "@/components/ui/Button";
+import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
@@ -36,9 +37,12 @@ interface Props {
   // When set, the composer opens directly in reply mode (skips emoji picker
   // and shows the comment field). Used from the reactions details sheet.
   replyMode?: boolean;
+  // When set, this reaction is anchored to a highlighted text selection —
+  // shown as a quoted block so the user can see what they're reacting to.
+  quote?: string;
 }
 
-export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false }: Props) {
+export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false, quote }: Props) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [stage, setStage] = useState<Stage>(replyMode ? "comment" : "picker");
@@ -137,6 +141,24 @@ export function ReactionComposer({ visible, onClose, onSubmit, replyMode = false
               <X size={22} color={colors.textPrimary} />
             </Pressable>
           </View>
+
+          {quote ? (
+            <View
+              style={{
+                flexDirection: "row",
+                gap: spacing.s2,
+                paddingVertical: spacing.s1,
+              }}
+            >
+              <View style={{ width: 3, borderRadius: radius.pill, backgroundColor: palette.highlight }} />
+              <Text
+                style={{ ...typography.bodySm, color: colors.textSecondary, fontStyle: "italic", flex: 1 }}
+                numberOfLines={3}
+              >
+                {quote}
+              </Text>
+            </View>
+          ) : null}
 
           {stage === "picker" ? (
             <>
