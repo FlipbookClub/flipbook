@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { internal } from "./_generated/api";
 import { getCurrentUser } from "./users";
 import { assertIsModerator } from "./clubs";
 
@@ -344,6 +345,13 @@ export const setMemberRole = mutation({
     if (membership.role === args.role) return null;
 
     await ctx.db.patch(membership._id, { role: args.role });
+    if (args.role === "moderator") {
+      await ctx.scheduler.runAfter(0, internal.notifications.sendModeratorPromotedFanout, {
+        clubId: args.clubId,
+        userId: args.userId,
+        promotedByUserId: me._id,
+      });
+    }
     return null;
   },
 });
@@ -356,7 +364,7 @@ export const unblockMember = mutation({
     const me = await getCurrentUser(ctx);
     const club = await ctx.db.get(args.clubId);
     if (!club) throw new ConvexError({ code: "club_not_found" });
-    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    await assertIsModerator(ctx, club, me._id);
 
     const block = await ctx.db
       .query("clubBlocks")

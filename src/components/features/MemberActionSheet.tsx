@@ -12,6 +12,25 @@ import { ShieldCheck, Trash2, X } from "@/lib/icons";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
 
+// setMemberRole's known ConvexError codes (convex/memberships.ts), mapped to
+// copy a member can act on. Falls back to the raw code (still more useful
+// than a silent generic message) rather than masking unexpected failures.
+function describeRoleError(err: unknown): string {
+  const code = (err as { data?: { code?: string } } | undefined)?.data?.code;
+  switch (code) {
+    case "not_moderator":
+      return "Only a moderator can do that.";
+    case "cannot_change_owner_role":
+      return "The community owner's role can't be changed.";
+    case "not_member":
+      return "They're no longer a member of this community.";
+    case "club_not_found":
+      return "This community couldn't be found.";
+    default:
+      return code ?? "Couldn't update their role. Try again.";
+  }
+}
+
 interface MemberActionSheetProps {
   visible: boolean;
   clubId: Id<"clubs">;
@@ -64,8 +83,8 @@ export function MemberActionSheet({
               await setMemberRole({ clubId, userId, role: "moderator" });
               onActionDone();
               onClose();
-            } catch {
-              Alert.alert("Couldn't update their role. Try again.");
+            } catch (err) {
+              Alert.alert(describeRoleError(err));
             } finally {
               setActing(false);
             }
@@ -90,8 +109,8 @@ export function MemberActionSheet({
               await setMemberRole({ clubId, userId, role: "member" });
               onActionDone();
               onClose();
-            } catch {
-              Alert.alert("Couldn't update their role. Try again.");
+            } catch (err) {
+              Alert.alert(describeRoleError(err));
             } finally {
               setActing(false);
             }
