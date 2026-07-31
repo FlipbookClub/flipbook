@@ -271,14 +271,11 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
           <Text style={{ ...typography.bodySm, color: palette.error }}>{error}</Text>
         ) : null}
 
-        {stage !== "metadata" ? (
-          <UploadProgressBar progress={stage === "registering" ? 1 : progress} />
-        ) : null}
-
         <Button
           label={stageLabel}
           fullWidth
           disabled={!canSubmit}
+          progress={stage !== "metadata" ? (stage === "registering" ? 1 : progress) : undefined}
           onPress={handleSubmit}
         />
         </View>
@@ -333,32 +330,3 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
   );
 }
 
-// A real, visible progress indicator — previously the only feedback during
-// upload was the (disabled, muted-colored) submit button's label text, which
-// read as inert rather than "actively working," and led to a few users
-// closing out mid-upload thinking nothing was happening.
-function UploadProgressBar({ progress }: { progress: number }) {
-  const { colors } = useTheme();
-  const pct = Math.max(0, Math.min(1, progress));
-  return (
-    <View
-      style={{
-        height: 6,
-        borderRadius: radius.pill,
-        backgroundColor: colors.border,
-        overflow: "hidden",
-      }}
-      accessibilityRole="progressbar"
-      accessibilityValue={{ min: 0, max: 100, now: Math.round(pct * 100) }}
-    >
-      <View
-        style={{
-          width: `${pct * 100}%`,
-          height: "100%",
-          borderRadius: radius.pill,
-          backgroundColor: palette.accent,
-        }}
-      />
-    </View>
-  );
-}

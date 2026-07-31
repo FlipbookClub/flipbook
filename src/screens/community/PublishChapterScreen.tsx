@@ -215,6 +215,7 @@ export function PublishChapterScreen({ navigation, route }: Props) {
             label={submitLabel}
             fullWidth
             disabled={!canSubmit}
+            progress={stage !== "form" ? (stage === "publishing" ? 1 : progress) : undefined}
             onPress={handleSubmit}
           />
         </ScrollView>
