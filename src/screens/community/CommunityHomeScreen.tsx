@@ -7,7 +7,7 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { Leaf, Plus, Rocket, UserGroup2 } from "@/lib/icons";
+import { Bell, Leaf, Plus, Rocket, UserGroup2 } from "@/lib/icons";
 import { useQuery } from "convex/react";
 import type { CompositeScreenProps } from "@react-navigation/native";
 import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
@@ -176,6 +176,7 @@ export function CommunityHomeScreen({ navigation }: Props) {
   const me = useQuery(api.users.me);
   const myClubs = useQuery(api.clubs.listMine);
   const popularClubs = useQuery(api.clubs.listPublic, {});
+  const unreadCount = useQuery(api.notifications.unreadCount);
 
   const ModeIcon = mode === "dark" ? Moon : mode === "flip" ? Sparkles : Sun;
   // Greeting uses the public display name (username), per Figma — not first name.
@@ -212,14 +213,47 @@ export function CommunityHomeScreen({ navigation }: Props) {
         }}
       >
         <Wordmark size={32} />
-        <Pressable
-          onPress={() => setMode(nextMode(mode))}
-          hitSlop={spacing.s3}
-          accessibilityRole="button"
-          accessibilityLabel="Change theme"
-        >
-          <ModeIcon size={20} color={colors.textPrimary} />
-        </Pressable>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: spacing.s4 }}>
+          <Pressable
+            onPress={() => navigation.navigate("Notifications")}
+            hitSlop={spacing.s3}
+            accessibilityRole="button"
+            accessibilityLabel={
+              unreadCount ? `Notifications, ${unreadCount} unread` : "Notifications"
+            }
+            style={{ position: "relative" }}
+          >
+            <Bell size={20} color={colors.textPrimary} />
+            {unreadCount ? (
+              <View
+                style={{
+                  position: "absolute",
+                  top: -4,
+                  right: -6,
+                  minWidth: 16,
+                  height: 16,
+                  borderRadius: 8,
+                  paddingHorizontal: 3,
+                  backgroundColor: palette.accent,
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
+                <Text style={{ ...typography.uiLabelMd, color: palette.textOnBrand, fontSize: 10 }}>
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </Text>
+              </View>
+            ) : null}
+          </Pressable>
+          <Pressable
+            onPress={() => setMode(nextMode(mode))}
+            hitSlop={spacing.s3}
+            accessibilityRole="button"
+            accessibilityLabel="Change theme"
+          >
+            <ModeIcon size={20} color={colors.textPrimary} />
+          </Pressable>
+        </View>
       </View>
 
       <ScrollView

@@ -8,6 +8,7 @@ import { EditBookScreen } from "@/screens/community/EditBookScreen";
 import { InviteMembersScreen } from "@/screens/community/InviteMembersScreen";
 import { JoinCommunityScreen } from "@/screens/community/JoinCommunityScreen";
 import { InviteAcceptScreen } from "@/screens/community/InviteAcceptScreen";
+import { NotificationsScreen } from "@/screens/community/NotificationsScreen";
 import { PublishChapterScreen } from "@/screens/community/PublishChapterScreen";
 import { ReaderScreen } from "@/screens/reader/ReaderScreen";
 import { UserProfileScreen } from "@/screens/profile/UserProfileScreen";
@@ -19,6 +20,7 @@ import type { Id } from "../../convex/_generated/dataModel";
 // too so taps from ClubDetail open the PDF in the same nav context.
 export type CommunityStackParamList = {
   CommunityHome: undefined;
+  Notifications: undefined;
   CreateCommunity: undefined;
   InviteMembers: { clubId: Id<"clubs">; inviteCode: string };
   JoinCommunity: undefined;
@@ -42,6 +44,7 @@ export function CommunityStack() {
   return (
     <Stack.Navigator screenOptions={{ headerShown: false, animation: "slide_from_right" }}>
       <Stack.Screen name="CommunityHome" component={CommunityHomeScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
       <Stack.Screen name="CreateCommunity" component={CreateCommunityScreen} />
       <Stack.Screen name="InviteMembers" component={InviteMembersScreen} />
       <Stack.Screen name="JoinCommunity" component={JoinCommunityScreen} />

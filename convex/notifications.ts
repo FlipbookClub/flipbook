@@ -1,4 +1,5 @@
 import { ConvexError, v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 import {
   internalAction,
@@ -16,50 +17,58 @@ const notificationTypeValidator = v.union(
   v.literal("reaction_reply"),
   v.literal("club_invite"),
   v.literal("milestone"),
+  v.literal("moderator_promoted"),
 );
-
-const notificationValidator = v.object({
-  _id: v.id("notifications"),
-  _creationTime: v.number(),
-  userId: v.id("users"),
-  type: notificationTypeValidator,
-  title: v.string(),
-  body: v.string(),
-  deepLink: v.string(),
-  isRead: v.boolean(),
-  sentAt: v.number(),
-  relatedId: v.optional(v.string()),
-});
 
 // ---------------------------------------------------------------------------
 // Public queries + mutations
 // ---------------------------------------------------------------------------
 
+// Real cursor pagination — no client consumed the old take(limit) shape yet
+// (grep confirms zero callsites), so this is a free breaking change ahead of
+// the first client (NotificationsScreen). Follows the pagination pattern in
+// convex/_generated/ai/guidelines.md exactly, including omitting a `returns`
+// validator (paginate()'s result shape is handled by the client hook).
 export const list = query({
-  args: { onlyUnread: v.optional(v.boolean()), limit: v.optional(v.number()) },
-  returns: v.array(notificationValidator),
+  args: { paginationOpts: paginationOptsValidator },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
-    if (!identity) return [];
+    if (!identity) {
+      return { page: [], isDone: true, continueCursor: "" };
+    }
     const me = await ctx.db
       .query("users")
       .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
       .unique();
-    if (!me) return [];
-
-    const limit = Math.min(args.limit ?? 50, 100);
-    if (args.onlyUnread) {
-      return await ctx.db
-        .query("notifications")
-        .withIndex("by_user_unread", (q) => q.eq("userId", me._id).eq("isRead", false))
-        .order("desc")
-        .take(limit);
+    if (!me) {
+      return { page: [], isDone: true, continueCursor: "" };
     }
     return await ctx.db
       .query("notifications")
       .withIndex("by_user_and_sent", (q) => q.eq("userId", me._id))
       .order("desc")
-      .take(limit);
+      .paginate(args.paginationOpts);
+  },
+});
+
+// Cheap unread count for the header badge — capped rather than an exact
+// count past a point, matching markAllRead's own take(500) cap.
+export const unreadCount = query({
+  args: {},
+  returns: v.number(),
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) return 0;
+    const me = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", identity.subject))
+      .unique();
+    if (!me) return 0;
+    const unread = await ctx.db
+      .query("notifications")
+      .withIndex("by_user_unread", (q) => q.eq("userId", me._id).eq("isRead", false))
+      .take(100);
+    return unread.length;
   },
 });
 
@@ -367,6 +376,77 @@ export const sendReplyPushFanout = internalAction({
           title,
           body,
           data: { deepLink: snap.deepLink, type: "reaction_reply", relatedId: args.reactionId },
+        },
+      ]);
+    }
+    return null;
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Internal — moderator-promotion notification
+// ---------------------------------------------------------------------------
+
+export const collectModeratorPromotionAudience = internalQuery({
+  args: { clubId: v.id("clubs"), userId: v.id("users"), promotedByUserId: v.id("users") },
+  returns: v.union(
+    v.null(),
+    v.object({
+      recipient: v.object({
+        userId: v.id("users"),
+        pushToken: v.optional(v.string()),
+      }),
+      clubName: v.string(),
+      promoterName: v.string(),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const club = await ctx.db.get(args.clubId);
+    if (!club) return null;
+    const recipient = await ctx.db.get(args.userId);
+    if (!recipient) return null;
+    const promoter = await ctx.db.get(args.promotedByUserId);
+    // Role changes are an administrative event, not a chat-style ping — no
+    // notificationPrefs gate (that object only covers chapterDrops /
+    // reactionReplies), same treatment as a "milestone" notification.
+    return {
+      recipient: { userId: recipient._id, pushToken: recipient.pushToken },
+      clubName: club.name,
+      promoterName: promoter?.displayName ?? "A moderator",
+    };
+  },
+});
+
+export const sendModeratorPromotedFanout = internalAction({
+  args: { clubId: v.id("clubs"), userId: v.id("users"), promotedByUserId: v.id("users") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const snap = await ctx.runQuery(internal.notifications.collectModeratorPromotionAudience, {
+      clubId: args.clubId,
+      userId: args.userId,
+      promotedByUserId: args.promotedByUserId,
+    });
+    if (!snap) return null;
+
+    const title = snap.clubName;
+    const body = `${snap.promoterName} made you a moderator of ${snap.clubName}.`;
+    const deepLink = `flipbook://clubs/${args.clubId}`;
+
+    await ctx.runMutation(internal.notifications.recordNotification, {
+      userId: snap.recipient.userId,
+      type: "moderator_promoted",
+      title,
+      body,
+      deepLink,
+      relatedId: args.clubId,
+    });
+    if (snap.recipient.pushToken) {
+      await sendExpoBatch([
+        {
+          to: snap.recipient.pushToken,
+          title,
+          body,
+          data: { deepLink, type: "moderator_promoted", relatedId: args.clubId },
         },
       ]);
     }
