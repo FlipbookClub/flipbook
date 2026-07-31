@@ -1,13 +1,15 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Image,
   Pressable,
   Text,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { ChevronLeft, ShieldCheck } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
+import { useFocusEffect, type CompositeScreenProps } from "@react-navigation/native";
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Button } from "@/components/ui/Button";
@@ -17,9 +19,13 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
+import type { MainTabsParamList } from "@/navigation/MainTabs";
 import { api } from "../../../convex/_generated/api";
 
-type Props = NativeStackScreenProps<CommunityStackParamList, "InviteAccept">;
+type Props = CompositeScreenProps<
+  NativeStackScreenProps<CommunityStackParamList, "InviteAccept">,
+  BottomTabScreenProps<MainTabsParamList>
+>;
 
 // Landing page for `flipbook://join/{code}` deep links. Looks up the club
 // via the invite code, shows a preview, then accepting calls joinByCode and
@@ -27,10 +33,23 @@ type Props = NativeStackScreenProps<CommunityStackParamList, "InviteAccept">;
 // instead of the deep-link feeling broken.
 export function InviteAcceptScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const inviteCode = route.params.inviteCode.toUpperCase();
   const club = useQuery(api.clubs.getByInviteCode, { inviteCode });
   const joinByCode = useMutation(api.memberships.joinByCode);
   const me = useQuery(api.users.me);
+
+  // Hides the bottom tab bar while this screen is focused — see the matching
+  // fix + explanation in JoinCommunityScreen.tsx.
+  useFocusEffect(
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({ tabBarStyle: { display: "none" } });
+      return () => {
+        parent?.setOptions({ tabBarStyle: undefined });
+      };
+    }, [navigation]),
+  );
 
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
@@ -82,7 +101,14 @@ export function InviteAcceptScreen({ navigation, route }: Props) {
         <ShieldCheck size={22} color={colors.textPrimary} />
       </View>
 
-      <View style={{ flex: 1, paddingHorizontal: spacing.s4, paddingBottom: spacing.s5, gap: spacing.s5 }}>
+      <View
+        style={{
+          flex: 1,
+          paddingHorizontal: spacing.s4,
+          paddingBottom: spacing.s4 + insets.bottom,
+          gap: spacing.s5,
+        }}
+      >
         <View style={{ gap: spacing.s1 }}>
           <Text style={{ ...typography.headingMd, color: colors.textPrimary }}>
             You've been invited

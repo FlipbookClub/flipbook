@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import {
   Pressable,
   ScrollView,
@@ -7,10 +7,12 @@ import {
   View,
   Platform,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import { ChevronLeft, Lock, Search, ShieldCheck } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
+import { useFocusEffect, type CompositeScreenProps } from "@react-navigation/native";
+import type { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { Button } from "@/components/ui/Button";
@@ -25,6 +27,7 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
+import type { MainTabsParamList } from "@/navigation/MainTabs";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
 
@@ -81,12 +84,30 @@ function ClubCardWithAvatars({
   );
 }
 
-type Props = NativeStackScreenProps<CommunityStackParamList, "JoinCommunity">;
+type Props = CompositeScreenProps<
+  NativeStackScreenProps<CommunityStackParamList, "JoinCommunity">,
+  BottomTabScreenProps<MainTabsParamList>
+>;
 
 const CODE_LENGTH = 6;
 
 export function JoinCommunityScreen({ navigation }: Props) {
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+
+  // Hides the bottom tab bar while this screen is focused — without this,
+  // the Join button sat ~83px above the actual screen bottom (tab bar +
+  // its own home-indicator inset) on top of this screen's own bottom
+  // padding, reading as a large dead gap. Mirrors ReaderScreen's same fix.
+  useFocusEffect(
+    useCallback(() => {
+      const parent = navigation.getParent();
+      parent?.setOptions({ tabBarStyle: { display: "none" } });
+      return () => {
+        parent?.setOptions({ tabBarStyle: undefined });
+      };
+    }, [navigation]),
+  );
 
   const [privateMode, setPrivateMode] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
@@ -272,7 +293,7 @@ export function JoinCommunityScreen({ navigation }: Props) {
         </ScrollView>
 
         {privateMode ? (
-          <View style={{ paddingHorizontal: spacing.s4, paddingBottom: spacing.s5 }}>
+          <View style={{ paddingHorizontal: spacing.s4, paddingBottom: spacing.s4 + insets.bottom }}>
             <Button
               label={submitting ? "Joining…" : "Join community"}
               fullWidth
