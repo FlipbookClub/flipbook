@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import {
+  Alert,
   Modal,
   Pressable,
   Text,
@@ -147,6 +148,25 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
     }
   };
 
+  // Closing mid-upload doesn't cancel the in-flight uploadAsync task — it just
+  // keeps going with no visible UI, which is exactly how a couple of uploads
+  // went silently incomplete. Gate every dismissal path (backdrop tap, Android
+  // back button) behind a confirmation once we're past the metadata stage.
+  const handleRequestClose = () => {
+    if (stage === "metadata") {
+      onClose();
+      return;
+    }
+    Alert.alert(
+      "Upload in progress",
+      "This book hasn't finished uploading yet. Leave anyway? It may not finish.",
+      [
+        { text: "Keep waiting", style: "cancel" },
+        { text: "Leave anyway", style: "destructive", onPress: onClose },
+      ],
+    );
+  };
+
   const stageLabel =
     stage === "uploading"
       ? `Uploading… ${Math.round(progress * 100)}%`
@@ -161,7 +181,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       visible={visible}
       transparent
       animationType="slide"
-      onRequestClose={onClose}
+      onRequestClose={handleRequestClose}
       accessibilityViewIsModal
     >
       <KeyboardAvoidingView
@@ -169,7 +189,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         style={{ flex: 1 }}
       >
         <Pressable
-          onPress={stage === "metadata" ? onClose : undefined}
+          onPress={handleRequestClose}
           style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
           accessibilityLabel="Dismiss sheet"
         />
@@ -255,6 +275,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
           label={stageLabel}
           fullWidth
           disabled={!canSubmit}
+          progress={stage !== "metadata" ? (stage === "registering" ? 1 : progress) : undefined}
           onPress={handleSubmit}
         />
         </View>
@@ -308,3 +329,4 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
     </Modal>
   );
 }
+

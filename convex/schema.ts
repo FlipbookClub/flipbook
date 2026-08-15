@@ -243,6 +243,7 @@ export default defineSchema({
       v.literal("reaction_reply"),
       v.literal("club_invite"),
       v.literal("milestone"),
+      v.literal("moderator_promoted"),
     ),
     title: v.string(),
     body: v.string(),

@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { isAdminEmail } from "./lib/admins";
+import { assertIsModerator } from "./clubs";
 import { getCurrentUser } from "./users";
 
 const MAX_TITLE = 200;
@@ -273,7 +274,7 @@ export const setCurrentlyReading = mutation({
     if (!book || book.isRemoved) throw new ConvexError({ code: "book_not_found" });
     const club = await ctx.db.get(book.clubId);
     if (!club) throw new ConvexError({ code: "club_not_found" });
-    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    await assertIsModerator(ctx, club, me._id);
 
     const clubBooks = await ctx.db
       .query("books")
@@ -381,7 +382,7 @@ export const moveToLibrary = mutation({
     if (!book) throw new ConvexError({ code: "book_not_found" });
     const club = await ctx.db.get(book.clubId);
     if (!club) throw new ConvexError({ code: "club_not_found" });
-    if (club.moderatorId !== me._id) throw new ConvexError({ code: "not_moderator" });
+    await assertIsModerator(ctx, club, me._id);
     await ctx.db.patch(args.bookId, { status: "library" });
     return null;
   },

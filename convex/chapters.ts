@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { internal } from "./_generated/api";
+import { assertIsModerator } from "./clubs";
 import { getCurrentUser } from "./users";
 
 const MAX_TITLE = 200;
@@ -30,9 +31,7 @@ async function assertModeratorOfCreator(
 ): Promise<Doc<"clubs">> {
   const club = await ctx.db.get(clubId);
   if (!club) throw new ConvexError({ code: "club_not_found" });
-  if (club.moderatorId !== userId) {
-    throw new ConvexError({ code: "not_moderator" });
-  }
+  await assertIsModerator(ctx, club, userId);
   if (club.type !== "creator") {
     // Standard clubs use the books table; chapters are only for creator clubs.
     throw new ConvexError({ code: "not_a_creator_club" });

@@ -85,10 +85,21 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const [sheetOpen, setSheetOpen] = useState(false);
   const [optionsBook, setOptionsBook] = useState<Doc<"books"> | null>(null);
   const [pickedFile, setPickedFile] = useState<PickedPdf | null>(null);
-  type MemberTarget = { userId: string; displayName: string } | null;
+  type MemberTarget = {
+    userId: string;
+    displayName: string;
+    role: "moderator" | "member";
+  } | null;
   const [memberActionTarget, setMemberActionTarget] = useState<MemberTarget>(null);
 
-  const isModerator = !!me && !!club && club.moderatorId === me._id;
+  // isOwner is the single, original club creator — the only one who can
+  // demote/remove/block another moderator. isModerator is broader: true for
+  // the owner OR any member delegated moderator status, and is what gates
+  // regular moderator actions (upload override, edit info, moderating
+  // regular members).
+  const isOwner = !!me && !!club && club.moderatorId === me._id;
+  const myMembership = members?.find((m) => m.userId === me?._id);
+  const isModerator = isOwner || myMembership?.role === "moderator";
   // FR-075: when previewing a public club from Discovery without having
   // joined, the user can see the club but the Activity tab's reactions
   // should be blurred until they join.
@@ -193,12 +204,20 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   };
 
   if (club === undefined) {
-    return <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }} />;
+    return (
+      <SafeAreaView
+        edges={["top", "left", "right"]}
+        style={{ flex: 1, backgroundColor: colors.surfacePrimary }}
+      />
+    );
   }
 
   if (club === null) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
+      <SafeAreaView
+        edges={["top", "left", "right"]}
+        style={{ flex: 1, backgroundColor: colors.surfacePrimary }}
+      >
         <View style={{ padding: spacing.s5, gap: spacing.s2 }}>
           <Pressable
             onPress={() => navigation.goBack()}
@@ -719,8 +738,15 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       key={m._id}
                       onPress={() => navigation.navigate("ViewProfile", { userId: m.userId })}
                       onLongPress={
-                        isModerator && m.userId !== club.moderatorId
-                          ? () => setMemberActionTarget({ userId: m.userId, displayName: m.displayName })
+                        isModerator &&
+                        m.userId !== me?._id &&
+                        (m.role !== "moderator" || isOwner)
+                          ? () =>
+                              setMemberActionTarget({
+                                userId: m.userId,
+                                displayName: m.displayName,
+                                role: m.role,
+                              })
                           : undefined
                       }
                       accessibilityRole="button"
@@ -794,7 +820,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
       <ClubOptionsSheet
         visible={sheetOpen}
         club={club}
-        isModerator={isModerator}
+        isModerator={isOwner}
         canEditInfo={canEditInfo}
         onClose={() => setSheetOpen(false)}
         onEdit={() => navigation.navigate("EditCommunity", { clubId })}
@@ -816,6 +842,8 @@ export function ClubDetailScreen({ navigation, route }: Props) {
           clubId={clubId}
           userId={memberActionTarget.userId as import("../../../convex/_generated/dataModel").Id<"users">}
           displayName={memberActionTarget.displayName}
+          targetRole={memberActionTarget.role}
+          viewerIsOwner={isOwner}
           onClose={() => setMemberActionTarget(null)}
           onActionDone={() => setMemberActionTarget(null)}
         />

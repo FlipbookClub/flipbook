@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, ScrollView, Text, View } from "react-native";
 import { useMutation } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -85,13 +85,15 @@ export function GenrePreferencesScreen({ route }: Props) {
         </Text>
       </View>
 
-      <View
-        style={{
-          marginTop: spacing.s5,
+      <ScrollView
+        style={{ flex: 1, marginTop: spacing.s5 }}
+        contentContainerStyle={{
           flexDirection: "row",
           flexWrap: "wrap",
           gap: spacing.s2,
+          paddingBottom: spacing.s2,
         }}
+        showsVerticalScrollIndicator={false}
       >
         {GENRES.map((genre) => {
           const isSelected = selected.has(genre);
@@ -102,18 +104,16 @@ export function GenrePreferencesScreen({ route }: Props) {
               accessibilityRole="button"
               accessibilityState={{ selected: isSelected }}
               style={{
-                paddingVertical: spacing.s2,
-                paddingHorizontal: spacing.s3,
-                borderRadius: radius.pill,
-                borderWidth: 1,
-                borderColor: isSelected ? palette.brandPrimary : colors.border,
-                backgroundColor: isSelected ? palette.brandPrimary : "transparent",
+                paddingVertical: 2,
+                paddingHorizontal: spacing.s2,
+                borderRadius: radius.md,
+                backgroundColor: isSelected ? palette.brandPrimary : colors.surfaceSecondary,
               }}
             >
               <Text
                 style={{
                   ...typography.uiLabelMd,
-                  color: isSelected ? palette.textOnBrand : colors.textPrimary,
+                  color: isSelected ? palette.textOnBrand : colors.textSecondary,
                 }}
               >
                 {genre}
@@ -121,9 +121,7 @@ export function GenrePreferencesScreen({ route }: Props) {
             </Pressable>
           );
         })}
-      </View>
-
-      <View style={{ flex: 1 }} />
+      </ScrollView>
 
       {formError ? (
         <Text

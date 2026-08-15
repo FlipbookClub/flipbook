@@ -3,13 +3,19 @@ import {
   ActivityIndicator,
   Dimensions,
   Modal,
+  Platform,
   Pressable,
   Text,
   View,
 } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import Pdf from "react-native-pdf";
-import { Bookmark, BookmarkFilled, Settings2, Smile, X } from "@/lib/icons";
+import {
+  NativeHighlightPdfView,
+  type HighlightRect,
+  type NativeHighlightPdfViewRef,
+} from "native-highlight-pdf";
+import { Bookmark, BookmarkFilled, Pencil, Settings2, Smile, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -256,6 +262,18 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
 
+  // iOS-only for now: PDFKit gives real text selection + highlighting for
+  // free. Android's hand-rolled PdfiumAndroid view has no page-turn gesture
+  // yet, so it stays on react-native-pdf until that's built separately.
+  const useNativeHighlightReader = Platform.OS === "ios";
+  const pdfRef = useRef<NativeHighlightPdfViewRef>(null);
+  const [hasSelection, setHasSelection] = useState(false);
+  const [pendingHighlight, setPendingHighlight] = useState<{
+    page: number;
+    quote: string;
+    rects: HighlightRect[];
+  } | null>(null);
+
   // Bookmarks: query which pages are saved; mutation to toggle the current page.
   const toggleBookmark = useMutation(api.bookmarks.toggle);
   const bookmarkedPages = useQuery(
@@ -295,15 +313,30 @@ export function ReaderScreen({ navigation, route }: Props) {
       : "skip",
   );
 
+  // Every text-anchored highlight for this book/chapter (all pages) — the
+  // native view itself filters down to whichever page is currently loaded.
+  const highlights = useQuery(
+    api.reactions.listHighlights,
+    effective && !effective.isRemoved && scopePayload
+      ? { clubId: effective.clubId, ...scopePayload }
+      : "skip",
+  );
+
   const handleReactionSubmit = async (payload: ReactionSubmission) => {
     if (!effective || !scopePayload) return;
+    // A highlight-originated reaction is anchored to the page the selection
+    // was made on (captured at selection time), not necessarily the page
+    // currently on screen if the reader moved on before the composer closed.
+    const page = pendingHighlight?.page ?? currentPage;
     const args = {
       clubId: effective.clubId,
       ...scopePayload,
-      page: currentPage,
+      page,
       type: payload.type,
       emoji: payload.emoji,
       text: payload.text,
+      highlightQuote: pendingHighlight?.quote,
+      highlightRects: pendingHighlight?.rects,
     };
     // FR-013 / FR-016 edge case: offline reactions queue locally and sync
     // on reconnect. The flush worker in RootNavigator drains the queue.
@@ -316,6 +349,8 @@ export function ReaderScreen({ navigation, route }: Props) {
         type: args.type,
         emoji: args.emoji,
         text: args.text,
+        highlightQuote: args.highlightQuote,
+        highlightRects: args.highlightRects,
       });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
       return;
@@ -337,6 +372,8 @@ export function ReaderScreen({ navigation, route }: Props) {
           type: args.type,
           emoji: args.emoji,
           text: args.text,
+          highlightQuote: args.highlightQuote,
+          highlightRects: args.highlightRects,
         });
       }
     }
@@ -487,33 +524,60 @@ export function ReaderScreen({ navigation, route }: Props) {
         ) : (
           <GestureDetector gesture={longPress}>
             <View style={{ flex: 1 }}>
-              <Pdf
-                source={{ uri: resolvedUri, cache: true }}
-                horizontal={pageMode === "paged"}
-                enablePaging={pageMode === "paged"}
-                page={targetPage ?? openAtPageRef.current ?? initialPage}
-                onLoadComplete={(numberOfPages) => {
-                  if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
-                  setTotalPages(numberOfPages);
-                  const startPage = Math.min(
-                    Math.max(1, openAtPageRef.current ?? initialPage),
-                    numberOfPages,
-                  );
-                  setCurrentPage(startPage);
-                  syncToServer(startPage, numberOfPages);
-                }}
-                onPageChanged={(page, total) => handlePageChanged(page, total)}
-                onError={(err) => {
-                  setLoadError(
-                    typeof err === "string"
-                      ? err
-                      : "The pages aren't loading. Mind trying again in a moment?",
-                  );
-                }}
-                renderActivityIndicator={() => <ActivityIndicator color={colors.textPrimary} />}
-                style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
-                trustAllCerts={false}
-              />
+              {useNativeHighlightReader ? (
+                <NativeHighlightPdfView
+                  ref={pdfRef}
+                  documentUri={resolvedUri}
+                  startPage={targetPage ?? openAtPageRef.current ?? initialPage}
+                  highlights={highlights ?? []}
+                  style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
+                  onDocumentLoaded={(e) => {
+                    const numberOfPages = e.nativeEvent.totalPages;
+                    if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
+                    setTotalPages(numberOfPages);
+                    const startPage = Math.min(
+                      Math.max(1, openAtPageRef.current ?? initialPage),
+                      numberOfPages,
+                    );
+                    setCurrentPage(startPage);
+                    syncToServer(startPage, numberOfPages);
+                  }}
+                  onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
+                  onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
+                  onHighlightTapped={(e) =>
+                    setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
+                  }
+                  onLoadError={(e) => setLoadError(e.nativeEvent.message)}
+                />
+              ) : (
+                <Pdf
+                  source={{ uri: resolvedUri, cache: true }}
+                  horizontal={pageMode === "paged"}
+                  enablePaging={pageMode === "paged"}
+                  page={targetPage ?? openAtPageRef.current ?? initialPage}
+                  onLoadComplete={(numberOfPages) => {
+                    if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
+                    setTotalPages(numberOfPages);
+                    const startPage = Math.min(
+                      Math.max(1, openAtPageRef.current ?? initialPage),
+                      numberOfPages,
+                    );
+                    setCurrentPage(startPage);
+                    syncToServer(startPage, numberOfPages);
+                  }}
+                  onPageChanged={(page, total) => handlePageChanged(page, total)}
+                  onError={(err) => {
+                    setLoadError(
+                      typeof err === "string"
+                        ? err
+                        : "The pages aren't loading. Mind trying again in a moment?",
+                    );
+                  }}
+                  renderActivityIndicator={() => <ActivityIndicator color={colors.textPrimary} />}
+                  style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
+                  trustAllCerts={false}
+                />
+              )}
             </View>
           </GestureDetector>
         )}
@@ -573,6 +637,41 @@ export function ReaderScreen({ navigation, route }: Props) {
           <Smile size={28} color={palette.textOnBrand} />
         </Pressable>
       ) : null}
+      {/* Only surfaces on the native-highlight-pdf reader (iOS today), and
+          only while there's an active text selection to act on. Stacks above
+          the React FAB rather than replacing it — the two are independent
+          actions (react to the page vs. highlight the selected text). */}
+      {useNativeHighlightReader && hasSelection ? (
+        <Pressable
+          onPress={async () => {
+            const captured = await pdfRef.current?.captureSelection();
+            if (!captured) return;
+            setPendingHighlight(captured);
+            setComposerOpen(true);
+          }}
+          accessibilityRole="button"
+          accessibilityLabel="Highlight selection"
+          hitSlop={spacing.s3}
+          style={{
+            position: "absolute",
+            right: spacing.s4,
+            bottom: spacing.s6 + 64,
+            width: 56,
+            height: 56,
+            borderRadius: 28,
+            backgroundColor: palette.highlight,
+            alignItems: "center",
+            justifyContent: "center",
+            shadowColor: "#000",
+            shadowOpacity: 0.25,
+            shadowOffset: { width: 0, height: 4 },
+            shadowRadius: 8,
+            elevation: 6,
+          }}
+        >
+          <Pencil size={24} color={palette.brandPrimary} />
+        </Pressable>
+      ) : null}
       <ReaderCustomizationSheet
         visible={customizeOpen}
         onClose={() => setCustomizeOpen(false)}
@@ -581,7 +680,15 @@ export function ReaderScreen({ navigation, route }: Props) {
       />
       <ReactionComposer
         visible={composerOpen}
-        onClose={() => setComposerOpen(false)}
+        quote={pendingHighlight?.quote}
+        onClose={() => {
+          setComposerOpen(false);
+          setPendingHighlight(null);
+          // Covers the cancel-without-capturing path (captureSelection
+          // already clears on the native side once it succeeds) — harmless
+          // no-op when there's nothing selected.
+          pdfRef.current?.clearSelection();
+        }}
         onSubmit={handleReactionSubmit}
       />
       {effective && !effective.isRemoved && scopePayload ? (

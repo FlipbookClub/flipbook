@@ -66,9 +66,10 @@ async function userCanSeeClub(
   return membership !== null;
 }
 
-// Who may edit community *info* (name/description/emblem): the moderator, or a
-// member when the moderator has granted membersCanUpdateInfo. Governance
-// (visibility/permissions/delete) stays moderator-only — enforced separately.
+// Who may edit community *info* (name/description/emblem): the owner, any
+// delegated moderator, or a plain member when the owner has granted
+// membersCanUpdateInfo. Governance (visibility/permissions/delete) stays
+// owner-only — enforced separately (see `remove`/`update`'s isMod check).
 async function assertCanEditInfo(
   ctx: QueryCtx | MutationCtx,
   club: Doc<"clubs">,
@@ -79,7 +80,29 @@ async function assertCanEditInfo(
     .query("memberships")
     .withIndex("by_club_and_user", (q) => q.eq("clubId", club._id).eq("userId", userId))
     .unique();
+  if (membership?.role === "moderator") return;
   if (!membership || !club.permissions.membersCanUpdateInfo) {
+    throw new ConvexError({ code: "not_moderator" });
+  }
+}
+
+// Whether `userId` holds moderator-level authority in this club — either as
+// the original owner (`club.moderatorId`) or a delegated moderator (a
+// membership row with role: "moderator"). Callers use this to gate actions
+// any moderator may take on regular members; actions targeting another
+// moderator (or the owner) stay owner-only, checked separately at each call
+// site rather than folded in here.
+export async function assertIsModerator(
+  ctx: QueryCtx | MutationCtx,
+  club: Doc<"clubs">,
+  userId: Id<"users">,
+): Promise<void> {
+  if (club.moderatorId === userId) return;
+  const membership = await ctx.db
+    .query("memberships")
+    .withIndex("by_club_and_user", (q) => q.eq("clubId", club._id).eq("userId", userId))
+    .unique();
+  if (!membership || membership.role !== "moderator") {
     throw new ConvexError({ code: "not_moderator" });
   }
 }

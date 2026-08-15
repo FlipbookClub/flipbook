@@ -8,6 +8,7 @@ import {
   type ViewStyle,
 } from "react-native";
 
+import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
@@ -30,6 +31,11 @@ export interface ButtonProps extends Omit<PressableProps, "style" | "children"> 
   leadingIcon?: React.ReactNode;
   trailingIcon?: React.ReactNode;
   style?: StyleProp<ViewStyle>;
+  // 0..1. When set, the button IS the progress bar: it stays on its normal
+  // vivid surface (never the muted/disabled look) with a darker fill
+  // growing left-to-right behind the label, and ignores taps regardless of
+  // the `disabled` prop. Used for upload/long-running submit affordances.
+  progress?: number;
 }
 
 // Avoid Pressable's `style={(state) => ...}` callback form — under
@@ -45,6 +51,7 @@ export function Button({
   leadingIcon,
   trailingIcon,
   style,
+  progress,
   onPressIn,
   onPressOut,
   ...rest
@@ -52,15 +59,21 @@ export function Button({
   const { buttons } = useTheme();
   const sizeTokens = SIZE_TOKENS[size];
   const [pressed, setPressed] = useState(false);
+  const inProgress = progress !== undefined;
+  const isDisabled = disabled || inProgress;
 
+  // While in progress, force the normal vivid surface/text — never the
+  // muted disabled look, regardless of the (also-true) real disabled state.
   const baseSurface =
     variant === "alt"
       ? "transparent"
-      : disabled
-        ? buttons[variant].muted.surface
-        : pressed
-          ? buttons[variant].pressed.surface
-          : buttons[variant].default.surface;
+      : inProgress
+        ? buttons[variant].default.surface
+        : disabled
+          ? buttons[variant].muted.surface
+          : pressed
+            ? buttons[variant].pressed.surface
+            : buttons[variant].default.surface;
 
   const textColor =
     variant === "alt"
@@ -69,18 +82,21 @@ export function Button({
         : pressed
           ? buttons.alt.pressed.text
           : buttons.alt.default.text
-      : disabled
-        ? buttons[variant].muted.text
-        : pressed
-          ? buttons[variant].pressed.text
-          : buttons[variant].default.text;
+      : inProgress
+        ? buttons[variant].default.text
+        : disabled
+          ? buttons[variant].muted.text
+          : pressed
+            ? buttons[variant].pressed.text
+            : buttons[variant].default.text;
 
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
-      accessibilityState={{ disabled }}
-      disabled={disabled}
+      accessibilityState={{ disabled: isDisabled, busy: inProgress }}
+      accessibilityValue={inProgress ? { min: 0, max: 100, now: Math.round(progress * 100) } : undefined}
+      disabled={isDisabled}
       onPressIn={(event) => {
         setPressed(true);
         onPressIn?.(event);
@@ -100,11 +116,25 @@ export function Button({
           justifyContent: "center",
           opacity: variant === "alt" && disabled ? 0.5 : 1,
           alignSelf: fullWidth ? "stretch" : "flex-start",
+          overflow: inProgress ? "hidden" : undefined,
         },
         style,
       ]}
       {...rest}
     >
+      {inProgress ? (
+        <View
+          pointerEvents="none"
+          style={{
+            position: "absolute",
+            left: 0,
+            top: 0,
+            bottom: 0,
+            width: `${Math.max(0, Math.min(1, progress)) * 100}%`,
+            backgroundColor: palette.brandPrimaryPressed,
+          }}
+        />
+      ) : null}
       {leadingIcon ? <View style={{ marginRight: spacing.s2 }}>{leadingIcon}</View> : null}
       <Text
         style={{
