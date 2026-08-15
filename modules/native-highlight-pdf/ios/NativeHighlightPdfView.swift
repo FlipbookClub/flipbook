@@ -8,6 +8,10 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   private let pdfView = PDFView()
   private var startPage: Int = 1
   private var pendingHighlights: [[String: Any]] = []
+  // Guards against re-jumping on every prop re-fire once the requested start
+  // page has actually been applied for the current document. Reset whenever
+  // a new document loads or a genuinely different startPage is requested.
+  private var hasAppliedStartPage = false
 
   let onDocumentLoaded = EventDispatcher()
   let onPageChanged = EventDispatcher()
@@ -40,17 +44,14 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
       self, selector: #selector(handleSelectionChanged),
       name: .PDFViewSelectionChanged, object: pdfView)
 
-    // Press-and-hold to select a word, matching standard text-selection
-    // affordance (PDFKit's own default is a slower double-tap-hold).
-    // minimumPressDuration undercuts PDFKit's internal ~0.5s so ours wins.
-    // shouldRecognizeSimultaneously lets it coexist with PDFView's own
-    // gesture recognizers (scrolling, its own selection drag handles) —
-    // it only ever fires after the finger has been stationary, so normal
-    // scrolling is unaffected.
-    let longPress = UILongPressGestureRecognizer(target: self, action: #selector(handleLongPress(_:)))
-    longPress.minimumPressDuration = 0.35
-    longPress.delegate = self
-    pdfView.addGestureRecognizer(longPress)
+    // BUG-001: a custom long-press recognizer used to live here, synthesizing
+    // a selection via `page.selectionForWord(at:)` + `setCurrentSelection`.
+    // That produces a *programmatic* selection, which PDFKit does NOT attach
+    // its native drag handles to — so extending it required falling back to
+    // PDFKit's own built-in double-tap-hold gesture, exactly the "requires
+    // double-tap then drag" bug reported. PDFView provides real long-press
+    // -> selection-with-handles for free; removing our recognizer lets it
+    // win arbitration instead of shadowing it with an inferior substitute.
 
     // Tap an existing highlight to open its reaction thread. cancelsTouchesInView
     // = false so this never blocks PDFView's own tap gestures (link-following,
@@ -84,6 +85,7 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
       return
     }
     pdfView.document = document
+    hasAppliedStartPage = false
     applyPendingHighlights()
     jumpToStartPageIfNeeded()
   }
@@ -93,15 +95,32 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   // trigger the initial jump — whichever arrives second is the one that
   // actually has both pieces of information available.
   func setStartPage(_ page: Int) {
-    startPage = max(1, page)
+    let newPage = max(1, page)
+    if newPage != startPage {
+      startPage = newPage
+      hasAppliedStartPage = false
+    }
     jumpToStartPageIfNeeded()
   }
 
+  // BUG-002: `PDFView.go(to:)` is unreliable when called synchronously from
+  // a prop setter on first mount — the view (pinned to its parent via Auto
+  // Layout constraints in init) may not have been through a real layout pass
+  // yet, so it has no meaningful bounds for PDFKit to compute a scroll
+  // destination against, and the call silently no-ops. The reader then sits
+  // on page 1 while `onDocumentLoaded`'s JS handler optimistically reports
+  // the *intended* resume page to the server — which the next real scroll
+  // event promptly overwrites back down, reading as "always opens on page 1."
+  // Deferring one run-loop tick lets the pending layout pass land first.
   private func jumpToStartPageIfNeeded() {
-    guard let document = pdfView.document, startPage > 1,
+    guard !hasAppliedStartPage, let document = pdfView.document, startPage > 1,
       let page = document.page(at: startPage - 1)
     else { return }
-    pdfView.go(to: page)
+    hasAppliedStartPage = true
+    DispatchQueue.main.async { [weak self] in
+      guard let self = self, self.pdfView.document === document else { return }
+      self.pdfView.go(to: page)
+    }
   }
 
   func setHighlightsData(_ items: [[String: Any]]) {
@@ -202,17 +221,6 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   }
 
   // MARK: - Gesture handlers
-
-  @objc private func handleLongPress(_ gesture: UILongPressGestureRecognizer) {
-    guard gesture.state == .began else { return }
-    let point = gesture.location(in: pdfView)
-    guard let page = pdfView.page(for: point, nearest: true) else { return }
-    let pagePoint = pdfView.convert(point, to: page)
-    guard let selection = page.selectionForWord(at: pagePoint) else { return }
-    pdfView.setCurrentSelection(selection, animate: true)
-    let generator = UIImpactFeedbackGenerator(style: .light)
-    generator.impactOccurred()
-  }
 
   @objc private func handleTap(_ gesture: UITapGestureRecognizer) {
     let point = gesture.location(in: pdfView)
