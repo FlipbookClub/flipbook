@@ -9,6 +9,7 @@ import {
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
 import Pdf from "react-native-pdf";
+import { inspectPdf } from "native-highlight-pdf";
 import { X } from "@/lib/icons";
 import { useMutation } from "convex/react";
 
@@ -93,6 +94,25 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       setTitle(file.name.replace(/\.pdf$/i, "").slice(0, 200));
     }
   }, [file, title]);
+
+  // iOS: page count + cover thumbnail via the native-highlight-pdf module's
+  // inspectPdf() — opens the picked file directly, no off-screen render
+  // needed. Android keeps the off-screen <Pdf singlePage> +
+  // react-native-view-shot path below unchanged.
+  useEffect(() => {
+    if (!file || Platform.OS !== "ios") return;
+    setPageCount(null);
+    setPageDetectionError(null);
+    setCoverUri(null);
+    inspectPdf(file.uri, COVER_W, COVER_H)
+      .then(({ pageCount: count, coverUri: uri }) => {
+        setPageCount(count);
+        setCoverUri(uri ?? null);
+      })
+      .catch(() => {
+        setPageDetectionError("Couldn't read this PDF. Try a different file.");
+      });
+  }, [file]);
 
   if (!file) return null;
 
@@ -281,51 +301,54 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         </View>
       </KeyboardAvoidingView>
 
-      {/* Off-screen Pdf used both to read pageCount (onLoadComplete) and to
+      {/* Android only — iOS uses inspectPdf() above instead (see that effect).
+          Off-screen Pdf used both to read pageCount (onLoadComplete) and to
           capture the first page as a cover thumbnail. Rendered at a real size
           far off-screen (not opacity:0 — view-shot can't capture invisible
           views) so the user never sees it. */}
-      <View
-        ref={coverViewRef}
-        collapsable={false}
-        style={{
-          position: "absolute",
-          left: -10000,
-          top: 0,
-          width: COVER_W,
-          height: COVER_H,
-          backgroundColor: "#ffffff",
-        }}
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      >
-        <Pdf
-          source={{ uri: file.uri }}
-          singlePage
-          fitPolicy={2}
-          onLoadComplete={(numberOfPages) => {
-            setPageCount(numberOfPages);
-            setPageDetectionError(null);
-            // Give PDFKit a beat to paint page 1, then snapshot it. Skipped
-            // entirely when view-shot isn't in the native binary yet.
-            if (!captureRef) return;
-            setTimeout(() => {
-              captureRef?.(coverViewRef, { format: "jpg", quality: 0.7, result: "tmpfile" })
-                .then((uri) => setCoverUri(uri))
-                .catch(() => {
-                  /* best-effort — book uploads cover-less */
-                });
-            }, 600);
+      {Platform.OS === "android" ? (
+        <View
+          ref={coverViewRef}
+          collapsable={false}
+          style={{
+            position: "absolute",
+            left: -10000,
+            top: 0,
+            width: COVER_W,
+            height: COVER_H,
+            backgroundColor: "#ffffff",
           }}
-          onError={(err) => {
-            setPageDetectionError(
-              typeof err === "string" ? err : "Couldn't read this PDF. Try a different file.",
-            );
-          }}
-          style={{ width: COVER_W, height: COVER_H }}
-          trustAllCerts={false}
-        />
-      </View>
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
+          <Pdf
+            source={{ uri: file.uri }}
+            singlePage
+            fitPolicy={2}
+            onLoadComplete={(numberOfPages) => {
+              setPageCount(numberOfPages);
+              setPageDetectionError(null);
+              // Give PDFKit a beat to paint page 1, then snapshot it. Skipped
+              // entirely when view-shot isn't in the native binary yet.
+              if (!captureRef) return;
+              setTimeout(() => {
+                captureRef?.(coverViewRef, { format: "jpg", quality: 0.7, result: "tmpfile" })
+                  .then((uri) => setCoverUri(uri))
+                  .catch(() => {
+                    /* best-effort — book uploads cover-less */
+                  });
+              }, 600);
+            }}
+            onError={(err) => {
+              setPageDetectionError(
+                typeof err === "string" ? err : "Couldn't read this PDF. Try a different file.",
+              );
+            }}
+            style={{ width: COVER_W, height: COVER_H }}
+            trustAllCerts={false}
+          />
+        </View>
+      ) : null}
     </Modal>
   );
 }
