@@ -59,10 +59,12 @@ Flipbook v1: mobile book-club app. Clubs upload books, members read in-app, reac
 
 **Diagnosis order (stop at first confirmed cause; there may be more than one):**
 
-- [ ] **P1-T1.** Check the write path first: query Convex prod `progress` rows for recent test accounts. If `currentPage` hasn't advanced since build 10 shipped, the native reader's `onPageChanged` event is not reaching `progress.update` — inspect the event wiring in `ReaderScreen.tsx` (is the handler attached to the native path or only the legacy `<Pdf>` path?) and the payload shape (`page` field name/type must match what the mutation expects).
-- [ ] **P1-T2.** Check the native prop race: `NativeHighlightPdfView.swift` line ~91 admits `documentUri`/`startPage` prop-order isn't guaranteed. If `startPage` is applied before the document loads, `PDFView.go(to:)` is a silent no-op. **Fix pattern:** store the requested start page in the view; apply it inside the document-did-load path (where `onDocumentLoaded` fires); guard against double-application if the prop re-fires.
-- [ ] **P1-T3.** Check the JS freeze logic: `ReaderScreen.tsx` ~198-244. `initialPage` falls back through `serverProgress?.currentPage ?? cached?.page`. Verify `openAtPageRef` cannot freeze a value of `1` (or `undefined` coerced) while `serverProgress` is still loading. The guard `initialPage !== null` only protects if the memo returns `null` (not `1`) during load — confirm and fix if the fallback chain short-circuits to a default prematurely.
-- [ ] **P1-T4.** Regression test on device per §6 items 1, 5, 6 (resume, force-quit resume, offline resume). Both fresh-install and upgrade-from-build-10 paths.
+> **Resolved 2026-08-15, but not via the diagnosis path below.** Four rounds of targeted patches against these hypotheses all failed on device. Root cause was architectural: the native view took `documentUri`/`startPage`/`highlights` as reactive React props, and both sides tried to own "what page are we on," reconciled through racing deferred blocks. The reader was rebuilt on an imperative-command model (commit `1ebbd7c`): JS calls `openDocument()` once and then only listens to `onPageChanged`, so PDFKit owns scroll position outright. T1-T3 below are retained as a record of what was ruled out.
+
+- [x] **P1-T1.** Check the write path first: query Convex prod `progress` rows for recent test accounts. If `currentPage` hasn't advanced since build 10 shipped, the native reader's `onPageChanged` event is not reaching `progress.update` — inspect the event wiring in `ReaderScreen.tsx` (is the handler attached to the native path or only the legacy `<Pdf>` path?) and the payload shape (`page` field name/type must match what the mutation expects).
+- [x] **P1-T2.** Check the native prop race: `NativeHighlightPdfView.swift` line ~91 admits `documentUri`/`startPage` prop-order isn't guaranteed. If `startPage` is applied before the document loads, `PDFView.go(to:)` is a silent no-op. **Fix pattern:** store the requested start page in the view; apply it inside the document-did-load path (where `onDocumentLoaded` fires); guard against double-application if the prop re-fires.
+- [x] **P1-T3.** Check the JS freeze logic: `ReaderScreen.tsx` ~198-244. `initialPage` falls back through `serverProgress?.currentPage ?? cached?.page`. Verify `openAtPageRef` cannot freeze a value of `1` (or `undefined` coerced) while `serverProgress` is still loading. The guard `initialPage !== null` only protects if the memo returns `null` (not `1`) during load — confirm and fix if the fallback chain short-circuits to a default prematurely.
+- [x] **P1-T4.** Regression test on device per §6 items 1, 5, 6 (resume, force-quit resume, offline resume). Both fresh-install and upgrade-from-build-10 paths.
 
 **Acceptance:** read to page N → background → relaunch → opens at N. Force-quit variant passes. Club progress bars reflect N on a second account. Legacy `<Pdf>` path (Android) unaffected.
 
@@ -74,11 +76,18 @@ Flipbook v1: mobile book-club app. Clubs upload books, members read in-app, reac
 
 **Approach (iOS, `NativeHighlightPdfView.swift`):**
 
-- [ ] **P2-T1.** Inventory every gesture recognizer the view adds to `PDFView`/its subviews, plus any `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)` / delegate overrides. Identify which one shadows PDFKit's built-in long-press text selection.
-- [ ] **P2-T2.** Restore native selection: PDFKit's `PDFView` provides long-press → selection-with-handles for free unless a custom recognizer wins arbitration. Scope the custom tap-recognizer (highlight-tap-to-open-thread) so it only claims touches that hit-test onto an existing highlight annotation; otherwise let the touch pass through. If needed, `require(toFail:)` the built-in interactions.
-- [ ] **P2-T3.** Drive highlight creation from `pdfView.currentSelection` via the selection-changed path / edit menu — do not synthesize selection from raw touches on iOS.
-- [ ] **P2-T4.** Preserve existing behaviors: tap-a-highlight-opens-thread, quoted context in composer, no orphan annotations, double-tap word-select still works.
-- [ ] **P2-T5.** Device matrix §6 items 2, 3, 4, 8.
+> **Resolved 2026-08-15.** The shadowing recognizer was not in the module at all. `GestureHandlerRootView` wraps the whole app in `App.tsx`, so RNGH's root arbitration recognizer sat above the reader even after every screen-local `GestureDetector` was removed. Wrapping the native view in `Gesture.Native()` makes it stand down, restoring PDFKit's own long-press selection. A custom in-module long-press recognizer was also removed (it synthesized a programmatic selection, which PDFKit does not attach drag handles to).
+>
+> **Also fixed in the same rebuild, beyond the original scope:**
+> - Page-by-page reading mode had never been wired to the iOS native view (`displayMode` was hardcoded to `.singlePageContinuous`). Now a real `setDisplayMode` command.
+> - Books opened to a black screen. React swaps the native view instance during post-mount layout churn, and a one-shot open left the replacement empty while the loaded instance sat off-screen. The open is now keyed to view instance. Found by adding a native debug event stream after five failed device rounds, which is the lesson worth carrying into Phase 3.
+> - Cover capture moved off the off-screen `react-native-pdf` render plus `react-native-view-shot` (which silently no-opped when missing from the dev-client binary) onto PDFKit's own thumbnail API on iOS. Android path unchanged.
+
+- [x] **P2-T1.** Inventory every gesture recognizer the view adds to `PDFView`/its subviews, plus any `gestureRecognizer(_:shouldRecognizeSimultaneouslyWith:)` / delegate overrides. Identify which one shadows PDFKit's built-in long-press text selection.
+- [x] **P2-T2.** Restore native selection: PDFKit's `PDFView` provides long-press → selection-with-handles for free unless a custom recognizer wins arbitration. Scope the custom tap-recognizer (highlight-tap-to-open-thread) so it only claims touches that hit-test onto an existing highlight annotation; otherwise let the touch pass through. If needed, `require(toFail:)` the built-in interactions.
+- [x] **P2-T3.** Drive highlight creation from `pdfView.currentSelection` via the selection-changed path / edit menu — do not synthesize selection from raw touches on iOS.
+- [x] **P2-T4.** Preserve existing behaviors: tap-a-highlight-opens-thread, quoted context in composer, no orphan annotations, double-tap word-select still works.
+- [x] **P2-T5.** Device matrix §6 items 2, 3, 4, 8.
 
 **Acceptance:** long-press a word → handles appear → drag to extend → highlight/react → annotation persists and threads correctly. All build-10 highlight behaviors intact.
 
