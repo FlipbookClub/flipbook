@@ -321,6 +321,17 @@ export function ReaderScreen({ navigation, route }: Props) {
       ? { clubId: effective.clubId, ...scopePayload }
       : "skip",
   );
+  // Stabilize the array reference passed to the native view: Convex re-runs
+  // this query (and can hand back a new array reference) on activity that
+  // has nothing to do with highlights (e.g. any reaction on this club bumps
+  // lastActivityAt, which other live queries transitively depend on). An
+  // unstable reference re-fires the `highlights` prop on the native side on
+  // every such render, which used to repaint every highlight annotation and
+  // disturb the reader's scroll position — see NativeHighlightPdfView.swift.
+  // Only produce a new reference when the actual content changes.
+  const highlightsSignature = JSON.stringify(highlights ?? []);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const stableHighlights = useMemo(() => highlights ?? [], [highlightsSignature]);
 
   const handleReactionSubmit = async (payload: ReactionSubmission) => {
     if (!effective || !scopePayload) return;
@@ -536,7 +547,7 @@ export function ReaderScreen({ navigation, route }: Props) {
               ref={pdfRef}
               documentUri={resolvedUri}
               startPage={targetPage ?? openAtPageRef.current ?? initialPage}
-              highlights={highlights ?? []}
+              highlights={stableHighlights}
               style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
               onDocumentLoaded={(e) => {
                 const numberOfPages = e.nativeEvent.totalPages;

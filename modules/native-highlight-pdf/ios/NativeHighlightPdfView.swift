@@ -12,6 +12,16 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   // page has actually been applied for the current document. Reset whenever
   // a new document loads or a genuinely different startPage is requested.
   private var hasAppliedStartPage = false
+  // Which (0-indexed) pages currently have painted highlight annotations —
+  // lets a repaint touch only pages that actually changed instead of the
+  // whole document. See applyPendingHighlights().
+  private var highlightedPageIndices: Set<Int> = []
+  // Cheap content signature of the last-painted highlight set, so a
+  // `highlights` prop re-fire with IDENTICAL data (RN/Fabric's prop diffing
+  // for array props isn't guaranteed to be reference-stable across every
+  // re-render — see applyPendingHighlights()) is a true no-op rather than a
+  // full repaint.
+  private var lastHighlightsSignature: String = ""
 
   let onDocumentLoaded = EventDispatcher()
   let onPageChanged = EventDispatcher()
@@ -86,6 +96,11 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
     }
     pdfView.document = document
     hasAppliedStartPage = false
+    // New document — any prior signature/page-index bookkeeping belonged to
+    // the previous book and must not cause this one's highlights to be
+    // skipped as "unchanged."
+    lastHighlightsSignature = ""
+    highlightedPageIndices = []
     applyPendingHighlights()
     jumpToStartPageIfNeeded()
   }
@@ -135,59 +150,105 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
     return URL(fileURLWithPath: uri)
   }
 
-  // Repaints every highlight annotation from scratch from `pendingHighlights`
-  // (server-confirmed data, normalized 0..1 top-left origin per the reactions
-  // schema). Simple clear-and-redraw — highlight counts per page are small,
-  // so there's no need for incremental diffing here. Each annotation is
-  // stamped with its reaction id (via `userName`, a free-form PDFAnnotation
-  // string field) so a tap can be traced back to the reaction thread.
+  // Cheap, order-independent signature of a highlight set, so a same-content
+  // `highlights` prop re-fire is a true no-op. RN/Fabric's prop diffing for
+  // array-type props isn't guaranteed to skip the native setter just because
+  // the JS-side values are unchanged (that generally requires the JS array
+  // to be the SAME reference, which isn't guaranteed across every re-render
+  // of the screen) — so without this, `setHighlightsData` can fire far more
+  // often than "a highlight was actually added or removed," including from
+  // re-renders totally unrelated to highlights (e.g. ordinary page-scroll
+  // state updates).
+  private func signature(for items: [[String: Any]]) -> String {
+    items.map { item -> String in
+      let id = (item["id"] as? String) ?? ""
+      let page = (item["page"] as? Int) ?? 0
+      let rectsSig =
+        (item["rects"] as? [[String: Any]])?
+        .map { r -> String in
+          let x = (r["x"] as? Double) ?? 0
+          let y = (r["y"] as? Double) ?? 0
+          let w = (r["w"] as? Double) ?? 0
+          let h = (r["h"] as? Double) ?? 0
+          return "\(x),\(y),\(w),\(h)"
+        }
+        .joined(separator: ";") ?? ""
+      return "\(id):\(page):\(rectsSig)"
+    }
+    .sorted()
+    .joined(separator: "|")
+  }
+
+  // Repaints highlight annotations from `pendingHighlights` (server-confirmed
+  // data, normalized 0..1 top-left origin per the reactions schema). Each
+  // annotation is stamped with its reaction id (via `userName`, a free-form
+  // PDFAnnotation string field) so a tap can be traced back to the reaction
+  // thread.
+  //
+  // BUG history: this used to unconditionally clear-and-redraw annotations
+  // across the WHOLE document on every call, and got called far more often
+  // than intended (see `signature` doc above) — bulk annotation churn in
+  // .singlePageContinuous mode was disturbing PDFView's scroll position,
+  // which the very next legitimate onPageChanged event then wrote back to
+  // the server as the "current page," corrupting resume progress. Fixed two
+  // ways together: (1) skip entirely when the content hasn't actually
+  // changed, (2) when it has, touch only the pages whose highlights changed,
+  // never the whole document.
   private func applyPendingHighlights() {
     guard let document = pdfView.document else { return }
 
-    // BUG: reacting to a highlight was snapping the reader back to page 1.
-    // This is the only code path that touches annotations across the WHOLE
-    // document on every `highlights` prop update (which fires after every
-    // reaction — highlight or not — since creating one bumps the club's
-    // lastActivityAt, which several live queries transitively depend on).
-    // Bulk annotation churn in .singlePageContinuous mode has been observed
-    // to disturb PDFView's scroll position; capture the page the reader is
-    // actually on and restore it afterward regardless of the exact
-    // mechanism, rather than relying on a specific PDFKit explanation.
+    let newSignature = signature(for: pendingHighlights)
+    guard newSignature != lastHighlightsSignature else { return }
+    lastHighlightsSignature = newSignature
+
+    var byPageIndex: [Int: [[String: Any]]] = [:]
+    for item in pendingHighlights {
+      guard let pageNum = item["page"] as? Int else { continue }
+      byPageIndex[pageNum - 1, default: []].append(item)
+    }
+    let newPageIndices = Set(byPageIndex.keys)
+    let pagesToTouch = highlightedPageIndices.union(newPageIndices)
+    highlightedPageIndices = newPageIndices
+
     let pageIndexBeforeRepaint = pdfView.currentPage.map { document.index(for: $0) }
 
-    for pageIndex in 0..<document.pageCount {
+    for pageIndex in pagesToTouch {
       guard let page = document.page(at: pageIndex) else { continue }
       for annotation in page.annotations where annotation.type == "Highlight" {
         page.removeAnnotation(annotation)
       }
-    }
-    for item in pendingHighlights {
-      guard
-        let id = item["id"] as? String,
-        let pageNum = item["page"] as? Int,
-        let rects = item["rects"] as? [[String: Any]],
-        let page = document.page(at: pageNum - 1)
-      else { continue }
+      guard let items = byPageIndex[pageIndex] else { continue }
       let pageBounds = page.bounds(for: .mediaBox)
-      for rectData in rects {
+      for item in items {
         guard
-          let x = rectData["x"] as? Double, let y = rectData["y"] as? Double,
-          let w = rectData["w"] as? Double, let h = rectData["h"] as? Double
+          let id = item["id"] as? String,
+          let rects = item["rects"] as? [[String: Any]]
         else { continue }
-        let bounds = denormalizedRect(x: x, y: y, w: w, h: h, pageBounds: pageBounds)
-        let annotation = PDFAnnotation(bounds: bounds, forType: .highlight, withProperties: nil)
-        annotation.color = UIColor.systemYellow.withAlphaComponent(0.4)
-        annotation.userName = id
-        page.addAnnotation(annotation)
+        for rectData in rects {
+          guard
+            let x = rectData["x"] as? Double, let y = rectData["y"] as? Double,
+            let w = rectData["w"] as? Double, let h = rectData["h"] as? Double
+          else { continue }
+          let bounds = denormalizedRect(x: x, y: y, w: w, h: h, pageBounds: pageBounds)
+          let annotation = PDFAnnotation(bounds: bounds, forType: .highlight, withProperties: nil)
+          annotation.color = UIColor.systemYellow.withAlphaComponent(0.4)
+          annotation.userName = id
+          page.addAnnotation(annotation)
+        }
       }
     }
 
-    if let wantIndex = pageIndexBeforeRepaint,
-      let nowIndex = pdfView.currentPage.map({ document.index(for: $0) }),
-      wantIndex != nowIndex,
-      let restorePage = document.page(at: wantIndex)
-    {
-      pdfView.go(to: restorePage)
+    // Belt-and-suspenders: re-assert the page we were actually on, even
+    // though the pages-touched set above should no longer disturb it.
+    // Deferred one run-loop tick in case any disturbance from the mutations
+    // above is itself asynchronous inside PDFKit.
+    if let wantIndex = pageIndexBeforeRepaint {
+      DispatchQueue.main.async { [weak self] in
+        guard let self = self, self.pdfView.document === document,
+          let restorePage = document.page(at: wantIndex)
+        else { return }
+        self.pdfView.go(to: restorePage)
+      }
     }
   }
 
