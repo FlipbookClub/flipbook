@@ -143,6 +143,18 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   // string field) so a tap can be traced back to the reaction thread.
   private func applyPendingHighlights() {
     guard let document = pdfView.document else { return }
+
+    // BUG: reacting to a highlight was snapping the reader back to page 1.
+    // This is the only code path that touches annotations across the WHOLE
+    // document on every `highlights` prop update (which fires after every
+    // reaction — highlight or not — since creating one bumps the club's
+    // lastActivityAt, which several live queries transitively depend on).
+    // Bulk annotation churn in .singlePageContinuous mode has been observed
+    // to disturb PDFView's scroll position; capture the page the reader is
+    // actually on and restore it afterward regardless of the exact
+    // mechanism, rather than relying on a specific PDFKit explanation.
+    let pageIndexBeforeRepaint = pdfView.currentPage.map { document.index(for: $0) }
+
     for pageIndex in 0..<document.pageCount {
       guard let page = document.page(at: pageIndex) else { continue }
       for annotation in page.annotations where annotation.type == "Highlight" {
@@ -168,6 +180,14 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
         annotation.userName = id
         page.addAnnotation(annotation)
       }
+    }
+
+    if let wantIndex = pageIndexBeforeRepaint,
+      let nowIndex = pdfView.currentPage.map({ document.index(for: $0) }),
+      wantIndex != nowIndex,
+      let restorePage = document.page(at: wantIndex)
+    {
+      pdfView.go(to: restorePage)
     }
   }
 

@@ -521,63 +521,72 @@ export function ReaderScreen({ navigation, route }: Props) {
           </View>
         ) : initialPage === null || resolvedUri === null ? (
           <LoadingState bg={colors.surfaceSecondary} fg={colors.textPrimary} />
+        ) : useNativeHighlightReader ? (
+          // Not wrapped in the JS long-press GestureDetector below — that
+          // gesture is for the legacy Android <Pdf> path only. On iOS,
+          // PDFKit must own long-press outright for text selection; a
+          // sibling RNGH recognizer here would win arbitration against
+          // PDFKit's own gesture (confirmed on-device: BUG-001 came right
+          // back once our competing in-module recognizer was removed,
+          // because this JS-level one was still wrapping the view). Page-
+          // level reactions on iOS go through the Smile FAB instead, which
+          // is why it's documented as "the reliable entry."
+          <View style={{ flex: 1 }}>
+            <NativeHighlightPdfView
+              ref={pdfRef}
+              documentUri={resolvedUri}
+              startPage={targetPage ?? openAtPageRef.current ?? initialPage}
+              highlights={highlights ?? []}
+              style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
+              onDocumentLoaded={(e) => {
+                const numberOfPages = e.nativeEvent.totalPages;
+                if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
+                setTotalPages(numberOfPages);
+                const startPage = Math.min(
+                  Math.max(1, openAtPageRef.current ?? initialPage),
+                  numberOfPages,
+                );
+                setCurrentPage(startPage);
+                syncToServer(startPage, numberOfPages);
+              }}
+              onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
+              onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
+              onHighlightTapped={(e) =>
+                setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
+              }
+              onLoadError={(e) => setLoadError(e.nativeEvent.message)}
+            />
+          </View>
         ) : (
           <GestureDetector gesture={longPress}>
             <View style={{ flex: 1 }}>
-              {useNativeHighlightReader ? (
-                <NativeHighlightPdfView
-                  ref={pdfRef}
-                  documentUri={resolvedUri}
-                  startPage={targetPage ?? openAtPageRef.current ?? initialPage}
-                  highlights={highlights ?? []}
-                  style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
-                  onDocumentLoaded={(e) => {
-                    const numberOfPages = e.nativeEvent.totalPages;
-                    if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
-                    setTotalPages(numberOfPages);
-                    const startPage = Math.min(
-                      Math.max(1, openAtPageRef.current ?? initialPage),
-                      numberOfPages,
-                    );
-                    setCurrentPage(startPage);
-                    syncToServer(startPage, numberOfPages);
-                  }}
-                  onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
-                  onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
-                  onHighlightTapped={(e) =>
-                    setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
-                  }
-                  onLoadError={(e) => setLoadError(e.nativeEvent.message)}
-                />
-              ) : (
-                <Pdf
-                  source={{ uri: resolvedUri, cache: true }}
-                  horizontal={pageMode === "paged"}
-                  enablePaging={pageMode === "paged"}
-                  page={targetPage ?? openAtPageRef.current ?? initialPage}
-                  onLoadComplete={(numberOfPages) => {
-                    if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
-                    setTotalPages(numberOfPages);
-                    const startPage = Math.min(
-                      Math.max(1, openAtPageRef.current ?? initialPage),
-                      numberOfPages,
-                    );
-                    setCurrentPage(startPage);
-                    syncToServer(startPage, numberOfPages);
-                  }}
-                  onPageChanged={(page, total) => handlePageChanged(page, total)}
-                  onError={(err) => {
-                    setLoadError(
-                      typeof err === "string"
-                        ? err
-                        : "The pages aren't loading. Mind trying again in a moment?",
-                    );
-                  }}
-                  renderActivityIndicator={() => <ActivityIndicator color={colors.textPrimary} />}
-                  style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
-                  trustAllCerts={false}
-                />
-              )}
+              <Pdf
+                source={{ uri: resolvedUri, cache: true }}
+                horizontal={pageMode === "paged"}
+                enablePaging={pageMode === "paged"}
+                page={targetPage ?? openAtPageRef.current ?? initialPage}
+                onLoadComplete={(numberOfPages) => {
+                  if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
+                  setTotalPages(numberOfPages);
+                  const startPage = Math.min(
+                    Math.max(1, openAtPageRef.current ?? initialPage),
+                    numberOfPages,
+                  );
+                  setCurrentPage(startPage);
+                  syncToServer(startPage, numberOfPages);
+                }}
+                onPageChanged={(page, total) => handlePageChanged(page, total)}
+                onError={(err) => {
+                  setLoadError(
+                    typeof err === "string"
+                      ? err
+                      : "The pages aren't loading. Mind trying again in a moment?",
+                  );
+                }}
+                renderActivityIndicator={() => <ActivityIndicator color={colors.textPrimary} />}
+                style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
+                trustAllCerts={false}
+              />
             </View>
           </GestureDetector>
         )}
