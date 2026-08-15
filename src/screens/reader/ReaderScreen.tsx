@@ -82,6 +82,36 @@ interface Props {
   route: RouteProp<{ Reader: ReaderRouteParams }, "Reader">;
 }
 
+// Calls openDocument() on the native reader, retrying with backoff if the
+// ref isn't attached yet OR the native call throws. This covers a real gap
+// between React committing a freshly-mounted Fabric native view and the
+// native side finishing registration for imperative view-tag calls on it —
+// a `useEffect` firing right after JS commit is NOT guaranteed to land after
+// that native-side registration completes, so the very first call can throw
+// "Unable to find the view with tag N" on a brand-new mount. Bounded (6
+// attempts, ~1.3s worst case) so a genuinely broken view still fails fast
+// rather than hanging silently.
+async function openDocumentWithRetry(
+  ref: React.RefObject<NativeHighlightPdfViewRef | null>,
+  uri: string,
+  page: number,
+  mode: "paged" | "scroll",
+  attempts = 6,
+): Promise<{ totalPages: number; startPage: number }> {
+  let lastError: unknown;
+  for (let i = 0; i < attempts; i++) {
+    if (ref.current) {
+      try {
+        return await ref.current.openDocument(uri, page, mode);
+      } catch (err) {
+        lastError = err;
+      }
+    }
+    await new Promise((resolve) => setTimeout(resolve, 60 * (i + 1)));
+  }
+  throw lastError instanceof Error ? lastError : new Error("Native reader view never became ready");
+}
+
 export function ReaderScreen({ navigation, route }: Props) {
   const { colors } = useTheme();
   const { bookId, chapterId, jumpToPage } = route.params;
@@ -249,15 +279,28 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [pageMode, setPageMode] = useState<"paged" | "scroll">(() =>
     storage.getString("reader.pageMode") === "scroll" ? "scroll" : "paged",
   );
+  // Read by the open effect so switching modes doesn't count as a change that
+  // re-opens the document (setDisplayMode handles mode switches in place).
+  const pageModeRef = useRef(pageMode);
+  pageModeRef.current = pageMode;
   // The page the Pdf is told to show. It stays put during normal swiping (so
   // neither live progress nor a re-render yanks it) and is re-anchored to the
   // *current* page only when the view mode changes — so switching continuous ⇄
   // page-by-page keeps your place instead of snapping to the opened page.
   const [targetPage, setTargetPage] = useState<number | null>(null);
+  // iOS (imperative reader): re-anchoring on a mode switch is a real native
+  // call, since PDFKit owns scroll position once open — see setDisplayMode()
+  // in NativeHighlightPdfView.swift. Android (legacy react-native-pdf): the
+  // `page` prop there is still reactive, so re-anchoring means bumping
+  // `targetPage` as before.
   const setReadingMode = (mode: "paged" | "scroll") => {
     setPageMode(mode);
     storage.set("reader.pageMode", mode);
-    setTargetPage(currentPage);
+    if (useNativeHighlightReader) {
+      if (readerReady) pdfRef.current?.setDisplayMode(mode);
+    } else {
+      setTargetPage(currentPage);
+    }
   };
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
@@ -266,7 +309,32 @@ export function ReaderScreen({ navigation, route }: Props) {
   // free. Android's hand-rolled PdfiumAndroid view has no page-turn gesture
   // yet, so it stays on react-native-pdf until that's built separately.
   const useNativeHighlightReader = Platform.OS === "ios";
-  const pdfRef = useRef<NativeHighlightPdfViewRef>(null);
+  const pdfRef = useRef<NativeHighlightPdfViewRef | null>(null);
+  // React can swap the underlying native view instance after mount (layout
+  // churn from hiding the tab bar resizes this subtree several times). A
+  // one-shot open leaves that replacement instance empty while the loaded
+  // one is off-screen — device traces showed openDocument succeeding with
+  // 488 pages, then the in-window view reporting 0 pages: two instances.
+  // So the open is keyed to the view instance, not to mount: attaching a new
+  // instance bumps this generation, which re-issues openDocument onto it.
+  const [viewGeneration, setViewGeneration] = useState(0);
+  const attachPdfRef = useCallback((instance: NativeHighlightPdfViewRef | null) => {
+    pdfRef.current = instance;
+    if (instance) setViewGeneration((g) => g + 1);
+  }, []);
+  const openedKeyRef = useRef<string | null>(null);
+  // Where to (re)open at. Starts null so the first open uses the resume page,
+  // then tracks the real position — so if the native view gets replaced
+  // mid-read, the re-open restores where you actually are rather than
+  // snapping back to the page you originally opened at.
+  const lastKnownPageRef = useRef<number | null>(null);
+  // readerReady gates the highlight-diff effect so it never paints before
+  // there's a document; it drops back to false whenever the view is replaced.
+  const [readerReady, setReaderReady] = useState(false);
+  // Which highlight ids are currently painted natively, so the diff effect
+  // below only ever sends the delta to addHighlight/removeHighlight — never
+  // a full repaint.
+  const paintedHighlightIdsRef = useRef(new Map<string, { page: number }>());
   const [hasSelection, setHasSelection] = useState(false);
   const [pendingHighlight, setPendingHighlight] = useState<{
     page: number;
@@ -321,18 +389,6 @@ export function ReaderScreen({ navigation, route }: Props) {
       ? { clubId: effective.clubId, ...scopePayload }
       : "skip",
   );
-  // Stabilize the array reference passed to the native view: Convex re-runs
-  // this query (and can hand back a new array reference) on activity that
-  // has nothing to do with highlights (e.g. any reaction on this club bumps
-  // lastActivityAt, which other live queries transitively depend on). An
-  // unstable reference re-fires the `highlights` prop on the native side on
-  // every such render, which used to repaint every highlight annotation and
-  // disturb the reader's scroll position — see NativeHighlightPdfView.swift.
-  // Only produce a new reference when the actual content changes.
-  const highlightsSignature = JSON.stringify(highlights ?? []);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const stableHighlights = useMemo(() => highlights ?? [], [highlightsSignature]);
-
   const handleReactionSubmit = async (payload: ReactionSubmission) => {
     if (!effective || !scopePayload) return;
     // A highlight-originated reaction is anchored to the page the selection
@@ -367,7 +423,20 @@ export function ReaderScreen({ navigation, route }: Props) {
       return;
     }
     try {
-      await createReaction(args);
+      const newReactionId = await createReaction(args);
+      // Paint immediately rather than waiting for the `listHighlights` query
+      // to round-trip — zero latency, and no scroll disturbance since
+      // addHighlight never touches scroll position. When the live query
+      // later includes this id, the diff effect below sees it's already
+      // painted and no-ops (no duplicate, no flicker).
+      if (pendingHighlight) {
+        pdfRef.current?.addHighlight({
+          id: newReactionId,
+          page: pendingHighlight.page,
+          rects: pendingHighlight.rects,
+        });
+        paintedHighlightIdsRef.current.set(newReactionId, { page: pendingHighlight.page });
+      }
       analytics.track("reaction_added", { type: payload.type });
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
     } catch (err) {
@@ -399,6 +468,19 @@ export function ReaderScreen({ navigation, route }: Props) {
     })
     .runOnJS(true);
 
+  // `GestureHandlerRootView` wraps the whole app (App.tsx) — RNGH's root
+  // touch-arbitration recognizer sits ABOVE this screen regardless of
+  // whether this screen attaches its own GestureDetector, and it can still
+  // interfere with a native view's own built-in gesture handling underneath
+  // it (a documented RNGH/native-view class of conflict — WebView, MapView,
+  // and apparently PDFKit's long-press-to-select all hit it). `Gesture.Native()`
+  // is RNGH's purpose-built escape hatch: it tells the root recognizer this
+  // subtree owns its own touches and to stand down, rather than arbitrating.
+  // Memoized: an unstable gesture object makes GestureDetector reconfigure on
+  // every render, which is one of the things churning this subtree's native
+  // views right after mount (see the view-generation note above).
+  const nativeReaderGesture = useMemo(() => Gesture.Native(), []);
+
   const syncToServer = useThrottledCallback(
     (page: number, total: number) => {
       if (!effective || !scopePayload) return;
@@ -420,6 +502,7 @@ export function ReaderScreen({ navigation, route }: Props) {
     if (page < 1 || total < 1 || page > total) return;
     if (!contentId) return;
     setCurrentPage(page);
+    lastKnownPageRef.current = page;
     setTotalPages(total);
     writeCachedProgress({ bookId: contentId, page, totalPages: total, updatedAt: Date.now() });
     syncToServer(page, total);
@@ -452,6 +535,67 @@ export function ReaderScreen({ navigation, route }: Props) {
       cancelled = true;
     };
   }, [effective]);
+
+  // Opens the document exactly once (openedRef guards re-entry) via the
+  // imperative command surface, rather than reactive documentUri/startPage
+  // props — see NativeHighlightPdfView.swift's top-of-file comment for why.
+  // The native view mounts empty; this effect runs after that mount commits
+  // (pdfRef.current is guaranteed set by then) and drives the actual open +
+  // initial jump in one native call.
+  useEffect(() => {
+    if (!useNativeHighlightReader) return;
+    if (!pdfRef.current || !resolvedUri || initialPage === null) return;
+    // Identity of "this document, open on this view instance". A new native
+    // instance (generation bump) re-opens even for the same URI.
+    const key = `${viewGeneration}:${resolvedUri}`;
+    if (openedKeyRef.current === key) return;
+    openedKeyRef.current = key;
+    // The replacement instance paints no annotations, so forget what the
+    // previous one had; the diff effect repaints from scratch once ready.
+    paintedHighlightIdsRef.current.clear();
+    setReaderReady(false);
+    (async () => {
+      try {
+        const target = lastKnownPageRef.current ?? initialPage;
+        const result = await openDocumentWithRetry(pdfRef, resolvedUri, target, pageModeRef.current);
+        setTotalPages(result.totalPages);
+        setCurrentPage(result.startPage);
+        lastKnownPageRef.current = result.startPage;
+        syncToServer(result.startPage, result.totalPages);
+        setReaderReady(true);
+      } catch {
+        setLoadError("The pages aren't loading. Mind trying again in a moment?");
+        openedKeyRef.current = null;
+      }
+    })();
+  }, [useNativeHighlightReader, viewGeneration, resolvedUri, initialPage, syncToServer]);
+
+  // Incrementally paints/removes highlight annotations as the live
+  // `listHighlights` query changes, diffed against what's already painted
+  // (paintedHighlightIdsRef) rather than re-sending the whole array. This is
+  // a true no-op on redundant re-fires from unrelated club activity (any
+  // reaction bumps lastActivityAt, which cascades to other live queries) by
+  // construction — no content-hashing needed, and it never touches scroll
+  // position (see addHighlight/removeHighlight in NativeHighlightPdfView.swift).
+  // Also how another user's highlight shows up live.
+  useEffect(() => {
+    if (!useNativeHighlightReader || !readerReady || highlights === undefined) return;
+    const painted = paintedHighlightIdsRef.current;
+    const incoming = new Map<string, { id: string; page: number; rects: HighlightRect[] }>();
+    for (const h of highlights ?? []) incoming.set(h.id, h);
+    for (const [id, h] of incoming) {
+      if (!painted.has(id)) {
+        pdfRef.current?.addHighlight({ id: h.id, page: h.page, rects: h.rects });
+        painted.set(id, { page: h.page });
+      }
+    }
+    for (const [id, meta] of painted) {
+      if (!incoming.has(id)) {
+        pdfRef.current?.removeHighlight(id, meta.page);
+        painted.delete(id);
+      }
+    }
+  }, [useNativeHighlightReader, readerReady, highlights]);
 
   const { width, height } = Dimensions.get("window");
 
@@ -541,33 +685,35 @@ export function ReaderScreen({ navigation, route }: Props) {
           // back once our competing in-module recognizer was removed,
           // because this JS-level one was still wrapping the view). Page-
           // level reactions on iOS go through the Smile FAB instead, which
-          // is why it's documented as "the reliable entry."
-          <View style={{ flex: 1 }}>
-            <NativeHighlightPdfView
-              ref={pdfRef}
-              documentUri={resolvedUri}
-              startPage={targetPage ?? openAtPageRef.current ?? initialPage}
-              highlights={stableHighlights}
-              style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
-              onDocumentLoaded={(e) => {
-                const numberOfPages = e.nativeEvent.totalPages;
-                if (!Number.isFinite(numberOfPages) || numberOfPages < 1) return;
-                setTotalPages(numberOfPages);
-                const startPage = Math.min(
-                  Math.max(1, openAtPageRef.current ?? initialPage),
-                  numberOfPages,
-                );
-                setCurrentPage(startPage);
-                syncToServer(startPage, numberOfPages);
-              }}
-              onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
-              onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
-              onHighlightTapped={(e) =>
-                setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
-              }
-              onLoadError={(e) => setLoadError(e.nativeEvent.message)}
-            />
-          </View>
+          // is why it's documented as "the reliable entry." It IS wrapped in
+          // a `Gesture.Native()` detector — see `nativeReaderGesture` above —
+          // so RNGH's app-wide root recognizer (GestureHandlerRootView in
+          // App.tsx) explicitly steps aside for this view instead of
+          // arbitrating against PDFKit's own touch handling.
+          <GestureDetector gesture={nativeReaderGesture}>
+            <View style={{ flex: 1 }}>
+              <NativeHighlightPdfView
+                ref={attachPdfRef}
+                style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
+                onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
+                onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
+                onHighlightTapped={(e) =>
+                  setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
+                }
+                // Diagnostic stream from the native render pipeline, surfaced
+                // in the Metro log. Tagged for grepping while debugging the
+                // blank-render bug; remove once that's confirmed fixed.
+                onDebug={(e) => {
+                  const d = e.nativeEvent;
+                  console.log(
+                    `[PDFDBG] ${d.msg} | bounds=${Math.round(d.boundsWidth)}x${Math.round(
+                      d.boundsHeight,
+                    )} scale=${d.scale.toFixed(3)} inWindow=${d.inWindow} pages=${d.pageCount}`,
+                  );
+                }}
+              />
+            </View>
+          </GestureDetector>
         ) : (
           <GestureDetector gesture={longPress}>
             <View style={{ flex: 1 }}>

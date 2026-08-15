@@ -3,31 +3,48 @@ import PDFKit
 
 // Wraps Apple's PDFKit (the same framework Preview.app and Books.app use) to
 // get real, native text selection and highlight annotations — no WebView, no
-// third-party SDK. See modules/native-highlight-pdf/README (plan doc) for why.
+// third-party SDK.
+//
+// Imperative-command architecture: JS opens the document once via
+// openDocument() and thereafter only LISTENS to onPageChanged — PDFKit is the
+// sole owner of scroll position from that point on. Nothing except an
+// explicit, user-triggered call (openDocument, setDisplayMode, jumpToPage)
+// ever calls pdfView.go(to:). An earlier version of this view took
+// documentUri/startPage/highlights as reactive React props and grew three
+// independent pieces of defensive bookkeeping trying to guess whether a given
+// prop re-fire was stale, redundant, or racing another deferred
+// DispatchQueue.main.async block — four rounds of device-tested patches later
+// the reconciliation itself was still producing new races (a highlight
+// repaint's "restore to current page" logic raced the initial resume jump;
+// annotation churn disturbed scroll position with no reliable way to
+// undo it). Removing the reactive layer removes the whole bug class instead
+// of guarding against it: addHighlight/removeHighlight below never call
+// pdfView.go() at all, so they structurally cannot move the reader.
 class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   private let pdfView = PDFView()
-  private var startPage: Int = 1
-  private var pendingHighlights: [[String: Any]] = []
-  // Guards against re-jumping on every prop re-fire once the requested start
-  // page has actually been applied for the current document. Reset whenever
-  // a new document loads or a genuinely different startPage is requested.
-  private var hasAppliedStartPage = false
-  // Which (0-indexed) pages currently have painted highlight annotations —
-  // lets a repaint touch only pages that actually changed instead of the
-  // whole document. See applyPendingHighlights().
-  private var highlightedPageIndices: Set<Int> = []
-  // Cheap content signature of the last-painted highlight set, so a
-  // `highlights` prop re-fire with IDENTICAL data (RN/Fabric's prop diffing
-  // for array props isn't guaranteed to be reference-stable across every
-  // re-render — see applyPendingHighlights()) is a true no-op rather than a
-  // full repaint.
-  private var lastHighlightsSignature: String = ""
+  // The start page requested by openDocument(), held until the view has real
+  // bounds to jump within. Applied (and cleared) by refreshRenderPipeline().
+  private var pendingStartPageIndex: Int? = nil
+  // Last bounds size the render pipeline was asserted against — lets
+  // layoutSubviews re-assert only on actual size changes, so routine layout
+  // passes (and especially user pinch-zoom, which doesn't change our bounds)
+  // never stomp PDFKit's state.
+  private var lastAssertedSize: CGSize = .zero
+  // PDFView has no public getter for usePageViewController, so track it.
+  private var isPagedMode = false
+  // Distinguishes view instances in the debug stream — the black-screen bug
+  // was two live instances (one holding the document off-screen, an empty one
+  // on screen), which is invisible without this.
+  private static var instanceCounter = 0
+  private let instanceId: Int = {
+    NativeHighlightPdfView.instanceCounter += 1
+    return NativeHighlightPdfView.instanceCounter
+  }()
 
-  let onDocumentLoaded = EventDispatcher()
   let onPageChanged = EventDispatcher()
   let onSelectionChanged = EventDispatcher()
   let onHighlightTapped = EventDispatcher()
-  let onLoadError = EventDispatcher()
+  let onDebug = EventDispatcher()
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -45,23 +62,23 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
     ])
 
     NotificationCenter.default.addObserver(
-      self, selector: #selector(handleDocumentChanged),
-      name: .PDFViewDocumentChanged, object: pdfView)
-    NotificationCenter.default.addObserver(
       self, selector: #selector(handlePageChanged),
       name: .PDFViewPageChanged, object: pdfView)
     NotificationCenter.default.addObserver(
       self, selector: #selector(handleSelectionChanged),
       name: .PDFViewSelectionChanged, object: pdfView)
 
-    // BUG-001: a custom long-press recognizer used to live here, synthesizing
-    // a selection via `page.selectionForWord(at:)` + `setCurrentSelection`.
+    // A custom long-press recognizer used to live here, synthesizing a
+    // selection via `page.selectionForWord(at:)` + `setCurrentSelection`.
     // That produces a *programmatic* selection, which PDFKit does NOT attach
     // its native drag handles to — so extending it required falling back to
     // PDFKit's own built-in double-tap-hold gesture, exactly the "requires
-    // double-tap then drag" bug reported. PDFView provides real long-press
-    // -> selection-with-handles for free; removing our recognizer lets it
-    // win arbitration instead of shadowing it with an inferior substitute.
+    // double-tap then drag" bug this used to have. PDFView provides real
+    // long-press -> selection-with-handles for free; removing our recognizer
+    // lets it win arbitration instead of shadowing it with an inferior
+    // substitute. (The other half of that fix is JS-side: the reader screen
+    // wraps this view in `Gesture.Native()` so RNGH's app-wide root
+    // recognizer stands down too — see ReaderScreen.tsx.)
 
     // Tap an existing highlight to open its reaction thread. cancelsTouchesInView
     // = false so this never blocks PDFView's own tap gestures (link-following,
@@ -83,173 +100,247 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
     return true
   }
 
-  // MARK: - Props (called by the generated Prop() bindings in the Module)
+  // MARK: - Render-pipeline self-correction (the actual black-screen fix)
 
-  func setDocumentUri(_ uri: String) {
-    guard let url = resolveUrl(uri) else {
-      onLoadError(["message": "Couldn't resolve file path: \(uri)"])
+  // Device-verified failure mechanism, reconciled across six build rounds:
+  // when openDocument() runs near-instantly (a local-cache HIT — which after
+  // enough reading is EVERY open), it executes before this view's layout has
+  // settled. PDFKit computes its autoScales scale factor and internal
+  // document layout at document-set time against whatever bounds exist right
+  // then — compute against unusable bounds and the visual pipeline is
+  // silently broken with nothing ever recomputing it (page bookkeeping still
+  // works, hence "Page 9 of 488" over black content). A cache MISS's
+  // download delay let layout settle first, which is why first-ever opens
+  // looked fine and masked this. No fixed delay inside openDocument can be
+  // correct — layout arrival is genuinely asynchronous — so instead the view
+  // self-corrects at the moments UIKit REPORTS layout state changed:
+  // layoutSubviews (bounds arrived/changed) and didMoveToWindow (attached or
+  // re-attached, which also covers Fabric view recycling). Event-driven, not
+  // timing-guessed.
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    if bounds.size != lastAssertedSize {
+      refreshRenderPipeline(reason: "layoutSubviews")
+    }
+  }
+
+  override func didMoveToWindow() {
+    super.didMoveToWindow()
+    if window != nil {
+      refreshRenderPipeline(reason: "didMoveToWindow")
+    }
+  }
+
+  private func refreshRenderPipeline(reason: String) {
+    guard let document = pdfView.document, bounds.width > 0, bounds.height > 0 else {
+      emitDebug("\(reason): SKIPPED (no doc or zero bounds)")
       return
+    }
+    lastAssertedSize = bounds.size
+
+    // layoutDocumentView() rebuilds PDFKit's internal document layout. It's
+    // documented for "after any operation that changes the document", but is
+    // unsafe while usePageViewController is on (that mode reparents PDFView's
+    // internals into a UIPageViewController that owns its own layout), so
+    // it's skipped there — paged mode was already confirmed rendering on
+    // device without it.
+    if !isPagedMode {
+      pdfView.layoutDocumentView()
+    }
+
+    // Force an auto-scale re-fit. Assigning `scaleFactor` directly would
+    // switch autoScales OFF, and assigning `autoScales = true` when it's
+    // already true is an internal no-op that recomputes nothing — so the
+    // only reliable re-fit is to toggle it off and back on.
+    pdfView.autoScales = false
+    pdfView.autoScales = true
+
+    if let index = pendingStartPageIndex, let page = document.page(at: index) {
+      pendingStartPageIndex = nil
+      pdfView.go(to: page)
+    }
+    emitDebug("\(reason): asserted")
+  }
+
+  private func emitDebug(_ msg: String) {
+    onDebug([
+      "msg": "#\(instanceId) \(msg)",
+      "boundsWidth": Double(bounds.width),
+      "boundsHeight": Double(bounds.height),
+      "scale": Double(pdfView.scaleFactor),
+      "inWindow": window != nil,
+      "pageCount": pdfView.document?.pageCount ?? 0,
+    ])
+  }
+
+  // MARK: - Imperative commands (called from JS via AsyncFunction)
+
+  func openDocument(uri: String, startPage: Int, displayMode: String) throws -> [String: Any] {
+    emitDebug("openDocument: entry")
+    guard let url = resolveUrl(uri) else {
+      throw Exception(name: "E_BAD_URI", description: "Couldn't resolve file path: \(uri)")
     }
     guard let document = PDFDocument(url: url) else {
-      onLoadError(["message": "Couldn't open PDF at \(uri)"])
-      return
+      throw Exception(name: "E_BAD_PDF", description: "Couldn't open PDF at \(uri)")
     }
+    // Nil-then-set forces PDFKit to fully tear down any prior document state
+    // (Fabric can recycle this view instance across screen entries).
+    pdfView.document = nil
     pdfView.document = document
-    hasAppliedStartPage = false
-    // New document — any prior signature/page-index bookkeeping belonged to
-    // the previous book and must not cause this one's highlights to be
-    // skipped as "unchanged."
-    lastHighlightsSignature = ""
-    highlightedPageIndices = []
-    applyPendingHighlights()
-    jumpToStartPageIfNeeded()
-  }
+    applyDisplayMode(displayMode)
 
-  // Prop application order between `documentUri` and `startPage` isn't
-  // guaranteed by the view system, so either setter needs to be able to
-  // trigger the initial jump — whichever arrives second is the one that
-  // actually has both pieces of information available.
-  func setStartPage(_ page: Int) {
-    let newPage = max(1, page)
-    if newPage != startPage {
-      startPage = newPage
-      hasAppliedStartPage = false
-    }
-    jumpToStartPageIfNeeded()
-  }
+    let clamped = max(1, min(startPage, document.pageCount))
+    pendingStartPageIndex = clamped - 1
 
-  // BUG-002: `PDFView.go(to:)` is unreliable when called synchronously from
-  // a prop setter on first mount — the view (pinned to its parent via Auto
-  // Layout constraints in init) may not have been through a real layout pass
-  // yet, so it has no meaningful bounds for PDFKit to compute a scroll
-  // destination against, and the call silently no-ops. The reader then sits
-  // on page 1 while `onDocumentLoaded`'s JS handler optimistically reports
-  // the *intended* resume page to the server — which the next real scroll
-  // event promptly overwrites back down, reading as "always opens on page 1."
-  // Deferring one run-loop tick lets the pending layout pass land first.
-  private func jumpToStartPageIfNeeded() {
-    guard !hasAppliedStartPage, let document = pdfView.document, startPage > 1,
-      let page = document.page(at: startPage - 1)
-    else { return }
-    hasAppliedStartPage = true
+    // Assert now if bounds are already valid; if not, layoutSubviews will
+    // when they arrive. The extra one-tick pass covers the case where bounds
+    // were already settled BEFORE this call (so no further layoutSubviews is
+    // coming) but PDFKit's tiling still needs a runloop turn after the
+    // document swap. Both paths funnel through the same idempotent refresh.
+    lastAssertedSize = .zero
+    refreshRenderPipeline(reason: "openDocument")
+    let targetIndex = clamped - 1
     DispatchQueue.main.async { [weak self] in
       guard let self = self, self.pdfView.document === document else { return }
-      self.pdfView.go(to: page)
+      // Re-arm the target before the second pass: the autoScales re-fit
+      // inside refreshRenderPipeline can shift scroll offset, which would
+      // otherwise silently undo a jump the first pass already applied. One
+      // runloop tick in, the user cannot have scrolled, so re-asserting the
+      // resume page here is always correct.
+      self.pendingStartPageIndex = targetIndex
+      self.refreshRenderPipeline(reason: "openDocument+tick")
+    }
+    return ["totalPages": document.pageCount, "startPage": clamped]
+  }
+
+  // A direct, user-triggered mode switch (the reader-customization sheet) —
+  // not reactive, so re-anchoring to the current page here is safe and
+  // intentional, unlike the highlight-repaint path below.
+  func setDisplayMode(_ mode: String) {
+    // Switching modes changes document layout, so it goes through the same
+    // idempotent refresh as opening — with the current page carried across as
+    // the pending target so the reader keeps its place.
+    if let document = pdfView.document, let anchor = pdfView.currentPage {
+      pendingStartPageIndex = document.index(for: anchor)
+    }
+    applyDisplayMode(mode)
+    lastAssertedSize = .zero
+    refreshRenderPipeline(reason: "setDisplayMode")
+  }
+
+  // `.singlePage` alone has no built-in swipe-to-turn-page gesture — it
+  // renders one static page with no innate way to navigate off it by touch.
+  // `usePageViewController` is what actually wires up swipe-based page
+  // transitions for a one-page-at-a-time layout; a black-content bug
+  // previously attributed to it was, on closer look, the same go(to:)-
+  // before-PDFKit's-render-pipeline-is-ready timing issue openDocument() now
+  // defers around above (confirmed by that bug also reproducing in
+  // Continuous mode, which never touched usePageViewController) — so there
+  // was no real reason to avoid it.
+  private func applyDisplayMode(_ mode: String) {
+    isPagedMode = mode == "paged"
+    if isPagedMode {
+      pdfView.usePageViewController(true, withViewOptions: nil)
+      pdfView.displayDirection = .horizontal
+    } else {
+      pdfView.usePageViewController(false, withViewOptions: nil)
+      pdfView.displayMode = .singlePageContinuous
+      pdfView.displayDirection = .vertical
     }
   }
 
-  func setHighlightsData(_ items: [[String: Any]]) {
-    pendingHighlights = items
-    applyPendingHighlights()
+  func jumpToPage(_ page: Int) {
+    guard let document = pdfView.document, let target = document.page(at: page - 1) else { return }
+    pdfView.go(to: target)
   }
+
+  // Paints one highlight's annotations. Scoped by `userName == id` on
+  // removal-before-repaint, so two different highlights sharing a page can't
+  // stomp each other (the old per-page bulk-clear-then-repaint-everything
+  // could). Deliberately calls pdfView.go() NOWHERE in this function —
+  // annotation mutation must never move scroll position. That was the root
+  // cause of the mid-session "react to a highlight snaps back to page 1"
+  // bug: the old view captured "the page we're on" and scheduled an async
+  // restore after every repaint, which raced the initial resume jump and
+  // other deferred blocks. Removing the restore removes the race.
+  func addHighlight(_ item: [String: Any]) {
+    guard let document = pdfView.document,
+      let id = item["id"] as? String,
+      let pageNum = item["page"] as? Int,
+      let rects = item["rects"] as? [[String: Any]],
+      let page = document.page(at: pageNum - 1)
+    else { return }
+    removeAnnotations(id: id, on: page)
+    let pageBounds = page.bounds(for: .mediaBox)
+    for rectData in rects {
+      guard
+        let x = rectData["x"] as? Double, let y = rectData["y"] as? Double,
+        let w = rectData["w"] as? Double, let h = rectData["h"] as? Double
+      else { continue }
+      let bounds = denormalizedRect(x: x, y: y, w: w, h: h, pageBounds: pageBounds)
+      let annotation = PDFAnnotation(bounds: bounds, forType: .highlight, withProperties: nil)
+      annotation.color = UIColor.systemYellow.withAlphaComponent(0.4)
+      annotation.userName = id
+      page.addAnnotation(annotation)
+    }
+  }
+
+  func removeHighlight(id: String, page pageNum: Int) {
+    guard let document = pdfView.document, let page = document.page(at: pageNum - 1) else { return }
+    removeAnnotations(id: id, on: page)
+  }
+
+  private func removeAnnotations(id: String, on page: PDFPage) {
+    for annotation in page.annotations where annotation.type == "Highlight" && annotation.userName == id {
+      page.removeAnnotation(annotation)
+    }
+  }
+
+  func clearCurrentSelection() {
+    pdfView.setCurrentSelection(nil, animate: false)
+  }
+
+  // Captures whatever's currently selected as {page, quote, rects} — WITHOUT
+  // painting an annotation. The caller persists this as a reaction first;
+  // the highlight paints in via an explicit addHighlight() call once that
+  // reaction exists, so cancelling the composer after this call leaves no
+  // orphan annotation. Anchored to the FIRST page the selection touches
+  // (matches the reactions schema's one-page-per-highlight model) — a
+  // selection spanning pages is vanishingly rare for a single reaction
+  // anyway.
+  func captureSelection() -> [String: Any]? {
+    guard let selection = pdfView.currentSelection, let document = pdfView.document else { return nil }
+    let quote = selection.string?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+    guard !quote.isEmpty, let firstPage = selection.pages.first else { return nil }
+
+    let pageIndex = document.index(for: firstPage)
+    let pageBounds = firstPage.bounds(for: .mediaBox)
+
+    var rectsOut: [[String: Double]] = []
+    for lineSelection in selection.selectionsByLine() {
+      guard lineSelection.pages.first == firstPage else { continue }
+      let bounds = lineSelection.bounds(for: firstPage)
+      guard bounds.width > 0, bounds.height > 0 else { continue }
+      rectsOut.append(normalizedRect(bounds, pageBounds: pageBounds))
+    }
+    guard !rectsOut.isEmpty else { return nil }
+
+    pdfView.setCurrentSelection(nil, animate: false)
+
+    return [
+      "page": pageIndex + 1,
+      "quote": quote,
+      "rects": rectsOut,
+    ]
+  }
+
+  // MARK: - Helpers
 
   private func resolveUrl(_ uri: String) -> URL? {
     if uri.hasPrefix("file://") || uri.hasPrefix("http://") || uri.hasPrefix("https://") {
       return URL(string: uri)
     }
     return URL(fileURLWithPath: uri)
-  }
-
-  // Cheap, order-independent signature of a highlight set, so a same-content
-  // `highlights` prop re-fire is a true no-op. RN/Fabric's prop diffing for
-  // array-type props isn't guaranteed to skip the native setter just because
-  // the JS-side values are unchanged (that generally requires the JS array
-  // to be the SAME reference, which isn't guaranteed across every re-render
-  // of the screen) — so without this, `setHighlightsData` can fire far more
-  // often than "a highlight was actually added or removed," including from
-  // re-renders totally unrelated to highlights (e.g. ordinary page-scroll
-  // state updates).
-  private func signature(for items: [[String: Any]]) -> String {
-    items.map { item -> String in
-      let id = (item["id"] as? String) ?? ""
-      let page = (item["page"] as? Int) ?? 0
-      let rectsSig =
-        (item["rects"] as? [[String: Any]])?
-        .map { r -> String in
-          let x = (r["x"] as? Double) ?? 0
-          let y = (r["y"] as? Double) ?? 0
-          let w = (r["w"] as? Double) ?? 0
-          let h = (r["h"] as? Double) ?? 0
-          return "\(x),\(y),\(w),\(h)"
-        }
-        .joined(separator: ";") ?? ""
-      return "\(id):\(page):\(rectsSig)"
-    }
-    .sorted()
-    .joined(separator: "|")
-  }
-
-  // Repaints highlight annotations from `pendingHighlights` (server-confirmed
-  // data, normalized 0..1 top-left origin per the reactions schema). Each
-  // annotation is stamped with its reaction id (via `userName`, a free-form
-  // PDFAnnotation string field) so a tap can be traced back to the reaction
-  // thread.
-  //
-  // BUG history: this used to unconditionally clear-and-redraw annotations
-  // across the WHOLE document on every call, and got called far more often
-  // than intended (see `signature` doc above) — bulk annotation churn in
-  // .singlePageContinuous mode was disturbing PDFView's scroll position,
-  // which the very next legitimate onPageChanged event then wrote back to
-  // the server as the "current page," corrupting resume progress. Fixed two
-  // ways together: (1) skip entirely when the content hasn't actually
-  // changed, (2) when it has, touch only the pages whose highlights changed,
-  // never the whole document.
-  private func applyPendingHighlights() {
-    guard let document = pdfView.document else { return }
-
-    let newSignature = signature(for: pendingHighlights)
-    guard newSignature != lastHighlightsSignature else { return }
-    lastHighlightsSignature = newSignature
-
-    var byPageIndex: [Int: [[String: Any]]] = [:]
-    for item in pendingHighlights {
-      guard let pageNum = item["page"] as? Int else { continue }
-      byPageIndex[pageNum - 1, default: []].append(item)
-    }
-    let newPageIndices = Set(byPageIndex.keys)
-    let pagesToTouch = highlightedPageIndices.union(newPageIndices)
-    highlightedPageIndices = newPageIndices
-
-    let pageIndexBeforeRepaint = pdfView.currentPage.map { document.index(for: $0) }
-
-    for pageIndex in pagesToTouch {
-      guard let page = document.page(at: pageIndex) else { continue }
-      for annotation in page.annotations where annotation.type == "Highlight" {
-        page.removeAnnotation(annotation)
-      }
-      guard let items = byPageIndex[pageIndex] else { continue }
-      let pageBounds = page.bounds(for: .mediaBox)
-      for item in items {
-        guard
-          let id = item["id"] as? String,
-          let rects = item["rects"] as? [[String: Any]]
-        else { continue }
-        for rectData in rects {
-          guard
-            let x = rectData["x"] as? Double, let y = rectData["y"] as? Double,
-            let w = rectData["w"] as? Double, let h = rectData["h"] as? Double
-          else { continue }
-          let bounds = denormalizedRect(x: x, y: y, w: w, h: h, pageBounds: pageBounds)
-          let annotation = PDFAnnotation(bounds: bounds, forType: .highlight, withProperties: nil)
-          annotation.color = UIColor.systemYellow.withAlphaComponent(0.4)
-          annotation.userName = id
-          page.addAnnotation(annotation)
-        }
-      }
-    }
-
-    // Belt-and-suspenders: re-assert the page we were actually on, even
-    // though the pages-touched set above should no longer disturb it.
-    // Deferred one run-loop tick in case any disturbance from the mutations
-    // above is itself asynchronous inside PDFKit.
-    if let wantIndex = pageIndexBeforeRepaint {
-      DispatchQueue.main.async { [weak self] in
-        guard let self = self, self.pdfView.document === document,
-          let restorePage = document.page(at: wantIndex)
-        else { return }
-        self.pdfView.go(to: restorePage)
-      }
-    }
   }
 
   // Our schema's rects are normalized 0..1 with a TOP-LEFT origin (matches
@@ -285,11 +376,6 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
 
   // MARK: - Notifications -> JS events
 
-  @objc private func handleDocumentChanged() {
-    guard let document = pdfView.document else { return }
-    onDocumentLoaded(["totalPages": document.pageCount])
-  }
-
   @objc private func handlePageChanged() {
     guard let document = pdfView.document, let currentPage = pdfView.currentPage else { return }
     let pageIndex = document.index(for: currentPage)
@@ -313,50 +399,5 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
       let reactionId = annotation.userName
     else { return }
     onHighlightTapped(["reactionId": reactionId])
-  }
-
-  // MARK: - Imperative functions (called from JS via AsyncFunction)
-
-  func jumpToPage(_ page: Int) {
-    guard let document = pdfView.document, let target = document.page(at: page - 1) else { return }
-    pdfView.go(to: target)
-  }
-
-  func clearCurrentSelection() {
-    pdfView.setCurrentSelection(nil, animate: false)
-  }
-
-  // Captures whatever's currently selected as {page, quote, rects} — WITHOUT
-  // painting an annotation. The caller persists this as a reaction first;
-  // the highlight paints back in reactively via the `highlights` prop once
-  // that reaction exists (see applyPendingHighlights), so cancelling the
-  // composer after this call leaves no orphan annotation. Anchored to the
-  // FIRST page the selection touches (matches the reactions schema's
-  // one-page-per-highlight model) — a selection spanning pages is
-  // vanishingly rare for a single reaction anyway.
-  func captureSelection() -> [String: Any]? {
-    guard let selection = pdfView.currentSelection, let document = pdfView.document else { return nil }
-    let quote = selection.string?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
-    guard !quote.isEmpty, let firstPage = selection.pages.first else { return nil }
-
-    let pageIndex = document.index(for: firstPage)
-    let pageBounds = firstPage.bounds(for: .mediaBox)
-
-    var rectsOut: [[String: Double]] = []
-    for lineSelection in selection.selectionsByLine() {
-      guard lineSelection.pages.first == firstPage else { continue }
-      let bounds = lineSelection.bounds(for: firstPage)
-      guard bounds.width > 0, bounds.height > 0 else { continue }
-      rectsOut.append(normalizedRect(bounds, pageBounds: pageBounds))
-    }
-    guard !rectsOut.isEmpty else { return nil }
-
-    pdfView.setCurrentSelection(nil, animate: false)
-
-    return [
-      "page": pageIndex + 1,
-      "quote": quote,
-      "rects": rectsOut,
-    ]
   }
 }
