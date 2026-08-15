@@ -15,11 +15,7 @@ public class NativeHighlightPdfModule: Module {
     }.runOnQueue(.main)
 
     View(NativeHighlightPdfView.self) {
-      // onDebug is a diagnostic stream (bounds/scale/window-attachment at
-      // every render-pipeline state transition) — see refreshRenderPipeline
-      // in NativeHighlightPdfView. Safe to leave wired: it only emits on
-      // discrete state changes, not per frame.
-      Events("onPageChanged", "onSelectionChanged", "onHighlightTapped", "onDebug")
+      Events("onPageChanged", "onSelectionChanged", "onHighlightTapped")
 
       // Imperative command surface. See NativeHighlightPdfView's top-of-file
       // comment for why this replaced the old documentUri/startPage/highlights

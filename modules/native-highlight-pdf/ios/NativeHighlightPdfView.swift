@@ -32,19 +32,10 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   private var lastAssertedSize: CGSize = .zero
   // PDFView has no public getter for usePageViewController, so track it.
   private var isPagedMode = false
-  // Distinguishes view instances in the debug stream — the black-screen bug
-  // was two live instances (one holding the document off-screen, an empty one
-  // on screen), which is invisible without this.
-  private static var instanceCounter = 0
-  private let instanceId: Int = {
-    NativeHighlightPdfView.instanceCounter += 1
-    return NativeHighlightPdfView.instanceCounter
-  }()
 
   let onPageChanged = EventDispatcher()
   let onSelectionChanged = EventDispatcher()
   let onHighlightTapped = EventDispatcher()
-  let onDebug = EventDispatcher()
 
   required init(appContext: AppContext? = nil) {
     super.init(appContext: appContext)
@@ -120,22 +111,19 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
   override func layoutSubviews() {
     super.layoutSubviews()
     if bounds.size != lastAssertedSize {
-      refreshRenderPipeline(reason: "layoutSubviews")
+      refreshRenderPipeline()
     }
   }
 
   override func didMoveToWindow() {
     super.didMoveToWindow()
     if window != nil {
-      refreshRenderPipeline(reason: "didMoveToWindow")
+      refreshRenderPipeline()
     }
   }
 
-  private func refreshRenderPipeline(reason: String) {
-    guard let document = pdfView.document, bounds.width > 0, bounds.height > 0 else {
-      emitDebug("\(reason): SKIPPED (no doc or zero bounds)")
-      return
-    }
+  private func refreshRenderPipeline() {
+    guard let document = pdfView.document, bounds.width > 0, bounds.height > 0 else { return }
     lastAssertedSize = bounds.size
 
     // layoutDocumentView() rebuilds PDFKit's internal document layout. It's
@@ -159,24 +147,11 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
       pendingStartPageIndex = nil
       pdfView.go(to: page)
     }
-    emitDebug("\(reason): asserted")
-  }
-
-  private func emitDebug(_ msg: String) {
-    onDebug([
-      "msg": "#\(instanceId) \(msg)",
-      "boundsWidth": Double(bounds.width),
-      "boundsHeight": Double(bounds.height),
-      "scale": Double(pdfView.scaleFactor),
-      "inWindow": window != nil,
-      "pageCount": pdfView.document?.pageCount ?? 0,
-    ])
   }
 
   // MARK: - Imperative commands (called from JS via AsyncFunction)
 
   func openDocument(uri: String, startPage: Int, displayMode: String) throws -> [String: Any] {
-    emitDebug("openDocument: entry")
     guard let url = resolveUrl(uri) else {
       throw Exception(name: "E_BAD_URI", description: "Couldn't resolve file path: \(uri)")
     }
@@ -198,7 +173,7 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
     // coming) but PDFKit's tiling still needs a runloop turn after the
     // document swap. Both paths funnel through the same idempotent refresh.
     lastAssertedSize = .zero
-    refreshRenderPipeline(reason: "openDocument")
+    refreshRenderPipeline()
     let targetIndex = clamped - 1
     DispatchQueue.main.async { [weak self] in
       guard let self = self, self.pdfView.document === document else { return }
@@ -208,7 +183,7 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
       // runloop tick in, the user cannot have scrolled, so re-asserting the
       // resume page here is always correct.
       self.pendingStartPageIndex = targetIndex
-      self.refreshRenderPipeline(reason: "openDocument+tick")
+      self.refreshRenderPipeline()
     }
     return ["totalPages": document.pageCount, "startPage": clamped]
   }
@@ -225,7 +200,7 @@ class NativeHighlightPdfView: ExpoView, UIGestureRecognizerDelegate {
     }
     applyDisplayMode(mode)
     lastAssertedSize = .zero
-    refreshRenderPipeline(reason: "setDisplayMode")
+    refreshRenderPipeline()
   }
 
   // `.singlePage` alone has no built-in swipe-to-turn-page gesture — it

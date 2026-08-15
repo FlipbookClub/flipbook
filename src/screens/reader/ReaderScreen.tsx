@@ -700,17 +700,6 @@ export function ReaderScreen({ navigation, route }: Props) {
                 onHighlightTapped={(e) =>
                   setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
                 }
-                // Diagnostic stream from the native render pipeline, surfaced
-                // in the Metro log. Tagged for grepping while debugging the
-                // blank-render bug; remove once that's confirmed fixed.
-                onDebug={(e) => {
-                  const d = e.nativeEvent;
-                  console.log(
-                    `[PDFDBG] ${d.msg} | bounds=${Math.round(d.boundsWidth)}x${Math.round(
-                      d.boundsHeight,
-                    )} scale=${d.scale.toFixed(3)} inWindow=${d.inWindow} pages=${d.pageCount}`,
-                  );
-                }}
               />
             </View>
           </GestureDetector>

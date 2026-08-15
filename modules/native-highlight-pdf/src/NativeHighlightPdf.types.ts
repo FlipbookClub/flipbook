@@ -13,16 +13,6 @@ export type ExistingHighlight = {
 export type PageChangedEventPayload = { page: number; totalPages: number };
 export type SelectionChangedEventPayload = { hasSelection: boolean };
 export type HighlightTappedEventPayload = { reactionId: string };
-// Diagnostic stream from the native render pipeline — emitted on discrete
-// state transitions (open, layout, window attach), not per frame.
-export type DebugEventPayload = {
-  msg: string;
-  boundsWidth: number;
-  boundsHeight: number;
-  scale: number;
-  inWindow: boolean;
-  pageCount: number;
-};
 
 // What captureSelection() resolves to — null if there was nothing (valid)
 // selected at call time.
@@ -39,7 +29,6 @@ export type NativeHighlightPdfViewProps = {
   onPageChanged?: (event: { nativeEvent: PageChangedEventPayload }) => void;
   onSelectionChanged?: (event: { nativeEvent: SelectionChangedEventPayload }) => void;
   onHighlightTapped?: (event: { nativeEvent: HighlightTappedEventPayload }) => void;
-  onDebug?: (event: { nativeEvent: DebugEventPayload }) => void;
 };
 
 // Imperative methods callable via a ref to <NativeHighlightPdfView>. This
