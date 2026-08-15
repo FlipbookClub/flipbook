@@ -13,18 +13,33 @@
 Flipbook v1: mobile book-club app. Clubs upload books, members read in-app, reactions/comments anchor to pages, progress syncs in real time. Expo (React Native) + Convex (prod deployed) + Clerk. iOS ships from TestFlight (build 10, commit `156cb3f`); Android's last EAS build was `a55a27b9` (2026-07-30).
 
 ### Current state you are inheriting
-- Branch `beta-feedback` is 12 commits ahead of origin — **Phase 0 fixes this before anything else.**
-- iOS reader uses a custom native module: `modules/native-highlight-pdf/` (PDFKit-based). Android side of the same module (PdfiumAndroid-based) has working text-selection + highlight (proven in a test harness) but **no scrolling/page-turning** and is **not wired into the app**.
-- `src/screens/reader/ReaderScreen.tsx` line 268: `const useNativeHighlightReader = Platform.OS === "ios";` — Android still renders the legacy `react-native-pdf` `<Pdf>` path (no highlighting).
-- Two live iOS regressions shipped with build 10 (see Phases 1-2).
+*(Updated Aug 15 after Phases 0-2 landed. Anything below marked "rebuilt" replaced what build 10 shipped.)*
+
+- Phase 0 is done: `main` reflects shipped build 10, and work happens on feature branches off `main`.
+- **The iOS reader was rebuilt on an imperative-command architecture** (`fix/reader-resume`, commits `1ebbd7c` / `4a53bab`). This is the single most important thing to understand before touching reader code. See "Reader architecture" below.
+- Android side of `modules/native-highlight-pdf/` (PdfiumAndroid-based) has working text-selection + highlight (proven in a test harness) but **no scrolling/page-turning** and is **not wired into the app**. It still carries the old reactive-prop shape that the iOS rebuild removed. Phase 3 must port it to the new model, not copy the old one.
+- `src/screens/reader/ReaderScreen.tsx` ~311: `const useNativeHighlightReader = Platform.OS === "ios";` — Android still renders the legacy `react-native-pdf` `<Pdf>` path (no highlighting).
+- Both build-10 iOS regressions (BUG-001, BUG-002) are fixed and device-verified. Build 11 has not shipped yet.
+
+### Reader architecture (read before any reader work, iOS or Android)
+
+The native view is **command-driven, not prop-driven.** JS calls `openDocument()` once and then only *listens* to `onPageChanged`. The native side owns scroll position outright. There are no `documentUri` / `startPage` / `highlights` props any more.
+
+Why this matters: the old design had JS and native both trying to own "what page are we on," reconciled through deferred blocks that raced each other. Four rounds of targeted patches each fixed one race and revealed another. Two rules fall out of the rebuild, and **both apply to Android**:
+
+1. **Nothing may move scroll position as a side effect of data changing.** `addHighlight` / `removeHighlight` never call `go(to:)`. Painting an annotation cannot move the reader, structurally, rather than by guard.
+2. **The open must be keyed to the native view instance, not to mount.** React swaps the native view instance during post-mount layout churn (hiding the tab bar resizes the subtree repeatedly). A one-shot open leaves the replacement instance empty while the loaded one sits off-screen, which renders as a black page with a correct page counter. `ReaderScreen.tsx` handles this with a callback ref that bumps a generation counter (~320) and re-issues the open onto each new instance, restoring the current page rather than the original resume page.
+
+**Debugging protocol for reader bugs:** these failures are near-impossible to reason about from screenshots, and each device round costs a 15-20 minute EAS build. After the *second* failed device round on one symptom, stop patching and add a native debug event stream (state at every transition, plus an instance identifier when object identity could be in play) logged through Metro. That is what found the black-screen bug, on its first run, after five failed theory-patches. `1ebbd7c` contains the instrumentation if it is needed again.
 
 ### Key file anchors (verified against the repo on Aug 15)
 | Path | What lives there |
 |---|---|
-| `src/screens/reader/ReaderScreen.tsx` | The reader. `initialPage` memo at ~198; `openAtPageRef` freeze logic at ~238-244; native path renders `<NativeHighlightPdfView startPage={...}>` at ~531; legacy path renders `<Pdf page={...}>` at ~557. |
+| `src/screens/reader/ReaderScreen.tsx` | The reader. `openDocumentWithRetry` helper at ~90 (covers the Fabric view-registration race); `initialPage` memo at ~228; platform gate at ~311; view-generation callback ref at ~320; open effect at ~555; highlight diff effect just below it; native view rendered at ~695, legacy `<Pdf>` at ~709. |
 | `src/screens/reader/ReactionComposer.tsx` | Reaction/comment composer with quoted-context support. |
-| `modules/native-highlight-pdf/ios/NativeHighlightPdfView.swift` | iOS native view. Events: `onDocumentLoaded`, `onPageChanged`, `onSelectionChanged`, `onHighlightTapped`, `onLoadError`. **Line ~91 comment admits prop application order between `documentUri` and `startPage` isn't guaranteed — prime suspect for BUG-002.** Highlight annotation creation ~147. |
-| `modules/native-highlight-pdf/ios/NativeHighlightPdfModule.swift` | Expo module definition / prop bindings. |
+| `modules/native-highlight-pdf/ios/NativeHighlightPdfView.swift` | iOS native view (rebuilt). Events: `onPageChanged`, `onSelectionChanged`, `onHighlightTapped` (no `onDocumentLoaded`/`onLoadError` — `openDocument` throws instead). Commands: `openDocument` ~154, `setDisplayMode` ~194, `addHighlight` ~241, `removeHighlight` ~263, `captureSelection` ~286. Render self-correction in `layoutSubviews`/`didMoveToWindow`/`refreshRenderPipeline` ~111-150. |
+| `modules/native-highlight-pdf/ios/NativeHighlightPdfDocumentInspector.swift` | Module-level `inspectPdf`: page count + first-page cover thumbnail via PDFKit, no mounted view needed. Used by the upload flow on iOS. |
+| `modules/native-highlight-pdf/ios/NativeHighlightPdfModule.swift` | Expo module definition. Imperative `AsyncFunction` bindings (all `.runOnQueue(.main)`), no `Prop()` bindings. |
 | `modules/native-highlight-pdf/android/src/main/java/expo/modules/nativehighlightpdf/NativeHighlightPdfView.kt` | Android native view (PdfiumAndroid). Selection + coordinate mapping proven. No scroll container. |
 | `modules/native-highlight-pdf/src/` | JS API: `NativeHighlightPdfView.tsx`, types, index. |
 | `convex/progress.ts` | `update` (mutation), `getMine`, `listForClub`, `listMine`, `listMyLibrary`. |
@@ -36,7 +51,7 @@ Flipbook v1: mobile book-club app. Clubs upload books, members read in-app, reac
 1. **Never break live users.** Build 10 is in real hands (163 users). All Convex schema changes are **additive** (new optional fields, new tables). Never change an existing function's argument or return contract — add a variant if needed.
 2. **One phase per PR. One concern per build.** Build 11 = Phases 1-2 (+ 0). Build 11.5 (Android) = Phase 3. Build 12 = Phase 4 (+ Phase 5 if it fits cleanly).
 3. **Device verification is mandatory for reader changes.** Every reader-touching PR must list the §6 matrix results in its description. Simulator is insufficient for gesture work — flag any step you cannot verify in simulator so Moks runs it on hardware.
-4. **Commit messages** reference the phase + task ID from this doc (e.g., `P1-T2: apply startPage after documentDidLoad`).
+4. **Commit messages** reference the phase + task ID from this doc (e.g., `P3-T2: match the iOS command surface on Android`).
 5. If a fix requires deviating from this plan, **stop and flag it in the PR** rather than silently improvising. Small implementation details are yours; architectural choices are not.
 6. Never run destructive git commands. Never force-push. Never touch `docs/` content except the checkboxes in this file.
 
@@ -99,13 +114,16 @@ Flipbook v1: mobile book-club app. Clubs upload books, members read in-app, reac
 
 **Why now:** 88 of 163 users are on Android and have no highlighting at all. The module's hard part (selection + coordinate mapping on PdfiumAndroid) is already proven; what's missing is scrolling and integration.
 
-- [ ] **P3-T1. Add continuous vertical scroll to the Android module.** Match the iOS reader's interaction model (continuous vertical scroll — do NOT invent a page-swipe model iOS doesn't have). Recommended shape: a `RecyclerView` of per-page rendered bitmaps (PdfiumAndroid renders per page; recycle aggressively; render at device resolution with a lower-res placeholder while scrolling). Preserve the existing per-page selection touch handling — selection long-press and scroll must coexist (long-press wins on text; vertical drag wins on movement; standard Android touch-slop disambiguation).
-- [ ] **P3-T2. Emit the same JS events as iOS** with identical payload shapes: `onDocumentLoaded`, `onPageChanged` (page = topmost fully-visible page), `onSelectionChanged`, `onHighlightTapped`, `onLoadError`. The JS layer must not need `Platform.OS` branches in event handling.
-- [ ] **P3-T3. Apply the Phase 1 lesson from day one:** `startPage` must be applied after document load (scroll to page offset in a post-layout pass), never at prop-set time.
-- [ ] **P3-T4. Apply the Phase 2 lesson from day one:** selection triggers on **long-press** (Android convention), with drag handles to extend. If PdfiumAndroid selection handles are custom-drawn, keep them simple (start/end pins).
-- [ ] **P3-T5. Wire into `ReaderScreen.tsx`:** flip the gate at line ~268 to include Android once P3-T1..T4 pass in the test harness. All existing props (`startPage`, `documentUri`, highlight data) flow identically.
-- [ ] **P3-T6. Highlight render + tap-to-thread parity** on Android: existing highlights render as overlays at correct coordinates (coordinate mapping already proven); tapping one opens its thread.
-- [ ] **P3-T7. Android EAS build** from current head (naturally includes the unverified `82a028f` cleanup — closing ST-06) → internal testing track → §6 full matrix on a physical Android device (mid-tier, e.g., a Redmi/Samsung A-series, not a flagship).
+> **Read "Reader architecture" in §0 first.** The iOS reader was rebuilt after this phase was originally written, and the tasks below were rewritten on Aug 15 to match. The Android module currently carries the *old* reactive-prop shape (`documentUri` / `startPage` / `highlights` as `Prop()` bindings, plus `onDocumentLoaded` / `onLoadError` events). Porting that shape forward would reproduce the exact bug class that cost four failed device rounds on iOS. Port the architecture, not the old prop surface.
+
+- [ ] **P3-T1. Add continuous vertical scroll to the Android module.** Match the iOS reader's interaction model. Recommended shape: a `RecyclerView` of per-page rendered bitmaps (PdfiumAndroid renders per page; recycle aggressively; render at device resolution with a lower-res placeholder while scrolling). Preserve the existing per-page selection touch handling — selection long-press and scroll must coexist (long-press wins on text; vertical drag wins on movement; standard Android touch-slop disambiguation). Note iOS also supports a page-by-page mode (`setDisplayMode`); Android may ship continuous-only in this phase, but the command must exist and be a no-op rather than absent, so the JS layer stays platform-agnostic.
+- [ ] **P3-T2. Match the iOS command + event surface exactly**, so `ReaderScreen.tsx` needs no `Platform.OS` branches. Commands: `openDocument(uri, startPage, displayMode) -> {totalPages, startPage}` (throws on failure), `setDisplayMode`, `jumpToPage`, `addHighlight`, `removeHighlight`, `clearSelection`, `captureSelection`. Events: `onPageChanged` (page = topmost fully-visible page), `onSelectionChanged`, `onHighlightTapped`. **No `Prop()` bindings for document/page/highlight state, and no `onDocumentLoaded`/`onLoadError`** — a command either resolves or throws. Android's current `onHighlightCreated` / `createHighlightFromSelection` pair is replaced by the capture-then-persist-then-`addHighlight` flow iOS uses, so cancelling the composer leaves no orphan annotation.
+- [ ] **P3-T3. Rule 1 from day one: no data change may move scroll position.** `addHighlight` / `removeHighlight` must not scroll, re-anchor, or "restore" position under any circumstance. On iOS this is what made the react-to-a-highlight page jump structurally impossible rather than merely guarded.
+- [ ] **P3-T4. Rule 2 from day one: survive view replacement and late layout.** The start page must be applied once the view actually has usable bounds, not at document-set time (Android's equivalent of the iOS `layoutSubviews` self-correction: hold the requested page as pending and apply it when layout arrives). Verify the view tolerates being recycled by Fabric mid-session; the JS side already re-issues `openDocument` per view instance, so the native side must handle a fresh `openDocument` on a view that already has a document.
+- [ ] **P3-T5. Selection UX:** long-press to select (Android convention), with drag handles to extend. If PdfiumAndroid selection handles are custom-drawn, keep them simple (start/end pins). Check whether RNGH's root recognizer interferes as it did on iOS; if so, the JS-side fix is the same `Gesture.Native()` wrapper already in `ReaderScreen.tsx`.
+- [ ] **P3-T6. Wire into `ReaderScreen.tsx`:** flip the gate at ~311 to include Android once P3-T1..T5 pass in a test harness. No new JS branching should be needed: the open effect, view-generation ref, and highlight diff effect are already platform-agnostic.
+- [ ] **P3-T7. Highlight render + tap-to-thread parity** on Android: existing highlights render as overlays at correct coordinates (coordinate mapping already proven); tapping one opens its thread.
+- [ ] **P3-T8. Android EAS build** from current head (naturally includes the unverified `82a028f` cleanup — closing ST-06) → internal testing track → §6 full matrix on a physical Android device (mid-tier, e.g., a Redmi/Samsung A-series, not a flagship).
 
 **Acceptance:** an Android user can scroll-read a 300-page PDF without jank, long-press to select and highlight, tap highlights to open threads, resume at last-read page, and sync progress. Feature parity with iOS build 11 reader.
 
@@ -173,6 +191,8 @@ Compressed spec; full context in `docs/synthesis-aug-2026.md` §3.3.
 6. Airplane mode: open cached book, read, highlight (PDF) → reconnect → progress + highlight sync.
 7. Scroll performance on a 300+ page PDF — no jank regression. (Android: mid-tier device.)
 8. Double-tap word-select still works; no gesture conflict with scroll.
+8b. Close the reader and reopen the same book, twice, on an already-cached file → renders content both times (guards the view-instance black screen; a correct page counter over a blank page is the signature of this bug returning).
+8c. Reader settings → switch Page by page ⇄ Continuous scroll → layout changes, swipe/scroll works in each, and your page is preserved across the switch.
 9. *(EPUB, from Phase 4)* Upload `.epub` → open on both platforms → paginate, TOC-jump, theme switch → close/reopen resumes exactly.
 9b. *(Multi-genre, from Phase 4C)* Upload with 2 genres → both chips render; legacy single-genre book still displays; edit upgrades it.
 10. *(Phase 5)* Reminder fires at set hour with correct book context; toggle off silences it.
@@ -180,8 +200,9 @@ Compressed spec; full context in `docs/synthesis-aug-2026.md` §3.3.
 ## 7. Sequencing summary
 
 ```
-Day 0:        Phase 0 (push, merge, cleanup)                    ← before anything
-Days 1-4:     Phase 1 (resume) → Phase 2 (selection) → matrix → BUILD 11 → TestFlight
+Day 0:        Phase 0 (push, merge, cleanup)                    ← DONE
+Days 1-4:     Phase 1 (resume) → Phase 2 (selection) → matrix     ← DONE (iOS reader rebuilt)
+              BUILD 11 → TestFlight                               ← NEXT, not yet shipped
               ← public commitment to Oyinadé rides on this
 Days 4-10:    Phase 3 (Android reader) → BUILD 11.5 → Play internal track
 Days 8-16:    Phase 4 (EPUB v1) → Phase 5 (retention) → BUILD 12 → both stores
@@ -193,7 +214,7 @@ Continuous:   additive-only schema · one concern per build · matrix per reader
 
 - EPUB highlights/reactions via CFI ranges (design doc first; the epub.js `annotations` API is the likely path).
 - EPUB bookmarks.
-- Horizontal page-by-page mode for the iOS PDF reader (only if Phase 2 work makes it nearly free — flag, don't build).
+- ~~Horizontal page-by-page mode for the iOS PDF reader.~~ **Shipped Aug 15** as part of the Phase 2 rebuild: the reading-mode toggle had never been wired to the native view, so fixing it was in scope rather than optional.
 - Moderator broadcast messages (FB-005) — next notifications wave.
 - Club reading-goal metrics (FB-009) — v2 roadmap parking lot per founder.
 - Streak mechanics — post-catalog (v2 era).
