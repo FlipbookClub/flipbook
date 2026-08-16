@@ -368,7 +368,7 @@ export const updateMetadata = mutation({
     if (!author || author.length > MAX_AUTHOR) {
       throw new ConvexError({ code: "invalid_author" });
     }
-    await ctx.db.patch(args.bookId, { title, author, genre });
+    await ctx.db.patch(args.bookId, { title, author, genre, genres });
     return null;
   },
 });
