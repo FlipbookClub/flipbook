@@ -39,6 +39,8 @@ internal data class HighlightEntry(val id: String, val page: Int, val rects: Lis
 
 internal class PdfViewException(message: String) : CodedException(message)
 
+private const val TAG = "NativeHighlightPdf"
+
 // Android's continuous-scroll PDF reader, at parity with the iOS PDFKit
 // module (modules/native-highlight-pdf/ios/NativeHighlightPdfView.swift).
 //
@@ -101,6 +103,9 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   // Rendered page bitmaps. Sized in bytes so a big page count can't OOM.
   private val bitmapCache: LruCache<Int, Bitmap>
   private val rendering = mutableSetOf<Int>()
+  // Pages whose render produced nothing. Retrying them every frame is what
+  // turns one bad page into a continuous redraw loop.
+  private val failedPages = mutableSetOf<Int>()
 
   private val highlights = linkedMapOf<String, HighlightEntry>()
 
@@ -126,7 +131,11 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   init {
     setWillNotDraw(false) // ViewGroups skip onDraw by default.
     isFocusable = true
-    val maxKb = (Runtime.getRuntime().maxMemory() / 1024 / 8).toInt()
+    // A quarter of the heap. Sized generously on purpose: the cache must
+    // comfortably hold every visible page plus the prefetched neighbours, or
+    // each render evicts a page that is still on screen, which re-renders,
+    // which evicts again — visible as constant flicker.
+    val maxKb = (Runtime.getRuntime().maxMemory() / 1024 / 4).toInt()
     bitmapCache = object : LruCache<Int, Bitmap>(maxKb) {
       override fun sizeOf(key: Int, value: Bitmap): Int = value.byteCount / 1024
     }
@@ -216,6 +225,8 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     // Bitmaps were rendered for the old width.
     if (w != oldw) {
       bitmapCache.evictAll()
+      // A page that failed at the old width deserves another go at the new one.
+      failedPages.clear()
     }
     // Rule 2: apply the requested start page once we actually have bounds.
     // A cache-hit open runs before layout, so this is the path that usually
@@ -338,6 +349,7 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   private fun requestRender(index: Int) {
     if (index < 0 || index >= totalPages) return
     if (bitmapCache.get(index) != null) return
+    if (failedPages.contains(index)) return
     synchronized(rendering) {
       if (!rendering.add(index)) return
     }
@@ -347,6 +359,7 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
       synchronized(rendering) { rendering.remove(index) }
       return
     }
+    android.util.Log.d(TAG, "render start page=$index")
     renderExecutor.execute {
       var bitmap: Bitmap? = null
       var aspect: Float? = null
@@ -374,15 +387,26 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
             page.close()
           }
         }
-      } catch (_: Exception) {
-        // A single page failing to render must not take the reader down; the
-        // placeholder stays and the next scroll retries.
+      } catch (e: Exception) {
+        // A single page failing to render must not take the reader down.
+        android.util.Log.w(TAG, "render failed for page $index: ${e.message}")
       } finally {
+        val produced = bitmap
         mainHandler.post {
           synchronized(rendering) { rendering.remove(index) }
           aspect?.let { pageAspects[index] = it }
-          bitmap?.let { bitmapCache.put(index, it) }
-          invalidate()
+          if (produced != null) {
+            bitmapCache.put(index, produced)
+            // Only redraw when there is genuinely something new to show.
+            // Invalidating unconditionally here means a page that fails to
+            // render drives draw -> request -> fail -> invalidate -> draw
+            // forever: an infinite redraw loop that reads as flicker.
+            invalidate()
+          } else {
+            // Give up on this page rather than retrying it on every frame.
+            failedPages.add(index)
+            android.util.Log.w(TAG, "page $index produced no bitmap; not retrying")
+          }
         }
       }
     }
@@ -592,6 +616,7 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     if (totalPages <= 0) throw PdfViewException("PDF has no pages: $uri")
 
     bitmapCache.evictAll()
+    failedPages.clear()
     pageAspects.clear()
     cachedDims = null
     highlights.clear()
