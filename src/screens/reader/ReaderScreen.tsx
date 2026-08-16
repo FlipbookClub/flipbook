@@ -308,10 +308,14 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [composerOpen, setComposerOpen] = useState(false);
   const [selectedReactionId, setSelectedReactionId] = useState<Id<"reactions"> | null>(null);
 
-  // iOS-only for now: PDFKit gives real text selection + highlighting for
-  // free. Android's hand-rolled PdfiumAndroid view has no page-turn gesture
-  // yet, so it stays on react-native-pdf until that's built separately.
-  const useNativeHighlightReader = Platform.OS === "ios";
+  // Both platforms now run the native highlight reader (P3-T6). They expose
+  // an identical command + event surface, so nothing below branches on
+  // platform. The legacy react-native-pdf path stays as the fallback for
+  // anything that isn't iOS or Android.
+  const useNativeHighlightReader = Platform.OS === "ios" || Platform.OS === "android";
+  // Android ships continuous scroll only; its setDisplayMode is a no-op, so
+  // don't offer a control that does nothing.
+  const supportsPageMode = Platform.OS === "ios";
   const pdfRef = useRef<NativeHighlightPdfViewRef | null>(null);
   // React can swap the underlying native view instance after mount (layout
   // churn from hiding the tab bar resizes this subtree several times). A
@@ -758,10 +762,19 @@ export function ReaderScreen({ navigation, route }: Props) {
           // App.tsx) explicitly steps aside for this view instead of
           // arbitrating against PDFKit's own touch handling.
           <GestureDetector gesture={nativeReaderGesture}>
-            <View style={{ flex: 1 }}>
+            {/* overflow hidden so a native child can never paint outside its
+                slot and over the surrounding chrome, whatever it measures. */}
+            <View style={{ flex: 1, overflow: "hidden" }}>
               <NativeHighlightPdfView
                 ref={attachPdfRef}
-                style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
+                // Sized by flex alone. It used to also carry an explicit
+                // `height: height - 120` measured from the whole window,
+                // which is taller than the slot actually available once the
+                // header, page indicator and safe areas are accounted for. On
+                // Android that overflow painted straight over the header
+                // (close, bookmark, settings) and the page counter, since the
+                // view draws its own canvas across its full bounds.
+                style={{ flex: 1, backgroundColor: colors.surfaceSecondary }}
                 onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
                 onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
                 onHighlightTapped={(e) =>
@@ -903,6 +916,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         onClose={() => setCustomizeOpen(false)}
         pageMode={pageMode}
         onChangeMode={setReadingMode}
+        showPageMode={supportsPageMode}
       />
       <ReactionComposer
         visible={composerOpen}
@@ -1017,11 +1031,15 @@ function ReaderCustomizationSheet({
   onClose,
   pageMode,
   onChangeMode,
+  showPageMode,
 }: {
   visible: boolean;
   onClose: () => void;
   pageMode: "paged" | "scroll";
   onChangeMode: (mode: "paged" | "scroll") => void;
+  // Android is continuous-scroll only, so the control is hidden there rather
+  // than shown as a toggle that does nothing.
+  showPageMode: boolean;
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -1051,6 +1069,7 @@ function ReaderCustomizationSheet({
           Reading customization
         </Text>
 
+        {showPageMode ? (
         <View style={{ gap: spacing.s2 }}>
           <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>Reading view</Text>
           <View
@@ -1091,6 +1110,7 @@ function ReaderCustomizationSheet({
             })}
           </View>
         </View>
+        ) : null}
 
         <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
           Font, line height, and page background controls are coming with Pro.
