@@ -99,6 +99,11 @@ export default defineSchema({
     .index("by_user_and_chapter", ["userId", "chapterId"])
     .index("by_user_and_club", ["userId", "clubId"]),
 
+  // NOTE: `bookValidator` in convex/books.ts is a strict v.object() that must
+  // mirror this table. Adding a field here without adding it there passes
+  // typecheck and deploys fine, then fails return validation the moment a
+  // document actually carries the new field — taking down every query that
+  // returns a book, for the whole club rather than the one row. Change both.
   books: defineTable({
     title: v.string(),
     author: v.string(),

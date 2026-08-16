@@ -18,6 +18,11 @@ const bookValidator = v.object({
   title: v.string(),
   author: v.string(),
   genre: v.optional(v.string()),
+  // Must mirror the books table in schema.ts. This is a strict object, so a
+  // field present on the document but missing here fails return validation
+  // and breaks every query that returns a book — for the whole club, not just
+  // the one row.
+  genres: v.optional(v.array(v.string())),
   pdfStorageId: v.id("_storage"),
   pdfPageCount: v.number(),
   coverImageUrl: v.optional(v.string()),
