@@ -762,10 +762,19 @@ export function ReaderScreen({ navigation, route }: Props) {
           // App.tsx) explicitly steps aside for this view instead of
           // arbitrating against PDFKit's own touch handling.
           <GestureDetector gesture={nativeReaderGesture}>
-            <View style={{ flex: 1 }}>
+            {/* overflow hidden so a native child can never paint outside its
+                slot and over the surrounding chrome, whatever it measures. */}
+            <View style={{ flex: 1, overflow: "hidden" }}>
               <NativeHighlightPdfView
                 ref={attachPdfRef}
-                style={{ flex: 1, width, height: height - 120, backgroundColor: colors.surfaceSecondary }}
+                // Sized by flex alone. It used to also carry an explicit
+                // `height: height - 120` measured from the whole window,
+                // which is taller than the slot actually available once the
+                // header, page indicator and safe areas are accounted for. On
+                // Android that overflow painted straight over the header
+                // (close, bookmark, settings) and the page counter, since the
+                // view draws its own canvas across its full bounds.
+                style={{ flex: 1, backgroundColor: colors.surfaceSecondary }}
                 onPageChanged={(e) => handlePageChanged(e.nativeEvent.page, e.nativeEvent.totalPages)}
                 onSelectionChanged={(e) => setHasSelection(e.nativeEvent.hasSelection)}
                 onHighlightTapped={(e) =>
