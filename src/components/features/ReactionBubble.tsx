@@ -18,6 +18,10 @@ interface Props {
   isAuthor?: boolean;
   user: { displayName: string; avatarUrl?: string };
   onPress: () => void;
+  // Queued offline and not yet on the server. Renders dimmed with a dashed
+  // ring so you can see your own drop landed, without it reading as
+  // confirmed. There's no thread to open yet, so it isn't pressable.
+  pending?: boolean;
 }
 
 // FR-016 + Vision § Motion: light fade-in + 8px horizontal slide on appearance.
@@ -26,7 +30,7 @@ const FADE_DURATION_MS = 160;
 const SLIDE_FROM_X = 8;
 const BUBBLE_SIZE = 36;
 
-export function ReactionBubble({ emoji, isComment, isAuthor, user, onPress }: Props) {
+export function ReactionBubble({ emoji, isComment, isAuthor, user, onPress, pending }: Props) {
   const { colors } = useTheme();
   const reduceMotion = useReducedMotion();
   const opacity = useSharedValue(0);
@@ -48,12 +52,19 @@ export function ReactionBubble({ emoji, isComment, isAuthor, user, onPress }: Pr
   return (
     <Animated.View style={animatedStyle}>
       <Pressable
-        onPress={onPress}
+        onPress={pending ? undefined : onPress}
+        disabled={pending}
         accessibilityRole="button"
         accessibilityLabel={
-          isComment ? `Comment from ${user.displayName}` : `${emoji} from ${user.displayName}`
+          pending
+            ? isComment
+              ? `Comment from ${user.displayName}, sending when you're back online`
+              : `${emoji} from ${user.displayName}, sending when you're back online`
+            : isComment
+              ? `Comment from ${user.displayName}`
+              : `${emoji} from ${user.displayName}`
         }
-        style={{ alignItems: "center", gap: 2 }}
+        style={{ alignItems: "center", gap: 2, opacity: pending ? 0.55 : 1 }}
       >
         <View
           style={{
@@ -63,8 +74,9 @@ export function ReactionBubble({ emoji, isComment, isAuthor, user, onPress }: Pr
             backgroundColor: colors.surfacePrimary,
             // FR-022: author reactions get a Golden Sand ring instead of the
             // standard border — quieter than the badge but still distinct.
-            borderWidth: isAuthor ? 2 : 1,
-            borderColor: isAuthor ? palette.highlight : colors.border,
+            borderWidth: isAuthor && !pending ? 2 : 1,
+            borderColor: isAuthor && !pending ? palette.highlight : colors.border,
+            borderStyle: pending ? "dashed" : "solid",
             alignItems: "center",
             justifyContent: "center",
             shadowColor: "#000",
