@@ -102,8 +102,13 @@ export default defineSchema({
   books: defineTable({
     title: v.string(),
     author: v.string(),
-    // Optional genre from the shared GENRES catalogue (src/lib/genres.ts).
+    // LEGACY single genre. Kept and still written (as genres[0]) so existing
+    // rows and any older client keep working — do not remove or migrate.
+    // Read through bookGenres() in src/lib/genres.ts rather than directly.
     genre: v.optional(v.string()),
+    // Up to MAX_BOOK_GENRES values from the shared catalogue (convex/genres.ts).
+    // Absent on rows written before multi-genre shipped.
+    genres: v.optional(v.array(v.string())),
     pdfStorageId: v.id("_storage"),
     pdfPageCount: v.number(),
     coverImageUrl: v.optional(v.string()),

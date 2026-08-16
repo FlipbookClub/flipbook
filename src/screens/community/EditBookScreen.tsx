@@ -16,6 +16,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { GenrePicker } from "@/components/features/GenrePicker";
+import { bookGenres } from "@/lib/genres";
 import { palette } from "@/theme/palette";
 import { spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -38,7 +39,7 @@ export function EditBookScreen({ navigation, route }: Props) {
   const [seeded, setSeeded] = useState(false);
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [genre, setGenre] = useState<string | null>(null);
+  const [genres, setGenres] = useState<string[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
 
@@ -46,7 +47,7 @@ export function EditBookScreen({ navigation, route }: Props) {
     if (result?.book && !seeded) {
       setTitle(result.book.title);
       setAuthor(result.book.author);
-      setGenre(result.book.genre ?? null);
+      setGenres(bookGenres(result.book));
       setSeeded(true);
     }
   }, [result, seeded]);
@@ -70,7 +71,7 @@ export function EditBookScreen({ navigation, route }: Props) {
         bookId,
         title: trimmedTitle,
         author: trimmedAuthor,
-        genre: genre ?? undefined,
+        genres,
       });
       navigation.goBack();
     } catch (err) {
@@ -141,9 +142,9 @@ export function EditBookScreen({ navigation, route }: Props) {
 
             <View style={{ gap: spacing.s2 }}>
               <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>
-                Genre
+                Genres (up to 3)
               </Text>
-              <GenrePicker value={genre} onChange={setGenre} />
+              <GenrePicker value={genres} onChange={setGenres} />
             </View>
 
             {formError ? (
