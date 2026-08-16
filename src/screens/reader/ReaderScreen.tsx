@@ -21,7 +21,10 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
 import { useFocusEffect, type RouteProp } from "@react-navigation/native";
 
-import { MarginReactionsList } from "@/components/features/MarginReactionsList";
+import {
+  MarginReactionsList,
+  type PendingMarginReaction,
+} from "@/components/features/MarginReactionsList";
 import { ReactionDetailsSheet } from "@/components/features/ReactionDetailsSheet";
 import { ReactionComposer, type ReactionSubmission } from "@/screens/reader/ReactionComposer";
 import { palette } from "@/theme/palette";
@@ -44,7 +47,7 @@ import {
 import { analytics } from "@/lib/analytics";
 import { storage } from "@/lib/storage";
 import { useConnectivity } from "@/lib/connectivity";
-import { enqueueReaction } from "@/lib/reactionQueue";
+import { enqueueReaction, listQueued } from "@/lib/reactionQueue";
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
@@ -389,6 +392,53 @@ export function ReaderScreen({ navigation, route }: Props) {
       ? { clubId: effective.clubId, ...scopePayload }
       : "skip",
   );
+  // BUG-003: a reaction dropped while offline lives only in the MMKV queue
+  // until reconnect, so nothing appeared in the margin and a tester re-sent
+  // the same comment, then saw both on reconnect. Echo queued drops locally,
+  // dimmed, until the flush worker lands them for real. MMKV isn't reactive,
+  // so re-read on the events that can change the queue: our own submit
+  // (queueVersion), a connectivity flip, and server data arriving after a
+  // flush. `pageReactions`, `highlights` and `isOnline` are deliberate
+  // re-read triggers rather than values this reads: each is a signal the
+  // queue may have drained. `highlights` matters on its own because a queued
+  // highlight for a page you've since scrolled away from lands without
+  // `pageReactions` changing.
+  const [queueVersion, setQueueVersion] = useState(0);
+  const queuedSnapshot = useMemo(
+    () => listQueued(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [queueVersion, pageReactions, highlights, isOnline],
+  );
+
+  // Every queued highlight, across all pages — the highlight diff effect
+  // must not reap these as "no longer on the server", since they were never
+  // on the server to begin with.
+  const pendingHighlightIdsRef = useRef<Set<string>>(new Set());
+  pendingHighlightIdsRef.current = new Set(
+    queuedSnapshot.filter((q) => (q.highlightRects?.length ?? 0) > 0).map((q) => q.localId),
+  );
+
+  const scopeBookId = scopePayload?.bookId;
+  const scopeChapterId = scopePayload?.chapterId;
+  const pendingReactions = useMemo<PendingMarginReaction[]>(() => {
+    if (!scopeBookId && !scopeChapterId) return [];
+    return queuedSnapshot
+      .filter(
+        (q) =>
+          q.page === currentPage &&
+          // listForPage shows top-level only; match it so replies don't
+          // surface as margin bubbles.
+          !q.parentReactionId &&
+          (scopeBookId ? q.bookId === scopeBookId : q.chapterId === scopeChapterId),
+      )
+      .map((q) => ({
+        localId: q.localId,
+        type: q.type,
+        emoji: q.emoji,
+        user: { displayName: me?.displayName ?? "You", avatarUrl: me?.avatarUrl },
+      }));
+  }, [queuedSnapshot, currentPage, scopeBookId, scopeChapterId, me]);
+
   const handleReactionSubmit = async (payload: ReactionSubmission) => {
     if (!effective || !scopePayload) return;
     // A highlight-originated reaction is anchored to the page the selection
@@ -408,7 +458,7 @@ export function ReaderScreen({ navigation, route }: Props) {
     // FR-013 / FR-016 edge case: offline reactions queue locally and sync
     // on reconnect. The flush worker in RootNavigator drains the queue.
     if (!isOnline) {
-      enqueueReaction({
+      const queued = enqueueReaction({
         clubId: args.clubId,
         bookId: scopePayload.bookId,
         chapterId: scopePayload.chapterId,
@@ -419,6 +469,19 @@ export function ReaderScreen({ navigation, route }: Props) {
         highlightQuote: args.highlightQuote,
         highlightRects: args.highlightRects,
       });
+      // Echo it straight away (BUG-003) — both the margin bubble, via the
+      // queue re-read this triggers, and the highlight itself. Keyed by
+      // localId; when the queue flushes, the server row arrives with a real
+      // id and the diff effect swaps the paint over.
+      setQueueVersion((v) => v + 1);
+      if (pendingHighlight) {
+        pdfRef.current?.addHighlight({
+          id: queued.localId,
+          page: pendingHighlight.page,
+          rects: pendingHighlight.rects,
+        });
+        paintedHighlightIdsRef.current.set(queued.localId, { page: pendingHighlight.page });
+      }
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => undefined);
       return;
     }
@@ -590,12 +653,16 @@ export function ReaderScreen({ navigation, route }: Props) {
       }
     }
     for (const [id, meta] of painted) {
-      if (!incoming.has(id)) {
+      // Skip still-queued offline highlights: they're painted under their
+      // localId and were never on the server, so "not in incoming" doesn't
+      // mean deleted. They clear on the pass after the queue flushes, when
+      // the real server id is what's painted.
+      if (!incoming.has(id) && !pendingHighlightIdsRef.current.has(id)) {
         pdfRef.current?.removeHighlight(id, meta.page);
         painted.delete(id);
       }
     }
-  }, [useNativeHighlightReader, readerReady, highlights]);
+  }, [useNativeHighlightReader, readerReady, highlights, queuedSnapshot]);
 
   const { width, height } = Dimensions.get("window");
 
@@ -741,11 +808,15 @@ export function ReaderScreen({ navigation, route }: Props) {
           child) so it draws above the native PDFKit view (the same trick the
           React FAB uses). It sits inside this flex wrapper, below the header
           and above the page indicator. */}
-      {pageReactions && pageReactions.length > 0 && !loadError && resolvedUri && initialPage !== null ? (
+      {((pageReactions && pageReactions.length > 0) || pendingReactions.length > 0) &&
+      !loadError &&
+      resolvedUri &&
+      initialPage !== null ? (
         <MarginReactionsList
-          reactions={pageReactions}
+          reactions={pageReactions ?? []}
           onSelectReaction={setSelectedReactionId}
           authorUserId={club?.type === "creator" ? club.moderatorId : null}
+          pendingReactions={pendingReactions}
         />
       ) : null}
       </View>

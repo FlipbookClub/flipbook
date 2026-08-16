@@ -19,12 +19,25 @@ export interface MarginReaction {
   };
 }
 
+// A reaction the user dropped while offline. It has no server row yet, so no
+// `_id` and no thread to open — kept as its own type rather than faking a
+// MarginReaction so nothing downstream mistakes it for confirmed data.
+export interface PendingMarginReaction {
+  localId: string;
+  type: "emoji" | "comment";
+  emoji?: string;
+  user: { displayName: string; avatarUrl?: string };
+}
+
 interface Props {
   reactions: MarginReaction[];
   onSelectReaction: (reactionId: Id<"reactions">) => void;
   // FR-022: when this reaction's user matches, the bubble gets the Golden
   // Sand author treatment. Only set for creator-type clubs.
   authorUserId?: Id<"users"> | null;
+  // BUG-003: queued-offline drops, rendered dimmed so you can see your own
+  // reaction landed instead of re-sending it because nothing appeared.
+  pendingReactions?: PendingMarginReaction[];
 }
 
 // One bubble ≈ 36px + small avatar overlap + spacing.s3 (12px) gap. 56px
@@ -38,18 +51,26 @@ const EXPANDED_MAX_HEIGHT = ROW_HEIGHT * MAX_VISIBLE_EXPANDED;
 // for the rest, keeping the reading surface uncluttered. Tap the badge to
 // expand and see all reactions; tap anywhere outside the strip to collapse
 // back. Founder UX call 2026-05-23 — five bubbles in the margin felt noisy.
-export function MarginReactionsList({ reactions, onSelectReaction, authorUserId }: Props) {
+export function MarginReactionsList({
+  reactions,
+  onSelectReaction,
+  authorUserId,
+  pendingReactions,
+}: Props) {
   const { colors } = useTheme();
   const [expanded, setExpanded] = useState(false);
 
-  if (reactions.length === 0) return null;
+  const pending = pendingReactions ?? [];
+  if (reactions.length === 0 && pending.length === 0) return null;
 
   // Most recent reaction sits at the top of the strip when collapsed —
   // listForPage returns ascending by createdAt, so the newest is at the
-  // end of the array.
+  // end of the array. Pending drops are the most recent of all (they were
+  // just made), so they lead.
   const ordered = [...reactions].reverse();
-  const headline = ordered[0];
-  const overflow = ordered.length - 1;
+  const headline = pending.length === 0 ? ordered[0] : null;
+  const headlinePending = pending.length > 0 ? pending[pending.length - 1] : null;
+  const overflow = ordered.length + pending.length - 1;
 
   return (
     <>
@@ -87,6 +108,16 @@ export function MarginReactionsList({ reactions, onSelectReaction, authorUserId 
             contentContainerStyle={{ alignItems: "center", gap: spacing.s3, paddingVertical: 4 }}
             showsVerticalScrollIndicator={ordered.length > MAX_VISIBLE_EXPANDED}
           >
+            {pending.map((p) => (
+              <ReactionBubble
+                key={p.localId}
+                emoji={p.emoji}
+                isComment={p.type === "comment"}
+                user={p.user}
+                onPress={() => undefined}
+                pending
+              />
+            ))}
             {ordered.map((r) => (
               <ReactionBubble
                 key={r._id}
@@ -103,17 +134,28 @@ export function MarginReactionsList({ reactions, onSelectReaction, authorUserId 
           </ScrollView>
         ) : (
           <View style={{ alignItems: "center", gap: spacing.s3 }}>
-            <ReactionBubble
-              key={headline._id}
-              emoji={headline.emoji}
-              isComment={headline.type === "comment"}
-              isAuthor={!!authorUserId && headline.user._id === authorUserId}
-              user={{
-                displayName: headline.user.displayName,
-                avatarUrl: headline.user.avatarUrl,
-              }}
-              onPress={() => onSelectReaction(headline._id)}
-            />
+            {headlinePending ? (
+              <ReactionBubble
+                key={headlinePending.localId}
+                emoji={headlinePending.emoji}
+                isComment={headlinePending.type === "comment"}
+                user={headlinePending.user}
+                onPress={() => undefined}
+                pending
+              />
+            ) : headline ? (
+              <ReactionBubble
+                key={headline._id}
+                emoji={headline.emoji}
+                isComment={headline.type === "comment"}
+                isAuthor={!!authorUserId && headline.user._id === authorUserId}
+                user={{
+                  displayName: headline.user.displayName,
+                  avatarUrl: headline.user.avatarUrl,
+                }}
+                onPress={() => onSelectReaction(headline._id)}
+              />
+            ) : null}
             {overflow > 0 ? (
               <Pressable
                 onPress={() => setExpanded(true)}
