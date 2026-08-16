@@ -51,7 +51,14 @@ export function BookListCard({
   // Keep the progress track visible against whichever card surface is in use.
   const trackColor = onPrimary ? colors.surfaceSecondary : colors.surfacePrimary;
   return (
-    <View
+    // The whole card opens the book. It used to be only the 56x80 cover
+    // thumbnail, which is a small target next to a card-sized affordance that
+    // looks tappable — taps on the title or progress bar simply did nothing.
+    // The options button below is nested and still takes its own taps.
+    <Pressable
+      onPress={onOpen}
+      accessibilityRole="button"
+      accessibilityLabel={`Open ${title}`}
       style={{
         flexDirection: "row",
         gap: spacing.s3,
@@ -60,10 +67,7 @@ export function BookListCard({
         backgroundColor: onPrimary ? colors.surfacePrimary : colors.surfaceSecondary,
       }}
     >
-      <Pressable
-        onPress={onOpen}
-        accessibilityRole="button"
-        accessibilityLabel={`Open ${title}`}
+      <View
         style={{
           width: 56,
           height: 80,
@@ -81,7 +85,7 @@ export function BookListCard({
             {initial}
           </Text>
         )}
-      </Pressable>
+      </View>
 
       <View style={{ flex: 1, gap: spacing.s2, justifyContent: "center" }}>
         <Text style={{ ...typography.overlineLg, color: colors.textAlt }} numberOfLines={2}>
@@ -138,6 +142,6 @@ export function BookListCard({
           <MoreVertical size={20} color={colors.textMuted} />
         </Pressable>
       ) : null}
-    </View>
+    </Pressable>
   );
 }
