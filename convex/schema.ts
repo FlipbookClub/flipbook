@@ -99,11 +99,21 @@ export default defineSchema({
     .index("by_user_and_chapter", ["userId", "chapterId"])
     .index("by_user_and_club", ["userId", "clubId"]),
 
+  // NOTE: `bookValidator` in convex/books.ts is a strict v.object() that must
+  // mirror this table. Adding a field here without adding it there passes
+  // typecheck and deploys fine, then fails return validation the moment a
+  // document actually carries the new field — taking down every query that
+  // returns a book, for the whole club rather than the one row. Change both.
   books: defineTable({
     title: v.string(),
     author: v.string(),
-    // Optional genre from the shared GENRES catalogue (src/lib/genres.ts).
+    // LEGACY single genre. Kept and still written (as genres[0]) so existing
+    // rows and any older client keep working — do not remove or migrate.
+    // Read through bookGenres() in src/lib/genres.ts rather than directly.
     genre: v.optional(v.string()),
+    // Up to MAX_BOOK_GENRES values from the shared catalogue (convex/genres.ts).
+    // Absent on rows written before multi-genre shipped.
+    genres: v.optional(v.array(v.string())),
     pdfStorageId: v.id("_storage"),
     pdfPageCount: v.number(),
     coverImageUrl: v.optional(v.string()),

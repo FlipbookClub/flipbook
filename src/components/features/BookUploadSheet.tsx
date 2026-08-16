@@ -62,7 +62,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
-  const [genre, setGenre] = useState<string | null>(null);
+  const [genres, setGenres] = useState<string[]>([]);
   const [pageCount, setPageCount] = useState<number | null>(null);
   const [pageDetectionError, setPageDetectionError] = useState<string | null>(null);
   const [progress, setProgress] = useState(0);
@@ -77,7 +77,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
     if (!visible) {
       setTitle("");
       setAuthor("");
-      setGenre(null);
+      setGenres([]);
       setPageCount(null);
       setPageDetectionError(null);
       setProgress(0);
@@ -150,7 +150,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         clubId,
         title: title.trim(),
         author: author.trim(),
-        genre: genre ?? undefined,
+        genres,
         pdfStorageId: storageId as Id<"_storage">,
         pdfPageCount: pageCount,
         fileSize: file.size,
@@ -276,10 +276,10 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         </View>
 
         <View style={{ gap: spacing.s2 }}>
-          <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>Genre (optional)</Text>
+          <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>Genres (optional, up to 3)</Text>
           <GenrePicker
-            value={genre}
-            onChange={setGenre}
+            value={genres}
+            onChange={setGenres}
             disabled={stage !== "metadata"}
           />
         </View>

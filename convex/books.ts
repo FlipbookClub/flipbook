@@ -3,6 +3,7 @@ import { ConvexError, v } from "convex/values";
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc, Id } from "./_generated/dataModel";
 import { isAdminEmail } from "./lib/admins";
+import { normalizeGenres } from "./genres";
 import { assertIsModerator } from "./clubs";
 import { getCurrentUser } from "./users";
 
@@ -17,6 +18,11 @@ const bookValidator = v.object({
   title: v.string(),
   author: v.string(),
   genre: v.optional(v.string()),
+  // Must mirror the books table in schema.ts. This is a strict object, so a
+  // field present on the document but missing here fails return validation
+  // and breaks every query that returns a book — for the whole club, not just
+  // the one row.
+  genres: v.optional(v.array(v.string())),
   pdfStorageId: v.id("_storage"),
   pdfPageCount: v.number(),
   coverImageUrl: v.optional(v.string()),
@@ -68,12 +74,41 @@ export const generateUploadUrl = mutation({
   },
 });
 
+// Resolve the genre fields from whichever shape the client sent.
+//
+// New clients send `genres` (up to MAX_BOOK_GENRES, validated against the
+// catalogue). Older clients send the single `genre`, which is left exactly as
+// it behaved before — no catalogue check, no `genres` written — so an old
+// binary can keep registering books unchanged. When `genres` IS supplied we
+// also write `genre = genres[0]`, so anything still reading the legacy field
+// keeps working without a migration.
+function resolveGenreFields(args: { genre?: string; genres?: string[] }): {
+  genre: string | undefined;
+  genres: string[] | undefined;
+} {
+  if (args.genres !== undefined) {
+    const normalized = normalizeGenres(args.genres);
+    if (normalized === null) {
+      throw new ConvexError({ code: "invalid_genre" });
+    }
+    if (normalized.length === 0) return { genre: undefined, genres: undefined };
+    return { genre: normalized[0], genres: normalized };
+  }
+  const single = args.genre?.trim() || undefined;
+  if (single && single.length > MAX_GENRE) {
+    throw new ConvexError({ code: "invalid_genre" });
+  }
+  return { genre: single, genres: undefined };
+}
+
 export const register = mutation({
   args: {
     clubId: v.id("clubs"),
     title: v.string(),
     author: v.string(),
     genre: v.optional(v.string()),
+    // Up to MAX_BOOK_GENRES. Takes precedence over `genre` when both arrive.
+    genres: v.optional(v.array(v.string())),
     pdfStorageId: v.id("_storage"),
     pdfPageCount: v.number(),
     fileSize: v.number(),
@@ -88,15 +123,12 @@ export const register = mutation({
 
     const title = args.title.trim();
     const author = args.author.trim();
-    const genre = args.genre?.trim() || undefined;
+    const { genre, genres } = resolveGenreFields(args);
     if (!title || title.length > MAX_TITLE) {
       throw new ConvexError({ code: "invalid_title" });
     }
     if (!author || author.length > MAX_AUTHOR) {
       throw new ConvexError({ code: "invalid_author" });
-    }
-    if (genre && genre.length > MAX_GENRE) {
-      throw new ConvexError({ code: "invalid_genre" });
     }
     if (args.pdfPageCount <= 0) {
       throw new ConvexError({ code: "invalid_page_count" });
@@ -133,6 +165,7 @@ export const register = mutation({
       title,
       author,
       genre,
+      genres,
       pdfStorageId: args.pdfStorageId,
       pdfPageCount: args.pdfPageCount,
       coverImageUrl,
@@ -311,13 +344,15 @@ async function assertCanManageBook(
   return { book, club };
 }
 
-// Edit a book's title / author / genre. Moderator or the uploader.
+// Edit a book's title / author / genres. Moderator or the uploader.
 export const updateMetadata = mutation({
   args: {
     bookId: v.id("books"),
     title: v.string(),
     author: v.string(),
     genre: v.optional(v.string()),
+    // Up to MAX_BOOK_GENRES. Takes precedence over `genre` when both arrive.
+    genres: v.optional(v.array(v.string())),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -326,17 +361,14 @@ export const updateMetadata = mutation({
 
     const title = args.title.trim();
     const author = args.author.trim();
-    const genre = args.genre?.trim() || undefined;
+    const { genre, genres } = resolveGenreFields(args);
     if (!title || title.length > MAX_TITLE) {
       throw new ConvexError({ code: "invalid_title" });
     }
     if (!author || author.length > MAX_AUTHOR) {
       throw new ConvexError({ code: "invalid_author" });
     }
-    if (genre && genre.length > MAX_GENRE) {
-      throw new ConvexError({ code: "invalid_genre" });
-    }
-    await ctx.db.patch(args.bookId, { title, author, genre });
+    await ctx.db.patch(args.bookId, { title, author, genre, genres });
     return null;
   },
 });
