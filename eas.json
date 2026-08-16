@@ -45,6 +45,17 @@
     "production": {
       "ios": {
         "ascAppId": "6778644424"
+      },
+      "android": {
+        "track": "production",
+        // Staged rollout. The native Android reader in this build has only
+        // ever run on an emulator, and it replaces the legacy reader that
+        // 88 of 163 users currently rely on — so a bad surprise on real
+        // hardware should reach a fraction of them, not all of them.
+        // Bump toward 1.0 in the Play Console once real devices look good;
+        // halting a staged rollout is immediate, unlike shipping a fix.
+        "releaseStatus": "inProgress",
+        "rollout": 0.1
       }
     }
   }
