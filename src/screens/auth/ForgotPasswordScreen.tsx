@@ -12,6 +12,7 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { AuthStackParamList } from "@/navigation/AuthStack";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "ForgotPassword">;
 
@@ -55,8 +56,11 @@ export function ForgotPasswordScreen({ navigation }: Props) {
         );
         return;
       }
-      const message =
-        errors?.[0]?.message ?? "Couldn't start a password reset. Check the email and try again.";
+      const message = userFacingError(
+        err,
+        { where: "password_reset_request", clerkCode: errors?.[0]?.code, clerkMessage: errors?.[0]?.message },
+        "Couldn't start a password reset. Check the email and try again.",
+      );
       setFormError(message);
     } finally {
       setSubmitting(false);

@@ -7,6 +7,7 @@ import { AppleAuthButton } from "@/components/auth/AppleAuthButton";
 import { AuthLayout } from "@/components/auth/AuthLayout";
 import { GoogleAuthButton } from "@/components/auth/GoogleAuthButton";
 import { Button } from "@/components/ui/Button";
+import { userFacingError } from "@/lib/monitoring";
 import { Input } from "@/components/ui/Input";
 import { useSocialAuth } from "@/hooks/useSocialAuth";
 import { palette } from "@/theme/palette";
@@ -145,15 +146,19 @@ export function SignInScreen({ navigation }: Props) {
         );
         return;
       }
-      // TEMPORARY diagnostic: append Clerk's error code. Multiple testers hit
-      // "Invalid verification strategy" and fall back to social sign-in, but
-      // the message alone doesn't identify which call failed — several Clerk
-      // codes share similar wording, and the one we already handle
-      // (strategy_for_user_invalid) would have shown its friendly message
-      // instead. The code names the cause. Testers report by screenshot, so
-      // it has to be on screen to reach us. Remove once diagnosed.
-      const detail = code ? ` [${code}]` : "";
-      setFormError((errors?.[0]?.message ?? "Sign-in failed. Please try again.") + detail);
+      // Anything else: the user gets a plain message plus a support
+      // reference; the Clerk code and message go to Sentry, tagged "signin",
+      // where we can actually group and count them. Several testers hit
+      // "Invalid verification strategy" and fell back to social sign-in, and
+      // the code is what identifies which call failed — it just doesn't
+      // belong on a reader's screen.
+      setFormError(
+        userFacingError(
+          err,
+          { where: "signin", clerkCode: code, clerkMessage: errors?.[0]?.message },
+          "We couldn't sign you in. Please try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }

@@ -12,6 +12,7 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { AuthStackParamList } from "@/navigation/AuthStack";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "ResetPassword">;
 
@@ -60,10 +61,9 @@ export function ResetPasswordScreen({ route }: Props) {
         setFormError("That code didn't work. Check it and try again.");
       }
     } catch (err) {
-      const message =
-        (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Couldn't reset your password. Please try again.";
-      setFormError(message);
+      setFormError(
+        userFacingError(err, { where: "password_reset" }, "Couldn't reset your password. Please try again."),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -78,10 +78,7 @@ export function ResetPasswordScreen({ route }: Props) {
       await signIn.create({ strategy: "reset_password_email_code", identifier: email });
       setResentNotice("We sent a new code.");
     } catch (err) {
-      const message =
-        (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Couldn't resend the code.";
-      setFormError(message);
+      setFormError(userFacingError(err, { where: "password_reset_resend" }, "Couldn't resend the code."));
     } finally {
       setResending(false);
     }

@@ -30,6 +30,7 @@ import type { CommunityStackParamList } from "@/navigation/CommunityStack";
 import type { MainTabsParamList } from "@/navigation/MainTabs";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+import { userFacingError } from "@/lib/monitoring";
 
 // Live preview shown once a full-length private code is typed — so the user
 // can confirm this is the right community before tapping Join, instead of
@@ -143,7 +144,7 @@ export function JoinCommunityScreen({ navigation }: Props) {
             ? "Enter a 6-character code."
             : code === "pro_required"
               ? "You're at the 3-club limit on the free tier. Flipbook Pro will lift the cap — coming soon."
-              : code ?? (err as { message?: string })?.message ?? "Couldn't join with that code.";
+              : userFacingError(err, { where: "join_with_code", code }, "Couldn't join with that code.");
       setFormError(message);
       setSubmitting(false);
     }

@@ -16,6 +16,7 @@ import { typography } from "@/theme/typography";
 
 import type { OnboardingStackParamList } from "@/navigation/OnboardingStack";
 import { api } from "../../../convex/_generated/api";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = NativeStackScreenProps<OnboardingStackParamList, "GenrePreferences">;
 
@@ -54,10 +55,10 @@ export function GenrePreferencesScreen({ route }: Props) {
       // RootNavigator's auth gate sees users.me become non-null and routes to
       // MainTabs automatically — no explicit navigation here.
     } catch (err) {
-      const code =
-        (err as { data?: { code?: string }; message?: string })?.data?.code ??
-        (err as { message?: string })?.message ??
-        "Couldn't save your profile. Mind trying again?";
+      // Recognised codes keep their specific, actionable wording. Anything
+      // else used to fall through to `code` itself, so users could be shown a
+      // raw identifier like "not_a_member".
+      const code = (err as { data?: { code?: string } })?.data?.code;
       const message =
         code === "display_name_taken"
           ? `"${displayName}" is taken. Tap back to try another.`
@@ -65,7 +66,11 @@ export function GenrePreferencesScreen({ route }: Props) {
             ? "Your invite code couldn't be verified. Go back to the welcome screen and re-enter it."
             : code === "invite_already_used"
               ? "That invite code has already been used."
-              : code;
+              : userFacingError(
+                  err,
+                  { where: "profile_setup", code },
+                  "Couldn't save your profile. Mind trying again?",
+                );
       setFormError(message);
       setSubmitting(false);
     }

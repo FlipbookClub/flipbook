@@ -15,6 +15,7 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { AuthStackParamList } from "@/navigation/AuthStack";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "CreateAccount">;
 
@@ -69,7 +70,13 @@ export function CreateAccountScreen({ navigation }: Props) {
         setFormError(null);
         return;
       }
-      setFormError(errors?.[0]?.message ?? "Sign-up failed. Please try again.");
+      setFormError(
+        userFacingError(
+          err,
+          { where: "signup", clerkCode: code, clerkMessage: errors?.[0]?.message },
+          "We couldn't create your account. Please try again.",
+        ),
+      );
     } finally {
       setSubmitting(false);
     }

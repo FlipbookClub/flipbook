@@ -45,6 +45,7 @@ const COVER_H = 340;
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+import { userFacingError } from "@/lib/monitoring";
 
 interface Props {
   visible: boolean;
@@ -165,11 +166,12 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       onUploaded(bookId);
       onClose();
     } catch (err) {
-      const message =
-        (err as { data?: { code?: string } })?.data?.code ??
-        (err as { message?: string })?.message ??
-        "The book didn't quite make it. Try again?";
-      setError(message);
+      // A recognised server code keeps its own wording where we have one;
+      // anything else is generic + a support ref, with the detail in Sentry.
+      const code = (err as { data?: { code?: string } })?.data?.code;
+      setError(
+        userFacingError(err, { where: "book_upload", code }, "The book didn't quite make it. Try again?"),
+      );
       setStage("metadata");
     }
   };

@@ -11,6 +11,7 @@ import { typography } from "@/theme/typography";
 
 import type { Doc, Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+import { userFacingError } from "@/lib/monitoring";
 
 interface Props {
   visible: boolean;
@@ -58,9 +59,10 @@ export function ClubOptionsSheet({
               onClose();
               onDeleted();
             } catch (err) {
-              const message =
-                (err as { message?: string })?.message ?? "Couldn't delete the community.";
-              Alert.alert("Couldn't delete", message);
+              Alert.alert(
+                "Couldn't delete",
+                userFacingError(err, { where: "club_delete" }, "Couldn't delete the community."),
+              );
             }
           },
         },

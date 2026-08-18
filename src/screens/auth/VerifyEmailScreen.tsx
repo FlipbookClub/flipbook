@@ -11,6 +11,7 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { AuthStackParamList } from "@/navigation/AuthStack";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "VerifyEmail">;
 
@@ -86,10 +87,9 @@ export function VerifyEmailScreen({ route }: Props) {
         }
       }
     } catch (err) {
-      const message =
-        (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Couldn't verify that code. Want to try again?";
-      setFormError(message);
+      setFormError(
+        userFacingError(err, { where: "verify_email" }, "Couldn't verify that code. Want to try again?"),
+      );
     } finally {
       setSubmitting(false);
     }
@@ -129,10 +129,7 @@ export function VerifyEmailScreen({ route }: Props) {
       }
       setResentNotice("We sent a new code.");
     } catch (err) {
-      const message =
-        (err as { errors?: { message?: string }[] })?.errors?.[0]?.message ??
-        "Couldn't resend the code.";
-      setFormError(message);
+      setFormError(userFacingError(err, { where: "verify_email_resend" }, "Couldn't resend the code."));
     } finally {
       setResending(false);
     }

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { useMutation } from "convex/react";
 
 import { useConnectivity } from "./connectivity";
+import { reportError } from "./monitoring";
 import {
   bumpAttempt,
   dropQueued,
@@ -33,6 +34,14 @@ export function useReactionQueueFlush(): void {
       try {
         for (const item of items) {
           if (item.attempts >= MAX_ATTEMPTS) {
+            // Dropping here loses something the user wrote. Silent until now,
+            // so it never showed up anywhere we could see it.
+            reportError(new Error("reaction dropped after max attempts"), {
+              where: "reaction_queue_flush",
+              reason: "max_attempts",
+              attempts: item.attempts,
+              type: item.type,
+            });
             dropQueued(item.localId);
             continue;
           }
@@ -42,6 +51,12 @@ export function useReactionQueueFlush(): void {
           } catch (err) {
             const code = (err as { data?: { code?: string } })?.data?.code;
             if (isTerminalRejection(code)) {
+              reportError(err, {
+                where: "reaction_queue_flush",
+                reason: "terminal_rejection",
+                code,
+                type: item.type,
+              });
               dropQueued(item.localId);
             } else {
               bumpAttempt(item.localId);

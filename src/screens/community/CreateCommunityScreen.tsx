@@ -28,6 +28,7 @@ import { typography } from "@/theme/typography";
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "CreateCommunity">;
 
@@ -106,7 +107,7 @@ export function CreateCommunityScreen({ navigation }: Props) {
       const message =
         code === "pro_required"
           ? "You're at the 3-club limit on the free tier. Flipbook Pro will lift the cap — coming soon."
-          : code ?? (err as { message?: string })?.message ?? "Couldn't create the community. Please try again.";
+          : userFacingError(err, { where: "create_community", code }, "Couldn't create the community. Please try again.");
       setFormError(message);
       setSubmitting(false);
     }

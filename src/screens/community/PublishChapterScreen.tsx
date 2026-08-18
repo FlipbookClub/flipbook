@@ -27,6 +27,7 @@ import { typography } from "@/theme/typography";
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "PublishChapter">;
 type Stage = "form" | "uploading" | "publishing";
@@ -102,8 +103,9 @@ export function PublishChapterScreen({ navigation, route }: Props) {
       navigation.goBack();
     } catch (err) {
       const code = (err as { data?: { code?: string } })?.data?.code;
-      const message = (err as { message?: string })?.message;
-      setError(code ?? message ?? "The chapter didn't quite make it. Try again?");
+      setError(
+        userFacingError(err, { where: "publish_chapter", code }, "The chapter didn't quite make it. Try again?"),
+      );
       setStage("form");
     }
   };

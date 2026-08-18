@@ -52,3 +52,58 @@ export function captureException(error: unknown, context?: Record<string, unknow
 export function isMonitoringEnabled(): boolean {
   return enabled;
 }
+
+// What users see when something fails for a reason we can't explain to them
+// usefully. Deliberately blank of detail: error codes and library messages
+// are for us, not for readers.
+export const GENERIC_ERROR_MESSAGE = "Something went wrong. Please try again.";
+
+/**
+ * Report a caught error and get back a short reference to show the user.
+ *
+ * `where` tags the flow ("signin", "book_upload", …) so Sentry groups by
+ * operation rather than by whatever wording a dependency happened to use.
+ * Everything else in `context` rides along as extra data.
+ *
+ * Returns the first 8 characters of the Sentry event id, or null when
+ * monitoring is off. Support can search the full id by that prefix, which is
+ * why users get a reference instead of an error code: it means something to
+ * us and nothing to an attacker.
+ */
+export function reportError(
+  error: unknown,
+  context: { where: string } & Record<string, unknown>,
+): string | null {
+  const { where, ...extra } = context;
+  if (enabled && sentry) {
+    try {
+      const eventId = sentry.captureException(error, {
+        tags: { where },
+        extra,
+      });
+      return typeof eventId === "string" ? eventId.slice(0, 8) : null;
+    } catch {
+      /* fall through to console */
+    }
+  }
+  console.error(`[monitoring] ${where}`, error, extra);
+  return null;
+}
+
+/**
+ * The message to show a user for an unexpected failure, with a support
+ * reference appended when we have one. Reports to Sentry as a side effect.
+ *
+ * Use this for the FALLBACK branch only. Errors we recognise and can explain
+ * (a known ConvexError code, "this account uses Google") should keep their
+ * specific, helpful wording — the point is to stop leaking raw library text
+ * and error codes, not to make every failure opaque.
+ */
+export function userFacingError(
+  error: unknown,
+  context: { where: string } & Record<string, unknown>,
+  message: string = GENERIC_ERROR_MESSAGE,
+): string {
+  const ref = reportError(error, context);
+  return ref ? `${message} (ref: ${ref})` : message;
+}

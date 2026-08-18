@@ -21,6 +21,7 @@ import { typography } from "@/theme/typography";
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
 import type { MainTabsParamList } from "@/navigation/MainTabs";
 import { api } from "../../../convex/_generated/api";
+import { userFacingError } from "@/lib/monitoring";
 
 type Props = CompositeScreenProps<
   NativeStackScreenProps<CommunityStackParamList, "InviteAccept">,
@@ -69,7 +70,7 @@ export function InviteAcceptScreen({ navigation, route }: Props) {
       const message =
         code === "pro_required"
           ? "You're at the 3-club limit on the free tier. Flipbook Pro will lift the cap — coming soon."
-          : code ?? (err as { message?: string })?.message ?? "Couldn't join. Please try again.";
+          : userFacingError(err, { where: "invite_accept", code }, "Couldn't join. Please try again.");
       setFormError(message);
       setSubmitting(false);
     }
