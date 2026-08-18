@@ -145,7 +145,15 @@ export function SignInScreen({ navigation }: Props) {
         );
         return;
       }
-      setFormError(errors?.[0]?.message ?? "Sign-in failed. Please try again.");
+      // TEMPORARY diagnostic: append Clerk's error code. Multiple testers hit
+      // "Invalid verification strategy" and fall back to social sign-in, but
+      // the message alone doesn't identify which call failed — several Clerk
+      // codes share similar wording, and the one we already handle
+      // (strategy_for_user_invalid) would have shown its friendly message
+      // instead. The code names the cause. Testers report by screenshot, so
+      // it has to be on screen to reach us. Remove once diagnosed.
+      const detail = code ? ` [${code}]` : "";
+      setFormError((errors?.[0]?.message ?? "Sign-in failed. Please try again.") + detail);
     } finally {
       setSubmitting(false);
     }

@@ -21,7 +21,7 @@ class NativeHighlightPdfModule : Module() {
     Name("NativeHighlightPdf")
 
     View(NativeHighlightPdfView::class) {
-      Events("onPageChanged", "onSelectionChanged", "onHighlightTapped")
+      Events("onPageChanged", "onSelectionChanged", "onHighlightTapped", "onSelectionUnavailable")
 
       // The only correct teardown point. The view deliberately does NOT tear
       // down in onDetachedFromWindow, since a detached view can be

@@ -8,6 +8,7 @@ import {
   Platform,
 } from "react-native";
 import { KeyboardAvoidingView } from "react-native-keyboard-controller";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Pdf from "react-native-pdf";
 import { inspectPdf } from "native-highlight-pdf";
 import { X } from "@/lib/icons";
@@ -57,6 +58,11 @@ type Stage = "metadata" | "uploading" | "registering";
 
 export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: Props) {
   const { colors } = useTheme();
+  // edgeToEdgeEnabled (app.json) means content draws under the system
+  // navigation bar, so a bottom sheet must add the inset itself or its
+  // primary action sits behind the nav bar. Worst on tablets and folds,
+  // where the inset is largest.
+  const insets = useSafeAreaInsets();
   const generateUploadUrl = useMutation(api.books.generateUploadUrl);
   const registerBook = useMutation(api.books.register);
 
@@ -220,7 +226,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
             borderTopRightRadius: radius.lg,
             paddingHorizontal: spacing.s4,
             paddingTop: spacing.s3,
-            paddingBottom: spacing.s5,
+            paddingBottom: spacing.s5 + insets.bottom,
             gap: spacing.s4,
           }}
         >

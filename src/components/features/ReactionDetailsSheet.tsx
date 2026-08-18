@@ -7,6 +7,7 @@ import {
   Text,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { MessageSquare, Trash2, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 
@@ -60,6 +61,9 @@ export function ReactionDetailsSheet({
   onClose,
 }: Props) {
   const { colors } = useTheme();
+  // See BookUploadSheet: edgeToEdgeEnabled means a sheet must add the bottom
+  // inset itself, or its content sits under the system navigation bar.
+  const insets = useSafeAreaInsets();
   const createReaction = useMutation(api.reactions.create);
   const removeReaction = useMutation(api.reactions.remove);
 
@@ -138,7 +142,7 @@ export function ReactionDetailsSheet({
           borderTopRightRadius: radius.lg,
           paddingHorizontal: spacing.s5,
           paddingTop: spacing.s4,
-          paddingBottom: spacing.s5,
+          paddingBottom: spacing.s5 + insets.bottom,
           maxHeight: "75%",
         }}
       >

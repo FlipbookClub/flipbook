@@ -13,6 +13,13 @@ export type ExistingHighlight = {
 export type PageChangedEventPayload = { page: number; totalPages: number };
 export type SelectionChangedEventPayload = { hasSelection: boolean };
 export type HighlightTappedEventPayload = { reactionId: string };
+// Android only, for now. A long-press landed but no selection could start.
+// `no_text_at_point` on a whole document usually means it is scanned images
+// with no text layer, where selection is impossible by nature rather than
+// broken.
+export type SelectionUnavailableEventPayload = {
+  reason: "no_page" | "no_text_page" | "no_text_at_point";
+};
 
 // What captureSelection() resolves to — null if there was nothing (valid)
 // selected at call time.
@@ -29,6 +36,9 @@ export type NativeHighlightPdfViewProps = {
   onPageChanged?: (event: { nativeEvent: PageChangedEventPayload }) => void;
   onSelectionChanged?: (event: { nativeEvent: SelectionChangedEventPayload }) => void;
   onHighlightTapped?: (event: { nativeEvent: HighlightTappedEventPayload }) => void;
+  onSelectionUnavailable?: (event: {
+    nativeEvent: SelectionUnavailableEventPayload;
+  }) => void;
 };
 
 // Imperative methods callable via a ref to <NativeHighlightPdfView>. This

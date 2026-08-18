@@ -74,6 +74,14 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   private val onSelectionChanged by EventDispatcher()
   private val onHighlightTapped by EventDispatcher()
 
+  // Fires when a long-press lands but no selection could start, with the
+  // reason. A tester reported "text selection does not work" and the two
+  // explanations look identical from the outside: the gesture never reaching
+  // us, versus the page genuinely having no text layer (every scanned PDF).
+  // Surfacing this tells the user what happened AND tells us which it was,
+  // without needing logcat access on someone else's phone.
+  private val onSelectionUnavailable by EventDispatcher()
+
   private val pdfiumCore = PdfiumCore(context)
   // Every Pdfium call goes through this lock. Rendering happens off the main
   // thread; selection hit-tests are fast enough to run on it. Pdfium is not
@@ -484,13 +492,33 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   }
 
   private fun beginSelectionAt(x: Float, y: Float) {
-    val hit = pointToPage(x, y) ?: return
+    android.util.Log.d(TAG, "longPress at ($x,$y)")
+    val hit = pointToPage(x, y)
+    if (hit == null) {
+      // Long-press landed outside any drawn page (the gap between pages, or
+      // the letterboxed margin of an odd-sized page).
+      android.util.Log.d(TAG, "longPress: no page under point")
+      onSelectionUnavailable(mapOf("reason" to "no_page"))
+      return
+    }
     val (index, pt) = hit
-    val textPage = textPageFor(index) ?: return
+    val textPage = textPageFor(index)
+    if (textPage == null) {
+      android.util.Log.d(TAG, "longPress: no text page for $index")
+      onSelectionUnavailable(mapOf("reason" to "no_text_page"))
+      return
+    }
     val idx = synchronized(pdfLock) {
       try { textPage.textPageGetCharIndexAtPos(pt.first, pt.second, 12.0, 12.0) } catch (_: Exception) { -1 }
     }
-    if (idx < 0) return
+    if (idx < 0) {
+      // No character within the hit tolerance. Either genuinely blank space,
+      // or the whole document is scanned images with no text layer — in which
+      // case selection is impossible here no matter what the code does.
+      android.util.Log.d(TAG, "longPress: no char at point on page $index")
+      onSelectionUnavailable(mapOf("reason" to "no_text_at_point"))
+      return
+    }
     selPage = index
     selAnchorChar = idx
     selStartChar = idx

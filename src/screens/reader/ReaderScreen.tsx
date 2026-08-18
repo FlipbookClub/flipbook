@@ -343,6 +343,10 @@ export function ReaderScreen({ navigation, route }: Props) {
   // a full repaint.
   const paintedHighlightIdsRef = useRef(new Map<string, { page: number }>());
   const [hasSelection, setHasSelection] = useState(false);
+  // Transient notice when a long-press can't start a selection. Tells the
+  // reader why nothing happened instead of leaving it looking broken, and
+  // tells us which case it was when a tester screenshots it.
+  const [selectionNotice, setSelectionNotice] = useState<string | null>(null);
   const [pendingHighlight, setPendingHighlight] = useState<{
     page: number;
     quote: string;
@@ -780,6 +784,15 @@ export function ReaderScreen({ navigation, route }: Props) {
                 onHighlightTapped={(e) =>
                   setSelectedReactionId(e.nativeEvent.reactionId as Id<"reactions">)
                 }
+                onSelectionUnavailable={(e) => {
+                  const reason = e.nativeEvent.reason;
+                  setSelectionNotice(
+                    reason === "no_text_at_point"
+                      ? "No selectable text here. Scanned books have no text layer."
+                      : "Press and hold directly on the text to select it.",
+                  );
+                  setTimeout(() => setSelectionNotice(null), 2600);
+                }}
               />
             </View>
           </GestureDetector>
@@ -840,6 +853,18 @@ export function ReaderScreen({ navigation, route }: Props) {
           alignItems: "center",
         }}
       >
+        {selectionNotice ? (
+          <Text
+            style={{
+              ...typography.bodySm,
+              color: colors.textSecondary,
+              textAlign: "center",
+              paddingBottom: spacing.s1,
+            }}
+          >
+            {selectionNotice}
+          </Text>
+        ) : null}
         <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
           Page {currentPage}
           {totalPages !== null ? ` of ${totalPages}` : ""}
