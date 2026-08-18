@@ -34,6 +34,7 @@ import { typography } from "@/theme/typography";
 import type { CommunityStackParamList } from "@/navigation/CommunityStack";
 import type { Doc } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
+import { bookGenres } from "@/lib/genres";
 
 type Props = NativeStackScreenProps<CommunityStackParamList, "ClubDetail">;
 type TabKey = "room" | "discussions" | "library";
@@ -449,6 +450,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       author={currentBook.author}
                       pageCount={currentBook.pdfPageCount}
                       coverUrl={currentBook.coverImageUrl}
+                      genres={bookGenres(currentBook)}
                       onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
                       started={startedLabel}
                       progress={currentProgress}
@@ -480,6 +482,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         author={b.author}
                         pageCount={b.pdfPageCount}
                         coverUrl={b.coverImageUrl}
+                        genres={bookGenres(b)}
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
                         onOptions={() => setOptionsBook(b)}
                       />
@@ -500,6 +503,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         pageCount={b.pdfPageCount}
                         coverUrl={b.coverImageUrl}
                         surface="primary"
+                        genres={bookGenres(b)}
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
                         onOptions={() => setOptionsBook(b)}
                       />
@@ -703,6 +707,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     author={currentBook.author}
                     pageCount={currentBook.pdfPageCount}
                     coverUrl={currentBook.coverImageUrl}
+                    genres={bookGenres(currentBook)}
                     onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
                     started={startedLabel}
                     progress={currentProgress}

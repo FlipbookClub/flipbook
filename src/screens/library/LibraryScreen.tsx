@@ -22,6 +22,7 @@ import { typography } from "@/theme/typography";
 
 import type { LibraryStackParamList } from "@/navigation/LibraryStack";
 import { api } from "../../../convex/_generated/api";
+import { bookGenres } from "@/lib/genres";
 
 type Props = NativeStackScreenProps<LibraryStackParamList, "LibraryHome">;
 type TabKey = "reading" | "finished";
@@ -170,6 +171,7 @@ export function LibraryScreen({ navigation }: Props) {
                     ? undefined
                     : { label: `Page ${item.currentPage} of ${item.totalPages}`, pct }
                 }
+                genres={bookGenres(item.book)}
                 onOpen={() => navigation.navigate("Reader", { bookId: item.book._id })}
               />
             );

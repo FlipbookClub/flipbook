@@ -21,6 +21,11 @@ interface Props {
   /** Optional progress bar + label. */
   progress?: { label: string; pct: number };
   /**
+   * Up to MAX_BOOK_GENRES chips. Resolve with `bookGenres(book)` so legacy
+   * rows that only have the single `genre` field still render.
+   */
+  genres?: string[];
+  /**
    * Card background. "secondary" (default) is the filled card; "primary" keeps
    * the screen background so the card sits flat — used for de-emphasized rows
    * like the club's "Past reads".
@@ -43,6 +48,7 @@ export function BookListCard({
   subtitle,
   started,
   progress,
+  genres,
   surface = "secondary",
 }: Props) {
   const { colors } = useTheme();
@@ -102,6 +108,28 @@ export function BookListCard({
           <Text style={{ ...typography.bodySm, color: colors.textMuted }} numberOfLines={1}>
             {subtitle}
           </Text>
+        ) : null}
+
+        {genres && genres.length > 0 ? (
+          // Quiet outline chips: this is metadata, not an action, so it must
+          // not compete with the title or the progress bar. Wraps rather than
+          // scrolls — at most three short labels.
+          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.s1 }}>
+            {genres.map((g) => (
+              <View
+                key={g}
+                style={{
+                  paddingVertical: 2,
+                  paddingHorizontal: spacing.s2,
+                  borderRadius: radius.pill,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                }}
+              >
+                <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{g}</Text>
+              </View>
+            ))}
+          </View>
         ) : null}
 
         {started ? (
