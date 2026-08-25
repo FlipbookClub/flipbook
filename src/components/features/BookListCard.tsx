@@ -1,4 +1,4 @@
-import { Image, Pressable, Text, View } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { MoreVertical } from "@/lib/icons";
 
 import { palette } from "@/theme/palette";
@@ -21,8 +21,9 @@ interface Props {
   /** Optional progress bar + label. */
   progress?: { label: string; pct: number };
   /**
-   * Up to MAX_BOOK_GENRES chips. Resolve with `bookGenres(book)` so legacy
-   * rows that only have the single `genre` field still render.
+   * Genres, rendered as one muted line under the author/page-count row.
+   * Resolve with `bookGenres(book)` so legacy rows that only carry the single
+   * `genre` field still render.
    */
   genres?: string[];
   /**
@@ -75,8 +76,17 @@ export function BookListCard({
     >
       <View
         style={{
-          width: 56,
-          height: 80,
+          // 72 rather than the original 56: once the frame stretches to the
+          // card's height, a 56-wide strip is far off book proportions and
+          // resizeMode="cover" crops the artwork's sides hard.
+          width: 72,
+          // Fills the card's height instead of sitting at a fixed 80 and
+          // floating in the middle of a much taller column. The row's height is
+          // still set by the text beside it, so the cover follows the card
+          // rather than driving it. minHeight keeps the old floor so a sparse
+          // card (no subtitle, no progress) does not end up with a squat cover.
+          alignSelf: "stretch",
+          minHeight: 80,
           borderRadius: radius.sm,
           overflow: "hidden",
           backgroundColor: palette.brandPrimary,
@@ -85,7 +95,12 @@ export function BookListCard({
         }}
       >
         {coverUrl ? (
-          <Image source={{ uri: coverUrl }} style={{ width: "100%", height: "100%" }} resizeMode="cover" />
+          // Absolutely positioned so the artwork contributes nothing to layout.
+          // As a normal child with height: "100%" it had no definite parent
+          // height to resolve against once the frame started stretching, so it
+          // fell back to the image's intrinsic pixel height and dragged the
+          // whole card to the size of the cover file.
+          <Image source={{ uri: coverUrl }} style={StyleSheet.absoluteFill} resizeMode="cover" />
         ) : (
           <Text style={{ fontFamily: "Raleway-Bold", fontSize: 22, color: palette.textOnBrand }}>
             {initial}
@@ -98,38 +113,38 @@ export function BookListCard({
           {title}
         </Text>
         <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
-          <Text style={{ ...typography.bodySm, color: colors.textAccent }} numberOfLines={1}>
+          {/* Books with a list of authors ("Marco Suarez, Jina Anne, Katie
+              Sylor-Miller, ...") overflow the card: numberOfLines alone only
+              caps the line count, it does not make the run give up width, so
+              the author took its intrinsic size and shoved the page count off
+              the right edge. flexShrink lets it yield and ellipsise instead.
+              The page count refuses to shrink so it stays whole. */}
+          <Text
+            style={{ ...typography.bodySm, color: colors.textAccent, flexShrink: 1 }}
+            numberOfLines={1}
+          >
             {author}
           </Text>
-          <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{pageCount} pages</Text>
+          <Text style={{ ...typography.bodySm, color: colors.textMuted, flexShrink: 0 }}>
+            {pageCount} pages
+          </Text>
         </View>
+
+        {genres && genres.length > 0 ? (
+          // Plain muted text on its own line, not chips: this is metadata and
+          // must not read as an action or compete with the title. Separated by
+          // a middot rather than commas because most of the catalogue is
+          // multi-word ("Biography & Memoir"), which commas run together.
+          // Held to a single line so the card gains one row, never two.
+          <Text style={{ ...typography.bodySm, color: colors.textMuted }} numberOfLines={1}>
+            {genres.join(" · ")}
+          </Text>
+        ) : null}
 
         {subtitle ? (
           <Text style={{ ...typography.bodySm, color: colors.textMuted }} numberOfLines={1}>
             {subtitle}
           </Text>
-        ) : null}
-
-        {genres && genres.length > 0 ? (
-          // Quiet outline chips: this is metadata, not an action, so it must
-          // not compete with the title or the progress bar. Wraps rather than
-          // scrolls — at most three short labels.
-          <View style={{ flexDirection: "row", flexWrap: "wrap", gap: spacing.s1 }}>
-            {genres.map((g) => (
-              <View
-                key={g}
-                style={{
-                  paddingVertical: 2,
-                  paddingHorizontal: spacing.s2,
-                  borderRadius: radius.pill,
-                  borderWidth: 1,
-                  borderColor: colors.border,
-                }}
-              >
-                <Text style={{ ...typography.bodySm, color: colors.textMuted }}>{g}</Text>
-              </View>
-            ))}
-          </View>
         ) : null}
 
         {started ? (
