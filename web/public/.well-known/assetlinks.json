@@ -5,7 +5,17 @@
       "namespace": "android_app",
       "package_name": "com.flipbook.club",
       "sha256_cert_fingerprints": [
-        "REPLACE_WITH_PLAY_APP_SIGNING_SHA256"
+        "7C:C0:8A:9B:82:10:92:2A:03:8D:01:5F:8E:3D:E2:07:6E:B8:03:6E:34:A4:9C:71:02:93:4E:42:6A:5F:21:05"
+      ]
+    }
+  },
+  {
+    "relation": ["delegate_permission/common.get_login_creds"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.flipbook.club",
+      "sha256_cert_fingerprints": [
+        "7C:C0:8A:9B:82:10:92:2A:03:8D:01:5F:8E:3D:E2:07:6E:B8:03:6E:34:A4:9C:71:02:93:4E:42:6A:5F:21:05"
       ]
     }
   }
