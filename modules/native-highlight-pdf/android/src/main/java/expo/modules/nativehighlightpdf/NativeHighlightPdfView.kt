@@ -126,6 +126,7 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   private var selEndChar = -1
   private var selAnchorChar = -1
   private var isSelecting = false
+  private var extendMissLogged = false
   private var selTextPage: PdfTextPage? = null
   private var selTextPageIndex = -1
 
@@ -136,6 +137,11 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
 
   private val pageGapPx: Int = (8 * context.resources.displayMetrics.density).roundToInt()
   private val handleRadiusPx: Float = 7f * context.resources.displayMetrics.density
+  // The pin is drawn at 7dp; a fingertip is nearer 25dp across, and the band
+  // expansion moved the pins further from the glyphs. A miss is expensive here:
+  // it falls through to a scroll, or to onSingleTapUp deciding the touch landed
+  // outside the selection and dismissing it.
+  private val handleGrabRadiusPx: Float = 28f * context.resources.displayMetrics.density
 
   init {
     setWillNotDraw(false) // ViewGroups skip onDraw by default.
@@ -385,16 +391,19 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   private fun tryGrabHandle(x: Float, y: Float): Boolean {
     if (isSelecting) return false
     val (start, end) = selectionHandleCentres() ?: return false
-    // The pin is 7dp; a finger is not. Grab within three radii of either centre.
-    val grab = handleRadiusPx * 3f
+    val grab = handleGrabRadiusPx
     val dStart = hypot(x - start.first, y - start.second)
     val dEnd = hypot(x - end.first, y - end.second)
-    if (min(dStart, dEnd) > grab) return false
+    if (min(dStart, dEnd) > grab) {
+      android.util.Log.d(TAG, "handle MISS dStart=$dStart dEnd=$dEnd grab=$grab")
+      return false
+    }
     // Anchor to the pin NOT being dragged, so extendSelectionTo's min/max keeps
     // the far end pinned while this one moves.
     if (dStart <= dEnd) {
       selAnchorChar = selEndChar
-      android.util.Log.d(TAG, "grabbed start handle (anchor $selAnchorChar)")
+      extendMissLogged = false
+    android.util.Log.d(TAG, "grabbed start handle (anchor $selAnchorChar)")
     } else {
       selAnchorChar = selStartChar
       android.util.Log.d(TAG, "grabbed end handle (anchor $selAnchorChar)")
@@ -418,9 +427,8 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     // Count the pins themselves as part of the selection so a tap on one does
     // not dismiss what it is there to adjust.
     val (start, end) = selectionHandleCentres() ?: return false
-    val grab = handleRadiusPx * 3f
-    return hypot(x - start.first, y - start.second) <= grab ||
-      hypot(x - end.first, y - end.second) <= grab
+    return hypot(x - start.first, y - start.second) <= handleGrabRadiusPx ||
+      hypot(x - end.first, y - end.second) <= handleGrabRadiusPx
   }
 
   private fun dismissSelection() {
@@ -629,7 +637,14 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     val idx = synchronized(pdfLock) {
       try { textPage.textPageGetCharIndexAtPos(pt.first, pt.second, 12.0, 12.0) } catch (_: Exception) { -1 }
     }
-    if (idx < 0) return
+    if (idx < 0) {
+      if (!extendMissLogged) {
+        android.util.Log.d(TAG, "extend MISS: no char at (${pt.first}, ${pt.second}) on page $index")
+        extendMissLogged = true
+      }
+      return
+    }
+    extendMissLogged = false
     if (idx != selEndChar && idx != selStartChar) {
       android.util.Log.d(TAG, "extend to char $idx (anchor $selAnchorChar)")
     }
