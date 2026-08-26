@@ -27,6 +27,7 @@ import java.io.File
 import java.util.concurrent.Executors
 import kotlin.math.abs
 import kotlin.math.floor
+import kotlin.math.hypot
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
@@ -176,6 +177,10 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     }
 
     override fun onLongPress(e: MotionEvent) {
+      // A handle drag holds the finger still long enough to trip the long-press
+      // timer. Without this guard, grabbing a pin and pausing would collapse the
+      // selection back to a single character under the finger.
+      if (isSelecting) return
       beginSelectionAt(e.x, e.y)
     }
 
@@ -186,13 +191,35 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   })
 
   override fun onTouchEvent(event: MotionEvent): Boolean {
-    // While a selection drag is in flight, keep any parent scroll container
-    // out of it.
-    parent?.requestDisallowInterceptTouchEvent(isSelecting)
+    // NOTHING in this view may ask an ancestor to stop intercepting. That call
+    // is what broke text selection on Android, and the reason is not obvious:
+    //
+    //   RNGestureHandlerRootView.dispatchTouchEvent runs the orchestrator with
+    //   passingTouch = true, sets it back to false, and only THEN calls
+    //   super.dispatchTouchEvent. This onTouchEvent is reached via that super
+    //   call, so passingTouch is always false by the time we run. The request
+    //   therefore clears RNGH's `!passingTouch` guard, reaches
+    //   tryCancelAllHandlers(), and cancels the Gesture.Native() handler
+    //   wrapping this view. NativeViewGestureHandler.onCancel() responds by
+    //   synthesising an ACTION_CANCEL straight into us, ending the drag.
+    //
+    // There was nothing to hold off anyway: this view owns its scrolling via
+    // OverScroller and has no scrolling ancestor (SafeAreaView > View > View >
+    // GestureDetector > View). The call was pure downside.
     gestureDetector.onTouchEvent(event)
     when (event.actionMasked) {
+      MotionEvent.ACTION_DOWN -> tryGrabHandle(event.x, event.y)
       MotionEvent.ACTION_MOVE -> if (isSelecting) extendSelectionTo(event.x, event.y)
-      MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> if (isSelecting) endSelectionDrag()
+      MotionEvent.ACTION_CANCEL -> {
+        if (isSelecting) {
+          // If this ever fires mid-selection, an ancestor stole the gesture and
+          // the drag is gone. It is the signature of the bug this comment block
+          // documents, so it stays instrumented.
+          android.util.Log.d(TAG, "selection cancelled by ancestor: an ancestor intercepted the drag")
+          endSelectionDrag()
+        }
+      }
+      MotionEvent.ACTION_UP -> if (isSelecting) endSelectionDrag()
     }
     return true
   }
@@ -330,26 +357,89 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     )
   }
 
+  // The two pin centres in view coordinates, or null when there is no
+  // selection. Drawing and hit-testing both read this, so a pin can never be
+  // painted somewhere the finger cannot grab it.
+  private fun selectionHandleCentres(): Pair<Pair<Float, Float>, Pair<Float, Float>>? {
+    if (selPage < 0) return null
+    val rects = currentSelectionRects()
+    if (rects.isEmpty()) return null
+    val dest = pageDrawRect(selPage) ?: return null
+    val first = rects.first()
+    val last = rects.last()
+    return Pair(
+      Pair(
+        dest.left + (first.x * dest.width()).toFloat(),
+        dest.top + (first.y * dest.height()).toFloat(),
+      ),
+      Pair(
+        dest.left + ((last.x + last.w) * dest.width()).toFloat(),
+        dest.top + ((last.y + last.h) * dest.height()).toFloat(),
+      ),
+    )
+  }
+
+  // Re-opens an existing selection for adjustment. P3-T5 asked for drag handles
+  // and only the drawing of them shipped, so a selection was final once the
+  // finger lifted.
+  private fun tryGrabHandle(x: Float, y: Float): Boolean {
+    if (isSelecting) return false
+    val (start, end) = selectionHandleCentres() ?: return false
+    // The pin is 7dp; a finger is not. Grab within three radii of either centre.
+    val grab = handleRadiusPx * 3f
+    val dStart = hypot(x - start.first, y - start.second)
+    val dEnd = hypot(x - end.first, y - end.second)
+    if (min(dStart, dEnd) > grab) return false
+    // Anchor to the pin NOT being dragged, so extendSelectionTo's min/max keeps
+    // the far end pinned while this one moves.
+    if (dStart <= dEnd) {
+      selAnchorChar = selEndChar
+      android.util.Log.d(TAG, "grabbed start handle (anchor $selAnchorChar)")
+    } else {
+      selAnchorChar = selStartChar
+      android.util.Log.d(TAG, "grabbed end handle (anchor $selAnchorChar)")
+    }
+    isSelecting = true
+    return true
+  }
+
+  private fun isPointInSelection(x: Float, y: Float): Boolean {
+    if (selPage < 0) return false
+    val rects = currentSelectionRects()
+    if (rects.isEmpty()) return false
+    val dest = pageDrawRect(selPage) ?: return false
+    for (r in rects) {
+      val l = dest.left + (r.x * dest.width()).toFloat()
+      val t = dest.top + (r.y * dest.height()).toFloat()
+      val rr = dest.left + ((r.x + r.w) * dest.width()).toFloat()
+      val b = dest.top + ((r.y + r.h) * dest.height()).toFloat()
+      if (x >= l && x <= rr && y >= t && y <= b) return true
+    }
+    // Count the pins themselves as part of the selection so a tap on one does
+    // not dismiss what it is there to adjust.
+    val (start, end) = selectionHandleCentres() ?: return false
+    val grab = handleRadiusPx * 3f
+    return hypot(x - start.first, y - start.second) <= grab ||
+      hypot(x - end.first, y - end.second) <= grab
+  }
+
+  private fun dismissSelection() {
+    android.util.Log.d(TAG, "selection dismissed by tap")
+    clearSelectionState()
+    onSelectionChanged(mapOf("hasSelection" to false))
+    invalidate()
+  }
+
   private fun drawSelection(canvas: Canvas, dest: RectF) {
     val rects = currentSelectionRects()
     if (rects.isEmpty()) return
     for (r in rects) drawNormRect(canvas, r, dest, selectionPaint)
-    // Simple start/end pins, per P3-T5 — enough to show the selection is
-    // draggable without imitating the full platform handle treatment.
-    val first = rects.first()
-    val last = rects.last()
-    canvas.drawCircle(
-      dest.left + (first.x * dest.width()).toFloat(),
-      dest.top + (first.y * dest.height()).toFloat(),
-      handleRadiusPx,
-      handlePaint,
-    )
-    canvas.drawCircle(
-      dest.left + ((last.x + last.w) * dest.width()).toFloat(),
-      dest.top + ((last.y + last.h) * dest.height()).toFloat(),
-      handleRadiusPx,
-      handlePaint,
-    )
+    // Simple start/end pins, per P3-T5. Positions come from
+    // selectionHandleCentres() rather than being recomputed here, so a pin is
+    // always painted exactly where tryGrabHandle() will look for it.
+    val (start, end) = selectionHandleCentres() ?: return
+    canvas.drawCircle(start.first, start.second, handleRadiusPx, handlePaint)
+    canvas.drawCircle(end.first, end.second, handleRadiusPx, handlePaint)
   }
 
   // MARK: - Page rendering (off the main thread)
@@ -540,6 +630,9 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
       try { textPage.textPageGetCharIndexAtPos(pt.first, pt.second, 12.0, 12.0) } catch (_: Exception) { -1 }
     }
     if (idx < 0) return
+    if (idx != selEndChar && idx != selStartChar) {
+      android.util.Log.d(TAG, "extend to char $idx (anchor $selAnchorChar)")
+    }
     selStartChar = min(selAnchorChar, idx)
     selEndChar = max(selAnchorChar, idx)
     invalidate()
@@ -550,17 +643,44 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     onSelectionChanged(mapOf("hasSelection" to (selPage >= 0 && selStartChar in 0..selEndChar)))
   }
 
+  // Memoized on (page, start, end). onDraw calls drawSelection every frame, and
+  // drawSelection asks for the rects once directly and again via
+  // selectionHandleCentres(), so an un-cached selection was recomputed twice
+  // per frame while extendSelectionTo invalidated on every ACTION_MOVE. The
+  // document never changes under a given key, so this is safe to hold.
+  private var selRectsKey: Triple<Int, Int, Int>? = null
+  private var selRectsCache: List<NormRect> = emptyList()
+
   private fun currentSelectionRects(): List<NormRect> {
     if (selPage < 0 || selStartChar < 0 || selEndChar < selStartChar) return emptyList()
+    val key = Triple(selPage, selStartChar, selEndChar)
+    if (key == selRectsKey) return selRectsCache
     val textPage = textPageFor(selPage) ?: return emptyList()
-    return lineGroupedRects(textPage, selPage, selStartChar, selEndChar)
+    val rects = selectionRectsForRange(textPage, selPage, selStartChar, selEndChar)
+    selRectsKey = key
+    selRectsCache = rects
+    return rects
   }
 
-  // Groups consecutive characters' boxes into per-line rects (characters on
-  // the same visual line share a Y band) — the same idea as iOS's
-  // selectionsByLine(), hand-rolled since Pdfium gives only per-character
-  // boxes.
-  private fun lineGroupedRects(textPage: PdfTextPage, pageIndex: Int, start: Int, end: Int): List<NormRect> {
+  // Per-line rectangles for a character range.
+  //
+  // Do NOT replace this with FPDFText_CountRects/GetRect. It looks like the
+  // counterpart of the selectionsByLine() the iOS module uses, and it is not.
+  // Measured on a real book: for a selection this produces 6 line bands,
+  // FPDFText_CountRects returned 261 rects for the same range. It splits on
+  // style runs, which in most PDFs is roughly per glyph, and each rect is tight
+  // to its letterform (9.6pt against our 13.2pt). A 40%-alpha fill over those
+  // reads as tinted text rather than a highlighter bar.
+  //
+  // Grouping is a vertical-overlap test: glyphs sharing a baseline always
+  // overlap heavily, glyphs on adjacent lines do not, even where a descender
+  // reaches into the leading. The band grows to the union of every glyph on the
+  // line. An earlier version updated only minX/maxX, so each band kept the
+  // FIRST glyph's height, and used that too-short band to test membership,
+  // which split one visual line into stacked slivers.
+  //
+  // This is O(characters), which is why currentSelectionRects() memoizes.
+  private fun selectionRectsForRange(textPage: PdfTextPage, pageIndex: Int, start: Int, end: Int): List<NormRect> {
     val dims = pageSizePoints(pageIndex) ?: return emptyList()
     val (wPt, hPt) = dims
     if (wPt <= 0f || hPt <= 0f) return emptyList()
@@ -569,32 +689,70 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
     synchronized(pdfLock) {
       for (i in start..end) {
         val box = try { textPage.textPageGetCharBox(i) } catch (_: Exception) { null } ?: continue
-        // Confirmed against PdfiumAndroid's source: box.top/box.bottom hold
-        // raw PDF-native values unflipped (box.top is numerically the LARGER,
-        // visually-higher y — the opposite of Android's top<bottom
-        // convention). Flip into top-left origin before grouping.
+        // textPageGetCharBox unpacks the native [left, right, bottom, top] of
+        // FPDFText_GetCharBox: PDF page space, bottom-left origin, so `top` is
+        // numerically the LARGER value. Flip into top-left origin.
         val visualTop = hPt - box.top.toFloat()
         val visualBottom = hPt - box.bottom.toFloat()
         val boxH = visualBottom - visualTop
         val boxLeft = box.left.toFloat()
         val boxRight = box.right.toFloat()
         if (boxRight - boxLeft <= 0f || boxH <= 0f) continue
-        val midY = visualTop + boxH / 2f
-        val line = lines.lastOrNull()?.takeIf { midY in it.minY..it.maxY }
+        val line = lines.lastOrNull()?.takeIf {
+          val overlap = min(visualBottom, it.maxY) - max(visualTop, it.minY)
+          overlap > 0.3f * min(boxH, it.maxY - it.minY)
+        }
         if (line != null) {
           line.minX = min(line.minX, boxLeft)
           line.maxX = max(line.maxX, boxRight)
+          line.minY = min(line.minY, visualTop)
+          line.maxY = max(line.maxY, visualBottom)
         } else {
           lines.add(Line(boxLeft, boxRight, visualTop, visualBottom))
         }
       }
     }
+    // Grow each band so consecutive lines meet, the way PDFKit's line boxes do.
+    // The glyph union is only the ink: measured at 13.2pt against a ~16pt line
+    // pitch, so bands stopped short of each other and a highlighted paragraph
+    // read as separate stripes instead of one continuous sweep. iOS looks
+    // different because selectionsByLine() hands back the full line box,
+    // leading included.
+    //
+    // The growth comes from the MEDIAN inter-line gap, not each local one, so a
+    // paragraph break or a heading caught in the selection cannot inflate every
+    // band. It is also capped against band height, so a pathological gap cannot
+    // produce a blob.
+    if (lines.isNotEmpty()) {
+      val heights = lines.map { it.maxY - it.minY }.sorted()
+      val medianH = heights[heights.size / 2]
+      val gaps = (0 until lines.size - 1)
+        .map { lines[it + 1].minY - lines[it].maxY }
+        .filter { it > 0f }
+        .sorted()
+      val grow = if (gaps.isNotEmpty()) {
+        min(gaps[gaps.size / 2] / 2f, 0.35f * medianH)
+      } else {
+        // Single-line selection: no gap to measure, so approximate the leading
+        // rather than leaving it visibly thinner than a multi-line one.
+        0.12f * medianH
+      }
+      if (grow > 0f) {
+        for (l in lines) {
+          l.minY -= grow
+          l.maxY += grow
+        }
+      }
+    }
     return lines.map { l ->
+      // Clamp: the outermost bands can now reach past the page edge.
+      val top = max(0f, l.minY)
+      val bottom = min(hPt, l.maxY)
       NormRect(
         x = (l.minX / wPt).toDouble(),
-        y = (l.minY / hPt).toDouble(),
+        y = (top / hPt).toDouble(),
         w = ((l.maxX - l.minX) / wPt).toDouble(),
-        h = ((l.maxY - l.minY) / hPt).toDouble(),
+        h = ((bottom - top) / hPt).toDouble(),
       )
     }
   }
@@ -602,6 +760,14 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   // MARK: - Highlight tap
 
   private fun handleTapForHighlight(x: Float, y: Float) {
+    // A tap anywhere off the selection dismisses it. This runs before any of the
+    // early returns below, because tapping the gap between two pages should
+    // clear a selection just as much as tapping another paragraph does. There
+    // was previously no way at all to get rid of one.
+    if (selPage >= 0 && !isPointInSelection(x, y)) {
+      dismissSelection()
+      return
+    }
     val stride = slotStride()
     if (stride <= 0) return
     val index = ((scrollY + y) / stride).toInt()
@@ -717,6 +883,8 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
   }
 
   private fun clearSelectionState() {
+    selRectsKey = null
+    selRectsCache = emptyList()
     selPage = -1
     selStartChar = -1
     selEndChar = -1
@@ -736,7 +904,7 @@ class NativeHighlightPdfView(context: Context, appContext: AppContext) : ExpoVie
       try { textPage.textPageGetText(selStartChar, length) } catch (_: Exception) { null }
     }?.trim().orEmpty()
     if (quote.isEmpty()) return null
-    val rects = lineGroupedRects(textPage, selPage, selStartChar, selEndChar)
+    val rects = selectionRectsForRange(textPage, selPage, selStartChar, selEndChar)
     if (rects.isEmpty()) return null
     val page = selPage + 1
     clearSelectionState()
