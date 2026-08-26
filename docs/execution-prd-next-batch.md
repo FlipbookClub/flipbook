@@ -225,6 +225,12 @@ Continuous:   additive-only schema · one concern per build · matrix per reader
 - Moderator broadcast messages (FB-005) — next notifications wave.
 - Club reading-goal metrics (FB-009) — v2 roadmap parking lot per founder.
 - Streak mechanics — post-catalog (v2 era).
+- **Android text-selection finesse, deferred to v2 (founder call, Aug 26).** Selection now works end to end on Android (multi-character drag, handle adjustment, tap to dismiss) and highlight bands are close to iOS but not equal to them. The gap is methodological, not a tuning oversight: PDFKit's `selectionsByLine().bounds` derives line boxes from the PDF's own font metrics (ascent/descent per line), which is what the iOS module uses. PdfiumAndroid exposes glyph boxes and `getFontSize()`, not those metrics, so the Android side approximates by unioning glyph boxes per line and growing by the median inter-line gap. Closing the last few percent means deriving real font metrics, which is v2-sized work.
+
+  Two dead ends recorded so they are not walked again:
+  - `FPDFText_CountRects`/`FPDFText_GetRect` are **not** the counterpart of `selectionsByLine()`. Measured on a real book: one selection produced 6 line bands where `CountRects` returned **261** rects, each tight to a single letterform (9.6pt vs our 13.2pt). Rendered as tinted text rather than a highlighter bar. Tried and reverted.
+  - Existing Android-made highlights keep their stored ragged rects. Only `rects` and the quote are persisted, not the character range, so there is nothing to recompute from. They need re-creating, or a migration if the volume ever justifies one.
+
 - Rich upload metadata (cover photo + synopsis) in v1 — v2 catalog carries this; only add to v1 if the Phase 4 upload-flow touch makes it trivially cheap (flag first). **Multi-genre is NOT parked — it ships in this batch as Phase 4C (founder decision, Aug 15).**
 
 ---
