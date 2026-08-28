@@ -65,7 +65,14 @@
       "expo-web-browser",
       "expo-document-picker",
       "@config-plugins/react-native-pdf",
-      "@config-plugins/react-native-blob-util"
+      "@config-plugins/react-native-blob-util",
+      [
+        "@sentry/react-native/expo",
+        {
+          "organization": "flipbook-ni",
+          "project": "react-native"
+        }
+      ]
     ],
     "extra": {
       "eas": {
