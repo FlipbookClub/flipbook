@@ -225,6 +225,10 @@ export const listMine = query({
 
 const libraryItemValidator = v.object({
   ...progressValidator.fields,
+  // NOTE: this is a hand-picked subset of the book document, so adding a
+  // field here also requires adding it to the object built in the handler
+  // below (and vice versa). They are separate declarations and nothing
+  // enforces the match.
   book: v.object({
     _id: v.id("books"),
     title: v.string(),
@@ -232,6 +236,8 @@ const libraryItemValidator = v.object({
     pdfPageCount: v.number(),
     coverImageUrl: v.optional(v.string()),
     isRemoved: v.boolean(),
+    genre: v.optional(v.string()),
+    genres: v.optional(v.array(v.string())),
   }),
   club: v.object({
     _id: v.id("clubs"),
@@ -274,6 +280,8 @@ export const listMyLibrary = query({
           pdfPageCount: book.pdfPageCount,
           coverImageUrl: book.coverImageUrl,
           isRemoved: book.isRemoved,
+          genre: book.genre,
+          genres: book.genres,
         },
         club: { _id: club._id, name: club.name },
       });
