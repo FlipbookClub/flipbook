@@ -30,8 +30,13 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# local env files
-.env*.local
+# local env files. The trailing * catches hand-made copies (.env.local.bak and
+# friends), which the bare pattern let through into `git status` as untracked.
+.env*.local*
+
+# Session scratch notes. These declare themselves untracked in their own
+# headers; ignoring them keeps `git status` honest.
+session-notes-*.md
 
 # typescript
 *.tsbuildinfo
