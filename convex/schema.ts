@@ -267,4 +267,17 @@ export default defineSchema({
   })
     .index("by_user_and_sent", ["userId", "sentAt"])
     .index("by_user_unread", ["userId", "isRead"]),
+
+  // One row per successful newsletter delivery. Without this a re-run of a
+  // campaign re-mails everyone: the first September broadcast lost 24
+  // addresses to rate limiting and the only way to retry just those was to
+  // reconcile against Resend by hand. The broadcast now skips anyone already
+  // recorded, so a retry is safe by construction rather than by remembering.
+  newsletterSends: defineTable({
+    // Stable campaign slug ("2026-09"), deliberately not the subject line, so
+    // editing the subject can't orphan the record of who already received it.
+    campaign: v.string(),
+    emailLower: v.string(),
+    sentAt: v.number(),
+  }).index("by_campaign_and_email", ["campaign", "emailLower"]),
 });

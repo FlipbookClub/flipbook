@@ -1,6 +1,10 @@
 import { v } from "convex/values";
 
-import { internalAction, internalQuery } from "./_generated/server";
+import {
+  internalAction,
+  internalMutation,
+  internalQuery,
+} from "./_generated/server";
 import { internal } from "./_generated/api";
 
 // Monthly newsletter to existing Flipbook users. Same Resend setup as the
@@ -47,6 +51,11 @@ const TEXT = "#3b3a6d"; // brand.deepIndigo.900 / text.primary
 const MUTED = "#989898"; // text.muted
 
 const SUBJECT = "A new month, a new chapter";
+
+// Identifies the campaign in `newsletterSends`. Bump this (and the copy below)
+// for next month's send; leaving it unchanged means the broadcast correctly
+// treats everyone as already-mailed and does nothing.
+const CAMPAIGN = "2026-09";
 
 const PARAGRAPHS: string[] = [
   "Hello Flipfolk,",
@@ -264,6 +273,116 @@ export const listRecipientEmails = internalAction({
   },
 });
 
+// Everyone already recorded as reached for a campaign.
+export const listSentEmails = internalQuery({
+  args: { campaign: v.string() },
+  returns: v.array(v.string()),
+  handler: async (ctx, args) => {
+    const rows = await ctx.db
+      .query("newsletterSends")
+      .withIndex("by_campaign_and_email", (q) => q.eq("campaign", args.campaign))
+      .collect();
+    return rows.map((r) => r.emailLower);
+  },
+});
+
+// Records one delivery. Idempotent: a second call for the same campaign and
+// address is a no-op rather than a duplicate row.
+export const recordSend = internalMutation({
+  args: { campaign: v.string(), email: v.string(), sentAt: v.number() },
+  returns: v.boolean(),
+  handler: async (ctx, args) => {
+    const emailLower = args.email.trim().toLowerCase();
+    const existing = await ctx.db
+      .query("newsletterSends")
+      .withIndex("by_campaign_and_email", (q) =>
+        q.eq("campaign", args.campaign).eq("emailLower", emailLower),
+      )
+      .unique();
+    if (existing) return false;
+    await ctx.db.insert("newsletterSends", {
+      campaign: args.campaign,
+      emailLower,
+      sentAt: args.sentAt,
+    });
+    return true;
+  },
+});
+
+// Every address Resend has accepted a message for under this campaign's
+// subject. Shared by the audit and the backfill below.
+async function fetchResendSeen(
+  apiKey: string,
+): Promise<{ seen: Set<string>; probe?: string }> {
+  type Row = { id: string; to?: string[] | string; subject?: string };
+  const seen = new Set<string>();
+  let after: string | undefined;
+
+  // Cursor pagination on the email id, stopping at has_more: false. Capped so
+  // a pagination bug can't spin forever.
+  for (let pages = 0; pages < 40; pages++) {
+    const url =
+      `https://api.resend.com/emails?limit=100` +
+      (after ? `&after=${encodeURIComponent(after)}` : "");
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${apiKey}` },
+    });
+    const raw = await res.text();
+    if (!res.ok) {
+      return { seen, probe: `status=${res.status} body=${raw.slice(0, 1200)}` };
+    }
+
+    const parsed = JSON.parse(raw) as { data?: Row[]; has_more?: boolean };
+    const rows = parsed.data ?? [];
+    for (const row of rows) {
+      // Scope to this campaign so welcome and invite mail doesn't count.
+      if (row.subject !== SUBJECT) continue;
+      const to = row.to;
+      const list = Array.isArray(to) ? to : to ? [to] : [];
+      for (const addr of list) seen.add(addr.trim().toLowerCase());
+    }
+
+    if (!parsed.has_more || rows.length === 0) break;
+    after = rows[rows.length - 1]?.id;
+    if (!after) break;
+  }
+  return { seen };
+}
+
+// Seeds `newsletterSends` from Resend's record. Needed once, for the September
+// campaign that shipped before the ledger existed: without it the ledger reads
+// empty and a re-run would mail all 178 people a second time.
+export const backfillFromResend = internalAction({
+  args: { campaign: v.optional(v.string()) },
+  returns: v.object({ recorded: v.number(), alreadyPresent: v.number() }),
+  handler: async (ctx, args): Promise<{
+    recorded: number;
+    alreadyPresent: number;
+  }> => {
+    const apiKey = process.env.RESEND_API_KEY;
+    if (!apiKey) throw new Error("[newsletter] RESEND_API_KEY not set.");
+    const campaign = args.campaign ?? CAMPAIGN;
+
+    const { seen, probe } = await fetchResendSeen(apiKey);
+    if (probe) throw new Error(`[newsletter] Resend list failed: ${probe}`);
+
+    let recorded = 0;
+    let alreadyPresent = 0;
+    for (const email of seen) {
+      const inserted: boolean = await ctx.runMutation(
+        internal.newsletter.recordSend,
+        { campaign, email, sentAt: Date.now() },
+      );
+      if (inserted) recorded += 1;
+      else alreadyPresent += 1;
+    }
+    console.log(
+      `[newsletter] Backfilled ${campaign}: ${recorded} recorded, ${alreadyPresent} already present.`,
+    );
+    return { recorded, alreadyPresent };
+  },
+});
+
 // Which recipients does Resend have no delivery record for? Convex only keeps
 // a rolling log window, so when a broadcast reports failures the per-address
 // error lines can age out before they're read. Resend is the durable record.
@@ -291,48 +410,14 @@ export const auditRecentSends = internalAction({
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey) throw new Error("[newsletter] RESEND_API_KEY not set.");
 
-    type Row = { id: string; to?: string[] | string; subject?: string };
-    const seen = new Set<string>();
-    let after: string | undefined;
-    let pages = 0;
-
-    // Cursor pagination on the email id, stopping at has_more: false. Capped so
-    // a pagination bug can't spin forever.
-    for (; pages < 40; pages++) {
-      const url =
-        `https://api.resend.com/emails?limit=100` +
-        (after ? `&after=${encodeURIComponent(after)}` : "");
-      const res = await fetch(url, {
-        headers: { Authorization: `Bearer ${apiKey}` },
-      });
-      const raw = await res.text();
-
-      if (args.probeOnly || !res.ok) {
-        return {
-          probe: `status=${res.status} body=${raw.slice(0, 1200)}`,
-          recipients: 0,
-          seenByResend: 0,
-          missing: [],
-        };
-      }
-
-      const parsed = JSON.parse(raw) as {
-        data?: Row[];
-        has_more?: boolean;
+    const { seen, probe } = await fetchResendSeen(apiKey);
+    if (args.probeOnly || probe) {
+      return {
+        probe: probe ?? `status=200 seen=${seen.size} for subject "${SUBJECT}"`,
+        recipients: 0,
+        seenByResend: seen.size,
+        missing: [],
       };
-      const rows = parsed.data ?? [];
-
-      for (const row of rows) {
-        // Scope to this campaign so welcome and invite mail doesn't count.
-        if (row.subject !== SUBJECT) continue;
-        const to = row.to;
-        const list = Array.isArray(to) ? to : to ? [to] : [];
-        for (const addr of list) seen.add(addr.trim().toLowerCase());
-      }
-
-      if (!parsed.has_more || rows.length === 0) break;
-      after = rows[rows.length - 1]?.id;
-      if (!after) break;
     }
 
     const { emails } = await ctx.runAction(
@@ -349,13 +434,20 @@ export const auditRecentSends = internalAction({
   },
 });
 
-// The actual broadcast. Sequential with per-address error capture, matching
-// invites.mintAndSendInvitesForEmails — the pattern that already broadcast to
-// the whole waitlist without tripping Resend's rate limit.
+// The actual broadcast. Sequential, paced, with per-address error capture.
 //
-// ALWAYS dry-run first. With dryRun: true nothing is sent; you get back the
-// recipient count and the first 20 addresses so the list can be eyeballed:
+// Re-running is safe. Every success is written to `newsletterSends`, and each
+// run skips anyone already recorded for the campaign, so the plain command is
+// also the retry command: after a partial failure it sends to exactly the
+// addresses that did not get through. Sending twice takes a deliberate
+// force: true.
+//
+// Still dry-run first. Nothing is sent, and you get the counts plus the first
+// 20 addresses to eyeball:
 //   npx convex run newsletter:broadcastMonthlyNewsletter '{"dryRun":true}'
+//
+// For next month: bump CAMPAIGN and the copy. A new campaign slug has an empty
+// ledger, so everyone is in scope again.
 //
 // `emails` overrides the Clerk lookup entirely, which is how you send to a
 // small test group before the real run.
@@ -365,12 +457,17 @@ export const broadcastMonthlyNewsletter = internalAction({
     emails: v.optional(v.array(v.string())),
     onlyAppAccounts: v.optional(v.boolean()),
     delayMs: v.optional(v.number()),
+    campaign: v.optional(v.string()),
+    // Escape hatch for a deliberate re-send. Off by default, because the
+    // whole point of the ledger is that the obvious command is the safe one.
+    force: v.optional(v.boolean()),
   },
   returns: v.object({
     dryRun: v.boolean(),
     recipients: v.number(),
     clerkTotal: v.number(),
     skippedNoAppAccount: v.number(),
+    skippedAlreadySent: v.number(),
     sample: v.array(v.string()),
     sent: v.number(),
     failed: v.array(v.string()),
@@ -380,10 +477,12 @@ export const broadcastMonthlyNewsletter = internalAction({
     recipients: number;
     clerkTotal: number;
     skippedNoAppAccount: number;
+    skippedAlreadySent: number;
     sample: string[];
     sent: number;
     failed: string[];
   }> => {
+    const campaign = args.campaign ?? CAMPAIGN;
     let clerkTotal = 0;
     let skippedNoAppAccount = 0;
     let recipients: string[];
@@ -400,18 +499,35 @@ export const broadcastMonthlyNewsletter = internalAction({
       skippedNoAppAccount = resolved.skippedNoAppAccount;
     }
 
+    // Drop anyone the ledger already has for this campaign. This is what makes
+    // a re-run safe: after a partial failure the same command retries exactly
+    // the addresses that did not get through.
+    let skippedAlreadySent = 0;
+    if (!args.force) {
+      const already = new Set(
+        await ctx.runQuery(internal.newsletter.listSentEmails, { campaign }),
+      );
+      const before = recipients.length;
+      recipients = recipients.filter(
+        (e) => !already.has(e.trim().toLowerCase()),
+      );
+      skippedAlreadySent = before - recipients.length;
+    }
+
     const sample = recipients.slice(0, 20);
 
     if (args.dryRun) {
       console.log(
-        `[newsletter] DRY RUN. ${recipients.length} recipients, nothing sent. ` +
-          `Clerk identities: ${clerkTotal}, skipped for having no app account: ${skippedNoAppAccount}.`,
+        `[newsletter] DRY RUN. ${recipients.length} to send, nothing sent. ` +
+          `Clerk identities: ${clerkTotal}, no app account: ${skippedNoAppAccount}, ` +
+          `already sent this campaign: ${skippedAlreadySent}.`,
       );
       return {
         dryRun: true,
         recipients: recipients.length,
         clerkTotal,
         skippedNoAppAccount,
+        skippedAlreadySent,
         sample,
         sent: 0,
         failed: [],
@@ -430,8 +546,18 @@ export const broadcastMonthlyNewsletter = internalAction({
           internal.newsletter.sendMonthlyNewsletter,
           { email },
         );
-        if (ok) sent += 1;
-        else failed.push(email);
+        if (ok) {
+          sent += 1;
+          // Record immediately rather than batching at the end, so a crash or
+          // timeout mid-run still leaves an accurate ledger to resume from.
+          await ctx.runMutation(internal.newsletter.recordSend, {
+            campaign,
+            email,
+            sentAt: Date.now(),
+          });
+        } else {
+          failed.push(email);
+        }
       } catch (err) {
         console.error(`[newsletter] Failed for ${email}:`, err);
         failed.push(email);
@@ -444,6 +570,7 @@ export const broadcastMonthlyNewsletter = internalAction({
       recipients: recipients.length,
       clerkTotal,
       skippedNoAppAccount,
+      skippedAlreadySent,
       sample,
       sent,
       failed,
