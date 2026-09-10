@@ -32,6 +32,7 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { ensureCachedPdf, getCachedPdfPath } from "@/lib/pdf";
+import { EpubReader } from "@/screens/reader/EpubReader";
 import { bookFileType, type BookFileType } from "@/lib/bookFile";
 import {
   PROGRESS_SYNC_INTERVAL_MS,
@@ -64,8 +65,8 @@ interface EffectiveContent {
   title: string;
   pageCount: number;
   isRemoved: boolean;
-  // P4-T1. Chapters are always PDFs; books may be either. The EPUB reader
-  // itself is P4-T5/T8, so for now this only gates the placeholder below.
+  // P4-T1. Chapters are always PDFs; books may be either. Drives the reader
+  // switch in P4-T8.
   fileType: BookFileType;
   clubName: string | null;
   // null when we only have local meta (offline) — the reader falls back to
@@ -274,6 +275,13 @@ export function ReaderScreen({ navigation, route }: Props) {
   // Set by the cache-resolution effect below once we know the storage ID.
   const [resolvedUri, setResolvedUri] = useState<string | null>(null);
   const [customizeOpen, setCustomizeOpen] = useState(false);
+  // EPUB-only. Percentage is display state; the font size persists across
+  // sessions the same way pageMode does.
+  const [epubPercent, setEpubPercent] = useState(0);
+  const [epubFontSize, setEpubFontSize] = useState<number>(() => {
+    const stored = Number(storage.getString("reader.epubFontSize"));
+    return Number.isFinite(stored) && stored >= 80 && stored <= 180 ? stored : 100;
+  });
 
   // Freeze the page we open at. `initialPage` recomputes whenever the live
   // serverProgress query updates (including right after our own syncToServer
@@ -575,6 +583,28 @@ export function ReaderScreen({ navigation, route }: Props) {
     PROGRESS_SYNC_INTERVAL_MS,
   );
 
+  // P4-T7. EPUB progress carries a CFI (precise resume) and a percentage
+  // (display). currentPage/totalPages are sent as 1/1 because the mutation
+  // requires them and reflowable text has no pages; the server knows to judge
+  // completion on percentComplete instead. Throttled on the same interval as
+  // the PDF path, since epub.js emits `relocated` on every page turn.
+  const syncEpubToServer = useThrottledCallback(
+    (cfi: string, percent: number) => {
+      if (!effective || !scopePayload) return;
+      updateProgress({
+        clubId: effective.clubId,
+        ...scopePayload,
+        currentPage: 1,
+        totalPages: 1,
+        locationCfi: cfi,
+        percentComplete: percent,
+      }).catch(() => {
+        // Best-effort, same as the PDF path.
+      });
+    },
+    PROGRESS_SYNC_INTERVAL_MS,
+  );
+
   const handlePageChanged = (page: number, total: number) => {
     if (!Number.isFinite(page) || !Number.isFinite(total)) return;
     if (page < 1 || total < 1 || page > total) return;
@@ -591,7 +621,7 @@ export function ReaderScreen({ navigation, route }: Props) {
     if (!effective || effective.isRemoved) return;
     const { storageId, pdfUrl } = effective;
     if (pdfUrl === null) {
-      const cached = getCachedPdfPath(storageId);
+      const cached = getCachedPdfPath(storageId, effective.fileType);
       if (cached) {
         setResolvedUri(cached);
       } else {
@@ -602,7 +632,7 @@ export function ReaderScreen({ navigation, route }: Props) {
       return;
     }
     let cancelled = false;
-    ensureCachedPdf(storageId, pdfUrl)
+    ensureCachedPdf(storageId, pdfUrl, effective.fileType)
       .then((path) => {
         if (!cancelled) setResolvedUri(path);
       })
@@ -738,28 +768,53 @@ export function ReaderScreen({ navigation, route }: Props) {
     );
   }
 
-  // P4-T8 replaces this with <EpubReader />. Until it lands, uploading an EPUB
-  // is possible (P4-T3) but reading one is not, and everything below this line
-  // is a PDF renderer that would be handed a zip. An honest message beats a
-  // blank page or a decode error.
+  // P4-T8. Route by file type. Deliberately a dumb switch: everything below
+  // this line is the PDF reader, which would be handed a zip otherwise.
+  //
+  // Out of scope for this batch per P4-T10: highlights, reactions and bookmarks
+  // inside EPUBs. Page-anchored reactions do not map onto reflowable text, so
+  // the reader chrome here is intentionally thinner than the PDF one.
   if (effective.fileType === "epub") {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
         <Header
           title={effective.title}
-          subtitle={effective.clubName}
+          // EPUBs have no page counter, so the percentage is the only position
+          // feedback the reader gets.
+          subtitle={
+            epubPercent > 0
+              ? `${effective.clubName ?? ""}${effective.clubName ? " · " : ""}${epubPercent}%`
+              : effective.clubName
+          }
           onClose={() => navigation.goBack()}
           onSettings={() => setCustomizeOpen(true)}
         />
-        <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center", gap: spacing.s3 }}>
-          <Text style={{ ...typography.headingMd, color: colors.textPrimary, textAlign: "center" }}>
-            EPUB reading is coming
-          </Text>
-          <Text style={{ ...typography.bodyMd, color: colors.textSecondary, textAlign: "center" }}>
-            This book uploaded fine and it's safe in your club. The reader for
-            EPUBs is on its way.
-          </Text>
-        </View>
+        {loadError ? (
+          <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center", gap: spacing.s3 }}>
+            <Text style={{ ...typography.bodyMd, color: colors.textSecondary, textAlign: "center" }}>
+              {loadError}
+            </Text>
+          </View>
+        ) : resolvedUri === null ? (
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <ActivityIndicator />
+          </View>
+        ) : (
+          <EpubReader
+            fileUri={resolvedUri}
+            // Resume from the stored CFI. Undefined (not null) so epub.js
+            // treats it as "no target" and opens at the beginning.
+            startCfi={serverProgress?.locationCfi ?? undefined}
+            fontSize={epubFontSize}
+            bg={colors.surfacePrimary}
+            fg={colors.textPrimary}
+            onRelocated={(cfi, percent) => {
+              setEpubPercent(percent);
+              syncEpubToServer(cfi, percent);
+            }}
+            onError={(message) => setLoadError(message)}
+          />
+        )}
       </SafeAreaView>
     );
   }

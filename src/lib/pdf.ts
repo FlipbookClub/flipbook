@@ -185,9 +185,9 @@ function writeIndex(entries: CacheEntry[]): void {
   storage.set(PDF_CACHE_INDEX_KEY, JSON.stringify(entries));
 }
 
-function localPathFor(storageId: string): string {
+function localPathFor(storageId: string, ext: BookFileType = "pdf"): string {
   // The storage ID is opaque but URL-safe enough to use as a filename.
-  return `${PDF_CACHE_DIR}${encodeURIComponent(storageId)}.pdf`;
+  return `${PDF_CACHE_DIR}${encodeURIComponent(storageId)}.${ext}`;
 }
 
 async function ensureCacheDir(): Promise<void> {
@@ -203,7 +203,10 @@ async function evictUntilUnder(maxBytes: number): Promise<CacheEntry[]> {
   while (total > maxBytes && entries.length > 0) {
     const oldest = entries.shift()!;
     try {
-      await deleteAsync(localPathFor(oldest.storageId), { idempotent: true });
+      // The index does not record which extension a storage id was written
+      // with, so evict both candidates; idempotent makes the miss free.
+      await deleteAsync(localPathFor(oldest.storageId, "pdf"), { idempotent: true });
+      await deleteAsync(localPathFor(oldest.storageId, "epub"), { idempotent: true });
     } catch {
       // best-effort
     }
@@ -222,9 +225,14 @@ function touchEntry(entries: CacheEntry[], storageId: string, bytes: number): Ca
 // Returns a local file URI for the given storage ID, downloading from the
 // signed URL on cache miss. After this resolves, react-native-pdf can render
 // from disk and subsequent opens are instant + offline-capable.
-export async function ensureCachedPdf(storageId: string, signedUrl: string): Promise<string> {
+export async function ensureCachedPdf(
+  storageId: string,
+  signedUrl: string,
+  // EPUBs share this cache and its LRU budget; only the extension differs.
+  ext: BookFileType = "pdf",
+): Promise<string> {
   await ensureCacheDir();
-  const localPath = localPathFor(storageId);
+  const localPath = localPathFor(storageId, ext);
   const info = await getInfoAsync(localPath);
 
   if (info.exists && !info.isDirectory) {
@@ -252,8 +260,11 @@ export async function ensureCachedPdf(storageId: string, signedUrl: string): Pro
 
 // Synchronous probe so the reader can render from cache instantly without
 // waiting for a fresh signed URL when offline.
-export function getCachedPdfPath(storageId: string): string | null {
+export function getCachedPdfPath(
+  storageId: string,
+  ext: BookFileType = "pdf",
+): string | null {
   const entries = readIndex();
   const hit = entries.find((e) => e.storageId === storageId);
-  return hit ? localPathFor(storageId) : null;
+  return hit ? localPathFor(storageId, ext) : null;
 }
