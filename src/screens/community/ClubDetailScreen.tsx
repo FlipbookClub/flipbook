@@ -25,7 +25,12 @@ import { BookOptionsSheet } from "@/components/features/BookOptionsSheet";
 import { ChapterListItem } from "@/components/features/ChapterListItem";
 import { ClubOptionsSheet } from "@/components/features/ClubOptionsSheet";
 import { MemberActionSheet } from "@/components/features/MemberActionSheet";
-import { MAX_PDF_BYTES, pickPdf, type PickedPdf } from "@/lib/pdf";
+import { MAX_PDF_BYTES, pickBookFile, type PickedPdf } from "@/lib/pdf";
+import {
+  progressPercent,
+  progressLabel,
+  progressLabelShort,
+} from "@/lib/progressDisplay";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -130,8 +135,8 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const currentProgress =
     myProgress && myProgress.totalPages > 0
       ? {
-          label: `Pg ${myProgress.currentPage} | ${myProgress.totalPages}`,
-          pct: Math.round((myProgress.currentPage / myProgress.totalPages) * 100),
+          label: progressLabelShort(myProgress),
+          pct: progressPercent(myProgress),
         }
       : undefined;
   const startedLabel = currentBook?.currentlyReadingAt
@@ -176,14 +181,14 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   ];
 
   const handleAddBook = async () => {
-    const result = await pickPdf();
+    const result = await pickBookFile();
     if (!result.ok) {
       if (result.reason === "cancelled") return;
       const message =
         result.reason === "too_large"
           ? `Books are limited to ${Math.round(MAX_PDF_BYTES / (1024 * 1024))}MB. Try a smaller file.`
           : result.reason === "not_pdf"
-            ? "That doesn't look like a PDF. Pick a .pdf file."
+            ? "That doesn't look like a book file. Pick a .pdf or .epub."
             : "Couldn't read that file. Try a different one.";
       Alert.alert("Can't upload", message);
       return;
@@ -734,10 +739,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                 </View>
                 {filteredMembers.map((m) => {
                   const p = progressByUser.get(m.userId);
-                  const pct =
-                    p && p.totalPages > 0
-                      ? Math.min(100, Math.round((p.currentPage / p.totalPages) * 100))
-                      : 0;
+                  const pct = progressPercent(p);
                   return (
                     <Pressable
                       key={m._id}
@@ -773,7 +775,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                       </View>
                       <View style={{ width: 100, gap: 4, alignItems: "flex-end" }}>
                         <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
-                          {p ? `${p.currentPage} of ${p.totalPages} pages` : "Not started"}
+                          {progressLabel(p)}
                         </Text>
                         <View style={{ height: 3, width: "100%", borderRadius: 2, backgroundColor: colors.surfaceSecondary }}>
                           <View

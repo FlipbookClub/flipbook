@@ -114,7 +114,17 @@ export default defineSchema({
     // Up to MAX_BOOK_GENRES values from the shared catalogue (convex/genres.ts).
     // Absent on rows written before multi-genre shipped.
     genres: v.optional(v.array(v.string())),
+    // P4-T1. Absent/undefined means "pdf" — that is what every legacy row is.
+    // Read through bookFileType() in src/lib/bookFile.ts rather than testing
+    // this field directly, so the legacy default lives in one place.
+    fileType: v.optional(v.union(v.literal("pdf"), v.literal("epub"))),
+    // Holds the file for BOTH types despite the name. Renaming would force a
+    // migration across every existing row and every query that reads it, which
+    // buys nothing; the name is a known wart, not an oversight.
     pdfStorageId: v.id("_storage"),
+    // For EPUBs this is the spine-item (chapter) count, not pages. Reflowable
+    // text has no fixed page count, and nothing critical reads this for EPUBs:
+    // their progress is carried by percentComplete on the progress row.
     pdfPageCount: v.number(),
     coverImageUrl: v.optional(v.string()),
     uploadedByUserId: v.id("users"),
@@ -157,6 +167,13 @@ export default defineSchema({
     // FR-018: reactions on pages beyond this are filtered out (no spoilers).
     // Monotonically non-decreasing; max(currentPage, prevFurthestPageReached).
     furthestPageReached: v.number(),
+    // P4-T4, EPUB only. A CFI is an EPUB's precise location pointer, which is
+    // what resume needs, since reflowable text has no stable page number.
+    // PDF rows never set these and keep using currentPage/totalPages.
+    locationCfi: v.optional(v.string()),
+    // 0..100, for display. The only progress figure that means anything for
+    // an EPUB, so progress bars prefer it when present.
+    percentComplete: v.optional(v.number()),
     finishedAt: v.optional(v.number()),
     updatedAt: v.number(),
   })
