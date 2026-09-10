@@ -5,6 +5,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -15,7 +16,7 @@ import {
   type HighlightRect,
   type NativeHighlightPdfViewRef,
 } from "native-highlight-pdf";
-import { Bookmark, BookmarkFilled, Pencil, Settings2, Smile, X } from "@/lib/icons";
+import { BookOpen, Bookmark, BookmarkFilled, Pencil, Settings2, Smile, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -32,7 +33,11 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { ensureCachedPdf, getCachedPdfPath } from "@/lib/pdf";
-import { EpubReader } from "@/screens/reader/EpubReader";
+import {
+  EpubReader,
+  type EpubReaderHandle,
+  type TocEntry,
+} from "@/screens/reader/EpubReader";
 import { bookFileType, type BookFileType } from "@/lib/bookFile";
 import {
   PROGRESS_SYNC_INTERVAL_MS,
@@ -278,10 +283,20 @@ export function ReaderScreen({ navigation, route }: Props) {
   // EPUB-only. Percentage is display state; the font size persists across
   // sessions the same way pageMode does.
   const [epubPercent, setEpubPercent] = useState(0);
+  const [epubToc, setEpubToc] = useState<TocEntry[]>([]);
+  const [tocOpen, setTocOpen] = useState(false);
+  const epubRef = useRef<EpubReaderHandle | null>(null);
   const [epubFontSize, setEpubFontSize] = useState<number>(() => {
     const stored = Number(storage.getString("reader.epubFontSize"));
-    return Number.isFinite(stored) && stored >= 80 && stored <= 180 ? stored : 100;
+    return Number.isFinite(stored) && stored >= EPUB_FONT_MIN && stored <= EPUB_FONT_MAX
+      ? stored
+      : EPUB_FONT_DEFAULT;
   });
+
+  const setEpubFont = useCallback((value: number) => {
+    setEpubFontSize(value);
+    storage.set("reader.epubFontSize", String(value));
+  }, []);
 
   // Freeze the page we open at. `initialPage` recomputes whenever the live
   // serverProgress query updates (including right after our own syncToServer
@@ -788,6 +803,7 @@ export function ReaderScreen({ navigation, route }: Props) {
           }
           onClose={() => navigation.goBack()}
           onSettings={() => setCustomizeOpen(true)}
+          onContents={() => setTocOpen(true)}
         />
         {loadError ? (
           <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center", gap: spacing.s3 }}>
@@ -801,6 +817,7 @@ export function ReaderScreen({ navigation, route }: Props) {
           </View>
         ) : (
           <EpubReader
+            ref={epubRef}
             fileUri={resolvedUri}
             // Resume from the stored CFI. Undefined (not null) so epub.js
             // treats it as "no target" and opens at the beginning.
@@ -812,9 +829,27 @@ export function ReaderScreen({ navigation, route }: Props) {
               setEpubPercent(percent);
               syncEpubToServer(cfi, percent);
             }}
+            onReady={setEpubToc}
             onError={(message) => setLoadError(message)}
           />
         )}
+        <TableOfContentsSheet
+          visible={tocOpen}
+          onClose={() => setTocOpen(false)}
+          toc={epubToc}
+          onSelect={(href) => epubRef.current?.gotoHref(href)}
+        />
+        <ReaderCustomizationSheet
+          visible={customizeOpen}
+          onClose={() => setCustomizeOpen(false)}
+          pageMode={pageMode}
+          onChangeMode={setReadingMode}
+          // epub.js runs paginated; there is no scroll variant to offer.
+          showPageMode={false}
+          showFontSize
+          fontSize={epubFontSize}
+          onChangeFontSize={setEpubFont}
+        />
       </SafeAreaView>
     );
   }
@@ -1068,9 +1103,20 @@ interface HeaderProps {
   settingsDisabled?: boolean;
   isBookmarked?: boolean;
   onBookmark?: () => void;
+  // P4-T6, EPUB only. Absent for PDFs, which have no table of contents.
+  onContents?: () => void;
 }
 
-function Header({ title, subtitle, onClose, onSettings, settingsDisabled, isBookmarked, onBookmark }: HeaderProps) {
+function Header({
+  title,
+  subtitle,
+  onClose,
+  onSettings,
+  settingsDisabled,
+  isBookmarked,
+  onBookmark,
+  onContents,
+}: HeaderProps) {
   const { colors } = useTheme();
   const BookmarkIcon = isBookmarked ? BookmarkFilled : Bookmark;
   return (
@@ -1108,6 +1154,16 @@ function Header({ title, subtitle, onClose, onSettings, settingsDisabled, isBook
         ) : null}
       </View>
       <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
+        {onContents ? (
+          <Pressable
+            onPress={onContents}
+            hitSlop={spacing.s3}
+            accessibilityRole="button"
+            accessibilityLabel="Table of contents"
+          >
+            <BookOpen size={22} color={colors.textPrimary} />
+          </Pressable>
+        ) : null}
         {onBookmark ? (
           <Pressable
             onPress={onBookmark}
@@ -1139,12 +1195,61 @@ function Header({ title, subtitle, onClose, onSettings, settingsDisabled, isBook
   );
 }
 
+// P4-T6. Percentages, because that is epub.js's own unit
+// (rendition.themes.fontSize). 100 is the publisher's intended size.
+const EPUB_FONT_MIN = 80;
+const EPUB_FONT_MAX = 180;
+const EPUB_FONT_STEP = 10;
+const EPUB_FONT_DEFAULT = 100;
+
+function FontStepButton({
+  label,
+  accessibilityLabel,
+  target,
+  onPress,
+}: {
+  label: string;
+  accessibilityLabel: string;
+  target: number;
+  onPress?: (value: number) => void;
+}) {
+  const { colors } = useTheme();
+  const disabled = target < EPUB_FONT_MIN || target > EPUB_FONT_MAX;
+  return (
+    <Pressable
+      onPress={() => onPress?.(target)}
+      disabled={disabled}
+      hitSlop={spacing.s2}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled }}
+      style={{
+        width: 56,
+        paddingVertical: spacing.s2,
+        alignItems: "center",
+        borderRadius: radius.pill,
+        backgroundColor: disabled ? "transparent" : colors.surfacePrimary,
+        opacity: disabled ? 0.4 : 1,
+      }}
+    >
+      <Text
+        style={{ ...typography.bodyLg, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 function ReaderCustomizationSheet({
   visible,
   onClose,
   pageMode,
   onChangeMode,
   showPageMode,
+  showFontSize,
+  fontSize = EPUB_FONT_DEFAULT,
+  onChangeFontSize,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -1153,6 +1258,11 @@ function ReaderCustomizationSheet({
   // Android is continuous-scroll only, so the control is hidden there rather
   // than shown as a toggle that does nothing.
   showPageMode: boolean;
+  // P4-T6, EPUB only. Reflowable text is the only thing we can resize; a PDF
+  // page is a fixed raster, so the control is hidden rather than inert.
+  showFontSize?: boolean;
+  fontSize?: number;
+  onChangeFontSize?: (value: number) => void;
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -1225,9 +1335,116 @@ function ReaderCustomizationSheet({
         </View>
         ) : null}
 
+        {showFontSize ? (
+          <View style={{ gap: spacing.s2 }}>
+            <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>Text size</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: colors.surfaceSecondary,
+                borderRadius: radius.pill,
+                paddingHorizontal: spacing.s2,
+                paddingVertical: 4,
+              }}
+            >
+              <FontStepButton
+                label="A-"
+                accessibilityLabel="Smaller text"
+                target={fontSize - EPUB_FONT_STEP}
+                onPress={onChangeFontSize}
+              />
+              <Text style={{ ...typography.bodyMd, color: colors.textMuted }}>{fontSize}%</Text>
+              <FontStepButton
+                label="A+"
+                accessibilityLabel="Larger text"
+                target={fontSize + EPUB_FONT_STEP}
+                onPress={onChangeFontSize}
+              />
+            </View>
+          </View>
+        ) : null}
+
         <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-          Font, line height, and page background controls are coming with Pro.
+          {showFontSize
+            ? "Line height and page background controls are coming with Pro."
+            : "Font, line height, and page background controls are coming with Pro."}
         </Text>
+      </View>
+    </Modal>
+  );
+}
+
+// P4-T6. Chapter navigation. epub.js gives a nested TOC; the runtime
+// flattens it with a depth, and depth becomes indentation here rather than a
+// collapsible tree, which is more machinery than a book contents list needs.
+function TableOfContentsSheet({
+  visible,
+  onClose,
+  toc,
+  onSelect,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  toc: TocEntry[];
+  onSelect: (href: string) => void;
+}) {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable
+        onPress={onClose}
+        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
+        accessibilityLabel="Dismiss contents"
+      />
+      <View
+        style={{
+          maxHeight: "70%",
+          backgroundColor: colors.surfacePrimary,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          paddingHorizontal: spacing.s5,
+          paddingTop: spacing.s4,
+          paddingBottom: spacing.s4 + insets.bottom,
+          gap: spacing.s3,
+        }}
+      >
+        <Text style={{ ...typography.headingMd, color: colors.textPrimary }}>Contents</Text>
+        {toc.length === 0 ? (
+          <Text style={{ ...typography.bodyMd, color: colors.textMuted }}>
+            This book doesn't list any chapters.
+          </Text>
+        ) : (
+          <ScrollView>
+            {toc.map((entry, i) => (
+              <Pressable
+                key={`${entry.href}:${i}`}
+                onPress={() => {
+                  onSelect(entry.href);
+                  onClose();
+                }}
+                accessibilityRole="button"
+                style={{
+                  paddingVertical: spacing.s3,
+                  paddingLeft: entry.depth * spacing.s4,
+                }}
+              >
+                <Text
+                  style={{
+                    ...typography.bodyMd,
+                    color: entry.depth === 0 ? colors.textPrimary : colors.textSecondary,
+                    fontFamily: entry.depth === 0 ? "Raleway-SemiBold" : undefined,
+                  }}
+                  numberOfLines={2}
+                >
+                  {entry.label || "Untitled"}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        )}
       </View>
     </Modal>
   );
