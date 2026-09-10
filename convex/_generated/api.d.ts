@@ -20,6 +20,7 @@ import type * as lib_admins from "../lib/admins.js";
 import type * as lib_emailAssets from "../lib/emailAssets.js";
 import type * as lib_inviteCode from "../lib/inviteCode.js";
 import type * as memberships from "../memberships.js";
+import type * as newsletter from "../newsletter.js";
 import type * as notifications from "../notifications.js";
 import type * as progress from "../progress.js";
 import type * as reactions from "../reactions.js";
@@ -46,6 +47,7 @@ declare const fullApi: ApiFromModules<{
   "lib/emailAssets": typeof lib_emailAssets;
   "lib/inviteCode": typeof lib_inviteCode;
   memberships: typeof memberships;
+  newsletter: typeof newsletter;
   notifications: typeof notifications;
   progress: typeof progress;
   reactions: typeof reactions;
