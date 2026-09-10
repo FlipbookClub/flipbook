@@ -143,10 +143,10 @@ Why this matters: the old design had JS and native both trying to own "what page
 
 ### 4A — Schema + upload (Convex, additive only)
 
-- [ ] **P4-T1.** `convex/schema.ts` — add to `books`: `fileType: v.optional(v.union(v.literal("pdf"), v.literal("epub")))`. **Absent/undefined ⇒ `"pdf"` (legacy rows).** The existing `pdfStorageId` field stores the file for both types (yes, the name is now imperfect — renaming would force a migration; add a schema comment instead). `pdfPageCount` stays required; for EPUBs store the spine-item count (chapter count) — it feeds nothing critical for EPUBs.
-- [ ] **P4-T2.** `convex/books.ts` `register` mutation — accept optional `fileType` arg (default `"pdf"`), validate: EPUBs pass the same 50MB cap; reject any other type. Do not change the existing argument contract — `fileType` is a new optional arg.
-- [ ] **P4-T3.** Upload UI (club book-upload flow) — accept `.epub` (MIME `application/epub+zip`) in the document picker alongside PDF; show the file type in the upload confirmation.
-- [ ] **P4-T4.** `convex/progress.ts` — additive fields on `progress` table: `locationCfi: v.optional(v.string())` and `percentComplete: v.optional(v.number())`. EPUB progress = CFI (precise resume) + percentage (display). PDF rows keep using `currentPage`/`totalPages` untouched. `progress.update` accepts the new optional args; club progress bars display `percentComplete` when present, else `currentPage/totalPages`.
+- [x] **P4-T1.** `convex/schema.ts` — add to `books`: `fileType: v.optional(v.union(v.literal("pdf"), v.literal("epub")))`. **Absent/undefined ⇒ `"pdf"` (legacy rows).** The existing `pdfStorageId` field stores the file for both types (yes, the name is now imperfect — renaming would force a migration; add a schema comment instead). `pdfPageCount` stays required; for EPUBs store the spine-item count (chapter count) — it feeds nothing critical for EPUBs.
+- [x] **P4-T2.** `convex/books.ts` `register` mutation — accept optional `fileType` arg (default `"pdf"`), validate: EPUBs pass the same 50MB cap; reject any other type. Do not change the existing argument contract — `fileType` is a new optional arg.
+- [x] **P4-T3.** Upload UI (club book-upload flow) — accept `.epub` (MIME `application/epub+zip`) in the document picker alongside PDF; show the file type in the upload confirmation.
+- [x] **P4-T4.** `convex/progress.ts` — additive fields on `progress` table: `locationCfi: v.optional(v.string())` and `percentComplete: v.optional(v.number())`. EPUB progress = CFI (precise resume) + percentage (display). PDF rows keep using `currentPage`/`totalPages` untouched. `progress.update` accepts the new optional args; club progress bars display `percentComplete` when present, else `currentPage/totalPages`.
 
 ### 4B — EPUB reader (cross-platform, WebView-based)
 

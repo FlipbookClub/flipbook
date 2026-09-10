@@ -32,6 +32,7 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { ensureCachedPdf, getCachedPdfPath } from "@/lib/pdf";
+import { bookFileType, type BookFileType } from "@/lib/bookFile";
 import {
   PROGRESS_SYNC_INTERVAL_MS,
   readCachedProgress,
@@ -63,6 +64,9 @@ interface EffectiveContent {
   title: string;
   pageCount: number;
   isRemoved: boolean;
+  // P4-T1. Chapters are always PDFs; books may be either. The EPUB reader
+  // itself is P4-T5/T8, so for now this only gates the placeholder below.
+  fileType: BookFileType;
   clubName: string | null;
   // null when we only have local meta (offline) — the reader falls back to
   // a previously-cached disk file or surfaces "not downloaded yet".
@@ -160,6 +164,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         title: localMeta.title,
         pageCount: localMeta.pageCount,
         isRemoved: localMeta.isRemoved,
+        fileType: "pdf",
         clubName: localMeta.clubName,
         pdfUrl: null,
       };
@@ -175,6 +180,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         title: bookData.book.title,
         pageCount: bookData.book.pdfPageCount,
         isRemoved: bookData.book.isRemoved,
+        fileType: bookFileType(bookData.book),
         clubName: club?.name ?? localMeta?.clubName ?? null,
         pdfUrl: bookData.pdfUrl,
       };
@@ -189,6 +195,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         title: `Ch. ${chapterData.chapter.chapterNumber} — ${chapterData.chapter.title}`,
         pageCount: chapterData.chapter.pdfPageCount,
         isRemoved: false,
+        fileType: "pdf",
         clubName: club?.name ?? localMeta?.clubName ?? null,
         pdfUrl: chapterData.pdfUrl,
       };
@@ -725,6 +732,32 @@ export function ReaderScreen({ navigation, route }: Props) {
           </Text>
           <Text style={{ ...typography.bodyMd, color: colors.textSecondary, textAlign: "center" }}>
             Reach out to the moderator for context.
+          </Text>
+        </View>
+      </SafeAreaView>
+    );
+  }
+
+  // P4-T8 replaces this with <EpubReader />. Until it lands, uploading an EPUB
+  // is possible (P4-T3) but reading one is not, and everything below this line
+  // is a PDF renderer that would be handed a zip. An honest message beats a
+  // blank page or a decode error.
+  if (effective.fileType === "epub") {
+    return (
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
+        <Header
+          title={effective.title}
+          subtitle={effective.clubName}
+          onClose={() => navigation.goBack()}
+          onSettings={() => setCustomizeOpen(true)}
+        />
+        <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center", gap: spacing.s3 }}>
+          <Text style={{ ...typography.headingMd, color: colors.textPrimary, textAlign: "center" }}>
+            EPUB reading is coming
+          </Text>
+          <Text style={{ ...typography.bodyMd, color: colors.textSecondary, textAlign: "center" }}>
+            This book uploaded fine and it's safe in your club. The reader for
+            EPUBs is on its way.
           </Text>
         </View>
       </SafeAreaView>
