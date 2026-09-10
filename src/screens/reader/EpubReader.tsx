@@ -77,6 +77,31 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
   const runtimeReadyRef = useRef(false);
   const openedRef = useRef(false);
 
+  const send = useCallback((msg: Record<string, unknown>) => {
+    const json = JSON.stringify(msg);
+    webRef.current?.injectJavaScript(
+      `window.__epubBridge && window.__epubBridge.handle(${json}); true;`,
+    );
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getEpubReaderHtmlUri()
+      .then((uri) => {
+        if (!cancelled) setHtmlUri(uri);
+      })
+      .catch((e) => onError?.(`reader html: ${String(e)}`));
+    return () => {
+      cancelled = true;
+    };
+  }, [onError]);
+
+  const sendRef = useRef(send);
+  sendRef.current = send;
+
+  // NB: declared after sendRef on purpose. The gesture closure captures
+  // its variables when this memo runs, so building it above the ref
+  // captured `undefined` and every swipe threw at onEnd.
   // Page turns are driven from here, not from inside the WebView. The
   // instrumented device run showed gesture listeners attaching successfully to
   // each section's iframe document and then never receiving a single
@@ -114,27 +139,6 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
     [],
   );
 
-  const send = useCallback((msg: Record<string, unknown>) => {
-    const json = JSON.stringify(msg);
-    webRef.current?.injectJavaScript(
-      `window.__epubBridge && window.__epubBridge.handle(${json}); true;`,
-    );
-  }, []);
-
-  useEffect(() => {
-    let cancelled = false;
-    getEpubReaderHtmlUri()
-      .then((uri) => {
-        if (!cancelled) setHtmlUri(uri);
-      })
-      .catch((e) => onError?.(`reader html: ${String(e)}`));
-    return () => {
-      cancelled = true;
-    };
-  }, [onError]);
-
-  const sendRef = useRef(send);
-  sendRef.current = send;
 
   useImperativeHandle(ref, () => ({
     next: () => send({ type: "next" }),
