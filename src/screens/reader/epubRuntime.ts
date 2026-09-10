@@ -84,6 +84,16 @@ export const EPUB_RUNTIME = String.raw`
 
     var sx = 0, sy = 0, st = 0, tracking = false;
 
+    ["pointerdown", "mousedown", "click"].forEach(function (name) {
+      doc.addEventListener(
+        name,
+        function () {
+          debug("evt:" + name, label);
+        },
+        { passive: true, capture: true }
+      );
+    });
+
     doc.addEventListener(
       "touchstart",
       function (e) {
@@ -249,9 +259,11 @@ export const EPUB_RUNTIME = String.raw`
         if (!rendition) return;
         switch (msg.type) {
           case "next":
+            debug("cmd:next");
             rendition.next();
             break;
           case "prev":
+            debug("cmd:prev");
             rendition.prev();
             break;
           case "gotoHref":

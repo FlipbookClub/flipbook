@@ -3,6 +3,7 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
@@ -76,6 +77,32 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
   const runtimeReadyRef = useRef(false);
   const openedRef = useRef(false);
 
+  // Page turns are driven from here, not from inside the WebView. The
+  // instrumented device run showed gesture listeners attaching successfully to
+  // each section's iframe document and then never receiving a single
+  // touchstart: the touches are consumed before the web content sees them, and
+  // Gesture.Native() did not release them. Rather than keep guessing at
+  // WKWebView touch delivery, RNGH recognises the swipe (which it plainly can,
+  // since it is what was swallowing them) and drives epub.js over the bridge
+  // that the table of contents already proves works.
+  //
+  // activeOffsetX means the pan only claims the gesture after real horizontal
+  // movement, so taps and long-presses still reach the page; failOffsetY lets a
+  // vertical drag out, for content that scrolls inside its own section.
+  const swipe = useMemo(
+    () =>
+      Gesture.Pan()
+        .activeOffsetX([-20, 20])
+        .failOffsetY([-24, 24])
+        .runOnJS(true)
+        .onEnd((e) => {
+          if (Math.abs(e.translationX) < 40) return;
+          if (e.translationX < 0) sendRef.current({ type: "next" });
+          else sendRef.current({ type: "prev" });
+        }),
+    [],
+  );
+
   const send = useCallback((msg: Record<string, unknown>) => {
     const json = JSON.stringify(msg);
     webRef.current?.injectJavaScript(
@@ -94,6 +121,9 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
       cancelled = true;
     };
   }, [onError]);
+
+  const sendRef = useRef(send);
+  sendRef.current = send;
 
   useImperativeHandle(ref, () => ({
     next: () => send({ type: "next" }),
@@ -186,7 +216,7 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
         // before the page ever sees them. Gesture.Native() makes it stand down.
         // This is the same fault that broke PDFKit's long-press selection in
         // Phase 2; see feedback on RNGH root arbitration.
-        <GestureDetector gesture={Gesture.Native()}>
+        <GestureDetector gesture={swipe}>
         <WebView
           ref={webRef}
           source={{ uri: htmlUri }}
