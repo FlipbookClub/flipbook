@@ -22,6 +22,7 @@ import { typography } from "@/theme/typography";
 
 import type { LibraryStackParamList } from "@/navigation/LibraryStack";
 import { api } from "../../../convex/_generated/api";
+import { progressPercent, progressLabel } from "@/lib/progressDisplay";
 import { bookGenres } from "@/lib/genres";
 
 type Props = NativeStackScreenProps<LibraryStackParamList, "LibraryHome">;
@@ -156,7 +157,7 @@ export function LibraryScreen({ navigation }: Props) {
           />
         ) : (
           visible.map((item) => {
-            const pct = Math.round((item.currentPage / item.totalPages) * 100);
+            const pct = progressPercent(item);
             return (
               <BookListCard
                 key={item._id}
@@ -169,7 +170,7 @@ export function LibraryScreen({ navigation }: Props) {
                 progress={
                   item.finishedAt
                     ? undefined
-                    : { label: `Page ${item.currentPage} of ${item.totalPages}`, pct }
+                    : { label: progressLabel(item), pct }
                 }
                 genres={bookGenres(item.book)}
                 onOpen={() => navigation.navigate("Reader", { bookId: item.book._id })}

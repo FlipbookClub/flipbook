@@ -22,6 +22,7 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { uploadBinary, uploadPdf, type PickedPdf } from "@/lib/pdf";
+import { fileTypeLabel } from "@/lib/bookFile";
 
 // react-native-view-shot is a native module added after the current dev-client
 // binary was built — so we load it lazily and tolerate its absence. On an old
@@ -55,6 +56,11 @@ interface Props {
   onUploaded: (bookId: Id<"books">) => void;
 }
 
+// pdfPageCount is required by the books schema and carries no meaning for
+// reflowable text. 1 keeps it past the server's `<= 0` guard without implying
+// a real length; percentComplete on the progress row is the figure that counts.
+const EPUB_PLACEHOLDER_PAGE_COUNT = 1;
+
 type Stage = "metadata" | "uploading" | "registering";
 
 export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: Props) {
@@ -66,6 +72,8 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
   const insets = useSafeAreaInsets();
   const generateUploadUrl = useMutation(api.books.generateUploadUrl);
   const registerBook = useMutation(api.books.register);
+
+  const isEpubFile = file?.fileType === "epub";
 
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
@@ -98,16 +106,30 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
   // taps in the common "I already named the file what I want" case.
   useEffect(() => {
     if (file && !title) {
-      setTitle(file.name.replace(/\.pdf$/i, "").slice(0, 200));
+      setTitle(file.name.replace(/\.(pdf|epub)$/i, "").slice(0, 200));
     }
   }, [file, title]);
+
+  // P4-T3. EPUBs skip inspection entirely: both page-count paths are PDF
+  // readers (inspectPdf on iOS, the off-screen <Pdf> on Android) and neither
+  // can open a zip. pdfPageCount is required by the schema but means nothing
+  // for reflowable text, so it is pinned to the placeholder below and real
+  // EPUB progress rides on percentComplete instead. No cover either: the first
+  // spine item is not a cover image, and extracting one needs the EPUB parser
+  // that only arrives with the reader in 4B.
+  useEffect(() => {
+    if (!file || !isEpubFile) return;
+    setPageCount(EPUB_PLACEHOLDER_PAGE_COUNT);
+    setPageDetectionError(null);
+    setCoverUri(null);
+  }, [file, isEpubFile]);
 
   // iOS: page count + cover thumbnail via the native-highlight-pdf module's
   // inspectPdf() — opens the picked file directly, no off-screen render
   // needed. Android keeps the off-screen <Pdf singlePage> +
   // react-native-view-shot path below unchanged.
   useEffect(() => {
-    if (!file || Platform.OS !== "ios") return;
+    if (!file || isEpubFile || Platform.OS !== "ios") return;
     setPageCount(null);
     setPageDetectionError(null);
     setCoverUri(null);
@@ -158,6 +180,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
         title: title.trim(),
         author: author.trim(),
         genres,
+        fileType: file.fileType,
         pdfStorageId: storageId as Id<"_storage">,
         pdfPageCount: pageCount,
         fileSize: file.size,
@@ -200,7 +223,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
       ? `Uploading… ${Math.round(progress * 100)}%`
       : stage === "registering"
         ? "Finalizing…"
-        : pageCount == null && !pageDetectionError
+        : !isEpubFile && pageCount == null && !pageDetectionError
           ? "Reading PDF…"
           : "Add book";
 
@@ -257,8 +280,12 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
             {file.name}
           </Text>
           <Text style={{ ...typography.uiLabelMd, color: colors.textMuted }}>
+            {fileTypeLabel(file.fileType)}
+            {" · "}
             {(file.size / (1024 * 1024)).toFixed(1)} MB
-            {pageCount !== null ? ` · ${pageCount} pages` : ""}
+            {/* Page count is a PDF fact. For an EPUB it is the placeholder,
+                so showing it would just be a lie that reads "1 pages". */}
+            {!isEpubFile && pageCount !== null ? ` · ${pageCount} pages` : ""}
           </Text>
         </View>
 
@@ -314,7 +341,7 @@ export function BookUploadSheet({ visible, clubId, file, onClose, onUploaded }: 
           capture the first page as a cover thumbnail. Rendered at a real size
           far off-screen (not opacity:0 — view-shot can't capture invisible
           views) so the user never sees it. */}
-      {Platform.OS === "android" ? (
+      {Platform.OS === "android" && !isEpubFile ? (
         <View
           ref={coverViewRef}
           collapsable={false}

@@ -11,6 +11,7 @@ import {
 } from "expo-file-system/legacy";
 
 import { storage } from "./storage";
+import type { BookFileType } from "./bookFile";
 
 // FR-010: 50MB cap, mirrored server-side in convex/books.ts.
 export const MAX_PDF_BYTES = 50 * 1024 * 1024;
@@ -26,20 +27,40 @@ interface CacheEntry {
   lastAccessAt: number;
 }
 
+export const EPUB_MIME = "application/epub+zip";
+
 export interface PickedPdf {
   uri: string;
   name: string;
   mimeType: string | null;
   size: number;
+  // P4-T3. "pdf" for everything picked through pickPdf(), so the chapter flow
+  // and every existing consumer read exactly as before.
+  fileType: BookFileType;
 }
 
 export type PickPdfResult =
   | { ok: true; file: PickedPdf }
   | { ok: false; reason: "cancelled" | "too_large" | "not_pdf" | "no_size" };
 
-export async function pickPdf(): Promise<PickPdfResult> {
+// Some Android providers hand back a null mimeType, so the extension is the
+// fallback rather than grounds for rejection.
+function detectType(
+  name: string,
+  mimeType: string | null,
+): BookFileType | null {
+  const lower = name.toLowerCase();
+  if (mimeType === "application/pdf" || lower.endsWith(".pdf")) return "pdf";
+  if (mimeType === EPUB_MIME || lower.endsWith(".epub")) return "epub";
+  return null;
+}
+
+async function pickDocument(
+  accept: string[],
+  allowed: BookFileType[],
+): Promise<PickPdfResult> {
   const result = await DocumentPicker.getDocumentAsync({
-    type: "application/pdf",
+    type: accept,
     copyToCacheDirectory: true,
     multiple: false,
   });
@@ -48,13 +69,12 @@ export async function pickPdf(): Promise<PickPdfResult> {
   }
   const asset = result.assets[0];
   const mimeType = asset.mimeType ?? null;
-  // Some Android devices return mimeType as null for PDFs picked from certain
-  // providers — fall back to the .pdf extension check rather than rejecting.
-  const looksLikePdf =
-    mimeType === "application/pdf" ||
-    asset.name.toLowerCase().endsWith(".pdf");
-  if (!looksLikePdf) return { ok: false, reason: "not_pdf" };
+  const fileType = detectType(asset.name, mimeType);
+  if (!fileType || !allowed.includes(fileType)) {
+    return { ok: false, reason: "not_pdf" };
+  }
   if (asset.size == null) return { ok: false, reason: "no_size" };
+  // EPUBs pass the same 50MB cap; the limit is on bytes, not format.
   if (asset.size > MAX_PDF_BYTES) return { ok: false, reason: "too_large" };
   return {
     ok: true,
@@ -63,8 +83,20 @@ export async function pickPdf(): Promise<PickPdfResult> {
       name: asset.name,
       mimeType,
       size: asset.size,
+      fileType,
     },
   };
+}
+
+// PDF only. Chapters are still PDF-only (the chapters table and the chapter
+// reader both assume pages), so this stays exactly as narrow as it was.
+export async function pickPdf(): Promise<PickPdfResult> {
+  return pickDocument(["application/pdf"], ["pdf"]);
+}
+
+// P4-T3. Books accept either format.
+export async function pickBookFile(): Promise<PickPdfResult> {
+  return pickDocument(["application/pdf", EPUB_MIME], ["pdf", "epub"]);
 }
 
 export interface UploadResult {
@@ -86,7 +118,13 @@ export async function uploadPdf(
     {
       httpMethod: "POST",
       uploadType: FileSystemUploadType.BINARY_CONTENT,
-      headers: { "Content-Type": file.mimeType ?? "application/pdf" },
+      // Android providers can hand back a null mimeType, so fall back to the
+      // detected type rather than blanket-labelling everything a PDF.
+      headers: {
+        "Content-Type":
+          file.mimeType ??
+          (file.fileType === "epub" ? EPUB_MIME : "application/pdf"),
+      },
     },
     onProgress
       ? (data) => {

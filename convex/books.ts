@@ -23,6 +23,7 @@ const bookValidator = v.object({
   // and breaks every query that returns a book — for the whole club, not just
   // the one row.
   genres: v.optional(v.array(v.string())),
+  fileType: v.optional(v.union(v.literal("pdf"), v.literal("epub"))),
   pdfStorageId: v.id("_storage"),
   pdfPageCount: v.number(),
   coverImageUrl: v.optional(v.string()),
@@ -109,6 +110,9 @@ export const register = mutation({
     genre: v.optional(v.string()),
     // Up to MAX_BOOK_GENRES. Takes precedence over `genre` when both arrive.
     genres: v.optional(v.array(v.string())),
+    // P4-T2. New optional arg; omitted means "pdf", so every existing caller
+    // keeps working untouched.
+    fileType: v.optional(v.union(v.literal("pdf"), v.literal("epub"))),
     pdfStorageId: v.id("_storage"),
     pdfPageCount: v.number(),
     fileSize: v.number(),
@@ -136,6 +140,10 @@ export const register = mutation({
     if (args.fileSize <= 0 || args.fileSize > MAX_FILE_SIZE) {
       throw new ConvexError({ code: "file_too_large", max: MAX_FILE_SIZE });
     }
+    // EPUBs pass the same 50MB cap as PDFs (checked above, the limit is on
+    // bytes and does not care about format). The union validator already
+    // rejects anything that is neither, so this only pins the default.
+    const fileType = args.fileType ?? "pdf";
 
     // Verify the storage object actually exists — guards against a client
     // registering a stale or bogus storage ID after a failed upload.
@@ -166,6 +174,7 @@ export const register = mutation({
       author,
       genre,
       genres,
+      fileType,
       pdfStorageId: args.pdfStorageId,
       pdfPageCount: args.pdfPageCount,
       coverImageUrl,
