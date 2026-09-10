@@ -170,7 +170,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         title: localMeta.title,
         pageCount: localMeta.pageCount,
         isRemoved: localMeta.isRemoved,
-        fileType: "pdf",
+        fileType: bookFileType(localMeta),
         clubName: localMeta.clubName,
         pdfUrl: null,
       };
@@ -232,6 +232,7 @@ export function ReaderScreen({ navigation, route }: Props) {
       title: effective.title,
       pageCount: effective.pageCount,
       isRemoved: effective.isRemoved,
+      fileType: effective.fileType,
       updatedAt: Date.now(),
     });
   }, [effective, contentId]);
@@ -631,6 +632,15 @@ export function ReaderScreen({ navigation, route }: Props) {
     syncToServer(page, total);
   };
 
+  // A book cached before EPUB support has meta with no fileType, so it
+  // hydrates as "pdf" one last time before the server rewrites it. That brief
+  // wrong guess can already have set the PDF reader's load error, which is
+  // sticky. Clear it the moment the type resolves to epub; the EPUB reader
+  // sets its own errors later, after mount, so they are not affected.
+  useEffect(() => {
+    if (effective?.fileType === "epub") setLoadError(null);
+  }, [effective?.fileType]);
+
   // Resolve PDF source — cached file when available, fresh signed URL on miss.
   useEffect(() => {
     if (!effective || effective.isRemoved) return;
@@ -667,6 +677,11 @@ export function ReaderScreen({ navigation, route }: Props) {
   // initial jump in one native call.
   useEffect(() => {
     if (!useNativeHighlightReader) return;
+    // Never hand an EPUB to the PDF reader. The type can be briefly wrong
+    // while the offline meta cache hydrates ahead of the server, and
+    // openDocument() on a zip throws into the catch below, which sets a
+    // sticky load error that survives the server correcting the type.
+    if (effective?.fileType === "epub") return;
     if (!pdfRef.current || !resolvedUri || initialPage === null) return;
     // Identity of "this document, open on this view instance". A new native
     // instance (generation bump) re-opens even for the same URI.
@@ -691,7 +706,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         openedKeyRef.current = null;
       }
     })();
-  }, [useNativeHighlightReader, viewGeneration, resolvedUri, initialPage, syncToServer]);
+  }, [useNativeHighlightReader, effective?.fileType, viewGeneration, resolvedUri, initialPage, syncToServer]);
 
   // Incrementally paints/removes highlight annotations as the live
   // `listHighlights` query changes, diffed against what's already painted

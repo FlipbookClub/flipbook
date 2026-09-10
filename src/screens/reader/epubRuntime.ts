@@ -59,6 +59,57 @@ export const EPUB_RUNTIME = String.raw`
     return 0;
   }
 
+  // epub.js paginates with CSS columns inside a per-section iframe and ships
+  // next()/prev() but NO touch navigation, so without this the only way to
+  // turn a page is the table of contents. Listeners must go on each section's
+  // own document: touches inside the iframe never reach the outer one.
+  var SWIPE_MIN_PX = 40;
+  var SWIPE_MAX_MS = 800;
+
+  function attachGestures(doc) {
+    if (!doc || doc.__flipbookGestures) return;
+    doc.__flipbookGestures = true;
+
+    var sx = 0, sy = 0, st = 0, tracking = false;
+
+    doc.addEventListener(
+      "touchstart",
+      function (e) {
+        if (!e.changedTouches || !e.changedTouches.length) return;
+        var t = e.changedTouches[0];
+        sx = t.clientX;
+        sy = t.clientY;
+        st = Date.now();
+        tracking = true;
+      },
+      { passive: true }
+    );
+
+    doc.addEventListener(
+      "touchend",
+      function (e) {
+        if (!tracking || !e.changedTouches || !e.changedTouches.length) return;
+        tracking = false;
+        var t = e.changedTouches[0];
+        var dx = t.clientX - sx;
+        var dy = t.clientY - sy;
+        // A slow drag is a text selection, not a page turn.
+        if (Date.now() - st > SWIPE_MAX_MS) return;
+        if (Math.abs(dx) < SWIPE_MIN_PX) return;
+        // Require the gesture to be decisively horizontal, so scrolling a long
+        // image or table does not flip the page out from under the reader.
+        if (Math.abs(dx) < Math.abs(dy) * 1.5) return;
+        try {
+          if (dx < 0) rendition.next();
+          else rendition.prev();
+        } catch (err) {
+          fail("swipe", err);
+        }
+      },
+      { passive: true }
+    );
+  }
+
   function applyTheme(bg, fg) {
     if (!rendition) return;
     try {
@@ -103,6 +154,17 @@ export const EPUB_RUNTIME = String.raw`
 
     rendition.themes.fontSize(cfg.fontSize + "%");
     applyTheme(cfg.bg, cfg.fg);
+
+    // Every section gets its own iframe document as it renders.
+    try {
+      rendition.hooks.content.register(function (contents) {
+        attachGestures(contents.document);
+      });
+    } catch (e) {
+      fail("gestureHook", e);
+    }
+    // The margins around the iframe belong to the outer document.
+    attachGestures(document);
 
     rendition.on("relocated", function (location) {
       if (!location || !location.start) return;
