@@ -9,7 +9,8 @@ import { typography } from "@/theme/typography";
 interface Props {
   title: string;
   author: string;
-  pageCount: number;
+  /** PDF page count. Null for EPUBs, where there is no page count to show. */
+  pageCount: number | null;
   coverUrl?: string;
   onOpen: () => void;
   /** Renders the ⋮ options affordance when provided. */
@@ -125,9 +126,11 @@ export function BookListCard({
           >
             {author}
           </Text>
-          <Text style={{ ...typography.bodySm, color: colors.textMuted, flexShrink: 0 }}>
-            {pageCount} pages
-          </Text>
+          {pageCount !== null ? (
+            <Text style={{ ...typography.bodySm, color: colors.textMuted, flexShrink: 0 }}>
+              {pageCount} pages
+            </Text>
+          ) : null}
         </View>
 
         {genres && genres.length > 0 ? (
@@ -168,7 +171,10 @@ export function BookListCard({
               />
             </View>
             <Text style={{ ...typography.bodySm, color: colors.textSecondary }}>
-              {progress.label} <Text style={{ color: colors.textAccent }}>{progress.pct}%</Text>
+              {/* EPUBs have no page label, and the card supplies the percentage
+                  itself — rendering both gave "9% 9%". */}
+              {progress.label ? `${progress.label} ` : ""}
+              <Text style={{ color: colors.textAccent }}>{progress.pct}%</Text>
             </Text>
           </View>
         ) : null}

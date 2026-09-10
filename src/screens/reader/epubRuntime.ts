@@ -31,6 +31,10 @@ export const EPUB_RUNTIME = String.raw`
     }
   }
 
+  function debug(tag, detail) {
+    post({ type: "debug", tag: tag, detail: detail === undefined ? null : String(detail) });
+  }
+
   function fail(where, err) {
     post({
       type: "error",
@@ -66,9 +70,17 @@ export const EPUB_RUNTIME = String.raw`
   var SWIPE_MIN_PX = 40;
   var SWIPE_MAX_MS = 800;
 
-  function attachGestures(doc) {
-    if (!doc || doc.__flipbookGestures) return;
+  function attachGestures(doc, label) {
+    if (!doc) {
+      debug("attach:no-document", label);
+      return;
+    }
+    if (doc.__flipbookGestures) {
+      debug("attach:already", label);
+      return;
+    }
     doc.__flipbookGestures = true;
+    debug("attach:ok", label);
 
     var sx = 0, sy = 0, st = 0, tracking = false;
 
@@ -81,6 +93,7 @@ export const EPUB_RUNTIME = String.raw`
         sy = t.clientY;
         st = Date.now();
         tracking = true;
+        debug("touchstart", label + " x=" + Math.round(sx));
       },
       { passive: true }
     );
@@ -158,13 +171,14 @@ export const EPUB_RUNTIME = String.raw`
     // Every section gets its own iframe document as it renders.
     try {
       rendition.hooks.content.register(function (contents) {
-        attachGestures(contents.document);
+        attachGestures(contents.document, "section");
       });
+      debug("gestureHook:registered");
     } catch (e) {
       fail("gestureHook", e);
     }
     // The margins around the iframe belong to the outer document.
-    attachGestures(document);
+    attachGestures(document, "outer");
 
     rendition.on("relocated", function (location) {
       if (!location || !location.start) return;

@@ -287,6 +287,9 @@ export function ReaderScreen({ navigation, route }: Props) {
   const [epubToc, setEpubToc] = useState<TocEntry[]>([]);
   const [tocOpen, setTocOpen] = useState(false);
   const epubRef = useRef<EpubReaderHandle | null>(null);
+  const epubCachedCfiRef = useRef<string | null>(
+    contentId ? (readCachedProgress(contentId)?.locationCfi ?? null) : null,
+  );
   const [epubFontSize, setEpubFontSize] = useState<number>(() => {
     const stored = Number(storage.getString("reader.epubFontSize"));
     return Number.isFinite(stored) && stored >= EPUB_FONT_MIN && stored <= EPUB_FONT_MAX
@@ -632,6 +635,24 @@ export function ReaderScreen({ navigation, route }: Props) {
     syncToServer(page, total);
   };
 
+  // P4-T7, and the Phase 1 lesson again. EpubReader sends `open` exactly once,
+  // when its runtime announces itself, using whatever startCfi it holds at that
+  // moment. If the progress query has not resolved by then the book opens at
+  // the beginning and the resume is silently lost — the same shape as the
+  // build-10 regression. So resolve the target FIRST and gate the mount on it.
+  //
+  // undefined = still deciding. null = decided, start at the beginning.
+  const epubStartCfi = useMemo<string | null | undefined>(() => {
+    if (effective?.fileType !== "epub") return null;
+    if (serverProgress !== undefined) {
+      return serverProgress?.locationCfi ?? epubCachedCfiRef.current ?? null;
+    }
+    // Offline the query never resolves, so fall back to the local cache rather
+    // than spinning forever.
+    if (effective.pdfUrl === null) return epubCachedCfiRef.current ?? null;
+    return undefined;
+  }, [effective?.fileType, effective?.pdfUrl, serverProgress]);
+
   // A book cached before EPUB support has meta with no fileType, so it
   // hydrates as "pdf" one last time before the server rewrites it. That brief
   // wrong guess can already have set the PDF reader's load error, which is
@@ -826,7 +847,7 @@ export function ReaderScreen({ navigation, route }: Props) {
               {loadError}
             </Text>
           </View>
-        ) : resolvedUri === null ? (
+        ) : resolvedUri === null || epubStartCfi === undefined ? (
           <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
             <ActivityIndicator />
           </View>
@@ -834,14 +855,24 @@ export function ReaderScreen({ navigation, route }: Props) {
           <EpubReader
             ref={epubRef}
             fileUri={resolvedUri}
-            // Resume from the stored CFI. Undefined (not null) so epub.js
-            // treats it as "no target" and opens at the beginning.
-            startCfi={serverProgress?.locationCfi ?? undefined}
+            // Resolved before mount (see epubStartCfi). undefined, not null, so
+            // epub.js reads it as "no target" and opens at the beginning.
+            startCfi={epubStartCfi ?? undefined}
             fontSize={epubFontSize}
             bg={colors.surfacePrimary}
             fg={colors.textPrimary}
             onRelocated={(cfi, percent) => {
               setEpubPercent(percent);
+              if (contentId) {
+                writeCachedProgress({
+                  bookId: contentId,
+                  page: 1,
+                  totalPages: 1,
+                  locationCfi: cfi,
+                  percentComplete: percent,
+                  updatedAt: Date.now(),
+                });
+              }
               syncEpubToServer(cfi, percent);
             }}
             onReady={setEpubToc}

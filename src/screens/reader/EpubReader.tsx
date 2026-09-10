@@ -7,6 +7,7 @@ import {
   useState,
 } from "react";
 import { ActivityIndicator, Text, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 
 import { EPUB_READER_DIR, getEpubReaderHtmlUri } from "./epubReaderHtml";
 
@@ -60,6 +61,7 @@ type Incoming =
   | { type: "locationsReady"; total: number }
   | { type: "relocated"; cfi: string; percent: number; atStart: boolean; atEnd: boolean }
   | { type: "tap" }
+  | { type: "debug"; tag: string; detail?: string }
   | { type: "error"; where: string; message: string };
 
 export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReader(
@@ -145,6 +147,15 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
         case "tap":
           onTap?.();
           break;
+        case "debug":
+          // Surfaces in Metro. The swipe path is hard to reason about from a
+          // screenshot: this says whether the gesture hook registered, whether
+          // listeners landed on the section iframe, and what each touch
+          // measured. Dev-only so it never ships noise to users.
+          if (__DEV__) {
+            console.log(`[epub] ${msg.tag}${msg.detail ? ` ${msg.detail}` : ""}`);
+          }
+          break;
         case "error":
           onError?.(`${msg.where}: ${msg.message}`);
           break;
@@ -170,6 +181,12 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
   return (
     <View style={{ flex: 1, backgroundColor: bg }}>
       {htmlUri ? (
+        // GestureHandlerRootView wraps the whole app (App.tsx), so RNGH's root
+        // recognizer sits above this web view and arbitrates its touches away
+        // before the page ever sees them. Gesture.Native() makes it stand down.
+        // This is the same fault that broke PDFKit's long-press selection in
+        // Phase 2; see feedback on RNGH root arbitration.
+        <GestureDetector gesture={Gesture.Native()}>
         <WebView
           ref={webRef}
           source={{ uri: htmlUri }}
@@ -191,6 +208,7 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
           style={{ flex: 1, backgroundColor: bg }}
           onError={() => onError?.("webview failed to load the reader")}
         />
+        </GestureDetector>
       ) : null}
 
       {!displayed ? (
