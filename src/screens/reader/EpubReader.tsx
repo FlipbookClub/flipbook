@@ -95,7 +95,18 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
         .activeOffsetX([-20, 20])
         .failOffsetY([-24, 24])
         .runOnJS(true)
+        // Logged on the RN side deliberately: this is independent of the
+        // reader HTML, so it stays truthful even if a stale runtime is cached.
+        .onBegin(() => {
+          if (__DEV__) console.log("[epub][rn] pan:begin");
+        })
+        .onStart(() => {
+          if (__DEV__) console.log("[epub][rn] pan:start (recognised)");
+        })
         .onEnd((e) => {
+          if (__DEV__) {
+            console.log(`[epub][rn] pan:end dx=${Math.round(e.translationX)}`);
+          }
           if (Math.abs(e.translationX) < 40) return;
           if (e.translationX < 0) sendRef.current({ type: "next" });
           else sendRef.current({ type: "prev" });

@@ -74,8 +74,10 @@ export async function getEpubReaderHtmlUri(): Promise<string> {
     await makeDirectoryAsync(EPUB_READER_DIR, { intermediates: true });
   }
 
-  const existing = await getInfoAsync(HTML_PATH);
-  if (existing.exists && !existing.isDirectory) {
+  // __DEV__ always rewrites: a stale copy served an old runtime through a
+  // whole debug round and made new instrumentation look like it never ran.
+  const existing = __DEV__ ? { exists: false } : await getInfoAsync(HTML_PATH);
+  if (existing.exists && !("isDirectory" in existing && existing.isDirectory)) {
     cachedUri = HTML_PATH;
     return HTML_PATH;
   }
