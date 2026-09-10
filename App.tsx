@@ -49,6 +49,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { OfflineBanner } from "@/components/ui/OfflineBanner";
 import { RootNavigator } from "@/navigation/RootNavigator";
+import { WebViewTeardownSpike } from "@/screens/dev/WebViewTeardownSpike";
 import { initAnalytics } from "@/lib/analytics";
 import { initMonitoring } from "@/lib/monitoring";
 import { useAnalyticsIdentity } from "@/lib/useAnalyticsIdentity";
@@ -63,6 +64,13 @@ if (!CLERK_PUBLISHABLE_KEY) {
   );
 }
 
+// THROWAWAY, spike/webview-teardown only. Flip to false to get the normal app
+// back. Kept inside GestureHandlerRootView because the app-wide RNGH root is
+// one of the conditions present when the June crash happened, and outside
+// Clerk/Convex because the touch-registry question has nothing to do with auth
+// and skipping sign-in makes the rebuild loop far shorter.
+const RUN_WEBVIEW_SPIKE = true;
+
 export default function App() {
   const [fontsLoaded] = useFonts({
     "Raleway-Medium": Raleway_500Medium,
@@ -75,6 +83,16 @@ export default function App() {
 
   if (!fontsLoaded) {
     return <View style={{ flex: 1, backgroundColor: palette.surfaceWarm }} />;
+  }
+
+  if (RUN_WEBVIEW_SPIKE) {
+    return (
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <WebViewTeardownSpike />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    );
   }
 
   return (
