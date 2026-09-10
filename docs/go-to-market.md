@@ -1,661 +1,560 @@
-# Flipbook — Go-to-Market & Pre-Launch Campaign Plan
+# Flipbook — Go-to-Market & Launch Plan (v2)
 
-**Owner:** Moks
-**Status:** v1 — draft, May 22 2026
-**Companion docs:** `product-vision.md`, `prd.md`, `product-roadmap.md`, `design-tokens.json`
-**Window covered:** May 22 → mid-July 2026 (8-week pre-launch sprint) + first 30 days post-beta
-**North-star outcome by end of week 8:** 1,000 waitlist signups, 30 design-partner book clubs lined up, a recognizable build-in-public voice on at least two channels, and a closed beta cohort of 75 active readers across 10 live clubs.
+**Owner:** Moks + Ayodeji
+**Status:** v2.1, August 15 2026
+
+> **Reality-check addendum (Aug 15, 2026).** One month into the 90-day window, actuals vs. plan:
+> - **Real beta base: 163 users/downloads/signups — 88 Android, 75 iOS.** Android is the majority platform (the roadmap and build plan now reflect this — see `execution-prd-next-batch.md`). The larger waitlist figures assumed in § 3 and § 9 predate this count; **re-baseline all waitlist/user targets at the next Sunday review** against real numbers rather than the July projections.
+> - **Masobe App has launched** (single-publisher subscription reading, ₦1,999–₦5,999/mo, physical-paperback ordering). Market validation + supply-side urgency lever. See § 2 wedge below and `product-vision.md` § 4 competitive narrative. Collaboration-first, compete-if-declined.
+> - **Flagship beta user identified:** Oyinadé Balógun (Lumee Book Club) — most engaged tester, active feedback loop, founding-partner treatment. First design-partner candidate for the v2 catalog beta.
+> - The week-by-week plan in § 7 (written Jul 15) is partially elapsed; treat the remaining weeks as directional and re-baseline dates at the Sunday review. The Oct 13 launch target stands until explicitly moved.
+**Companion docs:** `product-vision.md` v2.0, `prd.md` v2.0, `product-roadmap.md` v2.0, `model-math.md`, `docs/supply/*`, `landing-page-copy.md`.
+**Window covered:** July 15 → October 13, 2026 (90-day supply + build + public-launch sprint) plus the first 30 days post-cutover.
+**North-star outcome by October 13:** first paying reader on v2, 30 signed indie authors, 500+ public-domain titles ingested, 5,000+ pre-launch waitlist converted at 30%+, and a coordinated public launch across X, Instagram, LinkedIn, WhatsApp, and the founding-author network.
 
 ---
 
 ## 0. How to read this doc
 
-This is the campaign brief and the operating manual. Sections 1-6 are strategy (read once, refer back). Section 7 is the week-by-week you'll actually live in. Sections 8-15 are the playbooks you open as the week demands them. Section 16 is the punch list for the next 7 days.
+This replaces the v1 pre-launch campaign in full. v1's positioning (*"share a book, see friends' reactions in the margins"*) was built around user-uploaded PDFs and free creator publishing — both retired in v2. The v2 story is different: a **curated rental library** with community, priced for the Nigerian reader, paying African indie authors 70/30, with a campus surface as a bounded extension.
 
-The plan is deliberately built around what a **two-person, part-time founding team** with a $15-30/mo software budget can sustain — Moks on content/build, Ayodeji on BD/relationships (see § 1). Anywhere you see a tactic that would be "nice to have but takes 5 hours a week," it's marked *(stretch)*.
+The plan is built around what a two-cofounder team can sustain: Moks on product, catalog editorial, and frontend build; Ayodeji on supply-side pitching, small-publisher relationships, campus expansion, and operational ownership of the founding-30 cohort.
 
-The design isn't cast in stone — same applies here. Treat this as a working brief: ship the week, review on Sundays, adjust.
+Sections 1-6 are strategy (read once, refer back). Section 7 is the week-by-week you'll live in. Sections 8-14 are playbooks. Section 15 is this-week's punch list.
 
 ---
 
-## 1. The frame — 8 weeks to beta, two engines: build-in-public + relationship-led BD
+## 1. The frame — three tracks, one launch
 
-**Founder split (new — drives this whole plan).** Flipbook now has two cofounders with complementary strengths, and the GTM is built around both:
+v2 GTM has three tracks running in parallel:
 
-- **Moks** — product, vision, strategy, growth narrative. Owns the **build-in-public engine**: the design teardowns, the "today I shipped" cadence, the brand storytelling. This is the introvert's superpower — visible craft, no schmoozing required.
-- **Ayodeji** — operations, process, and the **relationship engine**: business development, partnerships, and getting Flipbook into rooms. A former Programs Manager at a gaming company with a deep network, a strong pitch, and real child-safety/age-gating operational experience (which matters for the Segment D children's-club channel later). This is the extrovert's superpower — and it means the heavy relationship work no longer falls on a heads-down designer.
+1. **Reader acquisition (Moks).** Ride on the v1 community app's existing waitlist and beta clubs. Convert them into v2 rental readers. Build-in-public content becomes the primary demand engine. Zero paid spend.
+2. **Supply-side outreach (Ayodeji, lead).** The founding-30 African indie authors + first small-publisher deals. This is the whole game — without books, v2 doesn't ship. Playbook lives in `docs/supply/`.
+3. **Campus pilot (Ayodeji, supporting Moks's parents).** Two university course communities live before public launch. Silent — no marketing yet. Signal-testing.
 
-The two engines compound: Moks' public build gives Ayodeji warm, credible material to pitch with; Ayodeji's rooms put that material in front of people Moks would never reach. Neither founder is a single point of failure for distribution.
-
-You're shipping code already. The campaign needs to do three things in parallel:
-
-1. **Compound an audience** that didn't know it was waiting for Flipbook — readers tired of solo reading, book club organizers tired of duct-taping WhatsApp + Goodreads, and indie creators looking for a more intimate channel than Substack.
-2. **Earn trust before launch** so when the beta link drops, people show up because they've watched you build it.
-3. **Recruit 30 design-partner clubs** who will load real books, invite real friends, and stress-test the product the day it opens.
-
-Build-in-public is **one** spine (Moks). Every screen designed, every Convex query shipped, every brand decision (why Deep Indigo? why Flip mode?) is content — visual, opinionated, shareable. The campaign makes sure none of that work goes unseen.
-
-**Relationship-led BD is the second spine (Ayodeji).** Direct outreach and partnerships — book-club organizers, BookTok/Bookstagram creators, indie authors, and (post-safety-stack) educators and librarians — are now a top-tier engine, not a footnote. For a product whose growth is fundamentally word-of-mouth (one organizer brings a whole club), a founder who can win organizers and partners in conversation is worth more than any number of impressions. This is the single biggest change the cofounder makes to the plan.
-
-Everything else — the waitlist, the launch-week stunt, the BookTok pushes — is layered on top of those two spines.
-
-### Why this works for Flipbook specifically
-
-- The product is itself a story about reading culture coming back. The campaign and the product reinforce each other.
-- The Magic Moment ("a creator drops a chapter → subscribers' phones light up → they open it and react in the margins together") is inherently *demoable in 15 seconds*, which is exactly what TikTok and Reels reward.
-- "Designer building a reading app from Lagos" is a narrative that earns attention on X and LinkedIn without needing paid spend.
-- WhatsApp — where most book clubs already operate — gives you a direct, zero-cost line to seed your first 30 clubs.
+**Why this shape:** Reader acquisition is the demand story we can tell today. Supply-side is the story we can only tell after we've signed authors. Campus is the story we only tell after we've proven the extension holds without breaking the North Star. The three converge at public launch (~October 13).
 
 ---
 
 ## 2. Positioning
 
-### One-liner (lead with this everywhere)
+### One-liner
 
-**Flipbook is where book clubs read together — share a book, see your friends' reactions in the margins, and finally finish what you started.**
+**Flipbook is a book-rental app for African readers — a curated library of world classics and African indie voices, rented affordably and read together.**
 
-Test it: it answers *what is it*, *who is it for*, and *what's different* in 22 words. Use it as the X bio, the IG bio, the landing-page H1, the WhatsApp pitch.
+Use this everywhere: X bio, IG bio, LinkedIn page, App Store description, landing-page H2, WhatsApp pitch to friends.
 
-### Shorter variants for tight spaces
+### Shorter variants
 
-- **TikTok / Reels caption:** "The book club app that makes you actually finish the book."
-- **LinkedIn / press:** "A social reading platform where communities read books together in real time, with reactions in the margins."
-- **WhatsApp pitch to club organizers:** "I'm building an app that turns your group chat into a real book club — same friends, same book, but with reading progress, reactions, and discussion all in one place."
+- **App Store one-liner:** *"The library African readers deserve."*
+- **TikTok / Reels caption:** *"Rent your next book for ₦1,500. Read it with your friends."*
+- **LinkedIn / press:** *"Flipbook is a licensed rental library for African readers, paying indie authors 70% of every rental."*
+- **WhatsApp pitch:** *"I built an app where you can rent Nigerian and classic books for ₦500-₦2,500 for four weeks. Come read with me."*
 
 ### Three messaging pillars
 
 | Pillar | What it claims | Proof points | Where it lives |
 |---|---|---|---|
-| **Together, in the margins** | Reading becomes social when reactions live next to the text, not in a separate chat. | The reactions-in-margins feature, group reading progress, live notifications when a friend reaches a chapter. | TikTok, Reels — visual demos. |
-| **Accountability without guilt** | Book clubs fail because life happens. Flipbook nudges, not shames. | Reading-streak gentleness, group progress, "your club is on chapter 4" digests. | X build-in-public, IG carousels. |
-| **A home for creators, not algorithms** | Indie authors and serialized writers can publish to *their* community, not to a feed. | Creator publishing tools, direct subscriber relationship, Phase 2 monetization. | LinkedIn, creator-focused threads, future newsletter. |
+| **Books at prices that make sense** | Rentals from ₦500-₦2,500, matched to Nigerian discretionary spend | Rental band structure; unlimited Band A on Pro; PD classics always free with Pro | Landing page, X, Instagram, WhatsApp |
+| **A community around every book** | Rent a book, join the community reading it, see reactions bloom in the margins | Real-time in-margin reactions; friend-clubs; live progress visibility | TikTok, Reels — visual demos; landing page hero |
+| **Authors get paid what they're worth** | 70% of every rental to the author; monthly statements; on-time payouts | Author term sheet public; founding-30 cohort real names visible; monthly payout log (aggregate) | LinkedIn, X threads, author communities |
 
-### Wedge vs. competitors (so you can answer the inevitable question)
+### Wedge vs. competitors
 
-- **vs. Fable**: They're a curated content marketplace with social wrappers. You're a community-first reading layer where the club organizer is the protagonist.
-- **vs. Bookclubs.com**: They organize meetings around books. You make the *reading itself* shared.
-- **vs. StoryGraph**: They give you data about your reading. You give your reading a community.
-- **vs. Goodreads**: They are a 2007 product on life support. You are 2026.
-- **vs. WhatsApp + PDFs (the real competitor)**: Same friends, same book, but the reactions live next to the text, progress is visible, and nobody has to remember which chapter the group is on.
-
-Keep this wedge short. You don't need a 60-slide competitive teardown right now — you need a paragraph you can paste under any tweet that asks "how is this different from X?"
+- **vs. Amazon Kindle:** *"Kindle prices in dollars and its Nigerian catalog is thin. We price in naira and lead with African voices."*
+- **vs. Okada Books / Selar:** *"They sell books one-by-one. We rent and read together — a different economic and social product."*
+- **vs. Goodreads:** *"Goodreads is for the books you've finished. Flipbook is for the book you're reading right now."*
+- **vs. Fable:** *"Fable centers celebrity book clubs. We center friend-clubs and African authors."*
+- **vs. WhatsApp + piracy PDFs (the real competitor):** *"Same friends, same book, but the book is licensed, the author is paid, and the reader has a proper EPUB experience with reactions in the margins."*
+- **vs. Masobe App (added Aug 15):** *"Masobe App is one publisher's bookshelf. Flipbook is the library — every publisher, every indie voice, rentals from ₦500, and the community layer no storefront has."* (Externally, stay gracious: they validated the market. The sharp version is for internal positioning and publisher pitches, not public sniping.)
 
 ---
 
-## 3. Goals & KPIs for the 8-week pre-launch sprint
+## 3. Goals & KPIs for the 90-day sprint
 
-| Metric | Week 4 milestone | Week 8 target | How you'll measure |
-|---|---|---|---|
-| **Waitlist signups** | 250 | 1,000 | Landing page → ConvertKit / Resend / Buttondown free tier |
-| **X / Twitter followers** | 300 | 1,200 | Native analytics |
-| **Threads / IG followers** | 200 | 800 | Native analytics |
-| **TikTok followers** *(stretch)* | 100 | 500 | Native analytics |
-| **LinkedIn followers (you) + Flipbook page** | 200 / 100 | 600 / 400 | Native analytics |
-| **Design-partner clubs committed** | 10 | 30 | Notion / spreadsheet tracker |
-| **Beta-day-1 active clubs** | — | 10 with real reads in flight | Convex dashboard |
-| **Press / podcast mentions** | 0 | 3 newsletters, 1 podcast | Manual log |
-| **Email open rate** | — | 45%+ | ESP analytics |
-| **Build-in-public posts shipped** | 24 (3/wk) | 48 (6/wk avg.) | Buffer / manual log |
+| Metric | 30-day (Aug 15) | 60-day (Sep 15) | 90-day (Oct 13) | How we measure |
+|---|---|---|---|---|
+| **Signed indie authors** | 8-10 | 20-25 | 30 | `authorAccounts` table + spreadsheet |
+| **Small-publisher meetings** | 2 | 5 | 8 | Ayodeji's tracker |
+| **PD titles ingested** | 100 | 300 | 500+ | Convex catalog count |
+| **Indie titles published** | 3 | 12 | 25+ | Catalog count where source == indie_author |
+| **v2 waitlist (net new + carried over)** | 5,500 | 7,000 | 8,000 | `waitlist` count |
+| **v1 → v2 waitlist conversion (day of launch)** | — | — | 30%+ (~2,400) | `users` created within 48h of launch |
+| **Course communities live (founding-educator)** | 2 (parents) | 3-5 | 5-8 | `communities` where type == course |
+| **First paying reader** | — | — | Oct 13 | first `rentals` row with `paymentSource: "paystack"` |
+| **Build-in-public posts shipped** | 24 (3/wk × 8) | 48 (avg 6/wk) | 72 (avg 8/wk) | Buffer / manual log |
+| **Waitlist → active-reader conversion (Oct)** | — | — | 30%+ | app analytics |
+| **Pro conversion (first 7 days post-launch)** | — | — | 3-5% | RevenueCat |
 
-The waitlist number is the **single number** to fixate on. Everything else is leading or lagging it.
+The **single number** to fixate on: **signed indie authors.** Everything else is a proxy for this. If we're at 12 by day 30, we push harder; if we're at 25 by day 60, we're on track; if we're at 30 by day 90, launch is real. Below 20 by day 90 is a launch-slip signal.
 
 ### Quality bars
 
-- A waitlist signup should require either an email *and* one qualifier ("which book club are you in?" or "what's the last book you finished?"). This filters tire-kickers and gives you copy for the launch.
-- A "design-partner club" means at least 3 real humans who are willing to load a book, read it, and answer two follow-up calls in beta. Don't dilute this.
+- A **signed indie author** means term-sheet executed and at least one book uploaded — not just a verbal yes.
+- A **small-publisher meeting** means a real 30-min conversation with someone who can green-light a deal (not just interest from an acquiring editor).
+- A **PD title ingested** means EPUB uploaded, cover set, description written, band assigned, `isPublished: true` — not just imported metadata.
 
 ---
 
-## 4. Audience segments
+## 4. Audience segments (v2)
 
-Three core segments for the pre-launch sprint, plus one expansion segment (D) that stays dormant until the minor-safety stack ships. Don't write one piece of copy for "readers." Always write *for* one specific segment.
+Three primary segments, each with a distinct hook.
 
-### Segment A — Book club members & organizers (primary, 70% of effort)
+### Segment A — Nigerian readers 20-40 (primary, 70% of effort)
 
-**Who they are.** People already in a book club (formal or informal — a group chat counts) who feel the friction: someone always falls behind, the discussion happens once a month and then evaporates, the book gets lost in WhatsApp scroll. Disproportionately women, 25-40, on Instagram and WhatsApp.
+**Who they are.** Ada from `product-vision.md`. Lagos, Ibadan, Abuja, Port Harcourt, and diaspora. Buys books faster than she finishes them. Watches BookTok. Spends ₦2,900/mo on Netflix, ₦900/mo on Spotify.
 
-**Hook.** "Your book club, but the reactions live in the book."
+**Hook.** *"Rent your next book for the price of a coffee. Read it with your friends."*
 
-**Where to reach them.** Bookstagram, BookTok, WhatsApp groups (via club organizers), Substack book newsletters, Reddit r/bookclub.
+**Where to reach them.** Instagram (Bookstagram Nigeria, book creators, lifestyle accounts), WhatsApp (via warm groups), X / Twitter (Nigerian tech + book-adjacent), TikTok BookTok Nigeria, Substack.
 
-**What converts them.** Seeing the Magic Moment demo. Hearing from another organizer who already runs their club on Flipbook.
+**What converts them.** (1) A catalog page they recognize — Nigerian names, not just Western classics. (2) A price that doesn't require justification. (3) A friend already using it.
 
-### Segment B — Solo readers seeking accountability (secondary, 20%)
+### Segment B — African indie authors (supply-side primary, 20% of effort)
 
-**Who they are.** People who buy books, read 30 pages, and stop. They follow #BookTok and #Bookstagram but don't post. They want a *low-commitment* way to read alongside others.
+**Who they are.** Ifeoma from `product-vision.md`. Publishing on Okada, Selar, KDP. Earns pennies on KU. Wants a real economics.
 
-**Hook.** "Finish more of what you start — read alongside people, not alone."
+**Hook.** *"70% of every rental. Non-exclusive. First 30 authors get founding-cohort placement."*
 
-**Where to reach them.** TikTok BookTok, Threads, Goodreads reviews (mention Flipbook tactfully in your own).
+**Where to reach them.** Direct DMs (X, Instagram, LinkedIn), warm intros via existing indie networks, Okada Books author profiles, Substack Africa.
 
-**What converts them.** The promise that they can join an *existing* club instead of having to start one — *lower activation energy than starting your own club*.
+**What converts them.** The term sheet reads like a founder wrote it (which it does — see `docs/supply/author-term-sheet.md`). The rev-share beats their current channel by an order of magnitude. Founding-30 status feels real.
 
-### Segment C — Indie authors & serialized writers (tertiary, 10% pre-launch, scales in Phase 2)
+### Segment C — Diaspora readers (secondary, 5% of effort at launch)
 
-**Who they are.** Substack writers with 500-5,000 readers who are tired of being one of 30 emails in an inbox. Self-published romance/sci-fi/literary authors looking for a more intimate channel. African writers in particular underserved by Western platforms.
+**Who they are.** Chidi from `product-vision.md`. Nigerian in London/NYC/Toronto. Reads Kindle for the US catalog, misses Nigerian voices. Willing to pay in USD.
 
-**Hook.** "Publish to your readers, not to an algorithm."
+**Hook.** *"The Nigerian catalog Kindle doesn't have. On your phone, wherever you are."*
 
-**Where to reach them.** LinkedIn, X, Substack Notes, writing-craft podcasts.
+**Where to reach them.** Nigerian diaspora Facebook groups, WhatsApp diaspora chats, Twitter Nigerian-abroad hashtags, LinkedIn (diaspora professionals).
 
-**What converts them.** Concrete pricing/economics conversation in Phase 2. Pre-launch they want to be on the *creator waitlist*, which is a separate signup with one extra field ("link to your work").
+**What converts them.** Availability of specific Nigerian titles they've been trying to get. Ability to pay in USD (deferred to Year 2; interim: gift-a-Pro-sub campaign for USD-paying diaspora giving to Nigerian friends).
 
-### Segment D — Guardians & educators running children's book clubs (expansion — DO NOT activate until safety ships)
+### Segment D — University educators (campus surface, 5% of effort at launch)
 
-**Who they are.** Parents running a kids' reading group, elementary/middle-school teachers, school librarians, and homeschool-co-op organizers who want a *safe, screen-calm* place for children to read and discuss together. They are not the reader or the creator — they're the **vetted adult** who provisions children into a closed, moderated club and stays responsible for it. High trust bar, high word-of-mouth (one teacher tells the whole grade level; one librarian tells the district).
+**Who they are.** Femi from `product-vision.md`. University lecturers who want to distribute course materials and reading lists to their students.
 
-**Hook.** "A reading club for your kids — walled-garden safe, no strangers, no feed, no ads." Lead with safety and calm, never with growth/engagement language.
+**Hook.** *"The reading space for your course. Bring your class. We handle the reading. Google Classroom handles the rest."*
 
-**Where to reach them.** Teacher communities (r/Teachers, edu Facebook groups, We Are Teachers), school-librarian networks (AASL/state library associations), homeschool co-ops and parenting newsletters, Bookstagram accounts that focus on kidlit/middle-grade. These are *trust-first* communities — show up as a builder who cares about child safety, not a marketer.
+**Where to reach them.** Warm intros only (never cold). Founding-educator cohort starts with Moks's parents; each new lecturer is warm-introduced by an existing one. Zero public campus marketing pre-launch.
 
-**What converts them.** Demonstrable safety architecture, not promises: the walled garden (no public discovery, no stranger contact, supervised audio only), the parental-consent flow, honest data practices, and a real privacy posture. They will ask "is this COPPA-compliant?" — you need a credible, counsel-backed answer before you say a word in these channels.
-
-**⚠️ Hard sequencing rule.** This segment is **off-limits until Phase 9 (age gate + segmentation) ships AND Phase 10 (children's clubs + verifiable parental consent) is built and legally reviewed.** Marketing a kids' product before the safety + consent machinery exists is both a legal and a reputational landmine. This is an **expansion channel for after the adult product is live and the safety stack is done** — *not* part of the 8-week pre-launch sprint below. Everything in §§5–11 of this plan stays adult-reader-focused.
+**What converts them.** A functioning demo of Moks's parents' courses. A 15-minute call. A promise that we will never build LMS features.
 
 ---
 
-## 5. Channel strategy — split across two founders
+## 5. Channel strategy — two cofounders, ~50-60 hours/week combined
 
-Two engines, two owners. **Moks owns the content channels** (build-in-public, brand, narrative). **Ayodeji owns the relationship channels** (BD, partnerships, organizer recruitment). This split is what lets a part-time team run more surface area than a solo founder could — neither is doing the other's least-favorite work.
+The channel plan is split between the two cofounders by aptitude.
 
-### Tier 1 — Relationship-led BD & partnerships *(Ayodeji, ~4-5 hrs/wk — co-equal primary)*
+### Moks — Product-adjacent, content-heavy channels (~30 hrs/wk between build, editorial, and marketing)
 
-**This is the new top-tier engine.** Flipbook grows when a trusted organizer brings a whole club — so a founder who can win organizers and partners in conversation is the highest-leverage channel we have. Ayodeji runs a lightweight pipeline (a simple CRM/Notion board: target → contacted → call → committed).
+**X / Twitter — build-in-public.** Design decisions, catalog choices, product screenshots, author announcements. 1 thoughtful post/day Mon-Fri, 1 deep thread/week.
 
-- **Book-club organizers** — the 30 design-partner clubs (see § 10) are *his* primary KPI to close, not a cold-DM afterthought. Warm intros first, then 2-hops-out, then targeted cold outreach.
-- **Creators & indie authors** — BookTok/Bookstagram creators and Substack novelists for early access + seeded public clubs (feeds Segment C and the launch). Relationship-first, deal-light pre-launch.
-- **Strategic partners** — bookish newsletters, indie bookstores, reading communities, and (only *after* the Phase 9/10 safety stack ships) schools, libraries, and parent/educator networks for the children's-club channel (Segment D). His gaming-industry child-safety background is a credibility asset in those rooms.
-- Cadence: 8-12 meaningful conversations/week; **North star: 30 design-partner clubs committed + 5-8 creator/partner relationships warm by week 8.**
+**Instagram / Threads — visual brand.** Book covers, three-mode theme showcases, Nigerian indie author features. 3 IG posts/wk (1 carousel, 1 reel, 1 aesthetic post), 1 Threads post/day.
 
-### Tier 1 — Content / build-in-public *(Moks, ~5 hrs/wk — co-equal primary)*
+**LinkedIn — founder narrative.** Long-form essays about the pivot, the model math, and building consumer subscription in Nigeria. 2 posts/wk.
 
-**X / Twitter** — your build-in-public home. Designers, indie hackers, #BookTwitter, and indie authors all live here. Lowest production cost per post, highest leverage for an articulate designer-founder.
+**TikTok / Reels *(stretch)*.** Cross-post Reels. Only invest more if Reels perform above baseline in first 6 weeks.
 
-- Cadence: 1 thoughtful post or thread daily (Mon-Fri), 1 deep thread per week (Tue or Thu), live replies/quote-tweets every evening.
-- North star: 1,200 followers by week 8, 5-10 "this is exactly what I've needed" replies that you screenshot for later.
+### Ayodeji — Relationship-heavy channels (~20-25 hrs/wk between supply outreach, campus, ops)
 
-**Instagram / Threads** — Bookstagram is *the* visual reading community. Your brand (Deep Indigo, Warm Ivory, Coral) is *made* for this surface. Threads is rising and underexploited.
+**Direct outreach — the founding-30 pitches.** Structured per `docs/supply/target-list.md`. Weekly cadence: 5-10 new pitches out, 5-10 follow-ups, 3-5 signing calls.
 
-- Cadence: 3 IG posts/wk (1 carousel design teardown, 1 quote/reading aesthetic post, 1 build-in-public Reel), 1 Threads post/day. Cross-post Reels to TikTok.
-- North star: 800 followers, 10+ saves per Reel by week 8.
+**Small-publisher relationships.** Cassava Republic, Farafina, Ouida, Masobe, NLP, Parrésia. Warm-intro-first, in-person when possible (Lagos-based advantage). Meeting cadence: 1-2 publisher meetings per week.
 
-### Tier 2 — Supporting (~2-3 hrs/wk)
+**Campus expansion.** Moks's parents onboarded first (founding pilot). Ayodeji owns the operational relationship — helping them run their courses, gathering feedback, capturing the *"and here's another lecturer who'd try it"* referrals.
 
-**LinkedIn** — Designer-founder narrative + creator outreach. Lower volume, higher quality.
-
-- Cadence: 2 posts/wk (Tue + Fri), 1 long-form essay every 2 weeks (e.g. "Why I'm building Flipbook," "Three things designing a reading app taught me about decision fatigue").
-- North star: 600 followers on personal page, 400 on Flipbook company page, 5 indie-author inbound DMs by week 8.
-
-**TikTok BookTok** *(stretch — only if you're willing to be on camera)* — biggest reading culture engine on the internet right now. Reels you make for IG can be cross-posted here.
-
-- Cadence: 3 videos/wk, mostly recycled from IG Reels with TikTok-native hooks.
-- North star: 500 followers, one video with 10k+ views.
-- **Honest assessment:** if you don't enjoy being on camera, skip this until you have a beta to show. The opportunity cost vs. one extra X thread is real.
-
-### Tier 3 — Direct messaging *(Ayodeji — the delivery layer for the BD engine)*
-
-**WhatsApp** — the seed-community closing tool. The 30 design-partner clubs are recruited here, as the delivery layer for Ayodeji's Tier 1 BD pipeline (not from X). This is now *his* channel, folded into the relationship engine above rather than a separate solo-founder task.
-
-- Cadence: 5-10 direct outreaches per week to club organizers in the network and 2 hops out (friends-of-friends).
-- North star: 30 design-partner clubs committed, in a dedicated WhatsApp broadcast list called "Flipbook design partners."
+**WhatsApp — network activation.** Announcements to warm groups; recruiting the first 100 beta v2 readers from existing friend + family networks.
 
 ### Weekly time budget summary
 
-| Channel | Hours/wk | Hours/post |
+| Owner | Channel | Hours/wk |
 |---|---|---|
-| X / Twitter | 3.0 | 0.25 (single post), 1.0 (thread) |
-| Instagram + Threads | 2.5 | 0.5 (carousel), 1.0 (Reel) |
-| LinkedIn | 1.5 | 0.3 (post), 1.5 (essay) |
-| TikTok *(stretch)* | 1.0 | 0.3 (cross-post + native hook) |
-| WhatsApp outreach | 1.0 | n/a |
-| **Total** | **9.0** | — |
+| **Moks** | X build-in-public | 5 |
+| Moks | IG / Threads | 4 |
+| Moks | LinkedIn | 2 |
+| Moks | TikTok *(stretch)* | 2 |
+| Moks | Product build | 12-15 |
+| Moks | Catalog editorial | 3-5 |
+| **Ayodeji** | Founding-30 outreach | 8-10 |
+| Ayodeji | Publisher meetings | 4-6 |
+| Ayodeji | Campus pilot ops | 3-4 |
+| Ayodeji | WhatsApp / warm networks | 2 |
+| Ayodeji | Author ops (statements, payouts prep) | 3-4 |
 
-This table is **Moks' content budget** (~9 hrs/wk on top of building). **Ayodeji's BD engine (Tier 1 relationships, ~4-5 hrs/wk) runs in parallel** — the two tracks don't compete for the same hours because they're owned by different people. If Moks' content runs over 10 hrs/week, cut TikTok first, then halve LinkedIn cadence. Protect the build time.
-
----
-
-## 6. Content pillars (the 5 buckets every post fits into)
-
-You should never sit down to write a post wondering "what do I post today?" Every post is one of these five, on a rotating schedule. This is also how you keep the feed from feeling samey.
-
-### Pillar 1 — "Behind the screen" (build-in-public, ~40%)
-
-Show the work. Design exports from Figma, Convex schema decisions, "today I built X / today X broke," before/after screen comparisons, the three theme modes side-by-side. The Deep Indigo Flip mode is *itself* content — most people have never seen a third theme mode.
-
-**Format examples:**
-- X thread: "I just spent 4 hours deciding between two onboarding flows. Here's why I picked the slower one →"
-- IG carousel: "Designing the sign-up flow — 8 slides, before & after"
-- LinkedIn essay: "What designing a reading app taught me about the difference between accountability and shame"
-
-### Pillar 2 — "Reading culture" (~25%)
-
-Posts that aren't about Flipbook, but about the world Flipbook lives in. Reading habits, book club stories, the death and rebirth of physical bookstores, BookTok phenomena. This is what makes your account follow-worthy when you're not actively shipping.
-
-**Format examples:**
-- IG Reel: "5 reasons your book club keeps dying"
-- X post: "The average book club has 4.2 members. The average book club lasts 11 months. The reasons are not what you think."
-- Thread: "Why Goodreads stopped being a reading app and became a review site"
-
-### Pillar 3 — "Wedge & demo" (~15%)
-
-Posts that show *exactly what Flipbook does that nothing else does*. These get the most saves and shares. Short videos demonstrating the Magic Moment. Carousels comparing reading-with-Flipbook to reading-in-WhatsApp-with-PDFs.
-
-**Format examples:**
-- 15-second IG Reel: "Watch what happens when my friend reaches chapter 3 →"
-- TikTok: "POV: your book club but the reactions are in the actual book"
-- X video: "30 seconds of the new club-creation flow"
-
-### Pillar 4 — "Founder voice & lessons" (~15%)
-
-You. Designer, 5 years in healthcare, building from Lagos, part-time, on a tight budget. This is the segment most founders skip — and where the *durable* following comes from. Audiences follow people more than products.
-
-**Format examples:**
-- LinkedIn long-form: "I'm a healthcare product designer. Here's why I'm building a book club app."
-- X post: "Building a global consumer app on $20/mo of cloud spend, from Lagos. AMA"
-- Thread: "5 things I underestimated about building solo and part-time"
-
-### Pillar 5 — "Community spotlight" (~5% pre-launch, grows post-beta)
-
-Highlight a real book club, a real reader, a real author. Pre-launch this is your design partners (with permission). Post-launch this becomes your retention engine.
-
-**Format examples:**
-- IG carousel: "Meet the Lagos Lit Society — Flipbook's first beta club"
-- X post: "[name] runs a 12-person book club in Toronto. Here's what she wishes her reading app could do."
+Total: ~50-60 hrs/wk across both cofounders combined, part-time around day jobs.
 
 ---
 
-## 7. The 8-week campaign — week by week
+## 6. Content pillars
 
-Each week has a **theme**, a **hero post** (one big thing the week is anchored around), a **build milestone** you're posting about, a **community action** (WhatsApp outreach or design-partner recruiting), and a **review checkpoint** on Sunday.
+Five pillars, rotating.
 
-### Week 1 (May 25 - May 31) — "Hello, world"
-
-- **Theme:** Introducing Flipbook + the founder.
-- **Hero post:** Long X thread + LinkedIn essay: "I'm building Flipbook. Here's why." Includes the Maya persona moment, the WhatsApp-PDF-chaos problem, the Magic Moment teaser, and a link to the waitlist.
-- **Build milestone:** Phase 0 underway (repo scaffolded, design tokens wired in). Post screenshots of the three theme modes.
-- **Community action:** DM 10 book club organizers you already know. Goal: 5 "yes I'd love to be a design partner."
-- **Channels live by end of week:** X handle, IG handle, LinkedIn page, waitlist landing page.
-- **Sunday review:** Did the hero post land? What replies stood out? Pull 2-3 quotes for next week's reuse.
-
-### Week 2 (Jun 1 - Jun 7) — "The look & feel"
-
-- **Theme:** Brand & design system reveal — three theme modes, the Flip mode story.
-- **Hero post:** IG carousel + X thread: "Three modes: Light, Dark, and Flip. Here's why I designed a third mode for a reading app."
-- **Build milestone:** Auth + onboarding shipping. Post the sign-up screen evolution (Figma → coded).
-- **Community action:** WhatsApp broadcast to design partners — "First sneak peek of the brand. What does this make you feel?"
-- **First Reel:** 15-sec animation of the Flip mode toggle. Cross-post to TikTok.
-- **Sunday review:** Followers vs. target. Anything from #Bookstagram bite?
-
-### Week 3 (Jun 8 - Jun 14) — "Why book clubs die"
-
-- **Theme:** The problem. This is your highest-leverage thought-leadership week.
-- **Hero post:** LinkedIn essay: "The average book club lasts 11 months. Here's why — and what I'm trying to fix." Cross-cut as X thread.
-- **Build milestone:** Club creation + invite link flow. Post the "create a club in 30 seconds" demo.
-- **Community action:** Open a dedicated **Flipbook Field Notes** newsletter (Buttondown or Substack — free tier). Migrate your waitlist there if you can. Send first issue: "Why I'm building Flipbook" + the LinkedIn essay condensed.
-- **First TikTok native:** "Book club organizer starter pack" *(stretch)*.
-- **Sunday review:** Newsletter open rate. Any inbound DMs from authors yet?
-
-### Week 4 (Jun 15 - Jun 21) — "The Magic Moment"
-
-- **Theme:** Show the wedge.
-- **Hero post:** 30-second video on every channel: "Watch what happens when my friend reaches chapter 3." This is the post most likely to go semi-viral. Polish it.
-- **Build milestone:** PDF reader + first reactions-in-margins prototype, even if rough. *Worth holding the hero post until this works in a recording.*
-- **Community action:** First **virtual design partner meetup** — 30 min on WhatsApp video or Google Meet with the 10+ committed organizers. Show the prototype. Take notes.
-- **Mid-sprint checkpoint:** 250 waitlist signups target. If under, diagnose: is the landing page converting? Is the traffic showing up? Is the messaging confusing?
-- **Sunday review:** Mid-sprint retrospective. What's working? What dies on contact? Adjust week 5-8 cadence if needed.
-
-### Week 5 (Jun 22 - Jun 28) — "Reactions in the margins"
-
-- **Theme:** Double down on the wedge after the Magic Moment post lands.
-- **Hero post:** X thread — "5 reactions, 5 ways readers will use them. Here's how I designed the reaction system."
-- **Build milestone:** Reading progress + push notifications. Post the "your friend just finished chapter 4" notification mockup.
-- **Community action:** Open the **creator waitlist** (separate signup, one question: "link to your work"). DM 10 indie authors / Substackers in your network.
-- **Sunday review:** Creator signups so far? Anyone reply with substantive interest in Phase 2 monetization?
-
-### Week 6 (Jun 29 - Jul 5) — "Meet a beta club"
-
-- **Theme:** Social proof early. Even one named club is enough.
-- **Hero post:** IG carousel + LinkedIn post: "Meet [Club Name] — Flipbook's first design-partner club." 6-8 slides about who they are, what they're reading, what they hope Flipbook fixes for them.
-- **Build milestone:** Discussion threads + reactions wired up.
-- **Community action:** Lock in 30 design-partner clubs total. If you're short, pivot the week 7 hero post into a more aggressive recruitment push.
-- **Sunday review:** Are you on track to hit 1,000 waitlist by week 8? If not, what's the unblock?
-
-### Week 7 (Jul 6 - Jul 12) — "The wait is almost over"
-
-- **Theme:** Build pre-launch anticipation. The waitlist is now a teaser.
-- **Hero post:** Drop a beta-invite countdown across all channels. Reveal the launch date for the closed beta (mid-week 8).
-- **Build milestone:** Final polish — onboarding tested with 3 strangers, PDF reader stable, push notifications firing.
-- **Community action:** WhatsApp the 30 design partners — "Beta opens [date]. You'll get your invite at 9am that morning. Here's how to prep your club."
-- **Newsletter issue:** "What you'll see on day 1" — a play-by-play of what the beta will include and won't.
-- **Sunday review:** Is the product actually ready for 75 people? If not, push launch by 5 days — don't ship a broken first impression.
-
-### Week 8 (Jul 13 - Jul 19) — Beta launch week
-
-See section 11 for the day-by-day launch playbook. The high-level structure of the week is:
-
-- **Monday:** Teaser — "this week" post on every channel.
-- **Tuesday:** Behind-the-scenes — "the team" (you, your laptop, and the cat).
-- **Wednesday morning, 9am Lagos / 4am ET:** Beta invite goes out to the 30 design-partner clubs via WhatsApp first, then the rest of the waitlist.
-- **Wednesday afternoon:** Launch post — a Magic Moment recording from a *real* beta club, with permission.
-- **Thursday & Friday:** Reaction posts. Quote tweets from beta users. Screenshots of real conversations happening in the app.
-- **Sunday:** First public-facing retrospective. Numbers, lessons, what's coming next.
+1. **The catalog** (40%) — every new title published gets a post. Cover, one-line hook, band price, "rent now" link. Anchors reader-facing marketing.
+2. **The build** (25%) — build-in-public. Design decisions, technical wins, honest failures. Signals founder trust and product craft.
+3. **The economics** (15%) — author rev-share transparency, monthly aggregate author payout numbers (after the first month), model math snapshots. Signals fairness and seriousness.
+4. **Author stories** (15%) — founding-30 authors in their own words: why they signed, what they're reading, what they're writing next. Human, warm, share-driven.
+5. **Reading culture** (5%) — Bookstagram-style aesthetic posts. Reading nooks. Coffee-and-a-book. Light lift, brand oxygen.
 
 ---
 
-## 8. The build-in-public playbook
+## 7. The 90 days — week by week
 
-### Cadence by channel
+Working backward from October 13 (public launch, first paying reader). Compressed for the two-cofounder team.
 
-| Channel | Mon | Tue | Wed | Thu | Fri | Sat | Sun |
-|---|---|---|---|---|---|---|---|
-| X | post | thread | post | thread *(if hot)* | post | reply day | retro post |
-| IG / Threads | Threads post | IG carousel | Threads post | IG Reel | Threads post | — | Threads roundup |
-| LinkedIn | — | post | — | — | post | — | essay *(biweekly)* |
-| TikTok | — | — | video | — | video | — | video *(stretch)* |
-| WhatsApp | — | outreach | — | outreach | — | — | — |
+### Weeks 1-2 (Jul 15 - Jul 28) — Foundation & first pitches
 
-### Reusable post templates
+**Moks:**
+- Schema migration (v1 → v2) in Convex — TASK-122–124.
+- EPUB reader library decision + prototype — TASK-125.
+- Ingest first 50 PD titles from Standard Ebooks — TASK-128 (partial).
+- Ship 2-3 build-in-public posts about the pivot.
 
-**Template A — "Today I shipped" (X / Threads, daily-ish):**
-> Today I shipped [thing].
->
-> [1-2 sentences on why it mattered or what was annoying about getting it right.]
->
-> [Screenshot or 5-sec video.]
->
-> Day [N] of building Flipbook in public.
+**Ayodeji:**
+- Verify contact vectors for target list entries #1-10 (`docs/supply/target-list.md`).
+- Set up `moks@getflipbook.com` and `ayodeji@getflipbook.com`.
+- Set up Cal.com booking link.
+- Send first 8-12 pitch emails: entries #3, #4, #5 (publishers) + #9, #10, #17, #18 (indie authors).
+- Onboard Moks's parents as founding-educator cohort — first course communities set up manually.
 
-**Template B — "Design decision" (LinkedIn / X thread):**
-> I had to pick between [option A] and [option B] for [feature].
->
-> Option A: [pros]. But: [con].
-> Option B: [pros]. But: [con].
->
-> I picked [winner] because [reason that reveals product values].
->
-> Here's what the screen looks like →
+**Sunday review (Jul 28):** how many pitches sent, how many replies, catalog count, migration status.
 
-**Template C — "Behind the brand" (IG carousel, weekly):**
-> Slide 1: Bold statement or question.
-> Slides 2-6: One design or brand decision, with screenshots.
-> Slide 7: What it means for readers.
-> Slide 8: "Get the beta → link in bio"
+### Weeks 3-4 (Jul 29 - Aug 11) — Ingestion & sign-ups
 
-**Template D — "Reader story" (any channel, weekly post-week 6):**
-> [Name] runs a [size] book club in [city]. They read [genre] and meet [cadence].
->
-> The thing they hate about their current setup: [pain].
->
-> What they're hoping Flipbook fixes: [hook].
->
-> Beta starts [date]. Their club will be on it day one.
+**Moks:**
+- Catalog browse UI + book detail — TASK-129, TASK-130.
+- Search + filter — TASK-131.
+- Continue PD ingestion — 200 titles by Aug 11.
+- Ship 4-6 build-in-public posts.
 
-### Hashtags & communities to live in
+**Ayodeji:**
+- Follow up on Week 1-2 sends.
+- Send next 10-12 pitches (entries #11-22).
+- First 3-5 signing calls with authors who said yes.
+- First publisher meeting (target: Ouida, Masobe, or NLP).
+- Start Okada Books author discovery for entries #21-30.
 
-- **X:** #buildinpublic, #indiehackers, #BookTwitter, follow @arvidkahl, @marc_louvion, @paulg style accounts and reply on relevant posts.
-- **IG / Threads:** #bookstagram, #bookclub, #currentlyreading, #booksoftiktok, #readingcommunity. Engage genuinely with 5 Bookstagram posts/day in your niche.
-- **TikTok:** #BookTok, #bookclubbook, #readingapp.
-- **LinkedIn:** #designerfounder, #productdesign, #buildinpublic, #indieauthor.
-- **Reddit (low-volume but high-quality):** r/bookclub, r/booksuggestions, r/selfpublish. Don't post until you have a beta to point to.
+**Sunday review (Aug 11):** signed authors count (target: 8-10), catalog count (target: 200+ PD + 3+ indie).
 
-### Voice & tone reminders
+### Weeks 5-6 (Aug 12 - Aug 25) — Rentals + Pro
 
-Pull from `product-vision.md` § 4 — Brand Voice & Tone is already locked in. Warm, observant, never preachy. Never use "passionate" or "leverage." Lean on specific reading details ("the smell of a new paperback," "the way book club Zooms run 20 minutes long because nobody wants to hang up") rather than generic claims about community.
+**Moks:**
+- Rentals mutation + expiry cron — TASK-132, TASK-133.
+- Watermarking — TASK-134.
+- RevenueCat integration + Pro upgrade screen — TASK-138, TASK-139.
+- Pro entitlement webhook — TASK-140.
+- Ship 6-8 build-in-public posts.
 
-### What not to do
+**Ayodeji:**
+- Second publisher meeting.
+- Author onboarding starts (as authors sign, they upload books via the new author flow — TASK-157–159).
+- Follow-up sweep on Week 3-4 pitches.
+- 10-15 new pitches to Okada-sourced romance/spec-fic authors.
 
-- Don't post launch-marketing-speak. "We're so excited to announce…" is a tell.
-- Don't lean on growth-hacking dark patterns (fake countdown timers, exit-intent popups). Your audience reads — they will notice.
-- Don't post about Flipbook seven times a day. The "reading culture" pillar exists so you're not exhausting your audience.
+**Sunday review (Aug 25):** signed authors (target: 15-20), Pro flow demo-able internally, first rental happy path end-to-end.
+
+### Weeks 7-8 (Aug 26 - Sep 8) — Audio + Payment rails
+
+**Moks:**
+- TTS ingestion pipeline (OpenAI) — TASK-148, TASK-149.
+- Audio playback UI in reader — TASK-151.
+- Paystack Standard integration + webhook — TASK-181, TASK-182.
+- Ship 6-8 build-in-public posts (including first audio demo — huge visual moment).
+
+**Ayodeji:**
+- Third publisher meeting.
+- Continue signing to reach 25+ authors.
+- Verify author payout vectors (Paystack Recipient Codes for NGN authors; Wise IDs for USD).
+- Ramp campus pilot — 3-5 additional lecturers targeted via warm intros from Moks's parents.
+
+**Sunday review (Sep 8):** signed authors (target: 25+), Paystack sandbox verified, audio playing end-to-end in dev.
+
+### Weeks 9-10 (Sep 9 - Sep 22) — Author ops + Course communities
+
+**Moks:**
+- Editorial review admin surface — TASK-160.
+- Monthly royalty statement cron + email — TASK-162, TASK-163.
+- Payout initiation (Paystack Transfers) — TASK-164.
+- Rebill / dunning logic — TASK-183.
+- Course community creation + roster invite — TASK-171–174.
+- Reading list mode — TASK-175.
+- Ship 6-8 build-in-public posts.
+
+**Ayodeji:**
+- Signing sprint — push to 30 authors.
+- Statement dry-run against synthetic data with 5 test authors — TASK-170.
+- 4-5 course communities live.
+
+**Sunday review (Sep 22):** 30 signed authors, statement dry-run clean, publisher deal pipeline at 3+ live conversations.
+
+### Weeks 11-12 (Sep 23 - Oct 6) — Polish + Launch prep
+
+**Moks:**
+- Age gate + minor-safe defaults if not already shipped — TASK-108–113.
+- Watermark verification on real EPUB — TASK-198.
+- App Store + Play Store v2 submission — TASK-193.
+- Landing page rewrite deployed — TASK-194 (uses `docs/landing-page-copy.md` v2).
+- Bug bash across happy paths.
+
+**Ayodeji:**
+- Waitlist reactivation email — announce v2 opening on Oct 13; ask for share.
+- Founding-30 author launch coordination — each author gets a launch pack (cover graphics, X/IG copy, launch-day plan).
+- Press email drafts — Brittle Paper, Olongo Africa, Isele, Doek!, Aké Festival.
+
+**Sunday review (Oct 6):** all P0 FRs green; App Store approved; 15+ indie titles published; waitlist reactivated.
+
+### Week 13 (Oct 7 - Oct 13) — Launch week
+
+Day-by-day playbook in § 11 below.
 
 ---
 
-## 9. Landing page & waitlist
+## 8. Build-in-public playbook (v2)
 
-### Minimum viable landing — ship this in week 1
+The v2 story is fundamentally different from v1's story — you're now building a **company** (with a catalog, a payment system, a payout obligation to real authors) rather than just a **community app**. Adjust the voice accordingly:
 
-Single page, mobile-first, sits at `getflipbook.com` (or whatever the domain is). One job: convert a visitor into a waitlist signup.
+- **v1 tone:** designer's Twitter, personal, intimate, "I'm building this for me."
+- **v2 tone:** founder's Twitter, still personal, but with real stakes — real authors depending on real payouts, real catalog choices with real editorial consequences, real Nigerian consumer subscription math. Grown up without being formal.
 
-**Above the fold:**
-- H1: the one-liner from § 2.
-- 15-second loop video of the Magic Moment (or a static three-up of the three theme modes if the video isn't ready).
-- Email field + button: "Get the beta."
+### Post templates (reusable)
 
-**Below the fold:**
-- Three messaging pillars (§ 2) as 3 cards.
-- One paragraph: "Who I am, why I'm building this." (Your face, your name, one short bio.)
-- 2-3 design-partner club logos / quotes once you have them (week 4+).
-- Footer: links to X, IG, LinkedIn, Field Notes newsletter.
+**Template A — Today I shipped:**
+> Today: [screenshot of a real screen or a diff].
+>
+> Why it matters: [one sentence tying the change to a reader or an author's experience].
+>
+> Next: [one specific next].
 
-### Stack recommendation (cheap)
+**Template B — Design decision:**
+> A choice I made this week: [decision — e.g., 4-week rentals, 15% Pro discount, tiered bands].
+>
+> The three options I considered: [A / B / C].
+>
+> Why I went with [X]: [one paragraph — usually reader-first or author-first reasoning].
 
-- **Hosting:** Vercel free tier or Carrd ($19/yr) if you don't want to write code on the marketing side.
-- **Forms + waitlist:** Resend + Convex *(you already use Convex)* OR Buttondown ($9/mo, has a free tier under 100 subscribers).
-- **Analytics:** Plausible ($9/mo) or Vercel Analytics free.
-- **Domain:** ~$12/yr.
+**Template C — Author story:**
+> Meet [Author]. She [one line about her work]. Her book *[Title]* opens in the Flipbook catalog on [date]. She's a founding-30 author.
+>
+> Why she signed: [one line quote or paraphrase].
+>
+> Rent her book on Flipbook for [₦ band] and 70% goes to her.
 
-Total month-1 cost: **$0-9** depending on whether you self-host the form.
+**Template D — Model math snapshot:**
+> Numbers from this week:
+> — [N] signed authors
+> — [N] PD titles ingested
+> — [N] on the waitlist
+> — [N] course communities live
+> — [$] estimated month-12 monthly contribution at current curve
+>
+> Full math: [link to public model math summary — later, when we're ready].
+
+### Cadence
+
+Both cofounders should be visible in the build-in-public thread — different voices, complementary angles. Moks posts product + design + build. Ayodeji posts publisher meetings + author signings + campus stories.
+
+---
+
+## 9. Landing page & waitlist (v2)
+
+The landing page rewrite is a dedicated deliverable — see `docs/landing-page-copy.md` v2.
+
+### High-level structure
+
+- **Hero:** *"The library African readers deserve. Rent smart. Read together."* + one-tap waitlist join.
+- **Below the fold:** three pillars (access / community / author economics), Nigerian indie catalog preview, founding-author names, brand-native Flip-mode visual.
+- **Founder section:** two-cofounder note.
+- **FAQ:** rentals, pricing, catalog, when the beta opens, how authors are paid.
+- **Footer:** links to X, IG, LinkedIn, hello@getflipbook.com.
+
+### Stack (unchanged from v1 landing)
+
+Single-file HTML + Tailwind, hosted on Vercel, form wired to the existing Convex `/waitlist` endpoint. Domain: getflipbook.com.
 
 ### Waitlist mechanics
 
-- Capture: email + 1 qualifier ("which book club are you in?" or "what's the last book you finished?"). The qualifier is the *real* value — it's both copy fuel and a signal of who's a hot lead vs. a passive lurker.
-- Confirmation email goes out immediately with a single CTA: "Reply to this email and tell me what you wish your current book club app did better." About 5-10% will reply. Every reply is product research.
-- **Referral loop *(stretch, week 5+)*:** Each signup gets a personal link. Refer 3 friends → guaranteed week-1 beta access. Use [waitlist.email](https://waitlist.email/) or roll your own with Convex.
-- **Two waitlists, not one:** a *reader waitlist* and a *creator waitlist* (one extra field on the latter). They get different email sequences.
-
-### Email sequence (4 touches over 8 weeks)
-
-1. **T+0** — welcome + 1 qualifier question.
-2. **Week 3** — first Field Notes issue.
-3. **Week 5** — the Magic Moment video, exclusive cut, "you'll be among the first to use this."
-4. **Week 7** — beta launch countdown + how to prep your club.
-5. **Week 8 day-of** — the invite link, plus a 1-pager on what's in beta vs. what's not.
+- Existing v1 waitlist carries over. New v2 waitlist signups are appended to the same `waitlist` table (same audience field).
+- Confirmation email (send via existing `internal.email.sendWelcomeEmail`) is rewritten to v2 voice: *"You're on the list. When we open in October, you'll be among the first."*
+- **v2 launch-day email:** sent to the full waitlist on Oct 13, 9am Lagos. Invite + first-book recommendation from the founding-30 catalog.
 
 ---
 
-## 10. The seed community — your 30 design-partner clubs
+## 10. The supply community — the founding-30 authors + first small publishers
 
-This is the most important non-build work you do in the 8 weeks. Press won't matter on day 1. Tweets won't matter on day 1. *Thirty real clubs with real books loaded* will.
+The most important non-build work in the 90 days. Detailed playbook in `docs/supply/`:
 
-### Where they come from
+- `docs/supply/target-list.md` — 30+ named authors and small publishers with contact vectors, warmth signals, and hooks.
+- `docs/supply/author-pitch-email.md` — 150-word pitch email + subject-line variants + follow-up cadence.
+- `docs/supply/author-term-sheet.md` — one-page plain-English term sheet.
 
-| Source | Estimated yield | Effort |
-|---|---|---|
-| Your direct network (friends, family, ex-coworkers, neighbors) | 8-12 | Low |
-| 2-hop network (your contacts' book clubs) | 8-12 | Medium — needs warm intros |
-| Bookstagram organizers you DM | 4-6 | Medium |
-| BookTok creators with small clubs | 2-3 | High |
-| Cold inbound from Field Notes / waitlist | 4-6 | Low — they come to you |
-| African / diaspora literary communities | 3-5 | Medium — high warmth |
+**Ayodeji owns.** Weekly progress reviewed at the Sunday cadence.
 
-### The pitch (90 seconds, in WhatsApp)
+### The founding-30 promise (public + to authors)
 
-> Hey [name] — I know you run [club name]. I'm building an app called Flipbook that's basically a real version of what your group chat is trying to be: a place to read the same book together, see each other's reactions on the page, and not lose discussion in scroll.
->
-> I'm looking for 30 book clubs to be design partners. You'd get the app first, free forever for your club, and the only ask is that you actually read a book on it with your group and give me notes.
->
-> Want a 5-minute call this week?
-
-### Onboarding a design partner
-
-Once they say yes:
-1. Add them to the "Flipbook design partners" WhatsApp broadcast list.
-2. Send them a short Notion / Google Doc with: what to expect, the timeline, what you'll ask of them, what you won't ask of them (no money, no spam, no public quotes without consent).
-3. Schedule a 20-min intake call: which book are they reading next? What's their current pain? What would make Flipbook a "must use" for them?
-4. Three days before beta day, send their personalized invite link and a "here's how to set up your club" 1-pager.
-
-### The first design-partner reward
-
-Free Pro tier for life (once Pro launches). You're spending zero now and giving them a small thing later that costs you almost nothing.
+- First 30 authors featured in launch marketing.
+- Guaranteed placement in launch shelf.
+- Band review at every subscriber milestone (500 Pro, 2,000 Pro, 10,000 Pro).
+- Consider offering an **80/20 founding-cohort split for the first 6 months** (case-by-case in signing negotiation — see term sheet internal notes).
 
 ---
 
-## 11. Launch week (week 8) — day by day
+## 11. Launch week (Oct 7 - Oct 13) — day by day
 
-| Day | Channels | What goes out |
-|---|---|---|
-| **Mon Jul 13** | X, IG, LinkedIn, Threads | Teaser: "Something I've been building for 7 weeks goes live this week." 1 sentence + a screenshot. |
-| **Tue Jul 14** | X, IG Reel | Behind-the-scenes: a 60-second "the journey" Reel — the first Figma file, the first Convex deploy, the first beta tester's reaction. |
-| **Wed Jul 15 9am Lagos** | WhatsApp broadcast → email → public | **Beta opens.** Design partners first (9am Lagos), then the full waitlist 2 hours later, then a public X / LinkedIn / IG post at 6pm Lagos / 12pm ET. |
-| **Wed Jul 15 evening** | All | **Launch post.** Format: short personal note from you + a 30-second clip of a real beta club reading together (with permission). Pinned tweet. |
-| **Thu Jul 16** | X, Threads, LinkedIn | Reaction roundup — quote-RT every meaningful post about Flipbook from real users. Screenshot 3 best ones for IG. |
-| **Fri Jul 17** | All | "Day 2 of the beta" — concrete numbers (N clubs, M reactions in margins, the most-read book so far). Specific > vague. |
-| **Sat Jul 18** | X | Pause. Rest day. |
-| **Sun Jul 19** | LinkedIn long-form + Field Notes newsletter | Retrospective. Honest: what worked, what broke, what's next. This becomes a foundational post you'll reference forever. |
+| Day | Owner | Channels | What goes out |
+|---|---|---|---|
+| **Mon Oct 7** | Moks + Ayodeji | X, IG, LinkedIn, Threads | Teaser: *"Something we've been building for the last 90 days opens next Monday."* + a screenshot of the catalog. |
+| **Tue Oct 8** | Moks | X, IG Reel | Behind-the-scenes: 60s Reel of the pivot journey — the old app, the new catalog, a founding author's book being uploaded. |
+| **Wed Oct 9** | Ayodeji | LinkedIn, X | Founding-author feature post — first 3 authors named with covers. |
+| **Thu Oct 10** | Moks | Instagram, TikTok | The 15-second audio-reader demo — a chapter narrated in Flip mode. Visually striking. |
+| **Fri Oct 11** | Ayodeji | Warm networks | WhatsApp broadcast to the founding-partner clubs + first 100 warm-network readers: *"Beta opens Monday 9am Lagos."* |
+| **Sat Oct 12** | Both | Quiet | Rest day. Final QA. |
+| **Sun Oct 13** | Both | All channels + waitlist email + press | **v2 launch.** |
 
-### Launch-day press list
+### Launch day (Oct 13) — hour by hour (Lagos time)
 
-You don't need press to launch. But a few targeted sends are cheap and asymmetric:
+- **6am** — final smoke test of the happy path with cofounders' accounts on live keys.
+- **8am** — waitlist launch email sent (full waitlist ~8k).
+- **9am** — founding-30 authors receive their launch pack + a personal thank-you message from Moks + Ayodeji.
+- **10am** — first public X post: *"Flipbook v2 is live. Rent your first book from ₦500."* + landing-page link + one-line pitch.
+- **11am** — Instagram post + Reel (audio demo).
+- **12pm (Lagos) / 1pm (Cairo) / 8am (New York)** — LinkedIn long-form post from Moks + Ayodeji, framed as "what we spent 90 days building."
+- **2pm** — Threads post + TikTok upload.
+- **3pm** — press sends to Brittle Paper, Olongo Africa, Isele Magazine, Doek! Magazine, Aké Festival network.
+- **6pm** — pinned tweet: aggregate launch-day numbers (waitlist opens, first rentals, first Pro subs).
+- **9pm** — a short evening reflection from Moks — *"Day 1 done. Here's what we saw."*
 
-- **Substack writers in books / reading / community:** Anne Helen Petersen, Anne Bogel, Lincoln Michel, Tajja Isen, smaller niche newsletters (Books Are Magic, Lit Hub).
-- **Indie podcasts:** Bookable, Currently Reading, By the Book, BookTok-adjacent podcasts.
-- **African / diaspora literary outlets:** Brittle Paper, Africa in Dialogue, Olongo Africa.
-- **Indie hacker / designer venues:** Indie Hackers homepage, Product Hunt *(only if/when ready — don't burn this card prematurely)*.
+### Launch-week press list
 
-Send one short email each. 3 sentences. Link to the Magic Moment video. No press release.
+- **African literary outlets:** Brittle Paper, Olongo Africa, Africa in Dialogue, Isele Magazine, Doek! Magazine, Bakwa Magazine.
+- **Nigerian tech press:** TechCabal, Benjamindada.com, Techpoint Africa.
+- **Bookstagram + BookTok:** the amplifier list from `docs/supply/target-list.md` Tier 3.
+
+Send one short email each. 3 sentences. Link to landing page. No press release.
 
 ---
 
-## 12. First 30 days post-beta
+## 12. First 30 days post-launch
 
-Once beta is live, the campaign's job changes. You're no longer recruiting — you're proving that people actually use it and that they tell their friends.
+**Goals:**
 
-### Goals for the first 30 days
-
-- **Activation:** 70% of beta-day-1 users finish onboarding and join or create at least one club within 48 hours.
-- **Engagement:** Avg. of 3 reading sessions per active user per week.
-- **Retention:** 50% of beta-day-1 users still active in week 4.
-- **Referral:** 30% of beta users invite at least one friend who joins a club.
-- **Stories captured:** 10 quotable customer testimonials + 3 video testimonials.
+- **First paying reader by day 1** (Oct 13).
+- **First author payout by Nov 15** (first monthly statement for October rentals).
+- **20+ rentals by day 3.**
+- **200+ active users by day 30.**
+- **10+ Pro subscribers by day 30.**
+- **5+ course communities live by day 30.**
+- **Public author-payout headline moment** — post the aggregate first-month payout amount at day 45 (once we're through the first monthly cycle).
 
 ### Content shift
 
-- Pillar mix changes: Pillar 1 (build) drops to 25%, Pillar 5 (community spotlight) jumps to 25%.
-- Weekly "this week in Flipbook" newsletter — numbers, club spotlights, lessons.
-- Start a "shipped this week" repeating X thread on Fridays. Becomes a ritual.
+Pre-launch was mostly promise ("here's what we're building"). Post-launch is proof ("here's what happened").
 
-### First post-beta paid experiment *(only if you have $50-100 to spend)*
-
-Run a small Meta / Instagram ad targeting Bookstagram interest users — $5/day for 7 days, single creative (the Magic Moment Reel), one CTA (join the waitlist or download the app). Goal isn't conversions, it's a *cost-per-click benchmark*. If CPC is under $0.50 you have a paid lever for later; if it's above $2 you don't, and that's fine.
+- **Daily** — one specific number, one specific delight (a real reader reaction quote with permission, a real author message).
+- **Weekly Sunday** — a retrospective post: what worked, what didn't, what shipped, what's next.
+- **Monthly** — aggregate numbers post: rentals, active users, Pro subs, author payouts.
 
 ---
 
-## 13. Metrics & measurement
+## 13. Metrics dashboard & sanity checks
 
-### Dashboard you check every Sunday
+Track weekly in a Notion or Airtable page. Reviewed at the Sunday cadence.
 
-| Metric | Source | Update cadence |
-|---|---|---|
-| Waitlist signups (total + delta) | Buttondown / Convex | Daily glance, Sunday review |
-| X followers / engagement | Native analytics | Sunday |
-| IG followers / saves per post | Native analytics | Sunday |
-| LinkedIn followers / impressions | Native analytics | Sunday |
-| Newsletter opens / clicks | Buttondown | Per send |
-| Design partners committed | Notion tracker | Weekly |
-| Top-3 best-performing posts of the week | Manual log | Sunday |
-| Total marketing hours spent | Toggl / self-report | Sunday |
+| Metric | Weeks 1-4 | Weeks 5-8 | Weeks 9-12 | Post-launch |
+|---|---|---|---|---|
+| Signed indie authors | 5-10 | 15-20 | 25-30 | 30 → 40+ |
+| Publisher meetings | 1-2 | 3-4 | 5-8 | 8+ |
+| PD titles ingested | 50-100 | 200-300 | 400-500 | 500-1000 |
+| Indie titles published | 0-3 | 5-12 | 20-25+ | 25 → 60+ |
+| Waitlist total | 5,200 | 6,000 | 7,500 | 8,000+ |
+| Active users | — | — | — | 200+ by day 30 |
+| Pro conversion | — | — | — | 3-5% by day 30 |
+| First paying reader | — | — | Oct 13 | ✅ |
 
-### Vanity metrics to ignore
+### Sanity checks
 
-- Total impressions (means nothing without engagement).
-- TikTok followers under 1,000 (the algorithm is the audience until 1k).
-- LinkedIn likes (LinkedIn is built on impressions, not likes).
-
-### The one sanity check
-
-If at the end of week 4 you have **fewer than 200 waitlist signups**, the issue is probably not the channels — it's the messaging. Stop posting for 48 hours, rewrite the one-liner, A/B test the landing page H1, and resume. Don't add channels to fix a positioning problem.
+- **If signed indie authors < 15 by day 45** — supply pitch or terms are wrong. Emergency review of `docs/supply/`. Consider a 90/10 or 80/20 founding-cohort split as a short-term unlock.
+- **If PD titles ingested < 200 by day 30** — ingestion pipeline is broken or too manual. Refactor.
+- **If waitlist growth stalls before day 60** — landing page is not landing. A/B a new hero or add a specific catalog title as social proof.
+- **If Pro conversion < 2% by day 30 post-launch** — Pro benefits aren't visible enough. Ship the audio-reader promo more aggressively.
 
 ---
 
-## 14. Budget allocation — $20/mo target
+## 14. Budget
 
-Within your stated $15-30/mo cap, here's a default allocation. Skip any line you can substitute with a free alternative.
+Same discipline as v1 — under $100/mo for the first year, growing only as revenue justifies.
 
-| Line item | Cost | Notes |
+| Line | Cost | Notes |
 |---|---|---|
-| Domain (annual ÷ 12) | $1/mo | Namecheap or Cloudflare Registrar. |
-| Buttondown newsletter | $9/mo | Free under 100 subs; upgrade in week 3 once you cross. Substack is free but locks you in. |
-| Plausible / Vercel Analytics | $0-9/mo | Free Vercel Analytics is fine for now. |
-| Canva Pro (carousels, Reels) | $0-12/mo | Free tier works for 80% of needs; upgrade only if you find yourself hitting limits. |
-| CapCut Pro (video editing) | $0/mo | Free tier covers your use case. |
-| Buffer / Hypefury *(scheduling, optional)* | $0-6/mo | Free Buffer plan covers 3 channels. |
-| **Total typical month** | **$10-25** | Leaves headroom for one paid experiment. |
+| Domain | ~₦1,500/mo | Namecheap or similar |
+| Vercel (landing) | $0-20/mo | Free tier probably enough |
+| Convex Pro | ~$25/mo | Bumping from free tier for real usage |
+| Buttondown OR Resend | $0-10/mo | Author statement emails + waitlist |
+| Cal.com | $0-15/mo | Author + lecturer booking |
+| Sentry free tier | $0 | Error tracking |
+| Canva Pro *(optional)* | $12/mo | Social + author launch packs |
+| CapCut Pro *(optional)* | Free | Video for TikTok/Reels |
+| Buffer *(optional)* | $6/mo | Scheduling |
+| **Fixed subtotal** | **~$50-90/mo** | |
+| OpenAI TTS ingestion | ~$6/book × ingestion rate | Real spend at ingestion cadence |
+| ElevenLabs (Specials) | ~$50/book | 5 titles at launch = ~$250 one-time |
+| Paystack fees | 1.5% of rentals | Cost-of-revenue |
+| Wise / PayPal fees | ~1-2% of USD payouts | Cost-of-payout |
 
-### Where *not* to spend in the pre-launch sprint
-
-- Paid ads (until week 8 at earliest).
-- Influencer paid posts (no ROI without a product to point to).
-- Stock photography (your screens are the photography).
-- A "real" PR firm (irrelevant at this stage).
+Total Year-1 fixed run rate: ~$50-100/mo. Content ingestion + payment fees scale with revenue.
 
 ---
 
 ## 15. Risks & mitigations
 
-| Risk | Likelihood | Impact | Mitigation |
+| Risk | Impact | Likelihood | Mitigation |
 |---|---|---|---|
-| Moks burns out on posting cadence | Medium (down from High — cofounder absorbs the BD load) | Slows content engine | Content is now only *half* the job, not all of it — Ayodeji owns BD/relationships, so Moks isn't also carrying organizer recruitment. If content still overloads: drop TikTok first, halve LinkedIn second, never drop X or IG. The 30 design-partner clubs (Ayodeji's pipeline) can carry the beta even if content goes quiet. |
-| Founder concentration — too much depends on one of the two | Medium | Stalls a whole engine if one is out | Two-person teams have no bench. Keep both engines documented and lightweight; cross-brief weekly so either can cover the other's basics for a short stretch. Don't let BD live only in Ayodeji's head — log it in the shared pipeline board. |
-| Beta product isn't ready on July 15 | Medium-high | Damages launch impression | Pre-commit week 7's "if not ready, slip 5 days" rule. Slipping is fine if announced 4 days early. Shipping broken is not. |
-| Waitlist plateaus around 400-500 | Medium | Below KPI but not fatal | Messaging is wrong. Rewrite H1. Switch hero post format. |
-| You can't recruit 30 clubs from your network | Medium | Beta cohort too thin | Expand source mix earlier — start cold-DMing Bookstagram organizers in week 3, not week 5. |
-| #BookTok / Bookstagram doesn't bite | Medium | Channel underperforms | Don't catastrophize — X + LinkedIn + WhatsApp are the load-bearing channels. IG/TikTok are upside. |
-| A competitor launches something similar in the window | Low | Distraction, not extinction | Your wedge (reactions in margins + creator publishing) is specific. Don't pivot to chase them. Lean harder into the differentiator. |
-| Hate / brigading on a viral post | Low | Energy drain | Don't engage. Mute, screenshot, move on. Pin a "what is Flipbook" tweet so new visitors can self-orient. |
-| Marketing the kids' / children's-club angle (Segment D) before safety ships | Medium | Legal + reputational landmine | Hard rule: no children's-club messaging, no edu/parent-channel outreach, and no "safe for kids" claims until Phase 9 (age gate) ships, Phase 10 (VPC) is built, and counsel has signed off. Keep the whole pre-launch sprint adult-reader-focused. |
-| Minors show up organically once the app is public | Medium | Compliance exposure | The Children's Code applies the moment minors are *likely to access* a public app — Phase 9's age gate must be live before public launch regardless of whether you market to kids. Don't open to the public without it. |
+| Founding-30 cohort under-fills (< 20 signed by day 60) | High — catalog is thin at launch | Medium | Over-pitch (35-40 targets); consider 80/20 bonus for founding cohort |
+| Paystack payment failure rate > 20% | Medium — kills first-week conversion | Medium | Rebill logic prioritized in Phase 16 (TASK-183) |
+| NGN depreciates 15%+ between now and launch | Medium — USD cost lines compress margin | High (structural) | Model FX conservatively; ready to raise Pro prices if NGN falls > 20% |
+| App Store or Play Store rejection | High — blocks launch date | Low-medium | Submit 3 weeks early; use existing v1 approval as reference |
+| Cofounder unavailability during launch week | High | Low | Confirm both cofounders are Lagos-based and available Oct 7-14; no travel |
+| Catalog copyright challenge (author dispute or publisher C&D) | Medium | Low | Non-exclusive terms + 30-day pullout right + DMCA takedown ready |
+| Two-cofounder capacity exhaustion | High | Medium | Ruthless scope; explicit "if we only ship one thing this week" prioritization |
+| Waitlist conversion < 15% at launch | Medium — hits day-1 numbers | Low-medium | Landing page A/B; personal reactivation from Ayodeji to top-100 warm signups |
 
 ---
 
-## 16. Next actions — this week (Mon May 25 → Sun May 31)
+## 16. This-week punch list (Jul 15-21)
 
-In priority order. Time estimates assume your part-time bandwidth.
+Written to be actioned on Monday morning by both cofounders.
 
-**Monday (1.5 hrs)**
-- Secure domain + create a Carrd / Vercel landing page with the one-liner, email field, and 3 pillar cards.
-- Set up Buttondown account (free tier) and connect the form.
-- Create or refresh the @flipbook handle on X, Instagram, Threads, LinkedIn (personal + company page), TikTok.
+**Moks:**
+- [ ] Ship schema migration (TASK-122–124) to staging.
+- [ ] EPUB reader library decision (TASK-125) — evaluate 3 options, pick one by Friday.
+- [ ] Ingest first 25 PD titles from Standard Ebooks manually.
+- [ ] Ship 3 build-in-public posts about the pivot.
+- [ ] Publish updated landing page copy (`docs/landing-page-copy.md` v2 → live at getflipbook.com).
 
-**Tuesday (1.5 hrs)**
-- Draft the **hero post** for week 1: the long-form "I'm building Flipbook. Here's why" (LinkedIn essay + X thread cut-down).
-- Sit on it overnight; edit Wednesday morning.
+**Ayodeji:**
+- [ ] Set up `moks@getflipbook.com` and `ayodeji@getflipbook.com`.
+- [ ] Set up Cal.com booking link.
+- [ ] Verify contact vectors for target list entries #1-10.
+- [ ] Send first 8-12 pitch emails.
+- [ ] Onboard Moks's parents' two course communities (do it in the v1 UI if v2 course type isn't shipped yet — use `type: "private"` as a temporary shim; migrate to `type: "course"` when Phase 15 ships).
+- [ ] Draft the v2 waitlist reactivation email (send in Week 11).
 
-**Wednesday (1.5 hrs)**
-- Post the hero post (X mid-morning Lagos time → strong overlap with US morning; LinkedIn early afternoon).
-- Reply to every reply for the first 4 hours. This is where momentum dies if you disappear.
-
-**Thursday (1 hr)**
-- Cross-publish a condensed version to Instagram (carousel) and Threads.
-- DM 5 book club organizers in your network with the "design partner" pitch.
-
-**Friday (1 hr)**
-- First "today I shipped" X post — show whatever you have from Phase 0 (the empty Convex schema, the design tokens rendered in three modes, anything).
-- DM 5 more book club organizers.
-
-**Saturday (30 min)**
-- Light. Reply to comments, save a few good Bookstagram posts to your reference folder.
-
-**Sunday (1 hr)**
-- First weekly review. Numbers, what worked, what to change in week 2.
-- Schedule week 2's hero post to be drafted by Tuesday.
+**Both, Sunday evening (Jul 20):**
+- [ ] 45-min review: what shipped, what's blocked, next week's punch list.
 
 ---
 
-## Appendix A — Quick reference: where this plan plugs into the other docs
+## Appendix A — Cross-references
 
-- **One-liner & pillars** — anchor the H1 in your landing page, IG bio, X bio.
-- **Three theme modes** — these are *content*, not just a build deliverable. Show them everywhere. (`product-vision.md` § 5, `design-tokens.json`.)
-- **Magic Moment** — defined in `product-vision.md` § 1; the campaign's hero demo is built around this exact 15-second clip.
-- **Permissions object** in `clubs` table — this is the foundation for the "your club, your rules" creator-narrative posts in week 5. (`prd.md` § Data Model.)
-- **Phase 2 monetization** — referenced in the creator pillar; pre-launch, you're only *signaling* it exists, not selling.
-- **Age gate & minor safety** — Segment D (children's clubs) is gated on `prd.md` § 6B and roadmap Phases 9–10. Treat it as a post-launch expansion channel; the onboarding lanes themselves are spec'd in `onboarding-flows.md`.
+- Product context: `product-vision.md` v2.0, `prd.md` v2.0.
+- Build sequence: `product-roadmap.md` v2.0.
+- Model math: `model-math.md`, `flipbook-model.xlsx`.
+- Supply playbooks: `docs/supply/author-pitch-email.md`, `docs/supply/author-term-sheet.md`, `docs/supply/target-list.md`.
+- Marketing site copy: `landing-page-copy.md` v2.
+
+## Appendix B — Note on the two-cofounder structure
+
+The plan above assumes both cofounders are available part-time (~50-60 hrs/wk combined) through the 90 days. If Ayodeji is unavailable for a week (day job, family, illness), the supply-side pitching slows but the build continues — Moks holds the product line, and Ayodeji catches up on return. Similarly if Moks is unavailable, supply-side and campus ops continue via Ayodeji while build pauses. **This resilience is the primary reason the two-cofounder split de-risks the plan** compared to a solo-founder equivalent.
 
 ---
 
-## Appendix B — A short note about your situation
-
-You're a two-person, part-time founding team building from Lagos on ~$20/month of software spend — a designer-founder (Moks) and an operations-and-network cofounder (Ayodeji). Most launch playbooks online are written by 4-person teams in San Francisco with $50k pre-launch budgets. This plan is deliberately the opposite: it leans on the two things those teams *can't fake* — that Moks is visibly, specifically, the person building this thing in public week after week, and that Ayodeji can actually get Flipbook into the rooms and relationships that turn into clubs.
-
-Two compounding assets, not one. The first is the **archive of build-in-public posts that, by week 8, looks like a documentary** — people scroll back through the feed before they sign up, so make what they find good. The second is the **network of warm relationships** Ayodeji builds: organizers, creators, and partners who show up at launch because a real person earned their trust, not because an ad found them. The introvert builds the artifact; the extrovert opens the doors. Play to both.
-
-— end of doc.
+**End of GTM v2.0.** Update the version header and the numbers in § 3 as the campaign runs.
