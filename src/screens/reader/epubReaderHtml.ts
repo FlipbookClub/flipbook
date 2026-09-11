@@ -20,7 +20,7 @@ import { EPUB_RUNTIME } from "./epubRuntime";
 
 // Bump when the runtime, CSS, or bundled libs change, so a stale on-disk copy
 // gets rewritten rather than silently serving the old reader.
-const READER_VERSION = "5";
+const READER_VERSION = "6";
 
 // Written into the same directory as the cached .epub files. WKWebView grants
 // read access by directory, so co-locating means the page can fetch the book

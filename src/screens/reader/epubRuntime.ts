@@ -20,6 +20,9 @@ export const EPUB_RUNTIME = String.raw`
   // from the spine index (see percentFor).
   var locationsReady = false;
   var currentCfi = null;
+  // Kept because a flow change rebuilds the rendition from scratch and has to
+  // restore everything the old one was carrying.
+  var settings = { fontSize: 100, bg: "#ffffff", fg: "#000000", flow: "paged" };
 
   function post(msg) {
     try {
@@ -134,6 +137,8 @@ export const EPUB_RUNTIME = String.raw`
   }
 
   function applyTheme(bg, fg) {
+    settings.bg = bg;
+    settings.fg = fg;
     if (!rendition) return;
     try {
       rendition.themes.override("color", fg);
@@ -157,12 +162,28 @@ export const EPUB_RUNTIME = String.raw`
     return out;
   }
 
-  function open(cfg) {
-    try {
-      book = ePub(cfg.url, { openAs: "epub" });
-    } catch (e) {
-      fail("open", e);
-      return;
+  // Builds (or rebuilds) the rendition for the current flow.
+  //
+  // The manager, not just the flow, is what decides whether scrolling chains
+  // across chapters. epub.js's default manager renders ONE spine item at a
+  // time, so "scrolled-doc" scrolls to the end of a chapter and simply stops,
+  // which is exactly what it did. The continuous manager pre-renders adjacent
+  // sections and stitches them into one scroll. The manager cannot be swapped
+  // on a live rendition, so a flow change has to tear down and rebuild.
+  function buildRendition() {
+    var scrolled = settings.flow === "scroll";
+
+    if (rendition) {
+      try {
+        rendition.destroy();
+      } catch (e) {
+        fail("destroyRendition", e);
+      }
+      rendition = null;
+      // Defensive: if destroy() leaves anything behind, renderTo would stack a
+      // second view on top of the remnants and the book would appear twice.
+      var container = document.getElementById("viewer");
+      if (container) container.innerHTML = "";
     }
 
     rendition = book.renderTo("viewer", {
@@ -170,15 +191,18 @@ export const EPUB_RUNTIME = String.raw`
       height: "100%",
       // Paginated is the closest thing to a book; "always" spread would give
       // two columns on a phone, which is unreadable.
-      flow: cfg.flow === "scroll" ? "scrolled-doc" : "paginated",
+      flow: scrolled ? "scrolled" : "paginated",
+      manager: scrolled ? "continuous" : "default",
       spread: "none",
       allowScriptedContent: false,
     });
+    debug("rendition:built", settings.flow + (scrolled ? " continuous" : " default"));
 
-    rendition.themes.fontSize(cfg.fontSize + "%");
-    applyTheme(cfg.bg, cfg.fg);
+    rendition.themes.fontSize(settings.fontSize + "%");
+    applyTheme(settings.bg, settings.fg);
 
-    // Every section gets its own iframe document as it renders.
+    // Every section gets its own iframe document as it renders. Re-registered
+    // on each rebuild, since the hooks belong to the rendition.
     try {
       rendition.hooks.content.register(function (contents) {
         attachGestures(contents.document, "section");
@@ -187,7 +211,6 @@ export const EPUB_RUNTIME = String.raw`
     } catch (e) {
       fail("gestureHook", e);
     }
-    // The margins around the iframe belong to the outer document.
     attachGestures(document, "outer");
 
     rendition.on("relocated", function (location) {
@@ -202,10 +225,24 @@ export const EPUB_RUNTIME = String.raw`
       });
     });
 
-    // A tap that is not a swipe: used by RN to toggle the chrome.
     rendition.on("click", function () {
       post({ type: "tap" });
     });
+  }
+
+  function open(cfg) {
+    settings.fontSize = cfg.fontSize;
+    settings.bg = cfg.bg;
+    settings.fg = cfg.fg;
+    settings.flow = cfg.flow === "scroll" ? "scroll" : "paged";
+    try {
+      book = ePub(cfg.url, { openAs: "epub" });
+    } catch (e) {
+      fail("open", e);
+      return;
+    }
+
+    buildRendition();
 
     book.ready
       .then(function () {
@@ -273,6 +310,7 @@ export const EPUB_RUNTIME = String.raw`
             rendition.display(msg.cfi);
             break;
           case "setFontSize":
+            settings.fontSize = msg.value;
             rendition.themes.fontSize(msg.value + "%");
             // Reflowing changes where we are; re-anchor on the current CFI so
             // the reader does not jump to the top of the chapter.
@@ -281,13 +319,19 @@ export const EPUB_RUNTIME = String.raw`
           case "setTheme":
             applyTheme(msg.bg, msg.fg);
             break;
-          case "setFlow":
-            debug("cmd:setFlow", msg.value);
-            rendition.flow(msg.value === "scroll" ? "scrolled-doc" : "paginated");
-            // Changing flow relays the whole section out, which loses the
-            // position; re-anchor on the current CFI the way font size does.
-            if (currentCfi) rendition.display(currentCfi);
+          case "setFlow": {
+            var nextFlow = msg.value === "scroll" ? "scroll" : "paged";
+            if (nextFlow === settings.flow) break;
+            debug("cmd:setFlow", nextFlow);
+            settings.flow = nextFlow;
+            var resumeAt = currentCfi;
+            buildRendition();
+            // The rebuild starts empty, so put the reader back where it was.
+            rendition.display(resumeAt || undefined).catch(function (e) {
+              fail("setFlow:display", e);
+            });
             break;
+          }
         }
       } catch (e) {
         fail("handle:" + (msg && msg.type), e);
