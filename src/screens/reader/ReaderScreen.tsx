@@ -859,6 +859,8 @@ export function ReaderScreen({ navigation, route }: Props) {
             // epub.js reads it as "no target" and opens at the beginning.
             startCfi={epubStartCfi ?? undefined}
             fontSize={epubFontSize}
+            // EPUBs honour the same Reading-view toggle as PDFs.
+            flow={pageMode}
             bg={colors.surfacePrimary}
             fg={colors.textPrimary}
             onRelocated={(cfi, percent) => {
@@ -890,8 +892,8 @@ export function ReaderScreen({ navigation, route }: Props) {
           onClose={() => setCustomizeOpen(false)}
           pageMode={pageMode}
           onChangeMode={setReadingMode}
-          // epub.js runs paginated; there is no scroll variant to offer.
-          showPageMode={false}
+          // epub.js has a scrolled flow, so the toggle is real here too.
+          showPageMode
           showFontSize
           fontSize={epubFontSize}
           onChangeFontSize={setEpubFont}

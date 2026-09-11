@@ -46,6 +46,8 @@ interface Props {
   /** Stored resume position. Undefined opens at the beginning. */
   startCfi?: string;
   fontSize: number;
+  /** Mirrors the PDF reader's pageMode: "paged" paginates, "scroll" flows. */
+  flow: "paged" | "scroll";
   bg: string;
   fg: string;
   onRelocated?: (cfi: string, percent: number) => void;
@@ -66,7 +68,7 @@ type Incoming =
   | { type: "error"; where: string; message: string };
 
 export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReader(
-  { fileUri, startCfi, fontSize, bg, fg, onRelocated, onReady, onTap, onError },
+  { fileUri, startCfi, fontSize, flow, bg, fg, onRelocated, onReady, onTap, onError },
   ref,
 ) {
   const webRef = useRef<{ injectJavaScript: (js: string) => void } | null>(null);
@@ -139,6 +141,20 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
     [],
   );
 
+  // Compose instead of replace. Gesture.Native() is what lets the web view
+  // receive its own touches at all — without it the instrumented run recorded
+  // zero pointer, mouse and touch events inside the page, which is why
+  // scrolling had nothing to work with. Simultaneous keeps the page swipe
+  // working alongside it. In scroll flow the swipe is dropped entirely, so a
+  // vertical drag is never competing with a page turn.
+  const gesture = useMemo(
+    () =>
+      flow === "scroll"
+        ? Gesture.Native()
+        : Gesture.Simultaneous(Gesture.Native(), swipe),
+    [flow, swipe],
+  );
+
 
   useImperativeHandle(ref, () => ({
     next: () => send({ type: "next" }),
@@ -156,6 +172,9 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
   useEffect(() => {
     if (displayed) send({ type: "setFontSize", value: fontSize });
   }, [displayed, fontSize, send]);
+  useEffect(() => {
+    if (displayed) send({ type: "setFlow", value: flow });
+  }, [displayed, flow, send]);
 
   const handleMessage = useCallback(
     (event: { nativeEvent: { data: string } }) => {
@@ -175,6 +194,7 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
               url: fileUri,
               startCfi: startCfi ?? null,
               fontSize,
+              flow,
               bg,
               fg,
             });
@@ -231,7 +251,7 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
         // before the page ever sees them. Gesture.Native() makes it stand down.
         // This is the same fault that broke PDFKit's long-press selection in
         // Phase 2; see feedback on RNGH root arbitration.
-        <GestureDetector gesture={swipe}>
+        <GestureDetector gesture={gesture}>
         <WebView
           ref={webRef}
           source={{ uri: htmlUri }}
@@ -243,9 +263,8 @@ export const EpubReader = forwardRef<EpubReaderHandle, Props>(function EpubReade
           allowFileAccess
           allowFileAccessFromFileURLs
           allowingReadAccessToURL={EPUB_READER_DIR}
-          // Pagination is horizontal; the outer scroll view would otherwise
-          // swallow the swipes epub.js needs.
-          scrollEnabled={false}
+          // Paginated content never scrolls; scrolled-doc must.
+          scrollEnabled={flow === "scroll"}
           bounces={false}
           javaScriptEnabled
           domStorageEnabled

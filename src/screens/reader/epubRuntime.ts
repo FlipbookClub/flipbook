@@ -170,7 +170,7 @@ export const EPUB_RUNTIME = String.raw`
       height: "100%",
       // Paginated is the closest thing to a book; "always" spread would give
       // two columns on a phone, which is unreadable.
-      flow: "paginated",
+      flow: cfg.flow === "scroll" ? "scrolled-doc" : "paginated",
       spread: "none",
       allowScriptedContent: false,
     });
@@ -280,6 +280,13 @@ export const EPUB_RUNTIME = String.raw`
             break;
           case "setTheme":
             applyTheme(msg.bg, msg.fg);
+            break;
+          case "setFlow":
+            debug("cmd:setFlow", msg.value);
+            rendition.flow(msg.value === "scroll" ? "scrolled-doc" : "paginated");
+            // Changing flow relays the whole section out, which loses the
+            // position; re-anchor on the current CFI the way font size does.
+            if (currentCfi) rendition.display(currentCfi);
             break;
         }
       } catch (e) {
