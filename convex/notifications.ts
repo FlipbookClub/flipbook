@@ -14,6 +14,7 @@ import { getCurrentUser } from "./users";
 
 const notificationTypeValidator = v.union(
   v.literal("chapter_drop"),
+  v.literal("new_book_in_club"),
   v.literal("reaction_reply"),
   v.literal("club_invite"),
   v.literal("milestone"),
@@ -265,6 +266,112 @@ export const sendChapterDropFanout = internalAction({
       }
     }
     // Expo accepts up to 100 messages per POST.
+    for (let i = 0; i < pushMessages.length; i += 100) {
+      await sendExpoBatch(pushMessages.slice(i, i + 100));
+    }
+    return null;
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Internal — new-book-in-club fanout (P5-T1 / FB-004)
+// ---------------------------------------------------------------------------
+
+export const collectNewBookAudience = internalQuery({
+  args: { bookId: v.id("books") },
+  returns: v.union(
+    v.null(),
+    v.object({
+      book: v.object({
+        _id: v.id("books"),
+        clubId: v.id("clubs"),
+        title: v.string(),
+        author: v.string(),
+      }),
+      clubName: v.string(),
+      uploaderName: v.string(),
+      recipients: v.array(
+        v.object({
+          userId: v.id("users"),
+          pushToken: v.optional(v.string()),
+        }),
+      ),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const book = await ctx.db.get(args.bookId);
+    if (!book || book.isRemoved) return null;
+    const club = await ctx.db.get(book.clubId);
+    if (!club) return null;
+    const uploader = await ctx.db.get(book.uploadedByUserId);
+    const memberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_club", (q) => q.eq("clubId", book.clubId))
+      .collect();
+
+    const recipients = [] as Array<{ userId: Id<"users">; pushToken?: string }>;
+    for (const m of memberships) {
+      // The uploader knows; they just did it.
+      if (m.userId === book.uploadedByUserId) continue;
+      const user = await ctx.db.get(m.userId);
+      if (!user) continue;
+      // Reuses the chapterDrops preference deliberately: from a member's side
+      // both are "new content landed in my club", and notificationPrefs is a
+      // strict object, so a third key would need every existing row to carry
+      // it. Revisit if anyone actually asks to split them.
+      if (user.notificationPrefs && !user.notificationPrefs.chapterDrops) continue;
+      recipients.push({ userId: user._id, pushToken: user.pushToken });
+    }
+
+    return {
+      book: {
+        _id: book._id,
+        clubId: book.clubId,
+        title: book.title,
+        author: book.author,
+      },
+      clubName: club.name,
+      uploaderName: uploader?.displayName ?? "Someone",
+      recipients,
+    };
+  },
+});
+
+export const sendNewBookFanout = internalAction({
+  args: { bookId: v.id("books") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const snapshot = await ctx.runQuery(
+      internal.notifications.collectNewBookAudience,
+      { bookId: args.bookId },
+    );
+    if (!snapshot) return null;
+
+    const title = snapshot.clubName;
+    // Voice guide: an invitation, never a summons. No counts, no streaks, no
+    // implication that anyone is behind.
+    const body = `${snapshot.uploaderName} added ${snapshot.book.title} by ${snapshot.book.author}. Come take a look.`;
+    const deepLink = `flipbook://clubs/${snapshot.book.clubId}/books/${snapshot.book._id}`;
+
+    const pushMessages: Parameters<typeof sendExpoBatch>[0] = [];
+    for (const r of snapshot.recipients) {
+      await ctx.runMutation(internal.notifications.recordNotification, {
+        userId: r.userId,
+        type: "new_book_in_club",
+        title,
+        body,
+        deepLink,
+        relatedId: snapshot.book._id,
+      });
+      if (r.pushToken) {
+        pushMessages.push({
+          to: r.pushToken,
+          title,
+          body,
+          data: { deepLink, type: "new_book_in_club", relatedId: snapshot.book._id },
+        });
+      }
+    }
     for (let i = 0; i < pushMessages.length; i += 100) {
       await sendExpoBatch(pushMessages.slice(i, i + 100));
     }

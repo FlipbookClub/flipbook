@@ -272,6 +272,7 @@ export default defineSchema({
     userId: v.id("users"),
     type: v.union(
       v.literal("chapter_drop"),
+      v.literal("new_book_in_club"),
       v.literal("reaction_reply"),
       v.literal("club_invite"),
       v.literal("milestone"),

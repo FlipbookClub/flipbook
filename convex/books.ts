@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 
 import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { internal } from "./_generated/api";
 import type { Doc, Id } from "./_generated/dataModel";
 import { isAdminEmail } from "./lib/admins";
 import { normalizeGenres } from "./genres";
@@ -188,6 +189,12 @@ export const register = mutation({
       createdAt: now,
     });
     await ctx.db.patch(args.clubId, { lastActivityAt: now });
+
+    // P5-T1. Scheduled rather than awaited, so a push outage can never fail an
+    // upload that already succeeded — same contract as the chapter drop.
+    await ctx.scheduler.runAfter(0, internal.notifications.sendNewBookFanout, {
+      bookId,
+    });
     return bookId;
   },
 });
