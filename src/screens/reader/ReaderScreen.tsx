@@ -16,7 +16,7 @@ import {
   type HighlightRect,
   type NativeHighlightPdfViewRef,
 } from "native-highlight-pdf";
-import { BookOpen, Bookmark, BookmarkFilled, Pencil, Settings2, Smile, X } from "@/lib/icons";
+import { BookOpen, Bookmark, BookmarkFilled, Pencil, Settings2, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -564,8 +564,9 @@ export function ReaderScreen({ navigation, route }: Props) {
     }
   };
 
-  // FR-014: 400ms long-press opens the picker (the floating Smile FAB is the
-  // reliable entry on iOS where PDFKit consumes touches before JS can see).
+  // FR-014: 400ms long-press opens the picker. Legacy Android <Pdf> path
+  // only — the native reader deliberately does not attach this, since it
+  // would fight the native view for long-press text selection.
   const longPress = Gesture.LongPress()
     .minDuration(400)
     .onStart(() => {
@@ -929,9 +930,9 @@ export function ReaderScreen({ navigation, route }: Props) {
           // sibling RNGH recognizer here would win arbitration against
           // PDFKit's own gesture (confirmed on-device: BUG-001 came right
           // back once our competing in-module recognizer was removed,
-          // because this JS-level one was still wrapping the view). Page-
-          // level reactions on iOS go through the Smile FAB instead, which
-          // is why it's documented as "the reliable entry." It IS wrapped in
+          // because this JS-level one was still wrapping the view). There is
+          // therefore no page-level reaction entry on this path: reactions
+          // anchor to a text selection. It IS wrapped in
           // a `Gesture.Native()` detector — see `nativeReaderGesture` above —
           // so RNGH's app-wide root recognizer (GestureHandlerRootView in
           // App.tsx) explicitly steps aside for this view instead of
@@ -1041,41 +1042,11 @@ export function ReaderScreen({ navigation, route }: Props) {
           {totalPages !== null ? ` of ${totalPages}` : ""}
         </Text>
       </View>
-      {/* Floating React button — sibling of the Pdf area, not a child, so
-          it's guaranteed to overlay the native PDFKit view. */}
-      {resolvedUri && !loadError && initialPage !== null ? (
-        <Pressable
-          onPress={() => setComposerOpen(true)}
-          accessibilityRole="button"
-          accessibilityLabel="React to this page"
-          hitSlop={spacing.s3}
-          // Static style (not the `({pressed}) => …` callback form): under
-          // reanimated 4 the callback silently drops backgroundColor, which
-          // left the FAB invisible (white icon only) — notably in light mode.
-          style={{
-            position: "absolute",
-            right: spacing.s4,
-            bottom: spacing.s6,
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            backgroundColor: palette.brandPrimary,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: "#000",
-            shadowOpacity: 0.25,
-            shadowOffset: { width: 0, height: 4 },
-            shadowRadius: 8,
-            elevation: 6,
-          }}
-        >
-          <Smile size={28} color={palette.textOnBrand} />
-        </Pressable>
-      ) : null}
-      {/* Only surfaces on the native-highlight-pdf reader (iOS today), and
-          only while there's an active text selection to act on. Stacks above
-          the React FAB rather than replacing it — the two are independent
-          actions (react to the page vs. highlight the selected text). */}
+      {/* The reader's only floating control, and only while there is a text
+          selection to act on. It used to stack above a permanently-visible
+          Smile FAB for page-level reactions; having both on screen during a
+          selection read as two competing ways to do the same thing, so the
+          FAB is gone and reactions are anchored to selected text. */}
       {useNativeHighlightReader && hasSelection ? (
         <Pressable
           onPress={async () => {
@@ -1090,7 +1061,7 @@ export function ReaderScreen({ navigation, route }: Props) {
           style={{
             position: "absolute",
             right: spacing.s4,
-            bottom: spacing.s6 + 64,
+            bottom: spacing.s6,
             width: 56,
             height: 56,
             borderRadius: 28,
