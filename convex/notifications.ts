@@ -15,6 +15,7 @@ import { getCurrentUser } from "./users";
 const notificationTypeValidator = v.union(
   v.literal("chapter_drop"),
   v.literal("new_book_in_club"),
+  v.literal("reading_reminder"),
   v.literal("reaction_reply"),
   v.literal("club_invite"),
   v.literal("milestone"),
@@ -270,6 +271,134 @@ export const sendChapterDropFanout = internalAction({
       await sendExpoBatch(pushMessages.slice(i, i + 100));
     }
     return null;
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Internal — reading reminders (P5-T2 / FB-011)
+// ---------------------------------------------------------------------------
+
+const DEFAULT_REMINDER_HOUR = 19;
+// Somebody who read this afternoon does not need reminding this evening. The
+// voice guide rules out nagging, and this is the cheapest way to honour that.
+const RECENTLY_READ_MS = 6 * 60 * 60 * 1000;
+
+export const collectReminderAudience = internalQuery({
+  // nowMs is passed in rather than read here so the query stays deterministic
+  // for a given set of arguments.
+  args: { nowMs: v.number() },
+  returns: v.array(
+    v.object({
+      userId: v.id("users"),
+      pushToken: v.string(),
+      bookTitle: v.string(),
+      clubId: v.id("clubs"),
+      bookId: v.id("books"),
+      page: v.optional(v.number()),
+      totalPages: v.optional(v.number()),
+      percentComplete: v.optional(v.number()),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const out = [];
+    // A full scan is fine at this size and would need an index on
+    // (reminderHour) well before it isn't.
+    const users = await ctx.db.query("users").collect();
+
+    for (const user of users) {
+      if (user.reminderEnabled === false) continue;
+      if (!user.pushToken) continue;
+      // No timezone yet means no idea what "19:00 their time" is. Skipping
+      // beats guessing UTC and waking someone at the wrong hour.
+      if (user.reminderTzOffsetMinutes === undefined) continue;
+
+      const localHour = Math.floor(
+        ((args.nowMs + user.reminderTzOffsetMinutes * 60_000) / 3_600_000) % 24,
+      );
+      if (localHour !== (user.reminderHour ?? DEFAULT_REMINDER_HOUR)) continue;
+
+      const rows = await ctx.db
+        .query("progress")
+        .withIndex("by_user_and_club", (q) => q.eq("userId", user._id))
+        .collect();
+      const latest = rows
+        .filter((r) => r.bookId && !r.finishedAt)
+        .sort((a, b) => b.updatedAt - a.updatedAt)[0];
+      // Nothing started, or everything finished: there is no book to point at,
+      // and a reminder with no object is just noise.
+      if (!latest || !latest.bookId) continue;
+      if (args.nowMs - latest.updatedAt < RECENTLY_READ_MS) continue;
+
+      const book = await ctx.db.get(latest.bookId);
+      if (!book || book.isRemoved) continue;
+
+      out.push({
+        userId: user._id,
+        pushToken: user.pushToken,
+        bookTitle: book.title,
+        clubId: latest.clubId,
+        bookId: latest.bookId,
+        page: latest.percentComplete === undefined ? latest.currentPage : undefined,
+        totalPages: latest.percentComplete === undefined ? latest.totalPages : undefined,
+        percentComplete: latest.percentComplete,
+      });
+    }
+    return out;
+  },
+});
+
+export const sendReadingReminders = internalAction({
+  args: {},
+  returns: v.object({ sent: v.number(), skipped: v.string() }),
+  handler: async (ctx): Promise<{ sent: number; skipped: string }> => {
+    // Hard off-switch. This is a daily push to every user, so it stays inert
+    // until someone deliberately turns it on, rather than starting the moment
+    // this merges. `npx convex env set READING_REMINDERS_ENABLED true --prod`.
+    if (process.env.READING_REMINDERS_ENABLED !== "true") {
+      return { sent: 0, skipped: "READING_REMINDERS_ENABLED is not 'true'" };
+    }
+
+    const now = Date.now();
+    const audience = await ctx.runQuery(
+      internal.notifications.collectReminderAudience,
+      { nowMs: now },
+    );
+    if (audience.length === 0) return { sent: 0, skipped: "nobody due this hour" };
+
+    const pushMessages: Parameters<typeof sendExpoBatch>[0] = [];
+    for (const r of audience) {
+      const title = r.bookTitle;
+      // Warm, no counting, no guilt, no implication of falling behind. The
+      // book is waiting; the reader is not late.
+      const where =
+        r.percentComplete !== undefined
+          ? `You're ${Math.round(r.percentComplete)}% in.`
+          : r.page !== undefined
+            ? `You're on page ${r.page}.`
+            : "";
+      const body = `${where} Pick up where you left off.`.trim();
+      const deepLink = `flipbook://clubs/${r.clubId}/books/${r.bookId}`;
+
+      await ctx.runMutation(internal.notifications.recordNotification, {
+        userId: r.userId,
+        type: "reading_reminder",
+        title,
+        body,
+        deepLink,
+        relatedId: r.bookId,
+      });
+      pushMessages.push({
+        to: r.pushToken,
+        title,
+        body,
+        data: { deepLink, type: "reading_reminder", relatedId: r.bookId },
+      });
+    }
+    for (let i = 0; i < pushMessages.length; i += 100) {
+      await sendExpoBatch(pushMessages.slice(i, i + 100));
+    }
+    console.log(`[reminders] sent ${pushMessages.length}`);
+    return { sent: pushMessages.length, skipped: "" };
   },
 });
 

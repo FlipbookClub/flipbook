@@ -81,18 +81,25 @@ export function SettingsScreen({ navigation }: Props) {
   const deleteSelf = useMutation(api.users.deleteSelf);
   const me = useQuery(api.users.me);
   const updateNotificationPrefs = useMutation(api.users.updateNotificationPrefs);
+  const updateReminderPrefs = useMutation(api.users.updateReminderPrefs);
 
   // Local mirror so toggles flip instantly; sync to server in the background.
   // Defaults to "all on" when the user has never visited Settings (matches
   // server-side opt-in default).
   const [chapterDrops, setChapterDrops] = useState(true);
   const [reactionReplies, setReactionReplies] = useState(true);
+  // P5-T2. Absent on the server reads as ON, matching the 19:00 default, so
+  // the local mirror starts on too.
+  const [readingReminder, setReadingReminder] = useState(true);
   useEffect(() => {
     if (me?.notificationPrefs) {
       setChapterDrops(me.notificationPrefs.chapterDrops);
       setReactionReplies(me.notificationPrefs.reactionReplies);
     }
   }, [me?.notificationPrefs]);
+  useEffect(() => {
+    if (me?.reminderEnabled !== undefined) setReadingReminder(me.reminderEnabled);
+  }, [me?.reminderEnabled]);
 
   const persistPrefs = (next: { chapterDrops: boolean; reactionReplies: boolean }) => {
     updateNotificationPrefs({ prefs: next }).catch(() => undefined);
@@ -203,6 +210,16 @@ export function SettingsScreen({ navigation }: Props) {
             onChange={(v) => {
               setReactionReplies(v);
               persistPrefs({ chapterDrops, reactionReplies: v });
+            }}
+          />
+          <ToggleRow
+            icon={<Bell size={18} color={colors.textPrimary} />}
+            label="Reading reminder"
+            sublabel="A nudge at 7pm about the book you're in the middle of."
+            value={readingReminder}
+            onChange={(v) => {
+              setReadingReminder(v);
+              updateReminderPrefs({ enabled: v }).catch(() => undefined);
             }}
           />
         </Section>
