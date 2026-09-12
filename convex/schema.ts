@@ -25,6 +25,15 @@ export default defineSchema({
         reactionReplies: v.boolean(),
       }),
     ),
+    // P5-T2 reading reminders. All optional so existing rows need no
+    // migration: absent reminderEnabled reads as ON, absent reminderHour as
+    // 19:00 local. reminderTzOffsetMinutes is reported by the client (see
+    // users.updatePushToken) because the server cannot know a user's local
+    // hour without it; until it arrives, that user is simply skipped rather
+    // than reminded at the wrong time.
+    reminderEnabled: v.optional(v.boolean()),
+    reminderHour: v.optional(v.number()),
+    reminderTzOffsetMinutes: v.optional(v.number()),
     createdAt: v.number(),
     lastActiveAt: v.number(),
   })
@@ -272,6 +281,8 @@ export default defineSchema({
     userId: v.id("users"),
     type: v.union(
       v.literal("chapter_drop"),
+      v.literal("new_book_in_club"),
+      v.literal("reading_reminder"),
       v.literal("reaction_reply"),
       v.literal("club_invite"),
       v.literal("milestone"),

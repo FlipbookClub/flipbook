@@ -14,6 +14,8 @@ import { getCurrentUser } from "./users";
 
 const notificationTypeValidator = v.union(
   v.literal("chapter_drop"),
+  v.literal("new_book_in_club"),
+  v.literal("reading_reminder"),
   v.literal("reaction_reply"),
   v.literal("club_invite"),
   v.literal("milestone"),
@@ -265,6 +267,240 @@ export const sendChapterDropFanout = internalAction({
       }
     }
     // Expo accepts up to 100 messages per POST.
+    for (let i = 0; i < pushMessages.length; i += 100) {
+      await sendExpoBatch(pushMessages.slice(i, i + 100));
+    }
+    return null;
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Internal — reading reminders (P5-T2 / FB-011)
+// ---------------------------------------------------------------------------
+
+const DEFAULT_REMINDER_HOUR = 19;
+// Somebody who read this afternoon does not need reminding this evening. The
+// voice guide rules out nagging, and this is the cheapest way to honour that.
+const RECENTLY_READ_MS = 6 * 60 * 60 * 1000;
+
+export const collectReminderAudience = internalQuery({
+  // nowMs is passed in rather than read here so the query stays deterministic
+  // for a given set of arguments.
+  args: { nowMs: v.number() },
+  returns: v.array(
+    v.object({
+      userId: v.id("users"),
+      pushToken: v.string(),
+      bookTitle: v.string(),
+      clubId: v.id("clubs"),
+      bookId: v.id("books"),
+      page: v.optional(v.number()),
+      totalPages: v.optional(v.number()),
+      percentComplete: v.optional(v.number()),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const out = [];
+    // A full scan is fine at this size and would need an index on
+    // (reminderHour) well before it isn't.
+    const users = await ctx.db.query("users").collect();
+
+    for (const user of users) {
+      if (user.reminderEnabled === false) continue;
+      if (!user.pushToken) continue;
+      // No timezone yet means no idea what "19:00 their time" is. Skipping
+      // beats guessing UTC and waking someone at the wrong hour.
+      if (user.reminderTzOffsetMinutes === undefined) continue;
+
+      const localHour = Math.floor(
+        ((args.nowMs + user.reminderTzOffsetMinutes * 60_000) / 3_600_000) % 24,
+      );
+      if (localHour !== (user.reminderHour ?? DEFAULT_REMINDER_HOUR)) continue;
+
+      const rows = await ctx.db
+        .query("progress")
+        .withIndex("by_user_and_club", (q) => q.eq("userId", user._id))
+        .collect();
+      const latest = rows
+        .filter((r) => r.bookId && !r.finishedAt)
+        .sort((a, b) => b.updatedAt - a.updatedAt)[0];
+      // Nothing started, or everything finished: there is no book to point at,
+      // and a reminder with no object is just noise.
+      if (!latest || !latest.bookId) continue;
+      if (args.nowMs - latest.updatedAt < RECENTLY_READ_MS) continue;
+
+      const book = await ctx.db.get(latest.bookId);
+      if (!book || book.isRemoved) continue;
+
+      out.push({
+        userId: user._id,
+        pushToken: user.pushToken,
+        bookTitle: book.title,
+        clubId: latest.clubId,
+        bookId: latest.bookId,
+        page: latest.percentComplete === undefined ? latest.currentPage : undefined,
+        totalPages: latest.percentComplete === undefined ? latest.totalPages : undefined,
+        percentComplete: latest.percentComplete,
+      });
+    }
+    return out;
+  },
+});
+
+export const sendReadingReminders = internalAction({
+  args: {},
+  returns: v.object({ sent: v.number(), skipped: v.string() }),
+  handler: async (ctx): Promise<{ sent: number; skipped: string }> => {
+    // Hard off-switch. This is a daily push to every user, so it stays inert
+    // until someone deliberately turns it on, rather than starting the moment
+    // this merges. `npx convex env set READING_REMINDERS_ENABLED true --prod`.
+    if (process.env.READING_REMINDERS_ENABLED !== "true") {
+      return { sent: 0, skipped: "READING_REMINDERS_ENABLED is not 'true'" };
+    }
+
+    const now = Date.now();
+    const audience = await ctx.runQuery(
+      internal.notifications.collectReminderAudience,
+      { nowMs: now },
+    );
+    if (audience.length === 0) return { sent: 0, skipped: "nobody due this hour" };
+
+    const pushMessages: Parameters<typeof sendExpoBatch>[0] = [];
+    for (const r of audience) {
+      const title = r.bookTitle;
+      // Warm, no counting, no guilt, no implication of falling behind. The
+      // book is waiting; the reader is not late.
+      const where =
+        r.percentComplete !== undefined
+          ? `You're ${Math.round(r.percentComplete)}% in.`
+          : r.page !== undefined
+            ? `You're on page ${r.page}.`
+            : "";
+      const body = `${where} Pick up where you left off.`.trim();
+      const deepLink = `flipbook://clubs/${r.clubId}/books/${r.bookId}`;
+
+      await ctx.runMutation(internal.notifications.recordNotification, {
+        userId: r.userId,
+        type: "reading_reminder",
+        title,
+        body,
+        deepLink,
+        relatedId: r.bookId,
+      });
+      pushMessages.push({
+        to: r.pushToken,
+        title,
+        body,
+        data: { deepLink, type: "reading_reminder", relatedId: r.bookId },
+      });
+    }
+    for (let i = 0; i < pushMessages.length; i += 100) {
+      await sendExpoBatch(pushMessages.slice(i, i + 100));
+    }
+    console.log(`[reminders] sent ${pushMessages.length}`);
+    return { sent: pushMessages.length, skipped: "" };
+  },
+});
+
+// ---------------------------------------------------------------------------
+// Internal — new-book-in-club fanout (P5-T1 / FB-004)
+// ---------------------------------------------------------------------------
+
+export const collectNewBookAudience = internalQuery({
+  args: { bookId: v.id("books") },
+  returns: v.union(
+    v.null(),
+    v.object({
+      book: v.object({
+        _id: v.id("books"),
+        clubId: v.id("clubs"),
+        title: v.string(),
+        author: v.string(),
+      }),
+      clubName: v.string(),
+      uploaderName: v.string(),
+      recipients: v.array(
+        v.object({
+          userId: v.id("users"),
+          pushToken: v.optional(v.string()),
+        }),
+      ),
+    }),
+  ),
+  handler: async (ctx, args) => {
+    const book = await ctx.db.get(args.bookId);
+    if (!book || book.isRemoved) return null;
+    const club = await ctx.db.get(book.clubId);
+    if (!club) return null;
+    const uploader = await ctx.db.get(book.uploadedByUserId);
+    const memberships = await ctx.db
+      .query("memberships")
+      .withIndex("by_club", (q) => q.eq("clubId", book.clubId))
+      .collect();
+
+    const recipients = [] as Array<{ userId: Id<"users">; pushToken?: string }>;
+    for (const m of memberships) {
+      // The uploader knows; they just did it.
+      if (m.userId === book.uploadedByUserId) continue;
+      const user = await ctx.db.get(m.userId);
+      if (!user) continue;
+      // Reuses the chapterDrops preference deliberately: from a member's side
+      // both are "new content landed in my club", and notificationPrefs is a
+      // strict object, so a third key would need every existing row to carry
+      // it. Revisit if anyone actually asks to split them.
+      if (user.notificationPrefs && !user.notificationPrefs.chapterDrops) continue;
+      recipients.push({ userId: user._id, pushToken: user.pushToken });
+    }
+
+    return {
+      book: {
+        _id: book._id,
+        clubId: book.clubId,
+        title: book.title,
+        author: book.author,
+      },
+      clubName: club.name,
+      uploaderName: uploader?.displayName ?? "Someone",
+      recipients,
+    };
+  },
+});
+
+export const sendNewBookFanout = internalAction({
+  args: { bookId: v.id("books") },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const snapshot = await ctx.runQuery(
+      internal.notifications.collectNewBookAudience,
+      { bookId: args.bookId },
+    );
+    if (!snapshot) return null;
+
+    const title = snapshot.clubName;
+    // Voice guide: an invitation, never a summons. No counts, no streaks, no
+    // implication that anyone is behind.
+    const body = `${snapshot.uploaderName} added ${snapshot.book.title} by ${snapshot.book.author}. Come take a look.`;
+    const deepLink = `flipbook://clubs/${snapshot.book.clubId}/books/${snapshot.book._id}`;
+
+    const pushMessages: Parameters<typeof sendExpoBatch>[0] = [];
+    for (const r of snapshot.recipients) {
+      await ctx.runMutation(internal.notifications.recordNotification, {
+        userId: r.userId,
+        type: "new_book_in_club",
+        title,
+        body,
+        deepLink,
+        relatedId: snapshot.book._id,
+      });
+      if (r.pushToken) {
+        pushMessages.push({
+          to: r.pushToken,
+          title,
+          body,
+          data: { deepLink, type: "new_book_in_club", relatedId: snapshot.book._id },
+        });
+      }
+    }
     for (let i = 0; i < pushMessages.length; i += 100) {
       await sendExpoBatch(pushMessages.slice(i, i + 100));
     }

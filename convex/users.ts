@@ -32,6 +32,13 @@ const userValidator = v.object({
   proSubscriptionStatus: proStatusValidator,
   proExpiresAt: v.optional(v.number()),
   notificationPrefs: v.optional(notificationPrefsValidator),
+  // Must mirror the users table in schema.ts. Strict object: a field on the
+  // document but missing here fails return validation, and users.me runs on
+  // every launch, so omitting these would break the app for everyone the
+  // moment the first timezone was written.
+  reminderEnabled: v.optional(v.boolean()),
+  reminderHour: v.optional(v.number()),
+  reminderTzOffsetMinutes: v.optional(v.number()),
   createdAt: v.number(),
   lastActiveAt: v.number(),
 });
@@ -194,15 +201,49 @@ export const updateNotificationPrefs = mutation({
 // FR-028: client calls this on app boot once it has a fresh Expo push token.
 // Stored on the user record so notification fanouts can look it up.
 export const updatePushToken = mutation({
-  args: { pushToken: v.union(v.string(), v.null()) },
+  args: {
+    pushToken: v.union(v.string(), v.null()),
+    // P5-T2. New optional arg, so existing callers are unaffected. The server
+    // has no other way to know a user's local hour, and this rides the call
+    // the client already makes on every launch, so it self-corrects on travel
+    // and daylight saving without a dedicated sync.
+    tzOffsetMinutes: v.optional(v.number()),
+  },
   returns: v.null(),
   handler: async (ctx, args) => {
     const user = await getCurrentUser(ctx);
     const next = args.pushToken ?? undefined;
-    if (user.pushToken === next) return null;
+    const tzChanged =
+      args.tzOffsetMinutes !== undefined &&
+      user.reminderTzOffsetMinutes !== args.tzOffsetMinutes;
+    // Was an early return on an unchanged token, which would have dropped a
+    // timezone update on every launch after the first.
+    if (user.pushToken === next && !tzChanged) return null;
     await ctx.db.patch(user._id, {
       pushToken: next,
+      ...(tzChanged ? { reminderTzOffsetMinutes: args.tzOffsetMinutes } : {}),
       lastActiveAt: Date.now(),
+    });
+    return null;
+  },
+});
+
+// P5-T2. Absent fields read as "on at 19:00", so a user who never opens
+// Settings still gets the founder-chosen default.
+export const updateReminderPrefs = mutation({
+  args: {
+    enabled: v.boolean(),
+    hour: v.optional(v.number()),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
+    if (args.hour !== undefined && (args.hour < 0 || args.hour > 23)) {
+      throw new ConvexError({ code: "invalid_hour" });
+    }
+    await ctx.db.patch(user._id, {
+      reminderEnabled: args.enabled,
+      ...(args.hour !== undefined ? { reminderHour: args.hour } : {}),
     });
     return null;
   },
