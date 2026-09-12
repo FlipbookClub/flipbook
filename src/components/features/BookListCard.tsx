@@ -37,9 +37,10 @@ interface Props {
 
 // The book card used across the club lobby (Room + Library tabs) and the user's
 // Library screen. A surfaceSecondary card with a cover-only thumbnail, an
-// uppercase title (textAlt), accent author + muted page count, and optional
-// subtitle / started date / progress bar. Text colors stay mode-correct on the
-// secondary surface. Figma "Frame 3910".
+// uppercase title, accent author + muted page count, and optional subtitle /
+// started date / progress bar. Text colours follow the card's surface, since
+// the primary and secondary surfaces invert between Light and Flip.
+// Figma "Frame 3910".
 export function BookListCard({
   title,
   author,
@@ -110,7 +111,17 @@ export function BookListCard({
       </View>
 
       <View style={{ flex: 1, gap: spacing.s2, justifyContent: "center" }}>
-        <Text style={{ ...typography.overlineLg, color: colors.textAlt }} numberOfLines={2}>
+        {/* textAlt is a near-black (#2f2f2f) in Light AND Flip, but Flip's
+            primary surface is a dark indigo, so the title was invisible there
+            while staying correct on Flip's light secondary surface. The colour
+            has to follow the surface, not the mode. */}
+        <Text
+          style={{
+            ...typography.overlineLg,
+            color: onPrimary ? colors.textPrimary : colors.textAlt,
+          }}
+          numberOfLines={2}
+        >
           {title}
         </Text>
         <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>

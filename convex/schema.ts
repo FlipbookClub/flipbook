@@ -212,6 +212,11 @@ export default defineSchema({
     .index("by_club", ["clubId"])
     .index("by_book_and_page", ["bookId", "page"])
     .index("by_chapter_and_page", ["chapterId", "page"])
+    // Discussions read chronologically, newest first. The _page_ indexes sort
+    // by position in the book, which is right for the reader margin and wrong
+    // for a conversation.
+    .index("by_book_and_created", ["bookId", "createdAt"])
+    .index("by_chapter_and_created", ["chapterId", "createdAt"])
     .index("by_user", ["userId"])
     .index("by_parent", ["parentReactionId"])
     // Rate-limit lookup (FR: max 10 reactions/min per user).
