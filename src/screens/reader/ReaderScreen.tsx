@@ -5,6 +5,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  ScrollView,
   Text,
   View,
 } from "react-native";
@@ -15,7 +16,7 @@ import {
   type HighlightRect,
   type NativeHighlightPdfViewRef,
 } from "native-highlight-pdf";
-import { Bookmark, BookmarkFilled, Pencil, Settings2, Smile, X } from "@/lib/icons";
+import { BookOpen, Bookmark, BookmarkFilled, Pencil, Settings2, Smile, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -32,6 +33,11 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { ensureCachedPdf, getCachedPdfPath } from "@/lib/pdf";
+import {
+  EpubReader,
+  type EpubReaderHandle,
+  type TocEntry,
+} from "@/screens/reader/EpubReader";
 import { bookFileType, type BookFileType } from "@/lib/bookFile";
 import {
   PROGRESS_SYNC_INTERVAL_MS,
@@ -64,8 +70,8 @@ interface EffectiveContent {
   title: string;
   pageCount: number;
   isRemoved: boolean;
-  // P4-T1. Chapters are always PDFs; books may be either. The EPUB reader
-  // itself is P4-T5/T8, so for now this only gates the placeholder below.
+  // P4-T1. Chapters are always PDFs; books may be either. Drives the reader
+  // switch in P4-T8.
   fileType: BookFileType;
   clubName: string | null;
   // null when we only have local meta (offline) — the reader falls back to
@@ -164,7 +170,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         title: localMeta.title,
         pageCount: localMeta.pageCount,
         isRemoved: localMeta.isRemoved,
-        fileType: "pdf",
+        fileType: bookFileType(localMeta),
         clubName: localMeta.clubName,
         pdfUrl: null,
       };
@@ -226,6 +232,7 @@ export function ReaderScreen({ navigation, route }: Props) {
       title: effective.title,
       pageCount: effective.pageCount,
       isRemoved: effective.isRemoved,
+      fileType: effective.fileType,
       updatedAt: Date.now(),
     });
   }, [effective, contentId]);
@@ -274,6 +281,26 @@ export function ReaderScreen({ navigation, route }: Props) {
   // Set by the cache-resolution effect below once we know the storage ID.
   const [resolvedUri, setResolvedUri] = useState<string | null>(null);
   const [customizeOpen, setCustomizeOpen] = useState(false);
+  // EPUB-only. Percentage is display state; the font size persists across
+  // sessions the same way pageMode does.
+  const [epubPercent, setEpubPercent] = useState(0);
+  const [epubToc, setEpubToc] = useState<TocEntry[]>([]);
+  const [tocOpen, setTocOpen] = useState(false);
+  const epubRef = useRef<EpubReaderHandle | null>(null);
+  const epubCachedCfiRef = useRef<string | null>(
+    contentId ? (readCachedProgress(contentId)?.locationCfi ?? null) : null,
+  );
+  const [epubFontSize, setEpubFontSize] = useState<number>(() => {
+    const stored = Number(storage.getString("reader.epubFontSize"));
+    return Number.isFinite(stored) && stored >= EPUB_FONT_MIN && stored <= EPUB_FONT_MAX
+      ? stored
+      : EPUB_FONT_DEFAULT;
+  });
+
+  const setEpubFont = useCallback((value: number) => {
+    setEpubFontSize(value);
+    storage.set("reader.epubFontSize", String(value));
+  }, []);
 
   // Freeze the page we open at. `initialPage` recomputes whenever the live
   // serverProgress query updates (including right after our own syncToServer
@@ -575,6 +602,28 @@ export function ReaderScreen({ navigation, route }: Props) {
     PROGRESS_SYNC_INTERVAL_MS,
   );
 
+  // P4-T7. EPUB progress carries a CFI (precise resume) and a percentage
+  // (display). currentPage/totalPages are sent as 1/1 because the mutation
+  // requires them and reflowable text has no pages; the server knows to judge
+  // completion on percentComplete instead. Throttled on the same interval as
+  // the PDF path, since epub.js emits `relocated` on every page turn.
+  const syncEpubToServer = useThrottledCallback(
+    (cfi: string, percent: number) => {
+      if (!effective || !scopePayload) return;
+      updateProgress({
+        clubId: effective.clubId,
+        ...scopePayload,
+        currentPage: 1,
+        totalPages: 1,
+        locationCfi: cfi,
+        percentComplete: percent,
+      }).catch(() => {
+        // Best-effort, same as the PDF path.
+      });
+    },
+    PROGRESS_SYNC_INTERVAL_MS,
+  );
+
   const handlePageChanged = (page: number, total: number) => {
     if (!Number.isFinite(page) || !Number.isFinite(total)) return;
     if (page < 1 || total < 1 || page > total) return;
@@ -586,12 +635,39 @@ export function ReaderScreen({ navigation, route }: Props) {
     syncToServer(page, total);
   };
 
+  // P4-T7, and the Phase 1 lesson again. EpubReader sends `open` exactly once,
+  // when its runtime announces itself, using whatever startCfi it holds at that
+  // moment. If the progress query has not resolved by then the book opens at
+  // the beginning and the resume is silently lost — the same shape as the
+  // build-10 regression. So resolve the target FIRST and gate the mount on it.
+  //
+  // undefined = still deciding. null = decided, start at the beginning.
+  const epubStartCfi = useMemo<string | null | undefined>(() => {
+    if (effective?.fileType !== "epub") return null;
+    if (serverProgress !== undefined) {
+      return serverProgress?.locationCfi ?? epubCachedCfiRef.current ?? null;
+    }
+    // Offline the query never resolves, so fall back to the local cache rather
+    // than spinning forever.
+    if (effective.pdfUrl === null) return epubCachedCfiRef.current ?? null;
+    return undefined;
+  }, [effective?.fileType, effective?.pdfUrl, serverProgress]);
+
+  // A book cached before EPUB support has meta with no fileType, so it
+  // hydrates as "pdf" one last time before the server rewrites it. That brief
+  // wrong guess can already have set the PDF reader's load error, which is
+  // sticky. Clear it the moment the type resolves to epub; the EPUB reader
+  // sets its own errors later, after mount, so they are not affected.
+  useEffect(() => {
+    if (effective?.fileType === "epub") setLoadError(null);
+  }, [effective?.fileType]);
+
   // Resolve PDF source — cached file when available, fresh signed URL on miss.
   useEffect(() => {
     if (!effective || effective.isRemoved) return;
     const { storageId, pdfUrl } = effective;
     if (pdfUrl === null) {
-      const cached = getCachedPdfPath(storageId);
+      const cached = getCachedPdfPath(storageId, effective.fileType);
       if (cached) {
         setResolvedUri(cached);
       } else {
@@ -602,7 +678,7 @@ export function ReaderScreen({ navigation, route }: Props) {
       return;
     }
     let cancelled = false;
-    ensureCachedPdf(storageId, pdfUrl)
+    ensureCachedPdf(storageId, pdfUrl, effective.fileType)
       .then((path) => {
         if (!cancelled) setResolvedUri(path);
       })
@@ -622,6 +698,11 @@ export function ReaderScreen({ navigation, route }: Props) {
   // initial jump in one native call.
   useEffect(() => {
     if (!useNativeHighlightReader) return;
+    // Never hand an EPUB to the PDF reader. The type can be briefly wrong
+    // while the offline meta cache hydrates ahead of the server, and
+    // openDocument() on a zip throws into the catch below, which sets a
+    // sticky load error that survives the server correcting the type.
+    if (effective?.fileType === "epub") return;
     if (!pdfRef.current || !resolvedUri || initialPage === null) return;
     // Identity of "this document, open on this view instance". A new native
     // instance (generation bump) re-opens even for the same URI.
@@ -646,7 +727,7 @@ export function ReaderScreen({ navigation, route }: Props) {
         openedKeyRef.current = null;
       }
     })();
-  }, [useNativeHighlightReader, viewGeneration, resolvedUri, initialPage, syncToServer]);
+  }, [useNativeHighlightReader, effective?.fileType, viewGeneration, resolvedUri, initialPage, syncToServer]);
 
   // Incrementally paints/removes highlight annotations as the live
   // `listHighlights` query changes, diffed against what's already painted
@@ -738,28 +819,85 @@ export function ReaderScreen({ navigation, route }: Props) {
     );
   }
 
-  // P4-T8 replaces this with <EpubReader />. Until it lands, uploading an EPUB
-  // is possible (P4-T3) but reading one is not, and everything below this line
-  // is a PDF renderer that would be handed a zip. An honest message beats a
-  // blank page or a decode error.
+  // P4-T8. Route by file type. Deliberately a dumb switch: everything below
+  // this line is the PDF reader, which would be handed a zip otherwise.
+  //
+  // Out of scope for this batch per P4-T10: highlights, reactions and bookmarks
+  // inside EPUBs. Page-anchored reactions do not map onto reflowable text, so
+  // the reader chrome here is intentionally thinner than the PDF one.
   if (effective.fileType === "epub") {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: colors.surfacePrimary }}>
         <Header
           title={effective.title}
-          subtitle={effective.clubName}
+          // EPUBs have no page counter, so the percentage is the only position
+          // feedback the reader gets.
+          subtitle={
+            epubPercent > 0
+              ? `${effective.clubName ?? ""}${effective.clubName ? " · " : ""}${epubPercent}%`
+              : effective.clubName
+          }
           onClose={() => navigation.goBack()}
           onSettings={() => setCustomizeOpen(true)}
+          onContents={() => setTocOpen(true)}
         />
-        <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center", gap: spacing.s3 }}>
-          <Text style={{ ...typography.headingMd, color: colors.textPrimary, textAlign: "center" }}>
-            EPUB reading is coming
-          </Text>
-          <Text style={{ ...typography.bodyMd, color: colors.textSecondary, textAlign: "center" }}>
-            This book uploaded fine and it's safe in your club. The reader for
-            EPUBs is on its way.
-          </Text>
-        </View>
+        {loadError ? (
+          <View style={{ flex: 1, padding: spacing.s5, justifyContent: "center", gap: spacing.s3 }}>
+            <Text style={{ ...typography.bodyMd, color: colors.textSecondary, textAlign: "center" }}>
+              {loadError}
+            </Text>
+          </View>
+        ) : resolvedUri === null || epubStartCfi === undefined ? (
+          <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+            <ActivityIndicator />
+          </View>
+        ) : (
+          <EpubReader
+            ref={epubRef}
+            fileUri={resolvedUri}
+            // Resolved before mount (see epubStartCfi). undefined, not null, so
+            // epub.js reads it as "no target" and opens at the beginning.
+            startCfi={epubStartCfi ?? undefined}
+            fontSize={epubFontSize}
+            // EPUBs honour the same Reading-view toggle as PDFs.
+            flow={pageMode}
+            bg={colors.surfacePrimary}
+            fg={colors.textPrimary}
+            onRelocated={(cfi, percent) => {
+              setEpubPercent(percent);
+              if (contentId) {
+                writeCachedProgress({
+                  bookId: contentId,
+                  page: 1,
+                  totalPages: 1,
+                  locationCfi: cfi,
+                  percentComplete: percent,
+                  updatedAt: Date.now(),
+                });
+              }
+              syncEpubToServer(cfi, percent);
+            }}
+            onReady={setEpubToc}
+            onError={(message) => setLoadError(message)}
+          />
+        )}
+        <TableOfContentsSheet
+          visible={tocOpen}
+          onClose={() => setTocOpen(false)}
+          toc={epubToc}
+          onSelect={(href) => epubRef.current?.gotoHref(href)}
+        />
+        <ReaderCustomizationSheet
+          visible={customizeOpen}
+          onClose={() => setCustomizeOpen(false)}
+          pageMode={pageMode}
+          onChangeMode={setReadingMode}
+          // epub.js has a scrolled flow, so the toggle is real here too.
+          showPageMode
+          showFontSize
+          fontSize={epubFontSize}
+          onChangeFontSize={setEpubFont}
+        />
       </SafeAreaView>
     );
   }
@@ -1013,9 +1151,20 @@ interface HeaderProps {
   settingsDisabled?: boolean;
   isBookmarked?: boolean;
   onBookmark?: () => void;
+  // P4-T6, EPUB only. Absent for PDFs, which have no table of contents.
+  onContents?: () => void;
 }
 
-function Header({ title, subtitle, onClose, onSettings, settingsDisabled, isBookmarked, onBookmark }: HeaderProps) {
+function Header({
+  title,
+  subtitle,
+  onClose,
+  onSettings,
+  settingsDisabled,
+  isBookmarked,
+  onBookmark,
+  onContents,
+}: HeaderProps) {
   const { colors } = useTheme();
   const BookmarkIcon = isBookmarked ? BookmarkFilled : Bookmark;
   return (
@@ -1053,6 +1202,16 @@ function Header({ title, subtitle, onClose, onSettings, settingsDisabled, isBook
         ) : null}
       </View>
       <View style={{ flexDirection: "row", gap: spacing.s2, alignItems: "center" }}>
+        {onContents ? (
+          <Pressable
+            onPress={onContents}
+            hitSlop={spacing.s3}
+            accessibilityRole="button"
+            accessibilityLabel="Table of contents"
+          >
+            <BookOpen size={22} color={colors.textPrimary} />
+          </Pressable>
+        ) : null}
         {onBookmark ? (
           <Pressable
             onPress={onBookmark}
@@ -1084,12 +1243,61 @@ function Header({ title, subtitle, onClose, onSettings, settingsDisabled, isBook
   );
 }
 
+// P4-T6. Percentages, because that is epub.js's own unit
+// (rendition.themes.fontSize). 100 is the publisher's intended size.
+const EPUB_FONT_MIN = 80;
+const EPUB_FONT_MAX = 180;
+const EPUB_FONT_STEP = 10;
+const EPUB_FONT_DEFAULT = 100;
+
+function FontStepButton({
+  label,
+  accessibilityLabel,
+  target,
+  onPress,
+}: {
+  label: string;
+  accessibilityLabel: string;
+  target: number;
+  onPress?: (value: number) => void;
+}) {
+  const { colors } = useTheme();
+  const disabled = target < EPUB_FONT_MIN || target > EPUB_FONT_MAX;
+  return (
+    <Pressable
+      onPress={() => onPress?.(target)}
+      disabled={disabled}
+      hitSlop={spacing.s2}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+      accessibilityState={{ disabled }}
+      style={{
+        width: 56,
+        paddingVertical: spacing.s2,
+        alignItems: "center",
+        borderRadius: radius.pill,
+        backgroundColor: disabled ? "transparent" : colors.surfacePrimary,
+        opacity: disabled ? 0.4 : 1,
+      }}
+    >
+      <Text
+        style={{ ...typography.bodyLg, fontFamily: "Raleway-SemiBold", color: colors.textPrimary }}
+      >
+        {label}
+      </Text>
+    </Pressable>
+  );
+}
+
 function ReaderCustomizationSheet({
   visible,
   onClose,
   pageMode,
   onChangeMode,
   showPageMode,
+  showFontSize,
+  fontSize = EPUB_FONT_DEFAULT,
+  onChangeFontSize,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -1098,6 +1306,11 @@ function ReaderCustomizationSheet({
   // Android is continuous-scroll only, so the control is hidden there rather
   // than shown as a toggle that does nothing.
   showPageMode: boolean;
+  // P4-T6, EPUB only. Reflowable text is the only thing we can resize; a PDF
+  // page is a fixed raster, so the control is hidden rather than inert.
+  showFontSize?: boolean;
+  fontSize?: number;
+  onChangeFontSize?: (value: number) => void;
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -1170,9 +1383,116 @@ function ReaderCustomizationSheet({
         </View>
         ) : null}
 
+        {showFontSize ? (
+          <View style={{ gap: spacing.s2 }}>
+            <Text style={{ ...typography.overlineLg, color: colors.textPrimary }}>Text size</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "space-between",
+                backgroundColor: colors.surfaceSecondary,
+                borderRadius: radius.pill,
+                paddingHorizontal: spacing.s2,
+                paddingVertical: 4,
+              }}
+            >
+              <FontStepButton
+                label="A-"
+                accessibilityLabel="Smaller text"
+                target={fontSize - EPUB_FONT_STEP}
+                onPress={onChangeFontSize}
+              />
+              <Text style={{ ...typography.bodyMd, color: colors.textMuted }}>{fontSize}%</Text>
+              <FontStepButton
+                label="A+"
+                accessibilityLabel="Larger text"
+                target={fontSize + EPUB_FONT_STEP}
+                onPress={onChangeFontSize}
+              />
+            </View>
+          </View>
+        ) : null}
+
         <Text style={{ ...typography.bodySm, color: colors.textMuted }}>
-          Font, line height, and page background controls are coming with Pro.
+          {showFontSize
+            ? "Line height and page background controls are coming with Pro."
+            : "Font, line height, and page background controls are coming with Pro."}
         </Text>
+      </View>
+    </Modal>
+  );
+}
+
+// P4-T6. Chapter navigation. epub.js gives a nested TOC; the runtime
+// flattens it with a depth, and depth becomes indentation here rather than a
+// collapsible tree, which is more machinery than a book contents list needs.
+function TableOfContentsSheet({
+  visible,
+  onClose,
+  toc,
+  onSelect,
+}: {
+  visible: boolean;
+  onClose: () => void;
+  toc: TocEntry[];
+  onSelect: (href: string) => void;
+}) {
+  const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <Pressable
+        onPress={onClose}
+        style={{ flex: 1, backgroundColor: "rgba(0,0,0,0.4)" }}
+        accessibilityLabel="Dismiss contents"
+      />
+      <View
+        style={{
+          maxHeight: "70%",
+          backgroundColor: colors.surfacePrimary,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          paddingHorizontal: spacing.s5,
+          paddingTop: spacing.s4,
+          paddingBottom: spacing.s4 + insets.bottom,
+          gap: spacing.s3,
+        }}
+      >
+        <Text style={{ ...typography.headingMd, color: colors.textPrimary }}>Contents</Text>
+        {toc.length === 0 ? (
+          <Text style={{ ...typography.bodyMd, color: colors.textMuted }}>
+            This book doesn't list any chapters.
+          </Text>
+        ) : (
+          <ScrollView>
+            {toc.map((entry, i) => (
+              <Pressable
+                key={`${entry.href}:${i}`}
+                onPress={() => {
+                  onSelect(entry.href);
+                  onClose();
+                }}
+                accessibilityRole="button"
+                style={{
+                  paddingVertical: spacing.s3,
+                  paddingLeft: entry.depth * spacing.s4,
+                }}
+              >
+                <Text
+                  style={{
+                    ...typography.bodyMd,
+                    color: entry.depth === 0 ? colors.textPrimary : colors.textSecondary,
+                    fontFamily: entry.depth === 0 ? "Raleway-SemiBold" : undefined,
+                  }}
+                  numberOfLines={2}
+                >
+                  {entry.label || "Untitled"}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+        )}
       </View>
     </Modal>
   );

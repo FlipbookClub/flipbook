@@ -24,6 +24,11 @@ export interface CachedContentMeta {
   author?: string;
   pageCount: number;
   isRemoved: boolean;
+  // Optional because rows written before EPUB support have none, and every
+  // one of those is a PDF. Absent must be read as "pdf" (bookFileType()), not
+  // defaulted at the call site: hardcoding "pdf" here is what made a reopened
+  // EPUB hydrate as a PDF and hand a zip to the native PDF reader.
+  fileType?: "pdf" | "epub";
   updatedAt: number;
 }
 

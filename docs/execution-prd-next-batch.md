@@ -150,11 +150,11 @@ Why this matters: the old design had JS and native both trying to own "what page
 
 ### 4B — EPUB reader (cross-platform, WebView-based)
 
-- [ ] **P4-T5.** New component `src/screens/reader/EpubReader.tsx`: **epub.js inside `react-native-webview`** (single implementation for iOS **and** Android — this is deliberate; no native module work for EPUB v1). Bundle epub.js locally (no CDN dependency at runtime — offline reading must work). Load the EPUB from the cached local file via a file URI or base64 bridge.
-- [ ] **P4-T6.** Reader features for v1 EPUB — scoped to: continuous or paginated flow (epub.js `flow: "paginated"` recommended — closest to book feel), chapter navigation via TOC, font-size steps, and **theme-following page colors** (Light/Flip/Dark backgrounds via epub.js themes — this also delivers Oyinadé's FB-007 for EPUBs).
-- [ ] **P4-T7.** Resume: on `relocated` events, debounce-persist `locationCfi` + `percentComplete` to `progress.update`. On open, `display(savedCfi)` **after** the book's `ready` promise resolves (the Phase 1 lesson, WebView edition).
-- [ ] **P4-T8.** `ReaderScreen.tsx` routes by `book.fileType`: `"epub"` → `EpubReader`, else existing PDF paths. Keep the switch dumb and obvious.
-- [ ] **P4-T9.** Offline: EPUB file cached to device on first open (same pattern as PDFs); reader works in airplane mode; progress syncs on reconnect.
+- [x] **P4-T5.** New component `src/screens/reader/EpubReader.tsx`: **epub.js inside `react-native-webview`** (single implementation for iOS **and** Android — this is deliberate; no native module work for EPUB v1). Bundle epub.js locally (no CDN dependency at runtime — offline reading must work). Load the EPUB from the cached local file via a file URI or base64 bridge.
+- [x] **P4-T6.** Reader features for v1 EPUB — scoped to: continuous or paginated flow (epub.js `flow: "paginated"` recommended — closest to book feel), chapter navigation via TOC, font-size steps, and **theme-following page colors** (Light/Flip/Dark backgrounds via epub.js themes — this also delivers Oyinadé's FB-007 for EPUBs).
+- [x] **P4-T7.** Resume: on `relocated` events, debounce-persist `locationCfi` + `percentComplete` to `progress.update`. On open, `display(savedCfi)` **after** the book's `ready` promise resolves (the Phase 1 lesson, WebView edition).
+- [x] **P4-T8.** `ReaderScreen.tsx` routes by `book.fileType`: `"epub"` → `EpubReader`, else existing PDF paths. Keep the switch dumb and obvious.
+- [x] **P4-T9.** Offline: EPUB file cached to device on first open (same pattern as PDFs); reader works in airplane mode; progress syncs on reconnect.
 - [ ] **P4-T10.** **Explicitly out of scope for this batch (do not build):** highlights/reactions inside EPUBs (page-anchored reactions don't map to reflowable text; CFI-range annotations are a designed follow-up — see Parking Lot), bookmarks on EPUB, EPUB metadata extraction beyond title. If any of these turn out to be nearly-free, flag in the PR — don't just add them.
 
 ### 4C — Multi-genre selection (founder-prioritized; ships in Build 12 with 4A/4B)
