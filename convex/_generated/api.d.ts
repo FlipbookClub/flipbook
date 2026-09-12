@@ -12,6 +12,7 @@ import type * as bookmarks from "../bookmarks.js";
 import type * as books from "../books.js";
 import type * as chapters from "../chapters.js";
 import type * as clubs from "../clubs.js";
+import type * as crons from "../crons.js";
 import type * as email from "../email.js";
 import type * as genres from "../genres.js";
 import type * as http from "../http.js";
@@ -38,6 +39,7 @@ declare const fullApi: ApiFromModules<{
   books: typeof books;
   chapters: typeof chapters;
   clubs: typeof clubs;
+  crons: typeof crons;
   email: typeof email;
   genres: typeof genres;
   http: typeof http;
