@@ -2,9 +2,7 @@
 
 **Date:** August 15, 2026
 **Audience:** Claude Code (primary executor) + Moks (reviewer, device tester)
-**Source decisions:** `docs/synthesis-aug-2026.md` (as amended Aug 15) + founder overrides: Android must reach reader parity; EPUB upload ships in v1 now.
-
-**Numbers updated Sept 11, 2026:** 185 signups — **97 iOS / 88 Android** — and **16 communities**. Note the movement since Aug 15 (163: 75 iOS / 88 Android): **iOS added 22 signups; Android added zero.** Android has not had an EAS build since `a55a27b9` (Jul 30) and still has no highlighting. Android is no longer the majority platform by headcount, but its growth has flatlined while iOS grew — which makes Phase 3 *more* urgent, not less. See § Phase 3 rationale.
+**Source decisions:** `docs/synthesis-aug-2026.md` (as amended Aug 15) + founder overrides: Android is the majority platform (88/163 users) and must reach reader parity; EPUB upload ships in v1 now.
 **Public commitment:** Moks told Oyinadé (Lumee Book Club) on Aug 10 that a sustainable highlight solution lands "this week." Phases 1-2 are past due. Treat as top priority.
 
 ---
@@ -50,7 +48,7 @@ Why this matters: the old design had JS and native both trying to own "what page
 | `convex/_generated/ai/guidelines.md` | **Read before any Convex change. Its rules override training data.** |
 
 ### Non-negotiable ground rules
-1. **Never break live users.** Build 10 is in real hands (185 users across 16 communities). All Convex schema changes are **additive** (new optional fields, new tables). Never change an existing function's argument or return contract — add a variant if needed.
+1. **Never break live users.** Build 10 is in real hands (163 users). All Convex schema changes are **additive** (new optional fields, new tables). Never change an existing function's argument or return contract — add a variant if needed.
 2. **One phase per PR. One concern per build.** Build 11 = Phases 1-2 (+ 0). Build 11.5 (Android) = Phase 3. Build 12 = Phase 4 (+ Phase 5 if it fits cleanly).
 3. **Device verification is mandatory for reader changes.** Every reader-touching PR must list the §6 matrix results in its description. Simulator is insufficient for gesture work — flag any step you cannot verify in simulator so Moks runs it on hardware.
 4. **Commit messages** reference the phase + task ID from this doc (e.g., `P3-T2: match the iOS command surface on Android`).
@@ -114,7 +112,7 @@ Why this matters: the old design had JS and native both trying to own "what page
 
 ## Phase 3 — Android native reader integration (majority-platform parity)
 
-**Why now:** 88 users are on Android with no highlighting at all — and **Android signups have flatlined** (zero net new between Aug 15 and Sept 11, while iOS added 22). Android has had no build since Jul 30 and a materially worse reader. In a market where most phones are Android, a product whose growth is iOS-only is a product not reaching its actual market. The module's hard part (selection + coordinate mapping on PdfiumAndroid) is already proven; what's missing is scrolling and integration.
+**Why now:** 88 of 163 users are on Android and have no highlighting at all. The module's hard part (selection + coordinate mapping on PdfiumAndroid) is already proven; what's missing is scrolling and integration.
 
 > **Read "Reader architecture" in §0 first.** The iOS reader was rebuilt after this phase was originally written, and the tasks below were rewritten on Aug 15 to match. The Android module currently carries the *old* reactive-prop shape (`documentUri` / `startPage` / `highlights` as `Prop()` bindings, plus `onDocumentLoaded` / `onLoadError` events). Porting that shape forward would reproduce the exact bug class that cost four failed device rounds on iOS. Port the architecture, not the old prop surface.
 
