@@ -18,6 +18,11 @@ const notificationPrefsValidator = v.object({
   reactionReplies: v.boolean(),
 });
 
+const emailPrefsValidator = v.object({
+  weeklyDigest: v.boolean(),
+  progressNote: v.boolean(),
+});
+
 const userValidator = v.object({
   _id: v.id("users"),
   _creationTime: v.number(),
@@ -36,6 +41,7 @@ const userValidator = v.object({
   // document but missing here fails return validation, and users.me runs on
   // every launch, so omitting these would break the app for everyone the
   // moment the first timezone was written.
+  emailPrefs: v.optional(emailPrefsValidator),
   reminderEnabled: v.optional(v.boolean()),
   reminderHour: v.optional(v.number()),
   reminderTzOffsetMinutes: v.optional(v.number()),
@@ -223,6 +229,28 @@ export const updatePushToken = mutation({
       pushToken: next,
       ...(tzChanged ? { reminderTzOffsetMinutes: args.tzOffsetMinutes } : {}),
       lastActiveAt: Date.now(),
+    });
+    return null;
+  },
+});
+
+// P5-T5. Absent prefs read as "both on". Also written by the unsubscribe
+// endpoint in http.ts, which is why it takes each flag explicitly rather than
+// toggling: a one-click unsubscribe must be able to set a specific flag off
+// without knowing the other's current value from a signed-out context.
+export const updateEmailPrefs = mutation({
+  args: {
+    weeklyDigest: v.boolean(),
+    progressNote: v.boolean(),
+  },
+  returns: v.null(),
+  handler: async (ctx, args) => {
+    const user = await getCurrentUser(ctx);
+    await ctx.db.patch(user._id, {
+      emailPrefs: {
+        weeklyDigest: args.weeklyDigest,
+        progressNote: args.progressNote,
+      },
     });
     return null;
   },

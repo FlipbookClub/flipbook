@@ -31,6 +31,15 @@ export default defineSchema({
     // users.updatePushToken) because the server cannot know a user's local
     // hour without it; until it arrives, that user is simply skipped rather
     // than reminded at the wrong time.
+    // P5-T5. Re-engagement email opt-outs. Absent means both on, matching the
+    // newsletter's opt-out posture; the unsubscribe link in every send writes
+    // here, so honouring it is a data fact rather than a manual promise.
+    emailPrefs: v.optional(
+      v.object({
+        weeklyDigest: v.boolean(),
+        progressNote: v.boolean(),
+      }),
+    ),
     reminderEnabled: v.optional(v.boolean()),
     reminderHour: v.optional(v.number()),
     reminderTzOffsetMinutes: v.optional(v.number()),

@@ -19,4 +19,16 @@ crons.hourly(
   {},
 );
 
+// P5-T5. Weekly re-engagement. Also inert unless
+// REENGAGEMENT_EMAILS_ENABLED is "true".
+//
+// Monday 09:00 UTC (10:00 Lagos): a digest about last week reads best at the
+// start of the next one, and it is well clear of the hourly reminder job.
+crons.weekly(
+  "weekly re-engagement email",
+  { dayOfWeek: "monday", hourUTC: 9, minuteUTC: 0 },
+  internal.reengagement.sendWeeklyReengagement,
+  {},
+);
+
 export default crons;

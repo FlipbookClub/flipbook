@@ -166,6 +166,55 @@ export const sendMonthlyNewsletter = internalAction({
 // installed, and missing anyone who signed up through Apple/Google without
 // ever touching the waitlist form).
 //
+// Every Clerk identity with a primary email, as {id, email}.
+//
+// The `users` table stores clerkId and no email, so Clerk is the only source
+// for an address. Shared by the newsletter and by the weekly re-engagement
+// job (convex/reengagement.ts) rather than paged twice.
+export async function fetchClerkAccounts(): Promise<
+  Array<{ id: string; email: string }>
+> {
+  const secret = process.env.CLERK_SECRET_KEY;
+  if (!secret) {
+    throw new Error("[clerk] CLERK_SECRET_KEY not set on this deployment.");
+  }
+
+  const out: Array<{ id: string; email: string }> = [];
+  const limit = 100;
+  let offset = 0;
+
+  // Clerk caps `limit` at 500; 100 keeps each response small.
+  for (;;) {
+    const res = await fetch(
+      `https://api.clerk.com/v1/users?limit=${limit}&offset=${offset}&order_by=-created_at`,
+      { headers: { Authorization: `Bearer ${secret}` } },
+    );
+    if (!res.ok) {
+      const detail = await res.text().catch(() => "");
+      throw new Error(`[clerk] list failed (${res.status}): ${detail}`);
+    }
+
+    const page = (await res.json()) as Array<{
+      id: string;
+      primary_email_address_id: string | null;
+      email_addresses: Array<{ id: string; email_address: string }>;
+    }>;
+
+    for (const user of page) {
+      const primary =
+        user.email_addresses.find((e) => e.id === user.primary_email_address_id) ??
+        user.email_addresses[0];
+      if (primary?.email_address) {
+        out.push({ id: user.id, email: primary.email_address });
+      }
+    }
+
+    if (page.length < limit) break;
+    offset += limit;
+  }
+  return out;
+}
+
 // Every clerkId that has an actual Flipbook account row. Used to filter the
 // Clerk list down to people who finished signing up in the app: Clerk also
 // holds abandoned signups (authenticated, never completed onboarding, so no
@@ -201,49 +250,8 @@ export const listRecipientEmails = internalAction({
     skippedNoAppAccount: number;
   }> => {
     const onlyAppAccounts = args.onlyAppAccounts ?? true;
-    const secret = process.env.CLERK_SECRET_KEY;
-    if (!secret) {
-      throw new Error(
-        "[newsletter] CLERK_SECRET_KEY not set on this Convex deployment.",
-      );
-    }
-
     const emails: string[] = [];
-    const clerkIdByEmail: Array<{ id: string; email: string }> = [];
-    const limit = 100;
-    let offset = 0;
-
-    // Clerk caps `limit` at 500; 100 keeps each response small.
-    for (;;) {
-      const res = await fetch(
-        `https://api.clerk.com/v1/users?limit=${limit}&offset=${offset}&order_by=-created_at`,
-        { headers: { Authorization: `Bearer ${secret}` } },
-      );
-      if (!res.ok) {
-        const detail = await res.text().catch(() => "");
-        throw new Error(`[newsletter] Clerk list failed (${res.status}): ${detail}`);
-      }
-
-      const page = (await res.json()) as Array<{
-        id: string;
-        primary_email_address_id: string | null;
-        email_addresses: Array<{ id: string; email_address: string }>;
-      }>;
-
-      for (const user of page) {
-        const primary =
-          user.email_addresses.find(
-            (e) => e.id === user.primary_email_address_id,
-          ) ?? user.email_addresses[0];
-        if (primary?.email_address) {
-          clerkIdByEmail.push({ id: user.id, email: primary.email_address });
-        }
-      }
-
-      if (page.length < limit) break;
-      offset += limit;
-    }
-
+    const clerkIdByEmail = await fetchClerkAccounts();
     const clerkTotal = clerkIdByEmail.length;
 
     let kept = clerkIdByEmail;

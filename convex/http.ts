@@ -2,6 +2,8 @@ import { httpRouter } from "convex/server";
 
 import { httpAction } from "./_generated/server";
 import { api, internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
+import { verifyUnsubscribeToken } from "./lib/emailAuth";
 import { LOGO_FULL_LIGHT_PNG_BASE64 } from "./lib/emailAssets";
 
 const http = httpRouter();
@@ -166,6 +168,66 @@ http.route({
       const status = code === "invalid_email" ? 400 : 500;
       return json({ ok: false, error: code }, status);
     }
+  }),
+});
+
+// P5-T5. One-click unsubscribe from re-engagement email. Reached from a mail
+// client, so there is no signed-in user: the HMAC in the link is the entire
+// authorisation, and it is scoped to one user and one preference.
+//
+// GET rather than POST because that is what a mail client follows. That makes
+// it safe for a scanner to prefetch, which is a real tradeoff — but the only
+// effect is turning OFF mail the recipient asked to stop, so a spurious
+// prefetch errs in the direction the recipient wanted.
+http.route({
+  path: "/email/unsubscribe",
+  method: "GET",
+  handler: httpAction(async (ctx, req) => {
+    const url = new URL(req.url);
+    const userId = url.searchParams.get("u") ?? "";
+    const pref = url.searchParams.get("p") ?? "";
+    const token = url.searchParams.get("k") ?? "";
+
+    const page = (message: string, status: number) =>
+      new Response(
+        `<!doctype html><html><head><meta charset="utf-8" />` +
+          `<meta name="viewport" content="width=device-width,initial-scale=1" />` +
+          `<title>Flipbook</title></head>` +
+          `<body style="margin:0;background:#f7f3e3;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif">` +
+          `<div style="max-width:520px;margin:0 auto;padding:56px 28px;color:#3b3a6d">` +
+          `<p style="font-size:17px;line-height:1.6">${message}</p>` +
+          `</div></body></html>`,
+        { status, headers: { "Content-Type": "text/html; charset=utf-8" } },
+      );
+
+    if (pref !== "weeklyDigest" && pref !== "progressNote") {
+      return page("That unsubscribe link isn't valid.", 400);
+    }
+    const ok = await verifyUnsubscribeToken(userId, pref, token);
+    if (!ok) {
+      return page("That unsubscribe link isn't valid or has been altered.", 400);
+    }
+
+    // A malformed id fails the mutation's own v.id() validator, which throws
+    // and would surface as a 500 on a public endpoint. Anyone can call this
+    // URL with anything in it, so a bad id is an expected input, not a fault.
+    let applied = false;
+    try {
+      applied = await ctx.runMutation(internal.reengagement.setEmailPref, {
+        userId: userId as Id<"users">,
+        pref,
+      });
+    } catch {
+      return page("That unsubscribe link isn't valid.", 400);
+    }
+    if (!applied) return page("We couldn't find that account.", 404);
+
+    return page(
+      pref === "weeklyDigest"
+        ? "Done. You won't get weekly club digests any more. You can turn them back on in Settings."
+        : "Done. You won't get reading notes any more. You can turn them back on in Settings.",
+      200,
+    );
   }),
 });
 
