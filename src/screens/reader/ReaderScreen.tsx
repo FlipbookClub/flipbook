@@ -1,4 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import {
   ActivityIndicator,
   Dimensions,
@@ -1017,6 +1024,12 @@ export function ReaderScreen({ navigation, route }: Props) {
           pendingReactions={pendingReactions}
         />
       ) : null}
+      {/* P5-T3, PDF only this batch: EPUB has no fixed page to corner. Inside
+          the page area rather than beside the header, so top/right anchor to
+          the page and not the screen, and last so it paints above the reader. */}
+      {resolvedUri && !loadError ? (
+        <BookmarkCornerMark visible={isBookmarked} />
+      ) : null}
       </View>
       <View
         style={{
@@ -1137,7 +1150,6 @@ function Header({
   onContents,
 }: HeaderProps) {
   const { colors } = useTheme();
-  const BookmarkIcon = isBookmarked ? BookmarkFilled : Bookmark;
   return (
     <View
       style={{
@@ -1184,17 +1196,7 @@ function Header({
           </Pressable>
         ) : null}
         {onBookmark ? (
-          <Pressable
-            onPress={onBookmark}
-            hitSlop={spacing.s3}
-            accessibilityRole="button"
-            accessibilityLabel={isBookmarked ? "Remove bookmark" : "Bookmark this page"}
-          >
-            <BookmarkIcon
-              size={22}
-              color={isBookmarked ? palette.accent : colors.textPrimary}
-            />
-          </Pressable>
+          <BookmarkButton isBookmarked={!!isBookmarked} onPress={onBookmark} />
         ) : null}
         <Pressable
           onPress={onSettings}
@@ -1466,6 +1468,107 @@ function TableOfContentsSheet({
         )}
       </View>
     </Modal>
+  );
+}
+
+// P5-T3 / FB-006. "Livelier" against a motion guide that rules out bounce and
+// pulse, so this is a crisp press response rather than a spring: a quick dip
+// and return with no overshoot, plus a short emphasis when the page actually
+// becomes bookmarked so the state change is felt and not just seen.
+const BOOKMARK_DIP = 0.84;
+const BOOKMARK_PRESS_MS = 90;
+const BOOKMARK_SETTLE_MS = 160;
+
+function BookmarkButton({
+  isBookmarked,
+  onPress,
+}: {
+  isBookmarked: boolean;
+  onPress: () => void;
+}) {
+  const { colors } = useTheme();
+  const reduceMotion = useReducedMotion();
+  const scale = useSharedValue(1);
+  const Icon = isBookmarked ? BookmarkFilled : Bookmark;
+
+  // Emphasis on the transition INTO bookmarked, not out of it: saving is the
+  // moment worth confirming; un-saving should be quiet.
+  const wasBookmarked = useRef(isBookmarked);
+  useEffect(() => {
+    if (isBookmarked && !wasBookmarked.current && !reduceMotion) {
+      scale.value = withSequence(
+        withTiming(1.18, { duration: BOOKMARK_PRESS_MS }),
+        withTiming(1, { duration: BOOKMARK_SETTLE_MS }),
+      );
+    }
+    wasBookmarked.current = isBookmarked;
+  }, [isBookmarked, reduceMotion, scale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => {
+        if (!reduceMotion) {
+          scale.value = withTiming(BOOKMARK_DIP, { duration: BOOKMARK_PRESS_MS });
+        }
+      }}
+      onPressOut={() => {
+        if (!reduceMotion) {
+          scale.value = withTiming(1, { duration: BOOKMARK_SETTLE_MS });
+        }
+      }}
+      hitSlop={spacing.s3}
+      accessibilityRole="button"
+      accessibilityLabel={isBookmarked ? "Remove bookmark" : "Bookmark this page"}
+    >
+      <Animated.View style={animatedStyle}>
+        <Icon size={22} color={isBookmarked ? palette.accent : colors.textPrimary} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// The page-level half of FB-006: without it, a bookmarked page looks exactly
+// like any other once the header scrolls out of mind. A folded corner is the
+// paper metaphor the reader already borrows, drawn with borders so it needs no
+// SVG. pointerEvents none — it is a mark, not a control, and must never eat a
+// tap meant for the page.
+function BookmarkCornerMark({ visible }: { visible: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const opacity = useSharedValue(visible ? 1 : 0);
+
+  useEffect(() => {
+    opacity.value = reduceMotion
+      ? (visible ? 1 : 0)
+      : withTiming(visible ? 1 : 0, { duration: BOOKMARK_SETTLE_MS });
+  }, [visible, reduceMotion, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={[
+        {
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: 0,
+          height: 0,
+          borderTopWidth: 28,
+          borderTopColor: palette.accent,
+          borderLeftWidth: 28,
+          borderLeftColor: "transparent",
+        },
+        animatedStyle,
+      ]}
+    />
   );
 }
 
