@@ -25,6 +25,24 @@ export default defineSchema({
         reactionReplies: v.boolean(),
       }),
     ),
+    // P5-T2 reading reminders. All optional so existing rows need no
+    // migration: absent reminderEnabled reads as ON, absent reminderHour as
+    // 19:00 local. reminderTzOffsetMinutes is reported by the client (see
+    // users.updatePushToken) because the server cannot know a user's local
+    // hour without it; until it arrives, that user is simply skipped rather
+    // than reminded at the wrong time.
+    // P5-T5. Re-engagement email opt-outs. Absent means both on, matching the
+    // newsletter's opt-out posture; the unsubscribe link in every send writes
+    // here, so honouring it is a data fact rather than a manual promise.
+    emailPrefs: v.optional(
+      v.object({
+        weeklyDigest: v.boolean(),
+        progressNote: v.boolean(),
+      }),
+    ),
+    reminderEnabled: v.optional(v.boolean()),
+    reminderHour: v.optional(v.number()),
+    reminderTzOffsetMinutes: v.optional(v.number()),
     createdAt: v.number(),
     lastActiveAt: v.number(),
   })
@@ -272,6 +290,8 @@ export default defineSchema({
     userId: v.id("users"),
     type: v.union(
       v.literal("chapter_drop"),
+      v.literal("new_book_in_club"),
+      v.literal("reading_reminder"),
       v.literal("reaction_reply"),
       v.literal("club_invite"),
       v.literal("milestone"),
@@ -289,4 +309,17 @@ export default defineSchema({
   })
     .index("by_user_and_sent", ["userId", "sentAt"])
     .index("by_user_unread", ["userId", "isRead"]),
+
+  // One row per successful newsletter delivery. Without this a re-run of a
+  // campaign re-mails everyone: the first September broadcast lost 24
+  // addresses to rate limiting and the only way to retry just those was to
+  // reconcile against Resend by hand. The broadcast now skips anyone already
+  // recorded, so a retry is safe by construction rather than by remembering.
+  newsletterSends: defineTable({
+    // Stable campaign slug ("2026-09"), deliberately not the subject line, so
+    // editing the subject can't orphan the record of who already received it.
+    campaign: v.string(),
+    emailLower: v.string(),
+    sentAt: v.number(),
+  }).index("by_campaign_and_email", ["campaign", "emailLower"]),
 });

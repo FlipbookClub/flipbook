@@ -1,5 +1,7 @@
 # Flipbook — Waitlist Landing Page Copy (v4 · Final)
 
+> **Status (Aug 15, 2026):** this is the copy for the **current live** waitlist site (v1 positioning — "read with the people who are reading right now"). It stays live while v1 acquires users. At the v2 catalog launch (roadmap TASK-194), the site is replaced with `docs/landing-page-copy.md` (v2 positioning — "the library African readers deserve"). Earlier drafts (`waitlist-landing-page-copy.md`, `-v2`, `-v3`) are superseded by this file and kept for reference only.
+
 **Voice:** Warm, generous, lightly clever. Never cute, never gamified. No exclamation points. Never the word *platform*.  
 **One action:** Get the beta. Every CTA on the page points here.  
 **Tone target:** Reading-room calm. White space. A well-edited literary magazine — not a SaaS funnel.  

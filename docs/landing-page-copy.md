@@ -1,35 +1,33 @@
-# Flipbook — Landing Page Copy
+# Flipbook — Landing Page Copy (v2)
 
 **Owner:** Moks
-**Status:** v1 draft, May 23 2026
-**Purpose:** Pre-launch marketing site (getflipbook.com). One job — convert a visitor into a beta-waitlist signup.
-**Companion docs:** `product-vision.md` §4 (Brand Strategy), `go-to-market.md` §9 (Minimum viable landing).
+**Status:** v2, July 15 2026
+**Purpose:** Pre-launch and launch marketing site (getflipbook.com). One job — convert a visitor into a v2 waitlist signup pre-launch, then convert a visitor into a paying rental reader post-launch.
+**Companion docs:** `product-vision.md` v2.0 §4 (Brand Strategy), `go-to-market.md` v2, `docs/supply/*` for the founding-author story.
+**Change note:** v2 rewrite. v1's *"share a book"* framing is retired. New anchor is *"The library African readers deserve — rent smart, read together, pay authors what they're worth."* All copy re-cast around the rental catalog + community + author-economics story.
 
 ---
 
 ## 0. Strategy in one screen
 
-- **Audience.** 70% book-club members / organizers, 20% solo readers seeking accountability, 10% indie authors. Write for #1 above the fold and let #3 surface in its own card lower down.
-- **One action.** *Get the beta.* Email + (optional) qualifier. Every CTA on the page points here.
-- **Voice.** Warm, generous, lightly clever. Never cute. Never gamified. Never the word *platform*. No exclamation points.
-- **Brand-native theme** for marketing imagery is **Flip** (Deep Indigo background, Warm Ivory text, Coral CTA). Light and Dark are referenced in the "Three modes" section as range — Flip carries the brand.
+- **Audience.** Nigerian readers 20-40 first, diaspora Nigerians second, African diaspora third. Publishers and lecturers are secondary surfaces linked from the main landing, not headline audiences.
+- **One action, pre-launch:** *Join the waitlist.* Email + audience tag (reader / author) + optional qualifier ("last book you finished").
+- **One action, post-launch:** *Get the app.* iOS + Android app store buttons, primary. Waitlist still available for readers who don't want to install yet.
+- **Voice.** Warm, generous, lightly clever. Bookish-modern with a Lagos accent. Never *platform*. No exclamation points.
+- **Brand-native theme for marketing imagery:** Flip mode (Deep Indigo background, Warm Ivory text, Coral CTA). Light and Dark referenced in the "Three modes" section as range — Flip carries the brand.
 - **Length goal.** Reading-room calm. Plenty of white space. The whole page should feel like a well-edited literary magazine, not a SaaS funnel.
 
 ---
 
 ## 1. Meta / SEO
 
-**Page title (≤60 chars)**
-`Flipbook — Read with the people who are reading right now`
+**Page title (≤60 chars):** `Flipbook — The library African readers deserve`
 
-**Meta description (≤155 chars)**
-`A social reading app where book clubs read the same book together, with reactions in the margins. Beta opens July 15.`
+**Meta description (≤155 chars):** `A curated rental library of world classics and African indie voices. Rent from ₦500, read together with friends, and pay authors what they're worth.`
 
-**Open Graph title**
-`Flipbook — Read with the people who are reading right now`
+**Open Graph title:** `Flipbook — The library African readers deserve`
 
-**Open Graph description**
-`Book clubs read together — share a book, see your friends' reactions in the margins, and finally finish what you started.`
+**Open Graph description:** `Rent great books from ₦500 to ₦2,500 for four weeks. Read them together inside the app, with reactions in the margins. Beta opens October 13.`
 
 **Theme color:** `#3b3a6d` (Deep Indigo)
 
@@ -37,315 +35,426 @@
 
 ## 2. Hero (above the fold)
 
-**Eyebrow (small caps, coral pulse dot)**
-`Closed beta — opens July 15`
+**Eyebrow (small caps, coral pulse dot):**
+`Public launch — October 13`
 
-**Headline (H1)**
+**Headline (H1):**
 
-> Read with the people<br/>
-> who are reading<br/>
-> *right now.*
+> The library<br/>
+> African readers<br/>
+> *deserve.*
 
-(*"right now"* italicized in Coral; rest in Warm Ivory.)
+(*"deserve"* italicized in Coral; rest in Warm Ivory on Deep Indigo background.)
 
-**Subheadline**
-`Book clubs read together — share a book, see your friends' reactions in the margins, and finally finish what you started.`
+**Subheadline:**
+`A curated catalog of African indie voices and world classics. Rent from ₦500 for four weeks. Read together, with reactions in the margins. Pay authors 70% of every rental.`
 
-**Primary CTA button**
-`Get the beta`
+**Primary CTA button (pre-launch):** `Join the waitlist`
 
-**Microcopy under the button**
-`One email. Pre-launch list, not a newsletter blast.`
+**Primary CTA buttons (post-launch):** `Get on iOS` (App Store link) + `Get on Android` (Play Store link)
 
-**Social proof line (with avatars)**
-`A growing room of readers already on the list.`
-*(Replace "A growing room" with a live count once you have one — see §10.)*
+**Microcopy under the button:**
+`One email. We'll send you the invite the day the app opens.` (pre-launch)
+`Free download. Rentals start at ₦500. Pro from ₦1,550/mo.` (post-launch)
 
-### Alternate H1s (pick one; A is recommended)
+**Social proof line (with avatars):**
+`Join a growing list of readers waiting for the beta.` (pre-launch — swap to a real count once healthy)
+`Read by [N] readers across Nigeria and diaspora.` (post-launch)
 
-- **A — Recommended.** *Read with the people who are reading right now.* — the brand-doc-blessed line; specific, present-tense, sets up the in-margin promise.
-- **B — Wedge-forward.** *Your book club, but the reactions live in the book.* — sharper for paid social, tighter for short ad units.
-- **C — Outcome-forward.** *Finally finish the book.* — best if you ever A/B-test a more solo-reader-oriented variant.
+### Alternate H1s (pick one — A is recommended; keep B and C for ads and social)
+
+- **A — Recommended.** *The library African readers deserve.* Broad reach, culturally-anchored, no incumbent can honestly claim it.
+- **B — Wedge-forward.** *Great books, made affordable. Read them together.* Better for paid social / price-conscious ads.
+- **C — Reader-first.** *Rent smart. Read together. Talk on the page.* The v2 tagline used as a headline — good for retargeting where visitor already knows the brand.
+
+### Old v1 headline (keep for retargeting or as a secondary section header)
+
+- *Read with the people who are reading right now.* Still valid; use as a section header lower on the page.
 
 ---
 
 ## 3. Hero visual caption
 
-(Underneath the Magic Moment loop)
+(Underneath the Magic Moment loop — updated to show rent → open → react)
 
-`Creator publishes → the room opens → reactions land in the margin.`
+`Rent a book → your friends see it on their shelf → reactions bloom in the margin as you both read.`
 
 ---
 
 ## 4. Marquee strip (between hero and problem)
 
-A slow, decorative scrolling line of brand-voice fragments — sets tone, no functional load.
+Slow, decorative scrolling line of brand-voice fragments. Sets tone.
 
-`Reading is a verb. · The book is the room. · Finish more of what you start. · Reactions live next to the paragraph. · No streaks. No shame. No leaderboards. · Built in the open from Lagos. · Three modes. One library.`
+`Rental from ₦500. · The great books, made affordable. · Nigerian indies. Ghanaian romance. The classics. · No spoilers ahead. · No ghost-town Discord. · 70% of every rental to the author. · Three modes. One library. · Built in Lagos, in the open.`
 
 ---
 
 ## 5. The problem
 
-**Eyebrow**
+**Eyebrow:**
 `The honest part`
 
-**Headline (H2)**
+**Headline (H2):**
 
-> Most book clubs<br/>die in three weeks.
+> Great books shouldn't<br/>cost a week's spend.
 
-**Body (≤45 words)**
-`Someone falls behind. Someone reads ahead. The conversation happens once a month in a group chat that buries it by Tuesday. The book stops feeling shared — and then it stops feeling worth finishing.`
+**Body (≤55 words):**
+`A hardcover in Lagos runs ₦25,000–₦35,000. Kindle prices in dollars and its Nigerian catalog is thin. The books you actually want to read either live behind a price you can't justify, or aren't available at all. And when you do get one, you read it alone — because your WhatsApp book club died three weeks ago.`
 
 ---
 
 ## 6. Three pillars (the solution)
 
-**Eyebrow**
+**Eyebrow:**
 `Why Flipbook`
 
-**Section headline (H2)**
+**Section headline (H2):**
 
-> Reading,<br/>the way it used to feel.
+> A library, priced right.<br/>Read together.
 
-### Pillar 01 — Finish more
+### Pillar 01 — Books at prices that make sense
 
-**Card title (large display)**
-`Reading alongside other people — visibly, gently — is the difference between a book finished and a bookmark abandoned.`
+**Card title (large display):**
+`Rent from ₦500 to ₦2,500 for four weeks.`
 
-**Subline**
-`No streaks. No nudges that shame. The room is just ahead of you, and that turns out to be enough.`
+**Subline:**
+`A coffee, not a week's spend. Public-domain classics come free with Pro. No ₦35,000 hardcovers to save up for.`
 
-### Pillar 02 — Talk on the page
+### Pillar 02 — A community around every book
 
-**Card title**
-`Reactions and comments live next to the paragraph that prompted them.`
+**Card title:**
+`Rent a book, join the community reading it.`
 
-**Subline**
-`No spoilers ahead. No ghost-town Discord. The conversation is right where you are in the book — and only what's safe to see from where you've read.`
+**Subline:**
+`Reactions and comments live next to the paragraph that prompted them. No spoilers ahead. No ghost-town Discord. The conversation is right where you are in the book.`
 
-### Pillar 03 — Follow the writers
+### Pillar 03 — Authors get paid what they're worth
 
-**Card title**
-`Indie authors publish here and turn their readers into communities.`
+**Card title:**
+`70% of every rental goes to the author.`
 
-**Subline**
-`When a writer drops a chapter, you're in the room — not on a mailing list. Not in a feed.`
+**Subline:**
+`Kindle Unlimited pays pennies per page read. On Flipbook, renting an indie author is a real vote for their work.`
 
 ---
 
 ## 7. How it works
 
-**Eyebrow**
-`How a Flipbook club works`
+**Eyebrow:**
+`How Flipbook works`
 
-**Section headline (H2)**
+**Section headline (H2):**
 
 > Three steps,<br/>then you're reading.
 
-### 01 — Start a club like a group chat.
-`Name it. Invite by link. Pick the book you've all been meaning to read.`
+### 01 — Browse the library.
+`African indie voices. World classics. Small-publisher titles. Curated by taste, not by algorithm.`
 
-### 02 — Read inside the app.
-`Open the book. Long-press a paragraph. Drop a reaction. Watch the room reply.`
+### 02 — Rent your first book.
+`One tap, one payment (₦500 to ₦2,500). Four weeks to read. Your book, in your shelf, in seconds.`
 
-### 03 — Finish, together.
-`When the room reaches the last page, the conversation stays. For whoever shows up next.`
+### 03 — Read together.
+`Join the community for your book, or start your own. Watch reactions bloom in the margins as your friends reach the same paragraphs you do.`
 
 ---
 
-## 8. Three modes (brand showpiece)
+## 8. The catalog preview
 
-**Eyebrow**
+**Eyebrow:**
+`What's on the shelf`
+
+**Section headline (H2):**
+
+> Curated,<br/>by hand.
+
+**Body:**
+`We open the catalog with 500+ hand-picked public-domain classics — Woolf, Baldwin, Dostoevsky, Achebe — and 30+ African indie voices you won't find front-page on Amazon. Every book chosen because we can explain choosing it.`
+
+**Visual:** grid of 12-15 real cover images across the three sources.
+
+**Small caps labels:** `Public-domain classics` · `African indie voices` · `Flipbook Specials`
+
+---
+
+## 9. Flipbook Pro
+
+**Eyebrow:**
+`Flipbook Pro`
+
+**Section headline (H2):**
+
+> Read more.<br/>Pay less.
+
+**Body:**
+`Pro unlocks unlimited access to our public-domain classics, 15% off every paid rental, curated Flipbook Specials, neural audio narration for the commute, and the ability to create your own communities. Less than Netflix. More than Netflix delivers.`
+
+**Pricing display:**
+- **₦1,550/mo** — Annual (best value, save 38%)
+- **₦2,000/mo** — Quarterly (billed ₦6,000/quarter)
+- **₦2,500/mo** — Monthly
+
+**Pro benefits list (compact):**
+- Unlimited public-domain rentals — free.
+- 15% off every paid rental.
+- Access to Flipbook Specials — curated titles you won't find anywhere else.
+- Neural audio narration for every book that hasn't opted out.
+- 6-week rental shelves (up from 4).
+- Create your own communities and invite whoever you want.
+- Join as many communities as you want.
+
+---
+
+## 10. Three modes (brand showpiece)
+
+**Eyebrow:**
 `A reader for every hour`
 
-**Section headline (H2)**
+**Section headline (H2):**
 
 > Three modes.<br/>One library.
 
-**Body**
+**Body:**
 `Light for the morning commute. Flip — our brand-native indigo — for the late-night reading nook. Dark for everyone else. Reading is personal. Your reader should be too.`
 
-**Mode labels (small caps in the visual)**
+**Mode labels (small caps in the visual):**
 `Light` · `Flip` · `Dark`
 
 ---
 
-## 9. Founder note
+## 11. For authors (secondary CTA — links out to a dedicated authors page or expanded section)
 
-**Identifier**
-`Moks — Designer, founder · Lagos`
+**Eyebrow:**
+`For African indie authors`
 
-**Body (pull quote, display type)**
-> "I've been a product designer for five years and a member of more book clubs than I've finished books. I abandoned every reading app on the market. Flipbook is the one I wished existed — I'm building it from Lagos, in the open, all the way to launch."
+**Section headline (H2):**
 
-**Links row**
+> Your work,<br/>paid for properly.
+
+**Body:**
+`If you publish on Amazon KDP or Selar or Okada Books, you already know the drill: pennies per page read. On Flipbook, you keep 70% of every rental. Non-exclusive — you keep publishing everywhere you already do. No upfront money required.`
+
+**CTA button:** `Publish on Flipbook →` (opens a form or a mailto)
+
+**Micro-story (2 lines):**
+`The first 30 authors get founding-cohort placement in the launch shelf, marketing feature during launch week, and a band review at every subscriber milestone.`
+
+---
+
+## 12. For lecturers (secondary CTA — bounded, small footprint on the page)
+
+**Eyebrow:**
+`For university lecturers`
+
+**Section headline (H3):**
+`Reading spaces for your class.`
+
+**Body:**
+`Distribute course materials, point at reading lists, and see anonymized class-wide progress. Not an LMS — no grade book, no attendance, no video calls. Just the reading part, done properly. Free during pilot.`
+
+**CTA button:** `Talk to us →` (email or Cal.com link)
+
+---
+
+## 13. Founder note
+
+**Identifier:**
+`Moks + Ayodeji — Lagos`
+
+**Body (pull quote, display type):**
+> *"We've spent a combined decade in product, ops, and community — and we've watched every reading app assume African readers were an afterthought. Flipbook is the reading library we want in our own pockets, made properly, built in the open."*
+
+**Links row:**
 `Follow the build` (X) · `Instagram` · `LinkedIn`
 
 ---
 
-## 10. Creator card (segment C inline)
+## 14. FAQ
 
-**Eyebrow**
-`For creators`
-
-**Headline (H2)**
-`Writing something serial?`
-
-**Body**
-`Indie authors and serialized novelists get a private creator beta. Publish chapters to your readers, not to a feed. Keep the relationship. Keep the room.`
-
-**Form fields**
-- Email — placeholder: `you@yourwriting.com`
-- Link to work — placeholder: `link to your work (substack, IG, blog…)`
-
-**CTA button**
-`Join the creator list`
-
----
-
-## 11. FAQ
-
-**Eyebrow**
+**Eyebrow:**
 `The questions we keep getting`
 
-**Section headline (H2)**
+**Section headline (H2):**
 `Likely on your mind.`
 
-### How is this different from Goodreads?
-`Goodreads is for the books you've finished. Flipbook is for the book you're reading right now. Different primitive, different room.`
+### How much does a book cost?
+`Rentals are ₦500 (public-domain classics), ₦1,500 (indie standard), ₦2,500 (premium indie), or ₦4,000 (later — larger-publisher titles). Every rental gives you 4 weeks. Pro subscribers get 6 weeks and 15% off B/C/D.`
 
-### I tried Discord book clubs. They didn't stick.
-`Same. They die in three weeks because the conversation isn't tied to the book. On Flipbook the reactions live on the page — they show up because you're already there.`
+### Why rent instead of buy?
+`Because a ₦1,500 rental you finish is better than a ₦35,000 hardcover you don't. And rental means more of the money reaches the author.`
 
-### I prefer reading alone.
-`You still can. Solo reading works. The clubs are there when you want them.`
+### How is this different from Amazon Kindle?
+`Kindle prices in dollars and its Nigerian catalog is thin. Flipbook prices in naira and starts with African voices. Our authors keep 70% per rental; Kindle Unlimited pays pennies per page read.`
+
+### How is this different from Okada Books?
+`Okada sells books one-by-one. Flipbook rents them and reads them together. Different economics, different reason to open the app. If you're on Okada already, you can keep publishing there — our terms are non-exclusive.`
 
 ### When does the beta open?
-`Wednesday, July 15. Design-partner clubs get in first; the rest of the waitlist follows the same day.`
+`Monday, October 13, 2026. Waitlist gets first access.`
 
-### Is it free?
-`Yes — for the beta, and free forever for every founding club. A Pro tier comes later for the obsessed. It will never be a paywall on reading together.`
+### What about the current Flipbook app (v1)?
+`If you're already in the v1 book-club beta, thanks for being early. v2 (rentals + catalog) opens October 13; your v1 clubs will still work, and you'll be the first cohort to try v2.`
+
+### Do I need a subscription to read?
+`No. You can rent one book at a time from the catalog as a Free user. Pro adds unlimited public-domain classics, audio narration, community creation, and more.`
+
+### Is my payment secure?
+`Yes. Paystack handles Nigerian card payments; RevenueCat handles Pro subscriptions through the App Store or Play Store. We never see your card number.`
 
 ### iOS and Android?
-`Both, from day one. Mobile-first by design. A web companion comes later.`
+`Both, from day one. Mobile-first by design. A web reader comes later.`
+
+### I'm an author — how do I get on the catalog?
+`Reach out via the "For authors" section above, or email us at hello@getflipbook.com. Founding-30 slots are still open.`
 
 ---
 
-## 12. Final CTA
+## 15. Final CTA
 
-**Eyebrow**
-`Closed beta — opens July 15`
+**Eyebrow (pre-launch):**
+`Public launch — October 13`
 
-**Section headline (H2)**
+**Eyebrow (post-launch):**
+`Available on iOS and Android`
 
-> The room is forming.<br/>
-> *Pull up a chair.*
+**Section headline (H2):**
 
-**Body**
-`Drop your email. We'll send one welcome note, one question we'd love you to answer, and an invite the day the beta opens.`
+> The library is<br/>
+> *forming.*
 
-**Form fields**
+**Body (pre-launch):**
+`Drop your email. We'll send you the invite the day the app opens — plus one question we'd love you to answer.`
+
+**Body (post-launch):**
+`Download the app, browse the catalog, and rent your first book. Public-domain classics start at ₦500 — start there if you want to see what the reader feels like before committing.`
+
+**Form fields (pre-launch):**
 - Email — placeholder: `you@reading.com`
 - Optional qualifier — placeholder: `(optional) what's the last book you finished?`
 
-**CTA button**
-`Get the beta`
+**CTA button (pre-launch):** `Join the waitlist`
+**CTA buttons (post-launch):** `Get on iOS` + `Get on Android`
 
-**Microcopy under form**
+**Microcopy under form:**
 `No spam. About one update a fortnight while we're building. Unsubscribe with one tap.`
 
 ---
 
-## 13. Footer
+## 16. Footer
 
-**Brand line**
+**Brand line:**
 `Flipbook`
-`Read together. Finish more. Talk on the page.`
+`Rent smart. Read together. Talk on the page.`
 
-**Column 1 — The room**
+**Column 1 — The library**
 - How it works
-- Why Flipbook
+- Pricing
+- Flipbook Pro
 - Three modes
 
 **Column 2 — For people**
-- Reader beta
-- Creator list
+- Reader beta / app
+- For authors
+- For lecturers
 - FAQ
 
 **Column 3 — Follow the build**
-- X / Twitter
+- X / Twitter (@flipbook_app)
 - Instagram
 - LinkedIn
 - `hello@getflipbook.com`
 
-**Bottom line (left)**
+**Bottom line (left):**
 `© 2026 Flipbook. Built in Lagos, in the open.`
 
-**Bottom line (right, display italic)**
+**Bottom line (right, display italic):**
 `A quiet vote of confidence in the reader.`
 
 ---
 
-## 14. Microcopy library (form states, errors, confirmation)
+## 17. Microcopy library (form states, errors, confirmation)
 
 ### Form button states
-- Default: `Get the beta`
-- Loading: `Adding you…`
-- Disabled: same as default (no separate state)
+- Default: `Join the waitlist` (pre-launch) / `Rent this book` (post-launch)
+- Loading: `Adding you…` / `Processing payment…`
+- Disabled: same as default
 
 ### Email validation
 - Empty: `An email helps us send the invite.`
 - Malformed: `That email doesn't look right — mind checking it?`
 
-### Submission states
+### Submission states (waitlist)
 - Success (first time): `You're on the list. Check your inbox in the next minute.`
 - Success (already on list): `You're already on the list — see you on launch day.`
 - Server error: `Couldn't reach the list right now. Try again in a moment?`
 
+### Payment states (post-launch)
+- Payment declined: `Your bank didn't approve the charge. Try again, or use a different card?`
+- Payment succeeded, rental created: `Rented. Opening your book…`
+- Rental duplicate: `You already have this one on your shelf. Opening…`
+
 ### Welcome email (T+0) — subject + first line
 
 - Subject: `You're on the list — one quick question`
-- First line: `Hi — Moks here. Real human, sending this from Lagos. Before launch, I'd love to know: what's the last book you finished, and what do you wish your current book-club setup did better? Hit reply, even one sentence helps.`
+- First line: `Hi — Moks + Ayodeji here. Real humans, sending this from Lagos. Before launch, we'd love to know: what's the last book you finished, and would you rather see it on Flipbook as a rental? Hit reply. Even one sentence helps.`
 
-(*The qualifier reply is real product research per GTM §9 — promise it lightly, mean it fully.*)
+### Launch-day email (Oct 13) — subject + first line
+
+- Subject: `Flipbook is open — start with these five books`
+- First line: `Hi — the app is live. You can download it here [iOS] [Android]. Your first rental can be a ₦500 classic (Woolf, Baldwin, Achebe — take your pick) or one of our founding-30 indie titles from ₦1,500. The catalog is small on purpose — every book on it, we can explain choosing.`
 
 ---
 
-## 15. CTAs in priority order
+## 18. CTAs in priority order
 
 For any A/B testing or paid-traffic landing variants, these are the CTAs ranked by strength:
 
-1. **`Get the beta`** — primary, used on all reader forms.
-2. **`Join the creator list`** — creator card only.
-3. **`Pull up a chair`** — alternate for the final CTA section if you want to test against #1.
-4. **`Save my seat`** — keep in reserve for an SMS / WhatsApp-driven campaign where "list" feels too cold.
+1. **`Join the waitlist`** — primary, pre-launch.
+2. **`Get on iOS` / `Get on Android`** — primary, post-launch.
+3. **`Publish on Flipbook →`** — author card only.
+4. **`Talk to us →`** — lecturer card only.
+5. **`Rent from ₦500`** — post-launch alternate for retargeting.
 
 Avoid: *Sign Up · Submit · Learn More · Join Now · Start Free Trial* — all generic, none earned.
 
 ---
 
-## 16. Brand-voice guardrails (so the copy can't drift)
+## 19. Brand-voice guardrails (so the copy can't drift)
 
-Pulled from `product-vision.md` §4. If a future revision touches the page, run it past this list:
+Pulled from `product-vision.md` v2 §4. If a future revision touches the page, run it past this list:
 
 - **Never** use *platform, leverage, synergy, solution, ecosystem, powered by, reimagined.*
 - **Never** end a sentence with an exclamation point in user-facing copy.
-- **Never** use streak language, owl shame, leaderboards, or "you're falling behind" framing.
+- **Never** use shame framing ("you're falling behind"), owl-shame energy, or leaderboard language in marketing copy. *(Note, Aug 15: streaks and reading goals are now permitted product features — if marketing copy ever references them, frame as celebration ("12 days of reading"), never as pressure.)*
 - **Never** say *Welcome to your reading journey* or anything that sounds like it.
-- **Always** prefer specific over vague: name the chapter, name the friend, name the book.
+- **Never** feel like Kindle — no USD pricing anywhere in the reader UI; no Western-first catalog on the launch shelves.
+- **Never** feel like an LMS on the lecturer card — no grade book, attendance, video, assignments.
+- **Never** make the user feel poor — pricing is shown proudly and legibly; Pro is framed as *"you get more,"* not as *"you unlock what you were locked out of."*
+- **Always** prefer specific over vague: name the chapter, name the friend, name the book, name the author.
 - **Always** keep the *book is the hero* — typographic, generous, restrained.
-- **Coral is rare on purpose.** If the page has 6 coral elements, it has too many.
+- **Coral is rare on purpose.** If the page has six coral elements, it has too many.
 
 ---
 
-## Appendix A — Headline alternates worth keeping around
+## Appendix A — Headline alternates worth keeping
 
 The brand-doc-blessed line wins for the homepage, but these all earned their seat in earlier drafts and are worth keeping for ads, social cards, and seasonal variants:
 
-- *Your book club, but the reactions live in the book.*
-- *Read together. Finish more. Talk on the page.* (the tagline — use it as a footer line, not a hero)
-- *The book club app that makes you actually finish the book.* (best for BookTok)
-- *Reading is having a moment. Make it a room.*
-- *A home for the book you're reading right now.*
-- *Finally finish the book.*
+- *Great books, made affordable. Read them together.*
+- *Rent smart. Read together. Talk on the page.* (the tagline — use it as a footer line, not a hero)
+- *Your next book is here. So are the readers.*
+- *The rental library that puts African authors first.*
+- *Read together. Rent affordably. Talk on the page.*
+- *Read with the people who are reading right now.* (v1 line — still valid for retargeting)
+- *A library curated by taste, not by algorithm.*
+
+## Appendix B — v1 → v2 copy diff summary
+
+For anyone auditing the pivot:
+
+- **Old H1:** *Read with the people who are reading right now.* → **New H1:** *The library African readers deserve.*
+- **Old subhead:** *Book clubs read together — share a book, see friends' reactions in the margins, finally finish what you started.* → **New subhead:** *A curated catalog of African indie voices and world classics. Rent from ₦500 for four weeks. Read together, with reactions in the margins. Pay authors 70% of every rental.*
+- **Old three pillars:** Finish more / Talk on the page / Follow the writers → **New three pillars:** Books at prices that make sense / A community around every book / Authors get paid what they're worth.
+- **Old "How it works" step 1:** *Start a club like a group chat.* → **New step 1:** *Browse the library.*
+- **Old business model in copy:** freemium creator subscriptions. → **New business model in copy:** rental catalog + Flipbook Pro subscription + author 70/30.
+- **New sections not in v1:** Catalog preview (§8), Flipbook Pro pricing (§9), For authors (§11), For lecturers (§12).
+- **Removed from v1:** *"Book clubs die in three weeks"* as headline framing (still referenced in FAQ), *"share a book"* language throughout, *"creator publishing"* concept entirely.

@@ -81,18 +81,35 @@ export function SettingsScreen({ navigation }: Props) {
   const deleteSelf = useMutation(api.users.deleteSelf);
   const me = useQuery(api.users.me);
   const updateNotificationPrefs = useMutation(api.users.updateNotificationPrefs);
+  const updateReminderPrefs = useMutation(api.users.updateReminderPrefs);
+  const updateEmailPrefs = useMutation(api.users.updateEmailPrefs);
 
   // Local mirror so toggles flip instantly; sync to server in the background.
   // Defaults to "all on" when the user has never visited Settings (matches
   // server-side opt-in default).
   const [chapterDrops, setChapterDrops] = useState(true);
   const [reactionReplies, setReactionReplies] = useState(true);
+  // P5-T2. Absent on the server reads as ON, matching the 19:00 default, so
+  // the local mirror starts on too.
+  const [readingReminder, setReadingReminder] = useState(true);
+  // P5-T5. Absent server-side reads as both on.
+  const [weeklyDigest, setWeeklyDigest] = useState(true);
+  const [progressNote, setProgressNote] = useState(true);
   useEffect(() => {
     if (me?.notificationPrefs) {
       setChapterDrops(me.notificationPrefs.chapterDrops);
       setReactionReplies(me.notificationPrefs.reactionReplies);
     }
   }, [me?.notificationPrefs]);
+  useEffect(() => {
+    if (me?.reminderEnabled !== undefined) setReadingReminder(me.reminderEnabled);
+  }, [me?.reminderEnabled]);
+  useEffect(() => {
+    if (me?.emailPrefs) {
+      setWeeklyDigest(me.emailPrefs.weeklyDigest);
+      setProgressNote(me.emailPrefs.progressNote);
+    }
+  }, [me?.emailPrefs]);
 
   const persistPrefs = (next: { chapterDrops: boolean; reactionReplies: boolean }) => {
     updateNotificationPrefs({ prefs: next }).catch(() => undefined);
@@ -203,6 +220,39 @@ export function SettingsScreen({ navigation }: Props) {
             onChange={(v) => {
               setReactionReplies(v);
               persistPrefs({ chapterDrops, reactionReplies: v });
+            }}
+          />
+          <ToggleRow
+            icon={<Bell size={18} color={colors.textPrimary} />}
+            label="Reading reminder"
+            sublabel="A nudge at 7pm about the book you're in the middle of."
+            value={readingReminder}
+            onChange={(v) => {
+              setReadingReminder(v);
+              updateReminderPrefs({ enabled: v }).catch(() => undefined);
+            }}
+          />
+        </Section>
+
+        <Section title="Email">
+          <ToggleRow
+            icon={<Bell size={18} color={colors.textPrimary} />}
+            label="Weekly club digest"
+            sublabel="A Monday summary of what happened in clubs you run."
+            value={weeklyDigest}
+            onChange={(v) => {
+              setWeeklyDigest(v);
+              updateEmailPrefs({ weeklyDigest: v, progressNote }).catch(() => undefined);
+            }}
+          />
+          <ToggleRow
+            icon={<Bell size={18} color={colors.textPrimary} />}
+            label="Reading notes"
+            sublabel="An occasional email about the book you're in the middle of."
+            value={progressNote}
+            onChange={(v) => {
+              setProgressNote(v);
+              updateEmailPrefs({ weeklyDigest, progressNote: v }).catch(() => undefined);
             }}
           />
         </Section>

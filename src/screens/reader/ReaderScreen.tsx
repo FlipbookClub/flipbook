@@ -1,4 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from "react-native-reanimated";
+import { useReducedMotion } from "@/lib/useReducedMotion";
 import {
   ActivityIndicator,
   Dimensions,
@@ -16,7 +23,7 @@ import {
   type HighlightRect,
   type NativeHighlightPdfViewRef,
 } from "native-highlight-pdf";
-import { BookOpen, Bookmark, BookmarkFilled, Pencil, Settings2, Smile, X } from "@/lib/icons";
+import { BookOpen, Bookmark, BookmarkFilled, Pencil, Settings2, X } from "@/lib/icons";
 import { useMutation, useQuery } from "convex/react";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import * as Haptics from "expo-haptics";
@@ -564,8 +571,9 @@ export function ReaderScreen({ navigation, route }: Props) {
     }
   };
 
-  // FR-014: 400ms long-press opens the picker (the floating Smile FAB is the
-  // reliable entry on iOS where PDFKit consumes touches before JS can see).
+  // FR-014: 400ms long-press opens the picker. Legacy Android <Pdf> path
+  // only — the native reader deliberately does not attach this, since it
+  // would fight the native view for long-press text selection.
   const longPress = Gesture.LongPress()
     .minDuration(400)
     .onStart(() => {
@@ -929,9 +937,9 @@ export function ReaderScreen({ navigation, route }: Props) {
           // sibling RNGH recognizer here would win arbitration against
           // PDFKit's own gesture (confirmed on-device: BUG-001 came right
           // back once our competing in-module recognizer was removed,
-          // because this JS-level one was still wrapping the view). Page-
-          // level reactions on iOS go through the Smile FAB instead, which
-          // is why it's documented as "the reliable entry." It IS wrapped in
+          // because this JS-level one was still wrapping the view). There is
+          // therefore no page-level reaction entry on this path: reactions
+          // anchor to a text selection. It IS wrapped in
           // a `Gesture.Native()` detector — see `nativeReaderGesture` above —
           // so RNGH's app-wide root recognizer (GestureHandlerRootView in
           // App.tsx) explicitly steps aside for this view instead of
@@ -1016,6 +1024,12 @@ export function ReaderScreen({ navigation, route }: Props) {
           pendingReactions={pendingReactions}
         />
       ) : null}
+      {/* P5-T3, PDF only this batch: EPUB has no fixed page to corner. Inside
+          the page area rather than beside the header, so top/right anchor to
+          the page and not the screen, and last so it paints above the reader. */}
+      {resolvedUri && !loadError ? (
+        <BookmarkCornerMark visible={isBookmarked} />
+      ) : null}
       </View>
       <View
         style={{
@@ -1041,41 +1055,11 @@ export function ReaderScreen({ navigation, route }: Props) {
           {totalPages !== null ? ` of ${totalPages}` : ""}
         </Text>
       </View>
-      {/* Floating React button — sibling of the Pdf area, not a child, so
-          it's guaranteed to overlay the native PDFKit view. */}
-      {resolvedUri && !loadError && initialPage !== null ? (
-        <Pressable
-          onPress={() => setComposerOpen(true)}
-          accessibilityRole="button"
-          accessibilityLabel="React to this page"
-          hitSlop={spacing.s3}
-          // Static style (not the `({pressed}) => …` callback form): under
-          // reanimated 4 the callback silently drops backgroundColor, which
-          // left the FAB invisible (white icon only) — notably in light mode.
-          style={{
-            position: "absolute",
-            right: spacing.s4,
-            bottom: spacing.s6,
-            width: 56,
-            height: 56,
-            borderRadius: 28,
-            backgroundColor: palette.brandPrimary,
-            alignItems: "center",
-            justifyContent: "center",
-            shadowColor: "#000",
-            shadowOpacity: 0.25,
-            shadowOffset: { width: 0, height: 4 },
-            shadowRadius: 8,
-            elevation: 6,
-          }}
-        >
-          <Smile size={28} color={palette.textOnBrand} />
-        </Pressable>
-      ) : null}
-      {/* Only surfaces on the native-highlight-pdf reader (iOS today), and
-          only while there's an active text selection to act on. Stacks above
-          the React FAB rather than replacing it — the two are independent
-          actions (react to the page vs. highlight the selected text). */}
+      {/* The reader's only floating control, and only while there is a text
+          selection to act on. It used to stack above a permanently-visible
+          Smile FAB for page-level reactions; having both on screen during a
+          selection read as two competing ways to do the same thing, so the
+          FAB is gone and reactions are anchored to selected text. */}
       {useNativeHighlightReader && hasSelection ? (
         <Pressable
           onPress={async () => {
@@ -1090,7 +1074,7 @@ export function ReaderScreen({ navigation, route }: Props) {
           style={{
             position: "absolute",
             right: spacing.s4,
-            bottom: spacing.s6 + 64,
+            bottom: spacing.s6,
             width: 56,
             height: 56,
             borderRadius: 28,
@@ -1166,7 +1150,6 @@ function Header({
   onContents,
 }: HeaderProps) {
   const { colors } = useTheme();
-  const BookmarkIcon = isBookmarked ? BookmarkFilled : Bookmark;
   return (
     <View
       style={{
@@ -1213,17 +1196,7 @@ function Header({
           </Pressable>
         ) : null}
         {onBookmark ? (
-          <Pressable
-            onPress={onBookmark}
-            hitSlop={spacing.s3}
-            accessibilityRole="button"
-            accessibilityLabel={isBookmarked ? "Remove bookmark" : "Bookmark this page"}
-          >
-            <BookmarkIcon
-              size={22}
-              color={isBookmarked ? palette.accent : colors.textPrimary}
-            />
-          </Pressable>
+          <BookmarkButton isBookmarked={!!isBookmarked} onPress={onBookmark} />
         ) : null}
         <Pressable
           onPress={onSettings}
@@ -1495,6 +1468,107 @@ function TableOfContentsSheet({
         )}
       </View>
     </Modal>
+  );
+}
+
+// P5-T3 / FB-006. "Livelier" against a motion guide that rules out bounce and
+// pulse, so this is a crisp press response rather than a spring: a quick dip
+// and return with no overshoot, plus a short emphasis when the page actually
+// becomes bookmarked so the state change is felt and not just seen.
+const BOOKMARK_DIP = 0.84;
+const BOOKMARK_PRESS_MS = 90;
+const BOOKMARK_SETTLE_MS = 160;
+
+function BookmarkButton({
+  isBookmarked,
+  onPress,
+}: {
+  isBookmarked: boolean;
+  onPress: () => void;
+}) {
+  const { colors } = useTheme();
+  const reduceMotion = useReducedMotion();
+  const scale = useSharedValue(1);
+  const Icon = isBookmarked ? BookmarkFilled : Bookmark;
+
+  // Emphasis on the transition INTO bookmarked, not out of it: saving is the
+  // moment worth confirming; un-saving should be quiet.
+  const wasBookmarked = useRef(isBookmarked);
+  useEffect(() => {
+    if (isBookmarked && !wasBookmarked.current && !reduceMotion) {
+      scale.value = withSequence(
+        withTiming(1.18, { duration: BOOKMARK_PRESS_MS }),
+        withTiming(1, { duration: BOOKMARK_SETTLE_MS }),
+      );
+    }
+    wasBookmarked.current = isBookmarked;
+  }, [isBookmarked, reduceMotion, scale]);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
+  return (
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => {
+        if (!reduceMotion) {
+          scale.value = withTiming(BOOKMARK_DIP, { duration: BOOKMARK_PRESS_MS });
+        }
+      }}
+      onPressOut={() => {
+        if (!reduceMotion) {
+          scale.value = withTiming(1, { duration: BOOKMARK_SETTLE_MS });
+        }
+      }}
+      hitSlop={spacing.s3}
+      accessibilityRole="button"
+      accessibilityLabel={isBookmarked ? "Remove bookmark" : "Bookmark this page"}
+    >
+      <Animated.View style={animatedStyle}>
+        <Icon size={22} color={isBookmarked ? palette.accent : colors.textPrimary} />
+      </Animated.View>
+    </Pressable>
+  );
+}
+
+// The page-level half of FB-006: without it, a bookmarked page looks exactly
+// like any other once the header scrolls out of mind. A folded corner is the
+// paper metaphor the reader already borrows, drawn with borders so it needs no
+// SVG. pointerEvents none — it is a mark, not a control, and must never eat a
+// tap meant for the page.
+function BookmarkCornerMark({ visible }: { visible: boolean }) {
+  const reduceMotion = useReducedMotion();
+  const opacity = useSharedValue(visible ? 1 : 0);
+
+  useEffect(() => {
+    opacity.value = reduceMotion
+      ? (visible ? 1 : 0)
+      : withTiming(visible ? 1 : 0, { duration: BOOKMARK_SETTLE_MS });
+  }, [visible, reduceMotion, opacity]);
+
+  const animatedStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
+  return (
+    <Animated.View
+      pointerEvents="none"
+      accessibilityElementsHidden
+      importantForAccessibility="no-hide-descendants"
+      style={[
+        {
+          position: "absolute",
+          top: 0,
+          right: 0,
+          width: 0,
+          height: 0,
+          borderTopWidth: 28,
+          borderTopColor: palette.accent,
+          borderLeftWidth: 28,
+          borderLeftColor: "transparent",
+        },
+        animatedStyle,
+      ]}
+    />
   );
 }
 

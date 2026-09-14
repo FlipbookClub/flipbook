@@ -1,53 +1,71 @@
 # Product Vision — Flipbook
 
+**Version:** v2.1 (August 15, 2026)
+**Companion docs:** `prd.md`, `product-roadmap.md`, `go-to-market.md`, `model-math.md`, `vision.json`, `design-tokens.json`, `synthesis-aug-2026.md`
+**Change note:** v2.0 (Jul 15) was the business-model pivot to a licensed rental library with community. v2.1 (Aug 15) implements the growth-ideology revision agreed in `synthesis-aug-2026.md` Theme D — daily-return optimization, habit mechanics permitted (marked "Revised Aug 15" inline) — and adds Masobe App to the competitive narrative.
+
 ## 1. Vision & Mission
 
 ### Vision Statement
 
-A world where reading is the most consistent social ritual people have — where every book becomes a thread of conversation between the people reading it, and where writers find their readers in the same place those readers find each other.
+A world where the best books ever written are within reach of every African reader, and where the reading of them is a shared act — where a young person in Lagos, Accra, or Nairobi opens a book on their phone and steps into a room already reading it with them.
 
 ### Mission Statement
 
-Flipbook turns books into living communities by anchoring conversation, progress, and creator publishing to the page itself — so reading stops being something done alone and becomes the easiest, most rewarding way to stay connected.
+Flipbook is the reading library African readers deserve. We license and curate a catalog of world classics and African indie voices, rent them at prices matched to local income, and wrap every book in a community — so reading becomes affordable, social, and the most consistent cultural ritual of the week.
 
 ### Founder's Why
 
-Moks is a product designer with five years inside healthcare — a domain where every interaction has to earn trust, reduce friction, and respect attention. Those are the same disciplines social reading has been missing. Most reading apps are either review-graveyards from another decade (Goodreads), solo trackers with no real community (StoryGraph), or content feeds dressed up as social spaces (Fable). They feel like databases. They don't feel like reading with someone.
+Moks is a product designer with five years inside healthcare — a domain where every interaction has to earn trust, reduce friction, and respect attention. Those are the same disciplines a reading, payments, and community product needs, and they're mostly missing from the reading apps that exist. Kindle is Western in catalog and USD in pricing. Local ebook platforms are fragmented and thin on curation. Goodreads is a graveyard. Fable is content-feed dressed up as community. None of them feel *made for* a Lagos reader who has ₦3,000 in discretionary spend on a good week.
 
-But the bigger reason Moks is the right person to build this isn't the design background — it's that he's been the user. He's been a member of multiple book clubs, a lover of the reading culture, and the kind of reader who's tried every app that promised to make reading more social and walked away from all of them. He knows what every existing reading app gets wrong because he's abandoned each of them. And he knows what a great book club moment feels like because he's lived inside several.
+But the deeper reason Moks is the right person to build this isn't design background — it's proximity. He lives in the market. He is the reader Flipbook is for. He knows what every existing reading app gets wrong because he's abandoned each of them, and he knows what a great book club moment feels like because he's lived inside several. Being based in Lagos is not incidental — it's the structural advantage. He can sign African indie publishers over coffee that no US or UK reading app can reach.
 
-Flipbook is the collision of those two worlds: applying serious product craft to a community he deeply understands. Five years of healthcare product design taught him how to ship with restraint and care. Years of being a reader taught him what restraint and care should be in service of. This is the app he wished existed, finally being built by someone qualified to build it well.
+Flipbook is the collision of two things: serious product craft applied to a category that hasn't seen it, and a market that no incumbent is close enough to understand. Five years of healthcare taught him how to ship with restraint. Years of being a reader taught him what restraint should be in service of. This is the app he wished existed, finally being built by someone qualified — and located — to build it well.
 
 ### Founding Team
 
-Flipbook is built by two complementary cofounders. **Moks** sets product direction, vision, strategy, and champions growth — the design-and-product mind and the reader who lived the problem. **Ayodeji** runs operations and process, and is the team's relationship engine: a former Programs Manager at a gaming company with a deep network, a gift for pitching, and a knack for getting Flipbook into rooms a heads-down designer never could. The dynamic is deliberate — an introverted product-and-vision founder paired with an extroverted operations-and-network founder, each covering the other's blind spot.
+Flipbook is a **two-cofounder company**.
 
-Two parts of Ayodeji's background matter strategically. First, the network and the pitch turn business development and partnerships into a real, ownable growth engine (reflected in `go-to-market.md` § Channel Strategy) rather than something a solo introvert has to force. Second, his hands-on experience with age-gating, parental controls, and child-safety operations inside a gaming company directly de-risks the Phase 9/10 minor-safety work — the hardest compliance surface on the roadmap is exactly the territory he already knows.
+**Moks** (designer-founder) owns product direction, vision, design, frontend build, growth, and hands-on supply-side outreach with individual authors. Five years of product design in healthcare, based in Lagos. Ships alongside AI coding agents (Claude Code) and managed services (Convex, Clerk, RevenueCat) — the tech stack is picked so a designer-led team can move fast without hiring a backend engineer prematurely.
 
-For planning, the team holds the conservative assumption: still part-time around day jobs (~10–15 hours/week each). The second pair of hands is treated as upside and resilience, not a reason to compress timelines yet.
+**Ayodeji** (operations cofounder) runs operations and process, and is the team's relationship engine — business development, partnerships, and the pitching that unlocks doors a heads-down designer can't. Former Programs Manager at a gaming company with a deep network, a gift for pitching, and hands-on operational exposure to age-gating, parental controls, and child-safety compliance that directly de-risks the minors-safety work on the roadmap.
+
+The two-cofounder split is deliberate and structural: an introverted product-and-vision founder paired with an extroverted operations-and-network founder. In the v2 (rentals + catalog + community) model, Ayodeji's role is even more strategically valuable than in v1 — small-publisher licensing conversations (Cassava Republic, Farafina, Masobe, etc.) are relationship work, the founding-30 author cohort onboarding and monthly statement/payout operations are ops work, and campus-surface expansion is warm-intro work. All three land on his side of the split. Moks focuses on product, catalog editorial, and frontend velocity.
+
+For planning purposes: assume ~50-60 hours/week combined across both cofounders, part-time around day jobs. That number is real, not aspirational — it's what the model math assumes and the 90-day plan is scoped against.
+
+**Near-term hiring plan.** The team is deliberately capped at two cofounders through Year 1 to preserve unit economics. First hire triggers on either (a) first fund raise, or (b) sustained monthly cash breakeven, whichever comes first — not before. The first hire is likely a backend engineer (to lift Convex and payment-rails build load off Moks) or a community/author-success lead (to scale the founding-cohort operations Ayodeji currently runs). Priority is decided by the bottleneck of the moment.
 
 ### Core Values
 
-**Read alongside, not at each other.** Every product decision has to make reading-with-people feel natural, not performative. We don't add features that turn reading into a status game (streaks, leaderboards, follower counts). We add features that make it easier for two strangers reading the same chapter to feel like they're in the same room.
+**Reading should be within reach.** Every product decision has to make books more accessible to the reader Flipbook is built for — pricing, curation, discovery, community. If a decision makes reading feel like a luxury, we reconsider.
+
+**Read alongside, not at each other.** Community exists to make reading more consistent, not to turn reading into a status game against other people. No public leaderboards, no public follower counts, no ranking readers against each other. Personal and club-level progress mechanics (streaks, goals, milestones) are welcome — they compete with your own past, never with your friends.
+
+**Build the daily reading habit.** *(Revised Aug 15, 2026 — supersedes the old "we don't optimize for time-in-app" stance.)* Flipbook optimizes for **daily return, not session length**. The goal is that opening Flipbook and reading becomes a daily ritual. Mechanics that build that habit — reading streaks, contextual nudges, re-engagement emails, progress celebration, gentle reminders — are in-bounds and encouraged. Mechanics that inflate time-in-app without serving reading — infinite scroll, engagement-bait feeds, notification spam — remain out. The test for any growth mechanic: *does this get someone reading today?* If yes, build it. If it only gets them scrolling, don't.
 
 **Conversations are tied to the page, not the timeline.** Reading isn't a feed. The home screen is a place — a library, a club, a nightstand — not an algorithmic stream. We resist infinite scroll the same way we resist all behaviors the user didn't ask for.
 
-**Creators get a home, not a paywall.** When a reader pays a creator, it should feel like joining something — a community, a release party, a long-running conversation — not unlocking a file. Monetization is a side effect of community, not its substitute.
+**Authors get an economics that matters.** When a reader rents a book, 70% goes to the author. When Kindle Unlimited pays pennies per page read, we pay a real chunk per rental. Author economics is a first-class product value, not a footnote.
 
-**Ship the smallest thing that delivers the magic.** The MVP exists to test whether a reader who joins a club, opens the book, and reads a chapter alongside other people experiences the magic. Everything else is later. Healthcare taught us that polish without value is theater; we ship the value first.
+**Ship the smallest thing that delivers the magic.** The MVP exists to test whether a reader who opens the app, rents a book, and reads it inside a community experiences the magic. Everything else is later. Healthcare taught us that polish without value is theater; we ship the value first.
 
-**Respect the reader's attention.** No notifications that exist to drag people back into the app. No engagement loops dressed up as features. If we ping a user, it's because someone replied to their comment in a book they're reading — never because we noticed they hadn't opened the app in three days.
+**Respect the reader's attention.** *(Revised Aug 15, 2026.)* Every notification serves the reading. Contextual pings are always fair game (someone replied to your reaction; a new book landed in your club; your rental is expiring). Reading reminders are allowed and encouraged — user-controllable, warm-toned, anchored to the actual book they're reading ("Chapter 5 of *Thirteen* is waiting"). What stays banned: shame framing ("you're falling behind"), fake urgency, and notifications with no reading-shaped payload behind them.
 
 ### Strategic Pillars
 
-1. **Reader-first wedge, creator-second flywheel.** We optimize the entire MVP for one user — Maya, the accountability-craving reader. Creators come into the picture as Phase 2 monetization, but the magic moment for readers is what wins this market.
-2. **Mobile is the only product surface that matters at launch.** Reading happens on phones, in beds, on commutes. The web companion is Phase 2, for creator dashboards and shareable invite links — never for the reading experience itself.
-3. **Live reactivity is the moat.** What separates Flipbook from every dead Discord and every stale review site is that conversations happen *as people are reading*. We invest disproportionately in the real-time backend (Convex) and the real-time UX (margin reactions, live progress, page-keyed comments).
-4. **Default to private uploads to manage copyright exposure.** Moderators can upload PDFs, but uploads are private to the club, not searchable, not redistributable. We avoid becoming a piracy platform while keeping the WhatsApp-easy onboarding that makes the product stick.
+1. **African-indie beachhead, world-catalog compounding.** The opening move is public-domain classics + African indie authors + small African publishers. It's the wedge nobody can contest and the founder can execute on from Lagos. The catalog widens outward from there — never abandoning the beachhead voice.
+2. **Rental, not sale.** Every book is a rental, not a purchase. This is a legal and economic choice: it sidesteps the ISBN / consumer-sale apparatus, keeps us close to library-licensing conventions that publishers already understand, and gives readers subscription-shaped intuitions (Spotify, Netflix) they already have.
+3. **Community is the retention engine.** Rentals bring readers in; communities keep them. Every reader who rents alongside a friend, a club, or a course community reads more, finishes more, and comes back for the next book. The rental and the community are one product, not two.
+4. **Mobile is the only surface that matters at launch.** Reading, community, rentals, checkout — all mobile. The web companion (invite landing pages, creator dashboards) is deferred to Year 2.
+5. **Live reactivity is the craft moat.** Reactions in the margin, real-time reading rooms, live chapter drops. Convex handles it natively. Every incumbent would have to rebuild to ship this.
+6. **Reading extends. Workflow does not.** Flipbook accepts new content types (course notes, reading lists, indie novellas) and new communities (book clubs, courses, creator drops) freely — as long as the interaction is reading and reacting on the page. Flipbook never builds tools for grading, scheduling, video, or any workflow that could be described as *learning management*.
 
 ### Success Looks Like
 
-Twelve months from now: 10,000+ monthly active readers. New book clubs forming weekly without paid acquisition because moderators invite their friends and the invites convert. A small but real cohort of creators publishing on Flipbook (Phase 2 monetization shipped) — not famous authors yet, but the kind of indie novelists and serialized writers whose 5,000-strong newsletters become our first paid communities. ~$50k MRR. A clear BookTok and Bookstagram presence with creators running public clubs we sponsored at launch. We've raised a small seed round to expand the team — at least one engineer to take the backend pressure off Moks, possibly a community lead. The product is regularly cited in "where bookish people hang out" lists. And, most importantly, Maya — the persona we built this for — has finished more books in the last six months than she finished in the previous two years.
+**By March 2027 (6 months in):** Monthly cash breakeven achieved. ~2,000 active users. 130+ Pro subscribers. Catalog of 800+ titles (200 licensed + 600 public-domain). First ₦100k+ month in author payouts distributed. Two university course communities live. The product is defensibly better than any competitor for the Nigerian reader.
+
+**By September 2027 (12 months in):** ~5,000 active users. ~400 Pro subscribers (8% conversion). Monthly net contribution ₦1.87M (~$1,248) — a livable founder income entirely from the product. Catalog widening from Nigerian indie into Kenyan, Ghanaian, and South African voices. First small publisher deal fully live. Campus surface spreading organically at 2–4 lecturers per new campus. Moks — the person we built this for — has read more in the last six months than in the previous two years.
 
 -----
 
@@ -55,92 +73,103 @@ Twelve months from now: 10,000+ monthly active readers. New book clubs forming w
 
 ### Primary Persona
 
-**Maya, 29, Marketing Manager.** Lives in a mid-size city. Reads on her commute (45 minutes each way) and for 30 minutes before bed. Has a stack of half-read books on her nightstand that she's been guiltily walking past for six months. Owns a Kindle and a phone — mostly reads on the phone now because Kindle's social layer is non-existent. Has a Goodreads account she hasn't opened in over a year. Joined two book clubs in the past 18 months: one IRL (fizzled after three meetings because of scheduling), one Discord (went quiet by week three because the discussion was disconnected from the chapters anyone was on).
+**Ada, 27, brand designer in Lagos.** Reads on her commute and before bed. Buys one book a month and finishes maybe every third. Has a WhatsApp group with three friends that used to be a book club and is now mostly memes. Owns a Kindle her cousin brought back from London — mostly reads on the phone now because the Kindle catalog she can afford is thin and Nigerian titles she wants aren't on it. Has a Goodreads account she opens twice a year to remember what she's read.
 
-Tech comfort: high. She's the friend her group chat asks for app recommendations. She uses Notion to track personal projects, Spotify with shared playlists, and follows a handful of bookish creators on TikTok and Instagram. Buys 2–4 books a month. Finishes maybe one. Spends $30–80/month on books, audiobooks, and book-adjacent content.
+Tech comfort: high. Spends ₦2,900/mo on Netflix and ₦900/mo on Spotify Premium and considers both essential — subscription is a familiar shape. Uses Notion for personal projects. Follows five Nigerian and diaspora authors on Instagram. Discovered BookTok in 2023 and follows a handful of Nigerian and diaspora book creators. Buys books she keeps meaning to read.
 
-Emotional state around reading: a low-grade ambient guilt. She *wants* to be the version of herself who finishes books and talks about them with people she likes — that version of her existed in college, when she was always in the middle of three group reads. She'd happily pay for a product that just *worked* and brought her back to that version of herself, but she's tried six apps that promised it and walked away from all of them. She's slightly skeptical and a little tired of being marketed to as "a reader."
+Emotional state around reading: a low-grade ambient guilt overlaid on a real love for it. She *wants* to be the version of herself who finishes books and talks about them with people she likes. She'd happily pay for a well-designed African reading app — but has never seen one. She's used to reading tools that were made for someone in Brooklyn and priced for someone in San Francisco.
 
-What would make her switch: a low-friction onboarding (under two minutes), one specific book she's been meaning to read with people who are visibly active and reading right now, and the feeling — within the first hour — that this app is built by someone who actually reads.
+What would make her switch: (a) prices that match her local income — ₦500 to ₦2,500 rentals feel right, ₦35,000 hardcovers do not; (b) a catalog that starts with African voices and world classics she recognizes; (c) low-friction onboarding (under two minutes); (d) evidence in the first ten minutes that this app was built by someone who reads what she reads.
 
 ### Secondary Personas
 
-**Indie Author / Serialized Writer (Creator).** A self-published author or Substack novelist with 500–10,000 readers. Currently stitches together Substack (for writing), Discord (for community), Amazon (for sales), and Patreon (for monetization). Each seam costs them readers and sanity. They want a single home where their audience can read, discuss, and pay them. On Flipbook in Phase 2, they publish chapters, build paid communities, and get to skip the platform-juggling. Their readers feel like fans of a community, not subscribers to a feed.
+**Ifeoma, 34, indie romance author, self-publishes on Okada Books and Amazon KDP.** Sells ~200 books a month across platforms. Her Amazon royalties are $0.005 per page read on Kindle Unlimited — pennies for a full read. She'd sign a 70/30 rev-share with a new platform in a heartbeat if it put her books in front of readers Amazon doesn't show her to. She writes and edits herself; a publisher relationship requires trust in a way a platform relationship doesn't. She's on Twitter and Instagram, moderately active. She has 3,500 followers who buy her books.
 
-**Book Club Moderator (Power Reader).** The friend in the group who organizes everything — picks the book, sends the invites, sets the reading pace, hosts the call. Power user of the moderator tools. Often graduates into creator-side activity (running paid public clubs, becoming an early Flipbook creator). High-leverage user: each moderator brings 6–12 readers with them. We design the moderator tools to make this person look good to their community — clean invite flows, beautiful club pages, easy reading pace settings.
+**Femi, 51, university lecturer in Comparative Literature, Ibadan.** Teaches two courses a semester. Distributes his lecture notes and required readings today via WhatsApp broadcast to his students — clumsy, no reading progress, no discussion. Discovered Flipbook because his son is friends with the founder. He'd use Flipbook to run a private course community if it took under 20 minutes to set up. He does not want a grade book, an assignment portal, or a video conference tool — those live in the school's Canvas. He wants a *reading space* for his class.
 
-**Bookish Content Creator (BookTok / Bookstagram).** Has 10k–500k followers on TikTok or Instagram, posts about books, sometimes runs informal "read along with me" series. We seed early access to this group as part of GTM. They become discovery pipelines into Flipbook — they run public clubs, their followers join, and a percentage convert into core readers. In Phase 2 they also become candidates for the paid creator side.
+**Chidi, 30, Nigerian in London, diaspora reader.** Reads in USD-priced apps because he's paid in GBP. But every third book he wants to read is a Nigerian author whose UK/US edition doesn't exist yet. He'd pay for a Nigerian reading app that gives him rental access to Nigerian titles. He pays in card USD via Stripe. He'd tell his friends.
+
+**Bibi, 42, editor at a small Lagos publishing house (Cassava Republic archetype).** Runs a catalog of 40 titles across five years. Distribution outside Nigeria is the perpetual bottleneck. She'd license non-exclusive digital rental rights to Flipbook if the split were fair, the DRM were credible, and the reporting were monthly. She's the person who unlocks 10–40 books in a single meeting.
+
+**Guardians and educators running children's book clubs.** Parents, teachers, and librarians running reading clubs for minors. They provision children into specific moderated private clubs, give parental consent, and act as the vetted-adult moderator. Distinct from the university-educator surface because the core job is walled-garden supervision for under-18s.
 
 ### Jobs To Be Done
 
-**Functional jobs.** Maya needs to: (1) finish books she starts, (2) find people to talk to *while* reading, not after, (3) discover what to read next without falling down a recommendations rabbit hole, (4) keep a book accessible across devices and offline (her commute has dead zones), (5) catch up to a club that started without her.
+**Functional jobs.** Ada needs to: (1) discover a book she wants that fits her budget, (2) rent and open it in under a minute, (3) find people to read alongside, (4) finish more of what she starts, (5) trust that the money she spends goes to writers she wants to support.
 
-**Emotional jobs.** Maya needs to: (1) feel like she's making progress on a self-image she values (the reader, the curious person, the person who finishes things), (2) reduce the guilt she feels about her unfinished stack, (3) feel connected to people in a low-pressure way that doesn't require scheduling, (4) feel like reading is a celebration, not a chore.
+**Emotional jobs.** Ada needs to: (1) feel like reading is affordable, not aspirational, (2) feel like the app was made for her, not translated for her, (3) reduce the guilt of unfinished stacks, (4) belong to a community where reading is celebrated.
 
-**Social jobs.** Maya needs to: (1) be seen by people whose taste she trusts as someone who reads thoughtfully, (2) have things to talk about with friends and colleagues that aren't work or news, (3) belong to a community of people who care about the same kinds of stories.
+**Social jobs.** Ada needs to: (1) be seen as someone who reads thoughtfully by people whose taste she trusts, (2) have things to talk about that aren't work, (3) belong to communities of readers who care about the stories she cares about.
+
+**Author jobs (Ifeoma).** Ifeoma needs to: (1) earn a meaningful chunk per reader, not pennies, (2) build a direct relationship with readers, not compete against an algorithm, (3) not sign her rights away, (4) get paid on time, monthly, in a currency she can actually spend.
 
 ### Pain Points
 
 Ranked by severity for the primary persona.
 
-1. **Books die in the gap between intention and finishing.** Maya buys books faster than she finishes them. The cost is emotional (guilt, ambient sense of failure as a reader) and financial (~$300/year of unfinished books). Frequency: every book she buys. Currently she does nothing — the books just accumulate. Severity: high — this is the existential problem the product solves.
-2. **There's no place to talk about a book *while* reading it.** When Maya hits chapter 11 of a book she loves and wants to text someone "wait, what just happened," nobody she knows is reading it. By the time she finishes, the moment is gone. Frequency: every interesting book. Currently she posts vague Goodreads updates that nobody reads. Severity: high — this is the magic-moment problem.
-3. **IRL book clubs have too much overhead and dissolve.** Scheduling, hosting, snacks, half the group not having read. Maya has been in two that died. Frequency: every IRL club she's joined. Currently she avoids them. Severity: medium — she's accepted the failure pattern but mourns it.
-4. **Goodreads and StoryGraph feel solo, dead, or both.** Even with friends added, it's a review log, not a conversation. Frequency: every time she opens them (which is rarely now). Severity: medium — she's already churned out, but it's the failed mode of the category.
-5. **Discord book clubs go quiet within weeks.** Conversation isn't tied to the book; it's tied to a general channel. Once the initial enthusiasm fades, there's nothing pulling people back. Frequency: every Discord she's joined. Severity: medium-high — same pattern keeps happening.
-6. **Reading on phone vs. Kindle vs. paperback fragments her experience.** Progress doesn't sync. Highlights live in three different places. Frequency: ongoing. Severity: low-medium — she's mostly accepted phone-only.
-7. **"Recommendation" feels like an algorithm guessing.** Most reading apps recommend by metadata; she wants to read what her people are reading. Frequency: every time she finishes a book and wonders what's next. Severity: low — she has other discovery channels (BookTok, friends).
+1. **Books she wants cost more than she can spend.** A ₦35,000 hardcover is a week's discretionary spend. Kindle prices in USD and skews Western. Frequency: every book she wants but can't rationalize buying. Severity: **high** — this is the access problem the product solves.
+2. **No place to talk about a book *while* reading it.** When Ada hits Chapter 11 of a book she loves and wants to text someone, nobody she knows is reading it. Frequency: every interesting book. Severity: **high** — this is the community magic-moment problem.
+3. **The reading apps that exist feel like they were made somewhere else.** Kindle's Nigerian catalog is thin; StoryGraph is beautiful but solo; Fable's recommendations skew celebrity book clubs from LA. Frequency: every time she opens one. Severity: **medium-high** — cultural fit gap is a slow bleed.
+4. **Book clubs form on WhatsApp and die by Chapter 3.** The chat's fine for two friends, hopeless at eight. Frequency: every club she's joined. Severity: **medium** — she's resigned to the pattern but mourns it.
+5. **Piracy is the local workaround, and it feels bad.** PDFs circulating in WhatsApp groups get the book into her hands but she can't support the authors she loves. Frequency: uncomfortably regular. Severity: **medium** — she wants a way to pay that isn't ₦35k.
+6. **When she does buy, she doesn't finish.** Reading alone with a stack of half-finished books produces guilt, not more reading. Frequency: every physical book she owns. Severity: **medium**.
 
 ### Current Alternatives & Competitive Landscape
 
-**Goodreads (Amazon).** The default reading log. Massive catalog and friend graph, but the product is a 2008 review-and-shelf paradigm grafted onto a modern phone. Where it falls short: no live discussion tied to a book in progress; the conversation, if any, lives in dead forums. Switching cost for Maya: low — she stopped using it years ago. What she'd want imported: her shelves and currently-reading list (Phase 2 import feature consideration).
+**Amazon Kindle.** The default global e-reader. Massive catalog, USD pricing, weak Nigerian catalog, no community layer. Where it falls short for Ada: prices are aspirational, catalog is Western-first, and there's no one to read *with*. Switching cost: low — most of her Kindle reading is books she'd rent on Flipbook anyway.
 
-**StoryGraph.** Beautiful, indie, beloved by serious readers. Best-in-class personal tracker with mood-based recommendations and stats. Where it falls short: explicitly solo; community features are minimal and not the product's center. Switching cost: medium — committed StoryGraph users have invested in their stats.
+**Google Play Books / Kobo.** Same story as Kindle. Global catalogs, USD/EUR pricing, no community. Switching cost: low.
 
-**Fable.** The closest direct competitor. Has book clubs and in-app reading. Where it falls short: the product feels more like a curated content feed (celebrity book clubs, themed lists) than a place where everyday clubs run their own reads. Conversation is feed-shaped rather than page-keyed. Switching cost: low for users who joined for one celebrity club and haven't formed real habits.
+**Everand / Scribd.** Unlimited-subscription reading. Better than Kindle for high-volume readers, still Western-catalog and no community. Switching cost: low.
 
-**Substack.** Used by indie creators to publish serialized fiction and bookish newsletters. Excellent for creators, terrible for readers wanting to discuss a chapter with strangers. Substack's "chat" feature is a tacked-on group chat, not reading-keyed conversation. Switching cost (creator side): medium-high — Substack creators have email lists that don't easily migrate.
+**Okada Books.** The Nigerian indie ebook platform. Direct sale of individual titles, no rental, no community. Beloved by Nigerian indie authors — the ecosystem we're recruiting from. Not a competitor for Flipbook so much as a complementary platform authors will keep using. Switching cost (for authors): zero, because we're non-exclusive.
 
-**Discord servers.** Used as ad-hoc book clubs. Free, flexible, familiar. Where it falls short: discussion is server-wide, not chapter-keyed. People drop because the server doesn't pull them back to *the book they're reading*. Switching cost: low — a Discord server is easy to abandon.
+**Selar.** Similar to Okada, broader (digital-product marketplace, not just books). Same non-exclusive coexistence.
 
-**WhatsApp / iMessage group chats.** Used by small friend groups for casual reading-along. Works for 2–4 friends, falls apart at 5+. No structure, no progress tracking, easy to derail. Switching cost: low — the group chat is the social fabric, not the book.
+**Bambooks.** Nigerian audiobook and ebook platform. Closest in market position, but audiobook-first and catalog-thin. Switching cost: low.
 
-**IRL book clubs.** The original product. Beloved when they work; brutal logistics. Where they fall short: scheduling, hosting overhead, the awkwardness when half the group hasn't read. Switching cost: medium — IRL clubs are also social events, not just reading tools.
+**Goodreads (Amazon).** The default reading log. Massive friend graph, 2008 forum UX. Where it falls short: the conversation, if any, lives in dead forums. Not a rental service; not a competitor for the transaction. Switching cost: low — she stopped using it years ago.
 
-**Kindle (with social features).** Goodreads-integrated, share highlights with friends. Where it falls short: Goodreads is the social graveyard underneath, and the book is locked into the Amazon ecosystem. Switching cost: high if Maya has a large Kindle library — but she's mostly reading on phone now.
+**StoryGraph.** Beautiful, indie-run, best-in-class personal tracker. Solo by design. Switching cost (for trackers): medium; loyal StoryGraph users have invested in their stats.
 
-**Doing nothing.** The most common alternative. Maya reads alone, abandons books, occasionally posts a half-finished one on Goodreads. The bar Flipbook needs to clear is not "better than Goodreads" — it's "better than just reading alone with low expectations."
+**Fable.** The closest social-reading competitor. Has clubs and in-app reading. Skews content-feed and celebrity-book-club. Where it falls short for Ada: doesn't feel made for her, doesn't have African catalog. Switching cost: low.
+
+**WhatsApp + PDFs (the real competitor).** Same friends, same book, but the book is a piracy PDF and the discussion buries in group chat. Where it falls short: everything, but it's *there*. Switching cost: low if we make onboarding as easy as sending a WhatsApp invite.
+
+**Doing nothing.** The most common alternative. Ada reads alone, abandons books, buys the next one anyway. The bar Flipbook needs to clear is not "better than Amazon" — it's "better than the mixture of habit and resignation she has now."
 
 ### Key Assumptions to Validate
 
-1. **Assumption:** Readers will accept the friction of "find a club to join" or "create a club and invite friends" in exchange for the social experience. **To validate:** Run the closed beta with 100 hand-picked readers. Measure the percentage who, within 7 days of signup, are part of at least one active club (defined as: at least one other member has read past page 10). Target: 70%. If <40%, the onboarding flow needs a "matchmaking" mechanic — auto-suggested clubs based on what they want to read.
-2. **Assumption:** Page-keyed reactions and discussion are dramatically more engaging than book-level forum discussion. **To validate:** In closed beta, A/B (qualitatively) the in-margin reaction feature against a chapter-end "discussion thread" view. Measure: average reactions per reader per session; qualitative feedback on which felt more "alive." Target: 3x more interactions in the in-margin variant.
-3. **Assumption:** Moderators will create clubs and stick around — not just ghost after the first invite. **To validate:** Track moderator retention at 14, 30, 60 days. Target: 60% of moderators have an active club at day 30. If <30%, the moderator tools are too thin or the social loop isn't rewarding.
-4. **Assumption:** Maya will actually finish more books in Flipbook than she does on her own. **To validate:** Compare self-reported "books finished in last 90 days" before and after the beta. Target: 50% lift. If <20%, the accountability mechanic isn't working — too passive, or progress isn't visible enough.
-5. **Assumption:** Private PDF uploads are a sufficient content model for MVP. **To validate:** Track DMCA-style takedown requests in the beta and first 90 days post-launch. If volume is high (>1 per week per 1000 users), we may need to layer in licensed catalog (Phase 1.5) earlier than planned.
-6. **Assumption:** Creators (Phase 2) will see Flipbook as a meaningfully better home than Substack + Discord + Patreon. **To validate:** In months 4–6, recruit 5 creators for a Phase 2 paid pilot. Measure: do they migrate audiences? Do they earn at least 50% of what their stitched-together stack earned? If no, the creator value prop needs sharpening before broad launch.
-7. **Assumption:** The wedge audience (readers) will pull creators in, rather than the reverse. **To validate:** Track inbound creator interest from organic channels (signup form for "I want to publish on Flipbook") in the first 90 days. Target: 50+ inbound creator signups by day 90 — signal that readers are becoming the gravity well. If <10, we may need to seed creators directly.
-8. **Assumption:** Maya will pay for the Pro tier within 60 days of joining. **To validate:** Track conversion to Pro at 30, 60, 90 days. Target: 5% of active readers on Pro by day 60. If <2%, the Pro tier features are not differentiated enough.
+1. **Readers will pay ₦500–₦2,500 to rent a book for 4 weeks.** Validate: closed beta rental conversion rate. Target: 30%+ of active users rent a paid book in month 1. If <15%, pricing or catalog fit is wrong.
+2. **Pro conversion sits at 5–8% at scale.** Validate: track Pro conversion at 30 / 60 / 90 days into general availability. Target: 5% at day 60, walking to 8% by month 12. If <3% at day 60, Pro value story (audio, Specials, community creation) needs sharpening.
+3. **Indie authors will accept 70/30 non-exclusive terms.** Validate: sign 30 founding-cohort authors by mid-August (target from the 90-day plan). If <15 by mid-August, terms or pitch or founder-network reach is wrong.
+4. **A curated PD + African-indie catalog is enough to launch.** Validate: closed-beta rental depth. Target: median beta user rents 2+ paid books in month 1, plus 1+ Band A. If <1 paid book median, catalog isn't dense enough.
+5. **In-margin reactions dramatically outperform book-level forum discussion.** Validate: in beta, count reactions-per-reading-session in-margin vs. an alt "chapter discussion thread" view. Target: 3x more interactions in-margin.
+6. **Nigerian card payments succeed at 88%+ after rebill logic.** Validate: track first-attempt approval and post-rebill effective approval on Paystack. Target: 88%+ effective. If below, invest in dunning + payment engineering earlier.
+7. **The audio reader materially moves Pro conversion.** Validate: A/B or before/after — Pro conversion in a cohort exposed to audio vs. a cohort not. Target: audio-exposed cohort converts 1.5–2× the non-exposed. If not, we've built expensive infrastructure for no lift.
+8. **The African-indie beachhead pulls readers in — it isn't just a supply story.** Validate: in beta and launch, ask new users "how did you hear about Flipbook?" and "which book made you sign up?" Target: 40%+ cite an African indie title as the reason.
+9. **Educators will use the campus feature and it stays reading-shaped.** Validate: onboard the founding-educator cohort (Moks's parents + 3 unrelated professors invited via them). Target: 8+ course communities live by month 6, none using it as an LMS.
+10. **The v1 community app's waitlist and beta users convert to v2 rental readers.** Validate: measure conversion of the pre-pivot waitlist and beta clubs into paying v2 users. Target: 30%+ conversion. If <15%, the pivot narrative isn't landing with the existing audience.
 
 ### User Journey Map
 
-**Awareness.** Maya sees a TikTok from a BookTok creator she follows: a 30-second video about how she's running a club for *Tomorrow, and Tomorrow, and Tomorrow* on this app she's been beta-testing called Flipbook. The video shows live reactions appearing in the margins of the book as the creator reads. Maya thinks: that's what I've been wanting. She taps the link.
+**Awareness.** Ada sees a Reel from a Nigerian book creator she follows: a 45-second video about renting *Nearly All the Men in Lagos Are Mad* for ₦1,500 on this app called Flipbook, with reactions from friends showing up in the margins as they read. She thinks: that price is real; that catalog is mine. She taps the link.
 
-**Consideration.** Lands on the App Store page (or, in Phase 2, a web preview). Sees: a single screenshot of the in-app reading experience with reactions in the margins, three lines of copy ("Read with the people who are reading right now. No scheduling. No hosting. Just the book and the room around it."), a few tasteful credibility signals (creators using it, club count). She downloads it. Friction point: standard App Store hesitation.
+**Consideration.** Lands on the App Store or Play Store page. Sees: one screenshot of the reading experience with in-margin reactions, one shot of the catalog showing three African covers and two classics, one line — *"Read together. Rent affordably. Talk on the page."* — and a rental price band that makes the pricing legible. She downloads.
 
-**First use (signup → first club).** Opens the app. Sees a clean welcome screen with the wordmark and one CTA: "Join a club" (primary) and "Start a club" (secondary). Taps Join a club. She's offered three things: (1) the public club run by the BookTok creator, since she came from that link, (2) a small set of suggested public clubs reading books in genres she selects in a quick onboarding, (3) "Have an invite? Paste it here." She joins the BookTok creator's club. She's in. Total time: ~90 seconds.
+**First use (signup → first rental).** Opens the app. Clean welcome, one CTA: "Browse the library." Signs up with Google or phone OTP in 30 seconds. Lands on a Flip-mode catalog view. Sees a shelf: **Nigerian indie**, **World classics**, **Flipbook Specials**. Taps into Damilare Kuku. Sees the ₦1,500 rental price, 4-week duration, one-tap rent. Pays via Paystack. Total time: under 3 minutes.
 
-**Magic moment (first reading session).** She opens the book inside Flipbook. Reads chapter 1 on the way home. As she finishes a paragraph she loves, a small reaction (a highlight + a 4-word comment from another club member) fades into the margin next to the same paragraph. She taps it, sees three other reactions. Drops her own reaction. Two minutes later, on the next paragraph, someone replies to her. *That's the magic moment.* She closes the app smiling. She is now a Flipbook user.
+**Magic moment (first reading session, into first community).** She opens the book inside the reader. Sees a small "3 friends are reading this" badge → taps it → sees an active community. Joins. As she finishes a paragraph she loves, a soft reaction from another reader fades into the margin. She taps to expand. Drops her own reaction. Another reader replies within an hour. *That's the magic moment.* She closes the app smiling.
 
-**Habit formation (week 1–4).** She reads in the app three times a week. The progress bar of her club (a soft, non-anxious visual showing where the median reader is) becomes a gentle pull — she's slightly ahead, slightly behind, in sync. She finishes the book — the first one she's finished in months — and the club opens its next selection. She invites two friends from her group chat. They join. She is now a moderator-in-the-making.
+**Habit formation (weeks 1–4).** She rents her second book — a public-domain title free with a Pro trial the app offered. She upgrades to Pro on the annual tier (₦18,600) after using it two weeks. The audio reader plays her through Chapter 4 during her commute — she's now reading with her ears. She finishes the book, the first she's finished in months. She invites her cousin. Her cousin rents. Ada is now a two-time referrer.
 
-**Advocacy.** Around month 2, she posts a TikTok about Flipbook unprompted. Her two friends invite their own friends. She converts to Pro at month 2 to unlock unlimited clubs (she's now in three). She is the early user the product was built for, and she's pulling new users with her.
+**Advocacy.** Month 2, she posts an Instagram Story unprompted about Flipbook. Two of her friends join. She creates her first community — a private club for four friends reading a new indie release together. Every friend she pulls in is a rental into an author's pocket and one step closer to Flipbook working.
 
 **Friction points at each stage:**
-- *First use:* If onboarding asks too many genre questions, she bounces. Cap at 3 questions.
-- *Magic moment:* If the first chapter she reads has zero margin reactions yet, the magic doesn't happen. Mitigation: seed the first 1–2 chapters of every onboarding-suggested club with reactions from beta users.
-- *Habit formation:* If progress visualization feels like a streak/guilt mechanic, she churns. Ours has to feel ambient and supportive.
-- *Advocacy:* If sharing a club is a 5-tap process, the viral loop dies. Sharing a club must be one tap → native share sheet.
+- *First use:* if the catalog opens on Western classics she doesn't recognize instead of African titles, she disengages. Onboarding sequence has to lead with African covers.
+- *First rental:* if Paystack fails the first time and there's no recovery, she abandons. Rebill and retry logic must be visible and fast.
+- *Magic moment:* if she rents a book and no one is reading it, the moment doesn't fire. Mitigation: for the first 6 months, every seeded title has at least 3 beta users pre-reacting on the first three chapters.
+- *Pro upgrade:* if the Pro upsell surfaces before she's had one great reading session, she resists. Timing matters — offer after book completion or after a delightful audio session, not on signup.
 
 -----
 
@@ -148,208 +177,250 @@ Ranked by severity for the primary persona.
 
 ### Product Principles
 
-1. **The page is the unit of conversation.** Every reaction, comment, and highlight is anchored to a specific page (and ideally a specific paragraph). When you scroll backwards, the conversation scrolls with you. When you scroll forward, you don't see what's ahead — no spoilers.
-2. **Progress is visible, never weaponized.** A club shows you where the median member is, and where you are relative to them. There are no streaks. No guilt push notifications. No "you're falling behind" copy. The product helps you keep up; it never punishes you for not.
-3. **Moderators are the infrastructure.** Power users — moderators — are the people we design for second, after the primary reader. The moderator tooling has to make creating a club feel like creating a WhatsApp group, and make running one feel rewarding without being effortful.
-4. **Creators get a community, not a CMS.** When creator publishing ships in Phase 2, the surface a creator sees is *their reading community* — not a publishing dashboard. Publishing chapters happens *inside* the community surface, alongside seeing who's reading and replying to fans.
-5. **Mobile is sacred. Web is utility.** The reading experience never crosses to web. Web only ever holds creator dashboards, invite landing pages, and shareable previews — Phase 2.
-6. **Every screen earns its existence.** We delete more than we add. If a feature doesn't make the magic moment more reliable or the moderator's job easier, we don't ship it.
+1. **The book is the hero.** Book covers, page content, and reader-generated marks (reactions, highlights) are the visual centerpiece. UI chrome stays restrained.
+2. **Reading extends. Workflow does not.** Flipbook accepts new reading-shaped surfaces (course communities, creator drops, Specials) freely. It never builds LMS features (grading, attendance, video, scheduling). When users need those, we point them elsewhere.
+3. **Curation over recommendation.** The catalog grows by editorial choice, not by algorithm. Every book we add is a book we can explain choosing. Discovery is human.
+4. **Progress is visible, never weaponized against you.** Communities show median reading position and where a member sits against it. Streaks and goals celebrate your own consistency; they never rank you publicly against other readers, and missing a day never shames you. No public leaderboards.
+5. **The page is the unit of conversation.** Reactions and comments are anchored to a specific paragraph on a specific page. Scrolling backwards scrolls the conversation with you; scrolling forward doesn't spoil what's ahead.
+6. **Mobile is sacred.** The reading experience never crosses to web. Web (Year 2) is only invite landing pages, creator dashboards, and shareable previews.
+7. **Author economics is a product value.** 70/30 in favor of the author is a first-class feature. Statements are monthly. Payouts are clean.
+8. **Every screen earns its existence.** We delete more than we add. If a feature doesn't make the magic more reliable, the rental smoother, or the community more alive, we don't ship it.
 
 ### Market Differentiation
 
-The social reading category has been calcified for over a decade. Goodreads has been frozen since the Amazon acquisition. The newer entrants (StoryGraph, Fable, Hardcover) have taken the same paradigm — the book as an entry in a log — and made it prettier. None of them have rebuilt the primitive.
+Flipbook's bet is that no incumbent is close enough to the market to serve it correctly, and the ones that are close are stuck on the wrong primitive.
 
-Flipbook's bet is that the primitive is wrong. Reading isn't a log entry; it's a real-time activity. The conversation that's been missing isn't a discussion thread tied to a finished book — it's a margin reaction tied to a paragraph someone just read. That requires a real-time backend (which is why we picked Convex), an in-app reading surface (which is why this can't be a web wrapper around Goodreads), and a moderator-led club model that feels like a group chat (which is why we're WhatsApp-easy to onboard).
+**Against global reading apps (Kindle, Kobo, Everand):** we are priced in naira for a reader who lives in Lagos, curated for a taste that starts with African voices, and social where they are solo. A Kindle can't get to any of these without rebuilding.
 
-Why this matters to Maya: every existing product makes her feel like reading is something she does alone and reports on later. Flipbook makes her feel like reading is something she does with people who are right there, page-by-page. That's not a feature difference — that's a category difference.
+**Against local ebook platforms (Okada, Selar, Bambooks):** we are a rental library, not a sales storefront — a fundamentally different economic and social product. We're additive to the ecosystem, not competitive: Okada/Selar authors keep those channels; Flipbook expands their addressable market.
 
-Why it's defensible: the real-time social layer compounds. Each new reader makes existing books more alive. Each active club makes the platform a more interesting place for the next reader. Each creator (Phase 2) brings their audience and converts them into a sub-community. The graph is a network effect; the experience is a craft moat. Goodreads can't ship this without rebuilding the product. Fable would have to gut its content-feed paradigm. We're starting from the right primitive.
+**Against reading trackers (Goodreads, StoryGraph):** they log what you've finished; we're built around what you're reading right now, with people who are reading it with you.
+
+**Against Fable:** they built book-club-as-content-feed with celebrity clubs on top. We're building member-led community from friend-clubs first, with the catalog serving them.
+
+**Against Discord + WhatsApp + PDFs (the real competitor):** we make legal what people already do informally, at a price they can rationalize, with a reading experience the piracy version can't match.
+
+The compounding advantage: **community makes the catalog stickier, the catalog makes community denser, and both drive Pro conversion.** Every reader who rents a book they later discuss in a community is a Pro candidate. Every Pro subscriber has better Specials, longer shelves, and audio — deeper reasons to keep the subscription. Every author on the catalog has a real economics reason to send their followers to Flipbook. The graph gets denser. The Pro base compounds. Goodreads can't ship this without rebuilding. Fable would have to gut its feed paradigm. Kindle would have to reinvent itself in Lagos. We start at the right primitive, in the right market.
 
 ### Magic Moment Design
 
-**The magic moment:** A reader is following an indie author on Flipbook. The author drops a new chapter. The reader opens it, reads it in-app, and on the last page sees other subscribers' reactions appearing live in the margins. They reply. The author replies back. They're inside a release party that didn't exist before.
+**The magic moment (rental era):** A reader in Lagos rents *Nearly All the Men in Lagos Are Mad* for ₦1,500. Her sister in Abuja rents it the same day. They form a two-person community. As each reads Chapter 4, the other's reactions bloom in the margin — a wry ♥ next to the funniest paragraph, a "wait, what?" next to the twist. Two weeks later they've finished the first book they've ever finished together. The author has earned ₦2,100 across the two rentals. Both readers are shopping for what to rent next.
 
-**For this to happen reliably in MVP, we need:**
+**For this to happen reliably at launch, we need:**
 
-- **Creator publishing (free in MVP).** Authors can publish chapters and notify subscribers. Monetization is Phase 2; the magic moment doesn't depend on payment.
-- **Push notification on new chapter drop.** Subscribers get a single, well-crafted notification: "*[Author] just dropped Chapter 4 of [Book Title]. Open to read.*"
-- **In-app reading with live reactions.** When the reader opens the chapter, the reading surface has to render the page with reactions appearing in real time as other subscribers read.
-- **Author presence.** The author needs to be a visible participant in the reading session — their reactions are tagged with an "Author" badge; they can reply to subscribers.
-- **Real-time backend.** Convex handles the live margin reactions natively; this is the key reason we chose it.
+- **Catalog with at least one book two readers both want to read** — the beachhead of African indies + world classics has to be dense enough that any two friends can find a book they both want. Target: 200 titles at launch, 800 by month 6.
+- **One-tap rental checkout.** Paystack for NGN, RevenueCat for Pro subscriptions, near-zero friction. Failed transactions must retry gracefully.
+- **In-app EPUB reader with in-margin reactions.** Real-time, driven by Convex. When a friend reads Chapter 4 and reacts, your Chapter 4 lights up next time you open it.
+- **Community discovery from a book you're renting.** "3 friends are reading this" → tap → join their community. One-tap community joining.
+- **Audio reader for Pro.** Neural-TTS pre-generated at ingestion, streamed to Pro subscribers. Enables the commute-reading habit.
 
-**Shortest path from sign-up to magic moment:** ~7 minutes. Sign up (90s) → Browse and follow at least one creator publishing on Flipbook (90s) → Receive a chapter drop within 1–7 days → Open the chapter and read (4 minutes for an 800-word chapter) → Drop a reaction → See others' reactions appearing live.
+**Shortest path from install to magic moment:** ~7 minutes. Install (60s) → sign up (30s) → browse catalog and rent (2 min) → open book (10s) → read Chapter 1 (3 min) → see or drop first reaction (30s).
 
-**Risk:** if no creator drops a chapter in the user's first week, the magic moment is delayed and onboarding loses its punch. **Mitigation:** seed the closed beta with 3–5 creators publishing on a known weekly cadence. Onboarding asks the new user to follow at least one creator with a recent drop, so the magic moment is achievable in the user's first session.
+**Risk:** if a new reader rents a book and there's no active community on it yet, the community half of the magic doesn't fire in session one. **Mitigation:** for the first 6 months, every launch title has 3–5 beta readers pre-reacting on the first 3 chapters, so a first reader always sees reactions in the margin. This is a hand-seeding operation, not an algorithm.
 
-**Supporting moments** (also in MVP, for users who don't immediately hit the creator-drop magic moment): synchronized chapter reactions inside a club (a reader reacts to a paragraph and sees other club members at the same point react too), and the "caught up to the club" rush (a new member reads to catch up and finds dormant reactions lighting up across pages they just finished).
+**Supporting moments:**
+- **The rental confirmation.** Paying ₦1,500 for a book you've been wanting for months and having it open in the app 8 seconds later is its own small delight. Design the checkout to earn that reaction.
+- **The Pro audio moment.** A Pro subscriber presses play on a book's audio narration on their commute, hears a warm neural voice reading the chapter they read yesterday, and the "this is worth ₦2,000/mo" moment fires.
+- **The author-message moment.** An author posts a note in their book's community — "hey, thanks for reading this one" — and readers see it, react, feel like they're inside the release, not on a mailing list.
 
 ### MVP Definition
 
-In scope. Buildable in 6–8 weeks of focused part-time work with Claude Code.
+The MVP is the smallest product that lets a reader rent a book, read it inside a community, and finish it. In scope, buildable across the 90-day plan alongside the supply-side outreach.
 
-**Authentication and account creation.** Clerk-based signup with Apple Sign-In, Google, and phone OTP. Profile with display name, avatar, and reading preferences. Required to do anything on the platform.
+**Authentication.** Clerk-based signup — Apple, Google, phone OTP. Profile: display name, avatar, reading genres.
 
-**Club creation and invite-link onboarding.** A signed-in user can create a private club: name, optional description, optional book selection (PDF upload, default private). Generates a shareable invite link. Anyone tapping the link, after signup, is auto-added to the club. This is the WhatsApp-easy core flow.
+**Catalog browse and search.** Editorial shelves (Nigerian indie, World classics, Flipbook Specials). Search across title, author, genre. Filter by rental band. Book detail page: cover, description, band, one-tap rent.
 
-**Private PDF upload and in-app reading.** Moderators upload a PDF; it's stored in Convex file storage and linked to the club. Members can open it in an in-app PDF reader (using a React Native PDF library) with offline support — once opened, the file is downloaded to the device and remains readable without connection. Progress is tracked page by page and synced when online.
+**Rental checkout.** Paystack (NGN) for local card payments. One-tap rent. Rental appears on the reader's shelf immediately. Failed payments retry through a rebill flow.
 
-**Page-keyed reactions and comments.** While reading, a user can long-press a paragraph (or page, depending on PDF text-extraction capability) to leave a reaction (emoji set: ~6 curated emojis, no full picker) or a short comment (≤200 characters). Other club members reading the same page see these reactions appear in the margin. Reactions are revealed as a member reaches the page — never spoiled ahead.
+**In-app EPUB reader with offline.** EPUB is the primary format at launch (Standard Ebooks is the PD source). Reader supports offline access — once opened, cached to device. Progress tracked page by page, synced when online.
 
-**Club progress visibility.** A club view shows: each member's current page (with a soft visualization, not a leaderboard), the median reading position, and recent reactions across the book. No streaks, no public ranking.
+**Page-keyed reactions and comments.** Long-press a paragraph, drop an emoji or short comment (≤200 chars). Reactions render in the margin next to the paragraph. Real-time via Convex. No spoilers ahead — reactions reveal as you reach the page.
 
-**Creator publishing (free).** Authors can publish original chapters as their own "club" (a special club type — the author is the moderator, members are subscribers). Subscribers receive a push notification on new chapter drops. The reading and reaction model is identical to a regular club.
+**Communities.** Book clubs formed like WhatsApp groups — invite by link, moderator role, member cap defaults reasonable. Free tier: join up to 3 communities. Pro tier: create and join unlimited.
 
-**Discovery feed.** A simple browseable list of public clubs and creators currently active on Flipbook. No algorithmic feed in MVP — sorted by activity (most recent reactions first), filterable by genre tags. Discovery exists primarily to help new users find their first club.
+**Flipbook Pro subscription.** RevenueCat-managed. Three tiers (₦1,550 annual / ₦2,000 quarterly / ₦2,500 monthly). Pro unlocks: unlimited Band A rentals, 15% off B/C/D, Flipbook Specials, audio reader, 6-week shelf on rentals, community creation, unlimited community joins.
 
-**Reader Pro tier.** Subscription via RevenueCat. Pro unlocks: more than three concurrent club memberships, advanced reading customization (font, theme), and offline downloads for unlimited PDFs. Free tier covers the core experience for Maya — Pro is for power users.
+**Author onboarding and royalty statements.** Author signup form. Book upload flow (title, cover, EPUB file, band assignment). Monthly per-author statement generation (Convex cron): rental count, gross, 70% share, payout log. Monthly payout via Paystack Transfers (NGN) or Wise/PayPal (USD).
 
-**Each MVP feature ties to either the magic moment or the moderator's ability to start a club. Anything that doesn't is out of scope.**
+**Course communities (educator surface — v1 minimal).** A course community type with start/end dates. Roster invites via emailed link. Lecturer role with reading-progress-across-class visibility. Reading list mode pointing at catalog books. **Explicitly no** grade book, attendance, or assignment workflows.
+
+**Audio reader (Pro-only).** OpenAI TTS at ingestion for general catalog, ElevenLabs for Specials. Streamed per-chapter to Pro subscribers only. Author opt-out honored per term sheet §4b.
+
+**Push notifications.** Curated: new chapter in a community you're in, reply to your reaction, rental expiring in 48 hours, Pro trial ending. Never engagement-driven ("you haven't read in 3 days").
+
+**Everything else is out.**
 
 ### Safety & Age Segmentation (required before public launch)
 
-Flipbook intends to host **children's book clubs** — minors reading and discussing inside the app. The moment minors are present, onboarding stops being a growth funnel and becomes a **safety and compliance gate**. This is a strategic constraint, not a feature: it reshapes onboarding, discovery, invites, analytics, and live audio.
+Flipbook intends to host children's book clubs — minors reading and discussing inside the app. The moment minors are present, onboarding stops being a growth funnel and becomes a **safety and compliance gate**.
 
-**The legal floor** (not legal advice — counsel review required before public/minor launch). Global App Store distribution from a Nigeria base means we inherit several regimes at once: **US COPPA** draws a hard line at **age 13** — no collection of a child's personal information without **verifiable parental consent (VPC)**, under the FTC's amended rule now in force (full-compliance deadline April 22, 2026). The **UK Children's Code** covers **everyone under 18** whenever minors are *likely to access* the service, demanding high-privacy defaults, data minimization, geolocation off, and no engagement nudges. The **EU** adds a 13–16 consent threshold. The defensible posture is to contain risk *structurally* rather than moderate it after the fact.
+**The legal floor** (not legal advice — counsel review required before public/minor launch). Global App Store distribution from a Nigeria base inherits multiple regimes: **US COPPA** (age 13, verifiable parental consent under the FTC amended rule effective April 2026), **UK Children's Code** (under 18, high-privacy defaults, no engagement nudges), **EU** 13–16 consent threshold. Defensible posture is structural containment, not moderation.
 
-**The model.** A neutral date-of-birth gate forks new users into three lanes — **under-13**, **13–17**, **18+**. Adults flow through the normal onboarding. **Every minor is adult-provisioned into a walled garden**: a vetted guardian/educator places the child into one specific, private, moderated club, and the child lives entirely inside that boundary — no public discovery, no stranger contact, no open audio, display-name only, high-privacy defaults forced on. The two minor lanes differ only in consent depth (under-13 = full VPC; 13–17 = lighter guardian consent + Children's Code defaults). The core magic moment (live margin reactions) works identically and safely inside a closed club, so our differentiator never depends on the risky open surfaces.
+**The model.** A neutral date-of-birth gate forks new users into three lanes: under-13, 13–17, 18+. Adults flow through normal onboarding. **Every minor is adult-provisioned into a walled garden**: a vetted guardian/educator places the child into one specific private moderated club, and the child lives inside that boundary — no public discovery, no stranger contact, no open audio, display-name only, high-privacy defaults forced on.
 
-**Sequencing.** The closed adult beta needs none of this. But the **age gate + 18/13-17 segmentation must ship before we open to the public**, because the Children's Code applies the instant minors are *likely to access* a public app. **Under-13 + VPC + children's-club tooling is staged** behind a kids-safety vendor (KWS or k-ID) and legal review, rolling out alongside the children's book-club push. See `prd.md` § 6B and `product-roadmap.md` Phases 9–10.
+**Sequencing.** The closed beta needs none of this. The 13+ age gate ships before public v2 launch. Under-13 + VPC + children's-club tooling stages behind a kids-safety vendor (KWS / k-ID) and legal review — timed alongside the children's book-club product surface, not before.
 
 ### Explicitly Out of Scope
 
-**Creator monetization (paid subscriptions, one-time purchases).** Tempting because it's the long-term marketplace business. Why deferred: the magic moment works with free creator drops; building Apple/Google IAP plus Stripe Connect creator payouts is a 4-week distraction that doesn't make MVP better. **Reconsider:** Phase 2, after we've validated reader retention and creator interest. Likely months 3–4 post-MVP.
+**Big-5 / major publisher licensing.** Tempting because it's the world catalog. Why deferred: those deals require distribution numbers and legal infrastructure we don't have. **Reconsider:** Year 2, at 10,000+ Pro subscribers.
 
-**Web companion / creator dashboard.** Tempting because creators want a bigger surface to manage their work. Why deferred: 100% of MVP magic happens on phones. Adding a web app doubles the engineering surface for marginal MVP benefit. **Reconsider:** Phase 2, alongside creator monetization.
+**Web reading experience.** Tempting because desktop reading is a real habit. Why deferred: 100% of MVP magic is mobile. Doubles engineering surface for marginal MVP benefit. **Reconsider:** Year 2.
 
-**Licensed book catalog.** Tempting because moderators would prefer a built-in catalog over uploading PDFs. Why deferred: licensing books at MVP scale is expensive ($100k+) and requires legal infrastructure we don't have. The private-upload model is good enough for closed-club reads. **Reconsider:** Year 2, after we've raised a seed round and have user base to justify licensing economics.
+**User-uploaded PDFs (from v1).** Tempting because it lowers supply-side friction. Why deferred: exactly the piracy exposure we redesigned the model to avoid. **Reconsider:** never as an open surface. Course communities allow lecturer PDF uploads for private, rights-certified educational use only.
 
-**Ratings and reviews.** Tempting because every reading app has them. Why deferred: ratings are the Goodreads paradigm we're explicitly rejecting. The conversation is the value, not the score. **Reconsider:** never, unless data shows users explicitly demand it — and even then, we'd implement as a private feature, not a public score.
+**Public ratings and reviews.** Tempting because every reading app has them. Why deferred: ratings are the Goodreads paradigm we're rejecting. The conversation is the value, not the score. **Reconsider:** never, unless data shows explicit user demand — and even then, private.
 
-**Social graph (followers, friends).** Tempting because it's a standard social mechanic. Why deferred: clubs *are* the social unit; adding a followers graph creates parallel social loops that compete with the core. **Reconsider:** Phase 3+, only if user research reveals a genuine gap.
+**Public follower graph.** Tempting because it's standard social. Why deferred: communities are the social unit; a followers graph creates parallel loops that compete. **Reconsider:** Phase 3+, only if research shows a genuine gap.
 
-**Audiobook integration.** Tempting because audiobooks are a huge slice of reading time. Why deferred: audio sync to text is a hard technical problem, and our wedge user (Maya) is primarily a text reader. **Reconsider:** Year 2 if usage data shows audio demand.
+**Algorithmic recommendation engine.** Tempting because scale. Why deferred: violates the curation principle. Discovery in MVP and Year 1 is human — active communities, editorial shelves. **Reconsider:** Year 2 if organic discovery caps growth.
 
-**Algorithmic recommendation engine.** Tempting because every app has one. Why deferred: violates Product Principle 6 (we don't add things that don't make the magic more reliable). Discovery in MVP is human (active clubs, active creators). **Reconsider:** Year 2 only if growth requires algorithmic discovery.
+**LMS-shaped features on the campus surface.** Quizzes, tests, grade books, attendance, video conferencing, calendars, deadlines, assignment submissions, certificates. **Never.** These live in Google Classroom, Canvas, or Moodle. When a lecturer asks for them, the answer is "great, use [X] for that, use Flipbook for the reading."
 
-**EPUB reader / native bookstore integration.** Tempting because PDFs are clunky. Why deferred: shipping a great PDF reader is hard enough; EPUB adds parser complexity and DRM concerns. **Reconsider:** Phase 3+, alongside licensed catalog work.
+**Institutional (university-level) enterprise sales.** Tempting when the campus surface has traction. Why deferred: enterprise sales is a whole different motion that will suck oxygen from the consumer product. **Reconsider:** Year 2, once 20+ lecturers use the free campus tier organically.
 
-**System-theme auto-switching ("Match system" toggle).** Tempting because it's a standard mobile UX. Why deferred: Flip mode is too brand-specific to be auto-selected by an OS-level "dark mode" trigger — we need to learn how users actually pick between Flip and Dark before mapping system-dark to one of them. The three explicit theme modes (Light, Flip, Dark) ship at MVP via an in-app picker; auto-switching follows after user data. **Reconsider:** Phase 2 polish.
+**Human-narrated audiobooks.** Tempting because audio is a huge market. Why deferred: audiobook rights are a separate license class from text rights, and studio-recorded audio at scale is a business we haven't proven we can run. Neural TTS gives us 80% of the value at 5% of the cost. **Reconsider:** Year 2+, only after proven Pro demand for a premium audio tier.
 
-**Web companion landing pages for invite links.** Tempting because invites currently require app download. Why deferred: deep links via Branch.io or App Clips work for MVP. **Reconsider:** Phase 2 alongside web companion.
+**Ads or sponsored placements.** Tempting because scale. Why deferred: violates the "no algorithm" and "no engagement surface" principles. Publisher-sponsored placement in Specials would need to be labeled as such and would compete with editorial trust. **Reconsider:** never in the consumer app; possibly in a Year-2 B2B model.
 
 ### Feature Priority (MoSCoW)
 
-**Must Have (P0 — MVP launch).**
+**Must Have (P0 — MVP launch, September 2026):**
 
 - Authentication (Clerk: Apple, Google, phone OTP)
-- Profile creation and editing (display name, avatar, reading preferences)
-- Club creation (name, description, PDF upload) — private only in MVP
-- Invite link generation and link-tapping auto-join
-- In-app PDF reader with offline support
-- Page-by-page progress tracking, synced when online
-- Page-keyed reactions (curated emoji set) and short comments
-- Club view (member progress, recent reactions, book details)
-- Creator publishing (chapters as a special club type — free in MVP)
-- Push notifications for new chapter drops, replies to your reactions
-- Discovery feed (active clubs, active creators — sorted by activity)
-- Reader Pro tier (RevenueCat subscription, gates: >3 clubs, advanced reading customization, unlimited offline)
+- Profile and reading genres
+- Catalog browse, search, filter, book detail
+- Rental checkout (Paystack NGN)
+- In-app EPUB reader with offline
+- Page-by-page progress tracking
+- Page-keyed reactions and short comments
+- Communities (join, create if Pro, invite by link, moderator role)
+- Push notifications (chapter drops, reaction replies, rental expiring)
+- Flipbook Pro subscription (RevenueCat, three tiers)
+- Pro discounts and unlimited Band A
+- Audio reader (Pro-only, neural TTS pre-generated at ingestion)
+- Author onboarding, book upload flow (band-assigned)
+- Author monthly royalty statements + payouts (Paystack Transfers NGN + Wise/PayPal USD)
+- Editorial shelves and Flipbook Specials
 
-**Should Have (P1 — MVP launch if time permits, otherwise immediately post-launch).**
+**Should Have (P1 — MVP launch if time permits, otherwise immediately post-launch):**
 
-- **Age gate + age-tier segmentation (under-13 / 13–17 / 18+) — REQUIRED before public launch.** Neutral DOB gate, "minor mode" defaults (high-privacy, non-discoverable, no stranger contact), and minor-aware guards on invites, discovery, and analytics. Not needed for the closed adult beta; a hard gate on opening to the public. See `prd.md` § 6B, roadmap Phase 9.
-- Streamlined adult onboarding — drop the real first/last-name step (display name only; data-minimization + less friction) and route new adults into first-club matchmaking instead of an empty home.
-- In-app onboarding genre selection (3 questions max) for first-club suggestions
-- Highlight (text selection on PDF) + reaction
+- 13+/18+ age gate — required before opening beyond closed beta
+- Streamlined adult onboarding — display-name only, first-community matchmaking
+- Highlight (text selection) + reaction
 - Reactions reveal animation as user reaches the page
-- Author badge for creator reactions in their own publishing club
-- Native share sheet for invite links
+- Author badge in a community for the book's author
+- Native share sheet for community invites
+- Course communities (educator surface v1) — bounded dates, roster invite, lecturer role
+- Reading-list mode (a community points at N titles from the catalog as required reading)
+- Rebill / dunning logic for failed Nigerian card charges
 
-**Could Have (P2 — Phase 2 or later).**
+**Could Have (P2 — Phase 2 or later):**
 
-- **Live review sessions (Phase 8 — fast-follow, the first thing after MVP launch).** Clubs schedule and hold live, Twitter Spaces–style review sessions: a host (the moderator, or a member granted hosting rights) goes live with real-time audio, members join to listen or request to speak (raise-hand), and a synchronized live text chat + reaction stream runs alongside the voice. Deliberately *not* in the launch MVP — it adds real-time audio infrastructure (a WebRTC provider on top of Convex) that would delay launch — but it's the highest-priority post-launch addition because it turns the async, page-keyed conversation into a scheduled synchronous ritual the community shows up for. Spec'd in full in `prd.md` (§ Live Review Sessions) and `product-roadmap.md` (Phase 8).
-- **Children's book clubs + under-13 support (Phase 10 — staged).** Child-safe club type, guardian/educator provisioning, verifiable parental consent via a kids-safety vendor (KWS / k-ID), and under-13 enablement. Deliberately staged after the 13+ age gate (Phase 9) ships and after legal review — it's the heaviest compliance surface and shouldn't block public launch. The highest-intent reason to build it: it's what lets children's clubs hold activities safely inside Flipbook.
-- Web companion (invite landing page, creator dashboard)
-- Creator monetization (paid subscriptions, one-time purchases) via Polar / Stripe Connect
-- System-theme auto-switching (the "Match system" toggle that maps OS dark mode to either Flip or Dark)
-- Reading customization beyond basic (themes, more fonts)
-- Reader stats (private only — books finished, pages read, time spent)
-- Reading goals (private, gentle — "I want to finish 12 books this year")
-- App Clips / Branch.io for richer invite-link previews
+- Stripe (USD checkout for diaspora readers)
+- Live review sessions (fast-follow — clubs schedule and hold real-time audio sessions)
+- Children's book clubs + under-13 support (staged behind VPC vendor and legal review)
+- Web companion (invite landing pages, author dashboards)
+- System-theme auto-switching (mapping OS dark mode to Flip or Dark)
+- Reading customization (more themes, more fonts)
+- Private reader stats (books finished, pages read — no public rank)
+- Reading goals (private, gentle)
+- Diaspora / non-Nigerian market expansion
+- Small publisher onboarding (Tier 3 in the supply plan)
 
-**Won't Have (this product cycle).**
+**Won't Have (this product cycle):**
 
 - Public book ratings or reviews
 - Public follower graph
-- EPUB / DRM'd ebook support
-- Audiobook integration
-- Licensed catalog
+- Human-narrated audiobooks
 - Algorithmic recommendation engine
-- Comments threading deeper than 1 level (replies to reactions are flat)
+- LMS features of any kind
+- Big-5 licensed catalog
+- Institutional enterprise sales motion
+- Comments threading deeper than 1 level
 
 ### Core User Flows
 
-**Flow 1: Reader joins a club from an invite link (the WhatsApp-easy flow).**
+**Flow 1: Reader browses the catalog and rents a book.**
 
-Trigger: a friend or moderator shares an invite link via group chat / DM.
+Trigger: user opens the app for the first time or returns to look for a new book.
 
-Steps: User taps the link → opens App Store if app not installed (or app if installed) → after install, app deep-links back to invite → if not signed in, signup screen with one-tap Apple / Google / phone OTP → on signup completion, auto-added to the club → lands on the club view → sees the book, the other members, recent reactions, current chapter → taps "Start reading" → the book opens to the reader's current page (page 1 if they're new).
+Steps: Home / catalog view → editorial shelves (Nigerian indie, Classics, Specials) → tap into a title → book detail page (cover, description, band price, "3 friends are reading this" if applicable) → tap "Rent" → Paystack checkout (saved card if returning) → confirmation → book appears on shelf, opens to page 1.
 
-Outcome: User is in a club, reading. Total time from tap to first page open: under 2 minutes for a returning App Store user; under 3 minutes for a first-time install.
+Outcome: reader has a rented book on their shelf, ready to read. Under 3 minutes for a first-time user; under 45 seconds for a returning user with a saved card.
 
-Success criteria: 70% of invite-link recipients who tap the link complete signup. 80% of signups open the book within 24 hours.
+Success criteria: 30%+ of active users rent at least one paid book in month 1; median 2+ paid rentals in month 1.
 
-**Flow 2: Reader has the magic moment (reactions in the margin).**
+**Flow 2: Reader has the in-margin magic moment.**
 
-Trigger: User is reading inside a club where other members are also reading.
+Trigger: user is reading a rented book where 1+ other readers are also reading.
 
-Steps: User reads a paragraph → reaches a paragraph that already has 1+ reactions from members ahead of them on the page → reactions render in the margin (a small icon + count) → user taps to expand → sees the comments → drops their own reaction (long-press the paragraph → emoji picker) → another member replies in real-time → user receives haptic feedback / subtle visual confirmation.
+Steps: reader reads a paragraph → reaches a paragraph with pre-existing reactions → reactions render in margin → user taps to expand → sees the comments → drops their own → another reader replies in real time.
 
-Outcome: User experiences the social-reading moment for the first time. They feel they are inside the book with other people.
+Outcome: reader experiences the social-reading moment. They feel they're inside the book with others.
 
-Success criteria: 70% of active readers leave at least one reaction in their first reading session. 50% of those receive a reply within 24 hours.
+Success criteria: 70% of active readers leave at least one reaction in their first session; 50% receive a reply within 24 hours.
 
-**Flow 3: Creator publishes a new chapter (Phase 2 magic moment supporting flow — but the chapter-drop notification is MVP).**
+**Flow 3: Author onboards and gets their first rental royalty.**
 
-Trigger: A creator has finished writing a new chapter and uploads it to their publishing club.
+Trigger: an African indie author signs the term sheet.
 
-Steps: Creator taps "Publish new chapter" in their club view → uploads the chapter (PDF or rich text → MVP: PDF only) → adds an optional author note → taps Publish → all subscribers receive a push notification ("[Author] just dropped Chapter 4 of [Book Title]") → subscribers tap notification → app opens directly to the new chapter → reading begins → as multiple subscribers open within minutes, their reactions appear live to each other.
+Steps: author receives signup link → creates account → uploads EPUB, cover, title/description/band → editorial reviews and publishes → the book appears on the catalog → readers rent it → at end of month, a statement email is sent → payout is initiated via Paystack Transfers or Wise → author receives money.
 
-Outcome: A small release party has spontaneously formed around a chapter drop. Author, fans, and reactions are co-located in real time.
+Outcome: author has been paid on time, in a currency they can spend. Trust is built.
 
-Success criteria: 60% of subscribers open a chapter notification within 24 hours. 40% leave a reaction. The author replies to at least one reaction in their first chapter drop.
+Success criteria: 100% of statement emails delivered by the 15th of the following month. 0% missed payouts. 3+ founding-cohort authors act as public testimonials by month 6.
+
+**Flow 4: Lecturer runs a course community.**
+
+Trigger: a lecturer wants to distribute course materials to their class.
+
+Steps: lecturer signs up (free) → creates a course community with start/end dates → uploads course materials (private PDF, rights-certified) OR points at catalog titles as a reading list → invites roster by pasting student emails → students receive invite links → students join, rent required titles from the catalog if applicable, or read the private course PDFs → lecturer sees anonymized progress across the class.
+
+Outcome: a functioning course reading space exists on Flipbook. Students who rented catalog titles have generated real revenue. Lecturer feels the tool is worth recommending to a colleague.
+
+Success criteria: 8+ course communities live by month 6, none using it as an LMS.
 
 ### Success Metrics
 
-**Primary metric:** *Books finished per active reader, per 90 days.* This is the metric that proves Flipbook is solving the core problem. Maya's "finished a book" is the truest signal of value delivery. Good: 1.5 (a 50% lift over baseline). Great: 2.5+ (the user is in active club rotation and finishing one book/month).
+**Primary metric:** *Monthly net contribution.* This is the number the business runs on. Target by month 12: ₦1.87M/mo (~$1,248). Target by month 6 (breakeven): ₦0+ (revenue ≥ costs).
 
-**Secondary metrics:**
-- *Active clubs (clubs with 1+ reactions in the last 7 days).* Good: 75 by day 90. Great: 200+.
-- *Magic moment hit rate.* Percent of new users who leave at least one reaction in their first session. Good: 50%. Great: 70%+.
-- *Moderator retention (D30).* Percent of users who created a club still active in their club at day 30. Good: 40%. Great: 60%+.
-- *Pro tier conversion (D60).* Percent of active readers who upgrade to Pro by day 60. Good: 3%. Great: 5%+.
+**Financial secondary metrics:**
+- *Pro conversion rate.* Target: 5% by day 60, walking to 8% by month 12.
+- *Active users.* Target: 1,400 (breakeven) by month 4-5, 5,000 by month 12.
+- *Rentals per Free user per month.* Target: 0.7.
+- *Rentals per Pro user per month.* Target: 4.
+
+**Product secondary metrics:**
+- *Magic moment hit rate.* % of new users who leave at least one reaction in their first reading session. Good: 50%. Great: 70%.
+- *Book completion rate.* % of rentals where the reader finishes the book within the rental window. Good: 30%. Great: 45%.
+- *Community activity.* Active communities (1+ reactions in last 7 days) as % of total communities. Good: 60%. Great: 80%.
+- *Author retention.* % of signed authors still on Flipbook 90 days after their first rental. Good: 85%. Great: 95%.
 
 **Leading indicators:**
-- *Invite-link tap-to-signup conversion rate.* Below 50% is a red flag; the invite UX needs work.
-- *Time to first reaction.* If new users take >1 hour from signup to first reaction, the seed-content or club-suggestion flow is failing.
-- *Chapter-drop open rate (creator pubs).* Below 40% within 24 hours suggests notification copy or timing is off.
+- *First-week rental conversion.* If <20% of signups rent a book in week one, checkout is broken or catalog isn't landing.
+- *Payment failure rate.* Sustained >15% post-rebill is an existential issue.
+- *Support ticket volume per 100 users.* Above 5 tickets per 100 users per month is a UX problem, not a support problem.
 
 ### Risks
 
-**Market risk: Reader retention falls off after the first book.** A user joins a club, finishes a book, and the next book the club picks doesn't excite them. Likelihood: medium. Impact: high — kills the long-term user. Mitigation: cross-club discovery (Maya can see what other clubs are reading), and easy "leave this club, join another" flows. Track book-2 retention as a KPI.
+**Supply risk: founding-30 author cohort under-fills.** If we sign 12 authors instead of 30 by mid-August, launch catalog is thin and rental depth suffers. Likelihood: medium. Impact: high. Mitigation: over-pitch (35–40 targets to yield 30); build the target list wide across genres; use small publisher deals as bulk-signing shortcuts (one publisher yes = 5–15 authors).
 
-**Execution risk: Real-time reactions are technically harder than expected on mobile.** Likelihood: medium. Impact: high — the magic moment doesn't fire cleanly. Mitigation: prototype the reactions surface in week 2 of build, before any other UI work; if Convex + RN don't deliver the perceived live experience, reset scope before too much else is built on top.
+**Payment risk: Nigerian card processing failure eats revenue.** Nigerian card decline rates on subscriptions run 15–25% without smart rebill. Likelihood: high. Impact: medium-high. Mitigation: invest in rebill / dunning logic in month 2; use Paystack's failure retry patterns; fall back to card + bank transfer + USSD.
 
-**Legal risk: Private PDF uploads attract DMCA takedowns at scale.** Likelihood: medium. Impact: medium — manageable if handled cleanly (DMCA process), existential if mishandled (platform shutdowns, App Store removal). Mitigation: implement DMCA takedown flow before public launch; private-by-default reduces exposure; never index user uploads in search.
+**Currency risk: NGN depreciation compresses margins.** USD-denominated costs (Convex, OpenAI TTS, ElevenLabs, Wise) don't depreciate; revenue is in NGN. Likelihood: high (structural). Impact: medium. Mitigation: model with conservative FX; consider USD-denominated Pro tier for diaspora readers to hedge.
 
-**Execution risk: Founder burnout / bandwidth.** ~10–15 hr/week each + day jobs + Nigerian financial constraints + ambitious 6-month vision. Likelihood: medium (reduced from prior solo-founder estimate). Impact: high. Mitigation: the two-cofounder split is the primary mitigation — Moks owns product/vision/growth, Ayodeji owns operations/process/BD, so neither carries the whole load and the extroverted networking work no longer falls on an introverted designer. Plus: ruthless MVP scoping (this doc); each phase produces a demoable increment for motivation hits; explicit Phase 2 deferrals; CodeRabbit + Claude Code reduce review burden. Residual risk: a two-person team has no slack if one cofounder is unavailable — keep scope honest and timelines conservative.
+**Product risk: catalog is thin and readers churn.** If a reader finishes their first rental and there's nothing else in the catalog they want, they churn immediately. Likelihood: medium in month 1-2; low once catalog crosses 300 titles. Mitigation: ingest PD fast to give catalog depth; over-index on Nigerian romance and popular fiction in month 1 for repeat-rental behavior.
 
-**Market risk: Apple/Google rules shift on creator monetization.** App Store rules around what's monetizable in-app evolve. Likelihood: low-medium. Impact: medium for Phase 2. Mitigation: route creator monetization via web checkout (Polar / Stripe) to avoid Apple/Google's 30% on creator revenue. Standard pattern (Patreon, Spotify, Substack).
+**Execution risk: two-cofounder capacity.** ~50-60 hrs/wk combined, part-time, across build, supply, ops, and marketing is a stretch. Illness, unexpected weeks, day-job crunch, or accelerator commitments compress the model. Likelihood: medium. Impact: high. Mitigation: the two-cofounder split is the primary mitigation — Moks owns product/vision/design/build, Ayodeji owns ops/BD/partnerships, so neither carries the whole load and the extroverted networking work no longer falls on a designer. Also: ruthless scope; Convex + Claude Code reduce build load; supply-side outreach can pause without killing product velocity; explicit "if we only ship one thing this week" prioritization. Residual risk: a two-person team has no slack if one cofounder is unavailable — keep scope honest and timelines conservative. First hire (backend engineer or community/author-success lead) triggered by first fund raise or sustained monthly breakeven, whichever comes first.
 
-**Market risk: Goodreads or Amazon ships a competing live-reading feature.** Likelihood: low (Amazon is glacial); but if they did, impact would be high. Mitigation: brand and craft moat — even if Amazon shipped a clone, Flipbook's specificity to the wedge audience is a defensible position.
+**Legal risk: content moderation on user-uploaded course materials.** A lecturer uploading a scanned chapter of a textbook they don't hold rights to is the piracy exposure we designed the platform to avoid. Likelihood: low if managed well. Impact: high if a rights-holder complaint reaches public. Mitigation: private-community-only, rights certification at upload, DMCA-style takedown flow, active moderation of course-material uploads until we have a scaled process.
 
-**Execution risk: Nigerian payment infrastructure for creator payouts (Phase 2) is harder than expected.** Stripe Connect doesn't natively support Nigeria. Likelihood: high (this is a known issue). Impact: medium-high if many creators are Nigerian-based. Mitigation: by Phase 2, decide on incorporation jurisdiction (Stripe Atlas / Delaware C-Corp), or route Nigerian creator payouts via Wise, Paystack, or Flutterwave. Plan deliberately, don't scramble.
+**Category risk: BookTok or Bookstagram doesn't convert into rentals.** Views are cheap; paying readers are not. Likelihood: medium. Impact: medium. Mitigation: track content-to-signup and signup-to-rental conversion by channel; kill under-performing channels quickly.
 
-**Market risk: BookTok / Bookstagram seeding doesn't convert at expected rates.** Creators may seed clubs that get high views but low conversion. Likelihood: medium. Impact: medium — affects 90-day GTM targets. Mitigation: track seeded creator → user → active reader conversion explicitly; adjust seeding strategy at day 30 and day 60 based on what's working.
+**Adjacent risk: campus surface pulls attention away from the consumer product.** Educators are demanding users. Two professors asking for grade-book features is a slippery slope. Likelihood: medium. Impact: high (kills the North Star). Mitigation: the "reading extends, workflow does not" principle in this doc + hard "no" muscle on non-reading requests.
+
+**Category risk: a well-funded incumbent (Everand, Fable, a Nigerian aggregator) ships something similar.** Likelihood: low. Impact: medium if they enter the Nigerian market seriously. Mitigation: founder proximity + author-network trust + community craft — none of which capital can immediately buy.
 
 -----
 
@@ -357,115 +428,146 @@ Success criteria: 60% of subscribers open a chapter notification within 24 hours
 
 ### Positioning Statement
 
-For accountability-craving readers in their 20s–40s who want the energy of a book club without the overhead, **Flipbook** is the *social reading platform* that makes finishing a book feel like a shared experience rather than a solo aspiration. Unlike Goodreads — a graveyard of past reviews — and unlike Discord book clubs that go quiet by week three, Flipbook ties the conversation to the page itself, so the community stays alive as long as someone is reading.
+For African readers in their 20s–40s who want a home for the book they're reading right now, **Flipbook** is the *reading library* that pairs a curated catalog of African indie voices and world classics with rental prices matched to local income and communities that make finishing a book feel shared. Unlike Kindle — Western catalog, USD pricing, no community — and unlike Goodreads — a graveyard of past reviews — Flipbook is priced for Lagos, curated by taste, and built around the book you're reading right now with the people reading it with you.
 
 ### Brand Personality
 
-If Flipbook were a person: she's the friend who ran two book clubs in college, works at an indie bookstore in her late 20s, has impeccable taste but never makes you feel uncool for not having read what she's read, and sends you a chapter she loved with one sentence in the message: "this part." She's bookish-modern with a cozy undertone — refined and confident, but also warm, generous, and a little playful. She knows reading is having a moment again and acts like it. She'd never use the word "platform" in a sentence. She'd never tell you you're "falling behind" on anything.
+If Flipbook were a person: she's the friend from Lagos who ran two book clubs in university, works at an indie bookstore now, has impeccable taste but never makes you feel uncool for not having read what she's read, and sends you a chapter she loved with one sentence in the message: *"this part."* She's bookish-modern with a cozy undertone — refined and confident, but also warm, generous, and a little playful. She knows reading is having a moment again and acts like it. She'd never use the word *platform* in a sentence. She'd never tell you you're falling behind on anything.
 
-She'd dress like she could equally walk into a literary reading or a coffee shop without changing — clean lines, one bold color, nothing overdone. She'd talk in full sentences, never in marketing copy. She'd read everything from Murakami to Brit Bennett to a serialized novella from someone she met on the app, and treat all of them with equal care. She'd never shame anyone for what they read or how slowly they read it. But she'd also never water down what she thinks; she's confident, she's specific, she has opinions.
+She reads Damilare Kuku, Chimamanda, Ta-Nehisi Coates, Zadie Smith, and the Standard Ebooks edition of *Mrs Dalloway* with equal care. She'd never shame anyone for what they read or how slowly they read it. But she also has opinions, and she doesn't water them down.
 
-The brand should feel like a quiet vote of confidence in the user — that they are someone who reads, who has taste, who cares about ideas, who deserves a beautiful tool.
+The brand should feel like a quiet vote of confidence in the reader — that they are someone who reads, who has taste, who cares about ideas, who deserves a beautiful tool that was made *for them*, not translated for them.
 
 ### Voice & Tone Guide
 
-The voice is constant: **warm, generous, lightly clever, never cute, never gamified.**
+The voice is constant: **warm, generous, lightly clever, never cute, never gamified. Speaks from Lagos, sounds like a well-read Nigerian friend, addresses a global reader from that vantage.**
 
 The tone shifts slightly across contexts:
 
 | Context | DO | DON'T |
 |---|---|---|
-| **Onboarding** | "Pick three books you've been meaning to read. We'll find you the right room." | "Welcome to your reading journey 📚✨ Let's get started!" |
-| **Empty state (no clubs yet)** | "No clubs yet. Want to start one — or wait for one to find you?" | "You haven't joined any clubs. Tap below to get started." |
-| **Empty state (no reactions yet on a page)** | "Be the first to react." | "No reactions yet. Be the first!" |
-| **Success — finished a book** | "That's a wrap. Add a thought before it fades?" | "🎉 Congrats! You finished a book! Keep up the reading streak!" |
-| **Error — upload failed** | "The book didn't quite make it. Try again?" | "Error 422: Upload failed. Please retry." |
-| **Push notification — chapter drop** | "[Author] just dropped Chapter 4 of [Book]. The room's filling up." | "🔔 New chapter alert! Don't miss out!" |
-| **Push notification — reply to your reaction** | "Toby replied to your reaction in [Book]." | "You have a new notification! Open the app to see." |
-| **Marketing — landing copy** | "Read with the people who are reading right now." | "The future of social reading, reimagined." |
+| **Onboarding** | "Pick three genres you love. We'll build your first shelf." | "Welcome to your reading journey. Let's get started." |
+| **Empty catalog shelf** | "Your shelf is empty. Rent your first book, or wait for a friend to invite you." | "You have no books yet. Tap here to browse." |
+| **Empty community** | "No community for this book yet. Start one — or wait for one to find you." | "No communities available. Create one now." |
+| **Empty state (no reactions on a page)** | "Be the first to react." | "No reactions yet. Be the first!" |
+| **Rental confirmation** | "It's yours for four weeks. Take your time — the room's here whenever you are." | "Purchase successful. Your rental has been activated." |
+| **Rental expiring** | "Two days left on *[Book]*. Finish, or renew — up to you." | "Your rental expires in 48 hours. Renew now to avoid losing access." |
+| **Success — finished a book** | "That's a wrap. Add a thought before it fades?" | "Congratulations! You finished a book. Keep up the reading streak!" |
+| **Payment failed** | "Your bank didn't approve the charge. Try again, or use a different card?" | "Error: Payment declined. Please try again." |
+| **Push — chapter drop** | "*[Author] just dropped Chapter 4 of [Book]*. The room's filling up." | "New chapter alert. Don't miss out." |
+| **Push — reply to reaction** | "Toby replied to your reaction in *[Book]*." | "You have a new notification. Open the app to see." |
+| **Marketing — landing copy** | "The library African readers deserve. Rent smart, read together." | "The future of social reading, reimagined." |
 | **Settings / billing** | "You're on the Pro plan. Cancel anytime — we won't make it weird." | "Manage your subscription. Premium membership active." |
-| **Confirmation — leave a club** | "Leave [Club Name]? Your progress stays with you. You can always come back." | "Are you sure you want to leave this club? This action cannot be undone." |
+| **Confirmation — leave a community** | "Leave *[Community Name]*? Your rental stays with you. You can always come back." | "Are you sure you want to leave this community? This action cannot be undone." |
 
 ### Messaging Framework
 
-**Tagline.** *Read together. Finish more. Talk on the page.*
+**Tagline (v2).** *Rent smart. Read together. Talk on the page.*
 
-**Homepage / App Store headline (primary).** *Read with the people who are reading right now.*
+**Homepage / App Store headline (primary).** *The library African readers deserve.*
 
-**Homepage / App Store subheadline.** *Flipbook turns books into living rooms — clubs you join in seconds, conversations tied to the page, and creators you follow into their next release.*
+**Alternate H1s worth keeping for ads and social:**
+- *Read with the people who are reading right now.* (still valid — from v1)
+- *Great books, made affordable. Read them together.*
+- *Your next book is here. So are the readers.*
 
-**Three value propositions.**
+**Homepage / App Store subheadline.** *A curated library of African indie voices and world classics. Rent affordably. Read inside a community. All from your phone.*
 
-1. **Finish more.** Reading alongside other people — visibly, gently — is the difference between a book finished and a bookmark abandoned. Flipbook makes the "with people" part as easy as opening the app.
-2. **Talk on the page.** Every reaction, every comment, every reply lives next to the paragraph that prompted it. No spoilers ahead, no ghost-town discord channels — the conversation is right where you are in the book.
-3. **Follow the writers, not the algorithm.** Indie authors and serialized novelists publish on Flipbook and turn their readers into communities. When they drop a new chapter, you're in the room — not just on a mailing list.
+**Three value propositions (v2).**
+
+1. **Books at prices that make sense.** Rent from a curated catalog for ₦500 to ₦2,500 — a coffee, not a week's spend. Public-domain classics come free with Pro. No ₦35,000 hardcovers to save up for.
+2. **A community around every book.** Rent a book, join the community reading it, and see reactions bloom in the margins as your friends reach the same paragraphs you do. No spoilers ahead. No ghost-town Discord.
+3. **Authors get paid what they're worth.** 70% of every rental goes to the author. If you love an indie writer, renting them on Flipbook is a real vote — not pennies-per-page-read like it is on Amazon.
 
 **Feature descriptions (in brand voice).**
 
-- *Clubs in seconds:* "Make a club like a group chat. Invite by link. Read together."
-- *In-app reading with offline:* "Open a book inside Flipbook. Read on the train. We'll catch up when you do."
-- *Reactions on the page:* "Long-press a paragraph. Drop a reaction. Watch the room reply."
-- *Live chapter drops:* "When a creator drops a chapter, you'll know. The room opens."
-- *Pro for the obsessed:* "More clubs, more offline, more reading. For the people who finish."
+- *Curated library:* "A library built by taste. Nigerian indies. Ghanaian romance. The classics that earned their place. Nothing on the shelf that shouldn't be."
+- *Rental:* "Rent a book for four weeks. Read it. Finish it. Rent the next. Your library shifts with what you're reading now."
+- *Communities:* "Make a community like a group chat. Invite your people. Read together."
+- *In-margin reactions:* "Long-press a paragraph. Drop a reaction. Watch the room reply."
+- *Flipbook Pro:* "Unlimited classics, free. 15% off everything else. The audio reader. The Specials shelf. Community creation. All for less than Netflix."
+- *Flipbook Specials:* "A private literary magazine that comes with your subscription. Curated titles you won't find on the everyday shelf. Free with Pro."
+- *Audio reader:* "Every book, read aloud. Warm neural narration for the commute, the walk, the wind-down."
+- *Course communities:* "For lecturers who want their students in one reading space. Not an LMS. Just the reading part, done properly."
 
 **Objection handlers.**
 
-- *"I have a Goodreads account."* — "Goodreads is for the books you've finished. Flipbook is for the book you're reading right now."
-- *"I tried Discord book clubs."* — "Same here. They die in three weeks because the conversation isn't tied to the book. Flipbook fixes that."
-- *"I prefer reading alone."* — "You still can. Solo reading works. The clubs are there when you want them."
-- *"I'm not a 'big reader.'"* — "Most of our users finish more in their first month than in the previous six. Showing up alongside other people changes how it feels."
+- *"Why not just use Kindle?"* — "Kindle prices in dollars and its Nigerian catalog is thin. Flipbook prices in naira and starts with African voices."
+- *"Why rent instead of buy?"* — "Because a ₦1,500 rental you finish is better than a ₦35,000 hardcover you don't. And when you rent, more of the money reaches the author."
+- *"How is this different from Okada Books?"* — "Okada sells books. Flipbook rents them, and reads them together. Different economics, different reason to open the app."
+- *"I already have a Goodreads account."* — "Goodreads is for the books you've finished. Flipbook is for the book you're reading right now."
+- *"I prefer reading alone."* — "You still can. Solo reading works. The communities are there when you want them."
+- *"I don't finish books."* — "Nobody does, when they read alone. That's the point of the room."
 
 ### Elevator Pitches
 
 **5-second pitch.**
-*"Flipbook is where book clubs read together in real time."*
+*"Flipbook is Netflix for books, with a community around every one."*
 
 **30-second pitch.**
-*"Flipbook is a social reading app where book clubs read together in real time — you create a club like you'd create a WhatsApp group, invite your friends, and as everyone reads, reactions and comments appear in the margins of the book on the page they're on. It also lets indie authors publish chapters and turn their readers into communities. We're starting on mobile, and we're building for the kind of reader who keeps trying to finish books and almost never does."*
+*"Flipbook is a book-rental app built for African readers. We license a curated catalog of African indie voices, world classics, and small-publisher titles, and we rent them for ₦500 to ₦2,500 per four weeks — a price a reader in Lagos can actually justify. Every book comes with an optional community: rent alongside your friends, drop reactions in the margins as you read, and finish more of what you start. Authors keep 70% of every rental. Pro subscribers ₦1,550/mo get unlimited access to the classics, audio narration, and our curated Specials shelf."*
 
 **2-minute pitch.**
 
-*Reading is one of the loneliest social activities people do. Most readers I know — myself included — buy books faster than they finish them, and the books they care about most are the ones they have nowhere to talk about. The existing tools don't fix it: Goodreads is a graveyard of past reviews, Discord book clubs die in three weeks, IRL clubs collapse under scheduling, and Substack is great for creators but terrible for readers wanting to discuss a chapter with strangers.*
+*Books are inaccessible for most African readers. A hardcover in Lagos costs ₦25,000–₦35,000 — a week's discretionary spend for a young professional. The digital alternatives — Kindle, Kobo, Google Play Books — price in dollars, skew Western in catalog, and have no community. Local ebook platforms exist but they're fragmented, thin on curation, and don't do rental. And even if a reader gets the book, they're reading it alone in a culture that's rediscovering reading as a shared act — book clubs form on WhatsApp and die by Chapter 3.*
 
-*Flipbook is a social reading platform that fixes this by tying the conversation to the page itself. Readers create or join book clubs in seconds — like a WhatsApp group — and as they read inside the app, reactions and comments appear in the margins, page by page. No spoilers ahead, no dead forums, no scheduling. The platform also lets indie authors publish chapters and turn their readers into communities — when an author drops a new chapter, subscribers get a notification, open the chapter, and find themselves in a live reading room with the author and other fans.*
+*Flipbook is the reading library African readers deserve. We license and curate a catalog — starting with African indie authors and public-domain classics, expanding outward — and we rent every book at prices between ₦500 and ₦2,500 for four weeks. Readers rent inside an in-app EPUB reader with in-margin reactions from friends and communities reading the same book. A Pro subscription ₦1,550/mo unlocks unlimited public-domain classics, audio narration, our curated Specials shelf, and community creation.*
 
-*The wedge is the reader. The flywheel is the creator. Mobile first, web companion later. Convex for the real-time backend, Clerk for auth, RevenueCat for the reader Pro tier. Creator monetization comes in Phase 2.*
+*The wedge is Nigerian and diaspora readers 20–40. The supply is African indie authors and small African publishers — a founder-network advantage no US or UK reading app can reach from Silicon Valley. Author economics are 70/30 in the author's favor, better than Kindle Unlimited by an order of magnitude, which makes the founding-30 supply cohort achievable. Course communities for university lecturers are an extension surface, not a separate product — the founder's parents are professors and the model has real early pull without pulling the product into LMS territory.*
 
-*Why now: Reading is having a cultural moment — BookTok pulled 100M+ users into bookish content, Substack proved readers will pay creators directly, and Discord proved community can outlast a single content moment. Nobody has put these three together for the actual reading experience.*
+*Convex for real-time reactions, Clerk for auth, RevenueCat + Paystack for payments, OpenAI TTS + ElevenLabs for audio, Expo for mobile. Two-cofounder team from Lagos — Moks (design + product + build) and Ayodeji (operations + BD + child-safety background) — shipping with AI coding agents. Monthly cash breakeven modeled at ~1,375 active users and 95 Pro subs — achievable in month 4-5 of the base case. 12-month projected net contribution ~₦1.87M/mo (~$1,248), a real founder income and a foundation to raise from.*
 
-*Why me: I've been a product designer for five years in healthcare — a domain that taught me how to build for trust, retention, and behavior change. I've been a member of several book clubs. I've abandoned every reading app on the market. I'm building the one I wished existed.*
+*Why now: African tech infrastructure (Paystack, RevenueCat, cheap Convex) finally makes a Nigerian consumer subscription product economically feasible. Neural TTS finally makes audio narration affordable at scale. And BookTok has pulled a generation of African readers into books without a home built for them. The market is real; nobody is building for it.*
 
-*The ask depends on the audience — a closed beta seat, an early creator partner, or feedback on the prototype.*
+*Why us: Moks brings five years of product design in healthcare — a domain that taught trust, retention, and behavior change are non-negotiable. Lagos-based, the reader Flipbook is for, has abandoned every reading app on the market, can sign African indie authors and small publishers over coffee that no incumbent can reach. Ayodeji brings ops chops, a deep relationship network, a gift for pitching, and hands-on child-safety operations experience from a gaming company. The introverted-designer plus extroverted-operator split is deliberate — each covers the other's blind spot.*
 
 ### Competitive Differentiation Narrative
 
-The social-reading category is full of products that are either ten years late or one half-step away from getting it right. Goodreads is the largest reading community on the internet and the worst-designed product in the category — Amazon hasn't shipped meaningfully on it in a decade, and it shows. StoryGraph is the gold standard for personal tracking but has explicitly chosen not to be a community product. Fable has the right instinct (clubs, in-app reading) but builds it on a content-feed paradigm that makes everyday clubs feel secondary to celebrity ones.
+The African reading market has been served by two categories of product: **global apps that don't fit** (Kindle, Kobo, Play Books — Western catalog, USD pricing, no community, no cultural anchor) and **local apps that under-invest** (Okada Books, Selar, Bambooks — great local ecosystem, but direct-sale one-off transactions, thin curation, no rental, no community). Both have real users; neither is what Ada actually wants.
 
-Flipbook makes a different bet: that the primitive is wrong across the category. Books aren't shelf entries; they're activities that happen in real time. The right unit of social isn't a finished review; it's a margin reaction tied to the paragraph someone just read. We've built around that — Convex for true real-time backend, an in-app reader where reactions render as you reach a page, a moderator-led club model that feels like a group chat. None of the incumbents can ship this without rebuilding their product. We start at the right primitive.
+Flipbook's bet is that the missing product is a **curated rental library with community, priced in naira, led by African voices, and paying its authors a real chunk.** That's four choices at once — catalog, pricing, taste, economics — and no incumbent can ship the combination without rebuilding.
 
-The two-sided model compounds this advantage. Creator monetization (Phase 2) gives indie authors and serialized writers a home that Substack + Discord + Patreon can't match — readers don't just subscribe, they show up to read together. Each new creator brings their audience; each reader becomes a candidate for follow-on creators. The graph gets denser. The conversation gets richer. The platform becomes harder to leave.
+**Kindle** would have to rebuild its pricing, its catalog acquisition, and its community layer. It won't.
+
+**Masobe App** *(launched 2026 — added Aug 15)* is the closest new entrant: a Nigerian publisher's own subscription reading app (₦1,999/mo for 2 books up to ₦5,999/mo unlimited, offline reading, physical-paperback ordering). But it is structurally a *single-publisher storefront* — Masobe titles only, no community layer, no rental, no third-party authors. It validates the market ("affordable legal access to African literature" is now a proven consumer proposition) while leaving our ground open: multi-publisher catalog, per-book rental below their subscription floor, 70/30 indie-author economics, and the community primitive they'd have to rebuild their app to match. Strategy: collaboration-first (Masobe titles renting on Flipbook non-exclusive), compete-if-declined. Their launch is also an urgency lever in every other publisher conversation: *"Masobe built their moat. Build yours, or use ours."*
+
+**Okada Books and Selar** would have to move from sales to rental — a different license, different economics, different social product. They've had years to and haven't.
+
+**Fable** is the closest analog to the community piece but is US-based, has no African catalog, and skews celebrity-book-club rather than friend-first.
+
+**Local piracy (WhatsApp + PDFs)** is the actual competitor. Beating it means being *nearly as easy* to share (invite-link communities) and *legibly better* on price (rental at coffee-money) and quality (a real EPUB reader with reactions in the margins).
+
+The compounding advantage is the flywheel: **more African indie authors sign because the economics beat Kindle Unlimited; more readers join because the catalog is dense and priced for them; communities form around books that already have readers; Pro conversion rises because the community + Specials + audio combination gets stickier as the catalog grows.** The graph gets denser. Kindle can't ship this. Okada would have to reinvent itself in a different license class. We start at the right primitive, in a market with founder-proximity as a structural moat.
 
 ### Brand Anti-Patterns
 
-**Never feel like Goodreads (or any 2008 forum).** No flat threaded discussions, no review counts as primary UI, no avatar-and-text grid layouts, no average-rating-out-of-five as a primary surface. The book metadata (ISBN, edition codes, page counts in the abstract) never leads the experience.
+**Never feel like Kindle.** No USD pricing anywhere in the reader UI. No Western-first catalog on the launch shelves. No "sync your Amazon library" — we don't want that library on our surface.
 
-**Never gamify reading.** No streaks-as-anxiety. No owl shame. No leaderboards. No "you're in the top 10% of readers this month" badges. No push notifications guilting users into opening the app. Progress is visible and ambient — never weaponized.
+**Never feel like Goodreads (or any 2008 forum).** No flat threaded discussions, no review counts as primary UI, no avatar-and-text grid layouts, no average-rating-out-of-five as a primary surface. Book metadata (ISBN, edition codes, page counts in the abstract) never leads the experience.
 
-**Never feel like a content feed.** No infinite scroll on the home screen. Flipbook is a place — a library, a club, a nightstand — not a timeline. No algorithmic recommendations as primary discovery. No engagement-on-engagement surfaces (likes-on-likes, follower counts as status).
+**Gamify only in service of the reading habit.** *(Revised Aug 15, 2026 — supersedes the blanket "never gamify" rule.)* Streaks, reading goals, milestones, and progress celebration are allowed — warm-toned, personal or club-level, always resettable without shame. What stays banned: streaks-as-anxiety (a broken streak never guilts), owl shame, public leaderboards ranking readers against each other, "top 10% of readers" status badges, and any notification that guilts rather than invites. The line: gamification that gets someone *reading* is good; gamification that makes someone feel *bad about not reading* is not.
+
+**Never feel like a content feed.** No infinite scroll on the home screen. Flipbook is a place — a library, a community, a nightstand — not a timeline. No algorithmic recommendations as primary discovery. No engagement-on-engagement surfaces (likes-on-likes, follower counts as status).
 
 **Never feel like Substack-on-mobile.** No email-first flows. No newsletter aesthetic. The reading happens in the app, the conversation happens on the page, the creator-reader connection happens inside the community surface — not in an inbox.
 
-**Never feel cheap.** No generic stock photography of a person reading by a window. No AI-generated illustrations. No auto-generated book covers. No emoji garlands in headers. No "Welcome to your reading journey" copy.
+**Never feel like an LMS.** No grade books. No attendance. No assignments. No video calls. No calendars. No certificates. Course communities are reading spaces, not classrooms — the moment a feature could be described as *learning management*, it's out.
 
-**Never use the word "platform" in user-facing copy.** Never use "leverage," "synergy," "solution," "ecosystem," "powered by," or "reimagined." Never end a sentence with an exclamation point in a notification.
+**Never feel cheap.** No generic stock photography of a person reading by a window. No AI-generated illustrations. No auto-generated book covers. No emoji garlands in headers. No "Welcome to your reading journey" copy. No off-brand cover images at any resolution.
+
+**Never use the word *platform* in user-facing copy.** Never use *leverage*, *synergy*, *solution*, *ecosystem*, *powered by*, or *reimagined*. Never end a sentence with an exclamation point in a notification.
 
 **Never crowd a screen.** Every page earns its real estate. If you can't justify why something is on the screen, it isn't. White space is part of the brand.
 
-**Never make the user feel behind.** No "you're falling behind" copy. No "your friends are reading more than you." If a club has moved past a member, the copy is gentle ("Toby is on chapter 4 — the room is just ahead of you") and the action is forward-leaning, not shame-driven.
+**Never make the user feel behind.** No "you're falling behind" copy. No "your friends are reading more than you." If a community has moved past a member, the copy is gentle ("Toby is on chapter 4 — the room is just ahead of you") and the action is forward-leaning, not shame-driven.
+
+**Never make the user feel poor.** Rental prices are shown proudly and legibly. The Pro tier is framed as *"you get more,"* not as *"you unlock what you were locked out of."* Pricing is a feature, not an apology.
 
 -----
 
 ## 5. Design Direction
+
+*Section 5 is preserved verbatim from v1 — the design system, brand colors, typography, spacing, components, iconography, accessibility, motion, and design tokens are unaffected by the business-model pivot. See `design-tokens.json` for the machine-readable source.*
 
 ### Design Philosophy
 
@@ -512,7 +614,7 @@ Flipbook ships **three theme modes at MVP** — Light, Flip, and Dark — all th
 | Golden Sand | `#e4b363` | `--color-highlight` | `highlight` | Author badges, highlight chips, special moments |
 | Muted Plum | `#5d3a5a` | `--color-accent-deep` | `accent-deep` | Editorial accents (rarely used surface) |
 | Warm Ivory | `#f7f3e3` | `--color-surface-warm` | `surface-warm` | Editorial sections, book detail surfaces |
-| Charcoal | `#121212` | `--color-bg-dark` | `bg-dark` | Dark mode primary background (Phase 2) |
+| Charcoal | `#121212` | `--color-bg-dark` | `bg-dark` | Dark mode primary background |
 
 **Surfaces.**
 
@@ -551,22 +653,6 @@ Flipbook ships **three theme modes at MVP** — Light, Flip, and Dark — all th
 
 **Type system overview.** Two-family system: **Raleway** (primary — content, body, headlines) and **Inter** (secondary — UI labels, captions, overlines). **Font Awesome 6 Pro** for icons (with Lucide as a fallback if licensing is unavailable).
 
-**Font loading.**
-
-```javascript
-// expo-font setup (load at app boot)
-import { useFonts } from 'expo-font';
-
-const [fontsLoaded] = useFonts({
-  'Raleway-Medium': require('./assets/fonts/Raleway-Medium.ttf'),
-  'Raleway-SemiBold': require('./assets/fonts/Raleway-SemiBold.ttf'),
-  'Raleway-Bold': require('./assets/fonts/Raleway-Bold.ttf'),
-  'Inter-Regular': require('./assets/fonts/Inter-Regular.ttf'),
-  'Inter-Medium': require('./assets/fonts/Inter-Medium.ttf'),
-  'Inter-SemiBold': require('./assets/fonts/Inter-SemiBold.ttf'),
-});
-```
-
 **Type scale (rem-style scale for design-doc clarity; React Native uses raw px).**
 
 | Token | Family | Weight | Size | Line | Letter | Use |
@@ -574,7 +660,7 @@ const [fontsLoaded] = useFonts({
 | `display-lg` | Raleway | 700 | 32px | 1.2 | 0 | Marketing screens, splash |
 | `display-md` | Raleway | 700 | 26px | 1.2 | 0 | Major screen titles |
 | `heading-lg` | Raleway | 600 | 22px | 1.3 | 0 | Section headers |
-| `heading-md` | Raleway | 600 | 18px | 1.3 | 0 | Card titles, club names |
+| `heading-md` | Raleway | 600 | 18px | 1.3 | 0 | Card titles, community names |
 | `body-lg` | Raleway | 500 | 16px | 1.3 | 0 | Body copy, paragraph reading text |
 | `body-md` | Raleway | 500 | 14px | 1.3 | 0 | Secondary body |
 | `body-sm` | Raleway | 500 | 12px | 1.3 | 0 | Tertiary body, captions |
@@ -615,18 +701,13 @@ const [fontsLoaded] = useFonts({
 - **Touch targets:** minimum 44x44px (iOS HIG), 48x48px preferred for primary CTAs.
 - **Maximum content width on tablet:** 600px centered (Phase 2 polish — MVP is phone-only).
 
-**Responsive breakpoints (Phase 2 web companion).**
-- Mobile: < 640px (default)
-- Tablet: 640–1024px
-- Desktop: > 1024px
-
 ### Component Philosophy
 
-**Buttons.** Pill-shaped or rounded-rectangle (8–12px radius). Three primary variants: **Primary** (Deep Indigo background, white text — for confirmations and main CTAs), **Secondary** (Vibrant Coral background, white text — for special social/community CTAs like "Join club" or "Drop a chapter"), and **Alt** (text-only, coral text on transparent — for tertiary actions). Each variant has default/hover/pressed/muted states (the Figma library has all four explicitly defined).
+**Buttons.** Pill-shaped or rounded-rectangle (8–12px radius). Three primary variants: **Primary** (Deep Indigo background, white text — for confirmations and main CTAs), **Secondary** (Vibrant Coral background, white text — for special social/community CTAs like "Join community" or "Rent this book"), and **Alt** (text-only, coral text on transparent — for tertiary actions). Each variant has default/hover/pressed/muted states.
 
 Buttons feel substantial but not chunky — 44px height for default, 36px for compact, 52px for primary screen CTAs. No drop shadows on buttons; reserve shadows for elevated surfaces.
 
-**Cards.** Rounded corners (12px), subtle shadow (soft, 0 2px 8px rgba(0,0,0,0.04)) on a near-white surface. Border treatment is rare — we lean on shadow and surface contrast instead. Cards for clubs and books prioritize the cover image (hero), with title in `heading-md` Raleway and meta in `ui-label-md` Inter underneath.
+**Cards.** Rounded corners (12px), subtle shadow (soft, 0 2px 8px rgba(0,0,0,0.04)) on a near-white surface. Border treatment is rare — we lean on shadow and surface contrast instead. Cards for communities and books prioritize the cover image (hero), with title in `heading-md` Raleway and meta in `ui-label-md` Inter underneath.
 
 **Inputs.** 1px border (Surface Border `#b4bfed`), 8px radius, 16px internal padding, default 48px height. Placeholder in Text Muted; entered text in Text Primary. Focus state: border thickens to 2px in Deep Indigo 700. No shadows on inputs.
 
@@ -638,61 +719,39 @@ Buttons feel substantial but not chunky — 44px height for default, 36px for co
 
 **Shadow philosophy.** Use sparingly. Two defined shadows: `shadow-sm` (0 1px 4px rgba(0,0,0,0.04)) for default cards and `shadow-md` (0 4px 16px rgba(0,0,0,0.08)) for elevated surfaces (modals, floating action buttons). Never use four-direction box shadows or colored shadows.
 
-### Iconography & Imagery
-
-**Icon library:** Font Awesome 6 Pro (per the Figma design system) is preferred. If FA Pro licensing is unavailable, fall back to **Lucide React Native** (open source, MIT, comparable coverage). Icons are stroke-based, not filled, with consistent 1.5–2px stroke weight at 24px size. Inline icon size: 12–16px. Standalone icon size: 24px (default), 20px (compact), 32px (large).
-
-**Imagery direction.**
-
-- **Book covers are sacred.** They appear at scale, never cropped, never overlaid with copy if avoidable.
-- **Photography (when used):** real, intimate, low-stimulation. Editorial-style images of books in real environments — never staged, never models pretending to read.
-- **Illustration:** sparse. If used, hand-drawn-feeling line art in brand colors, never auto-generated, never "AI illustrated."
-- **Avatars:** soft, real photos when users upload them. Initials-on-color fallbacks for users without avatars (color cycled from a defined palette).
-
-**Never:** stock photography of "a person reading by a window," AI-generated illustrations, auto-generated book covers, emoji garlands, decorative gradients.
-
 ### Accessibility Commitments
 
 **WCAG 2.1 Level AA compliance** is the floor for MVP, AAA for color contrast where feasible.
 
-**Color contrast.** All text meets WCAG AA (4.5:1 for normal text, 3:1 for large text). Verified pairings: Deep Indigo 900 on Surface Primary (8.6:1), Text Secondary `#464646` on Surface Primary (9.1:1), Vibrant Coral 500 on Surface Primary (4.6:1 — acceptable for large text and CTAs only). Body text never uses Vibrant Coral.
-
-**Focus indicators.** Every interactive element has a visible focus ring (2px Deep Indigo 700, 2px offset). Focus order follows visual order. No "outline: none" without replacement.
-
-**Touch targets.** Minimum 44x44px on all interactive elements (iOS HIG). Primary CTAs are 48x48px or larger. Tap zones extend beyond visible bounds where needed.
-
-**Screen reader support.** All images have descriptive alt text or are marked decorative. All interactive elements have accessible labels (Buttons announce their action, not "button"). Reading view: each page is announced with chapter and page number; reactions are announced as "reaction by [user] on paragraph [N]: [text]." Dynamic content (live reactions appearing) uses ARIA live regions on web (Phase 2) and accessibility announcements on native.
-
-**Motion.** Respect `prefers-reduced-motion` — animations either eliminated or reduced to opacity-only fades. Reading view never animates content into place when reduced motion is set.
-
-**Type scaling.** Respect iOS Dynamic Type / Android font scale at 100–200% range. Layouts must reflow gracefully; no text clipped or truncated unintentionally.
-
-**Captions / transcripts.** Any audio content (Phase 2 audiobook integration, if shipped) ships with full transcripts.
+- **Color contrast.** All text meets WCAG AA. Body text never uses Vibrant Coral.
+- **Focus indicators.** Every interactive element has a visible focus ring (2px Deep Indigo 700, 2px offset).
+- **Touch targets.** Minimum 44x44px on all interactive elements.
+- **Screen reader support.** All images have descriptive alt text. All interactive elements have accessible labels. Reading view: each page is announced with chapter and page number; reactions are announced as "reaction by [user] on paragraph [N]: [text]."
+- **Motion.** Respect `prefers-reduced-motion`.
+- **Type scaling.** Respect iOS Dynamic Type / Android font scale at 100–200% range.
+- **Audio content.** Audio narration ships with visible text (the book itself) so the audio is always accompanied by transcribable content.
 
 ### Motion & Interaction
 
 **Transition durations.** Default: 200ms. Quick (small UI feedback): 120ms. Slow (modal/sheet entry): 320ms. Never longer than 400ms.
 
-**Easing.** Default: `cubic-bezier(0.4, 0.0, 0.2, 1)` (material standard). Entrance: `cubic-bezier(0.0, 0.0, 0.2, 1)` (decelerate). Exit: `cubic-bezier(0.4, 0.0, 1, 1)` (accelerate).
+**Easing.** Default: `cubic-bezier(0.4, 0.0, 0.2, 1)`. Entrance: `cubic-bezier(0.0, 0.0, 0.2, 1)`. Exit: `cubic-bezier(0.4, 0.0, 1, 1)`.
 
-**What animates:** screen transitions, modal/sheet entry/exit, reaction appearance (subtle fade-and-scale, 200ms), button press states (8ms scale to 0.98), pull-to-refresh, page turns in the reading view (subtle horizontal slide, 240ms).
+**What animates:** screen transitions, modal/sheet entry/exit, reaction appearance (subtle fade-and-scale, 200ms), button press states, pull-to-refresh, page turns in the reading view (subtle horizontal slide, 240ms).
 
-**What never animates:** typography (no animated text). Colors (instant on state change). Reading content — pages don't animate during a normal scroll.
+**What never animates:** typography, colors on state change (instant), reading content during a normal scroll.
 
-**Hover/focus/active.** Mobile-first means hover is rare. Press states (active) are visible — buttons subtly compress and the surface darkens 8%. Long-press (for reactions) has a haptic pulse.
+**Loading states.** Skeleton loaders for content-heavy screens (catalog, community lists). Spinners only for blocking operations (uploads, payments). Optimistic UI for reactions.
 
-**Loading states.** Skeleton loaders are preferred over spinners for content-heavy screens (club lists, book lists). Spinners are reserved for blocking operations (uploads). Optimistic UI for reactions and comments — they appear instantly and reconcile if the server rejects.
-
-**Live reactivity (the magic-moment animation).** When a reaction appears in the margin from another reader, it fades-in (160ms) with a subtle horizontal slide of 8px. Never bounces. Never pulses. The smallest possible motion that says "this is live."
+**Live reactivity.** When a reaction appears in the margin from another reader, it fades-in (160ms) with a subtle horizontal slide of 8px. Never bounces. Never pulses. The smallest possible motion that says "this is live."
 
 ### Design Tokens
 
-Consolidated reference for implementation. Full structured set lives in `design-tokens.json` (sibling to this doc).
+Consolidated reference. Full structured set in `design-tokens.json`.
 
 **Brand-constant tokens** (same across all three theme modes):
 
 ```css
-/* Brand identity — constant across Light, Flip, Dark */
 --color-brand-primary: #3b3a6d;
 --color-brand-primary-hover: #48448f;
 --color-brand-primary-pressed: #252442;
@@ -707,25 +766,20 @@ Consolidated reference for implementation. Full structured set lives in `design-
 --color-highlight: #e4b363;
 --color-accent-deep: #5d3a5a;
 
-/* Semantic — constant */
 --color-success: #3CAA6E;
 --color-warning: #e4b363;
 --color-error: #e51d1d;
 --color-info: #5752b0;
 
-/* Typography */
 --font-primary: 'Raleway', system-ui, sans-serif;
 --font-secondary: 'Inter', system-ui, sans-serif;
 --font-icon: 'Font Awesome 6 Pro', sans-serif;
 
-/* Spacing */
 --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
 --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px;
 
-/* Radius */
 --radius-sm: 8px; --radius-md: 12px; --radius-lg: 16px; --radius-pill: 9999px;
 
-/* Motion */
 --duration-quick: 120ms;
 --duration-default: 200ms;
 --duration-slow: 320ms;
@@ -734,7 +788,7 @@ Consolidated reference for implementation. Full structured set lives in `design-
 --easing-exit: cubic-bezier(0.4, 0.0, 1, 1);
 ```
 
-**Mode-dependent semantic tokens** (these are the values that swap per theme):
+**Mode-dependent semantic tokens:**
 
 | Token | Light | Flip | Dark |
 |---|---|---|---|
@@ -750,6 +804,4 @@ Consolidated reference for implementation. Full structured set lives in `design-
 | `--shadow-sm` | `0 1px 4px rgba(0,0,0,0.04)` | `0 1px 4px rgba(0,0,0,0.20)` | `0 1px 4px rgba(0,0,0,0.40)` |
 | `--shadow-md` | `0 4px 16px rgba(0,0,0,0.08)` | `0 4px 16px rgba(0,0,0,0.32)` | `0 4px 16px rgba(0,0,0,0.50)` |
 
-Note: the Flip and Dark mappings above are starting defaults based on the Figma designs — the coding agent should verify each surface against the Figma frames during build (Phase 0, TASK-008) and adjust if a specific Figma node uses a different value. The Figma file is the canonical source.
-
-These tokens are the contract between design and engineering. Every implementation reference, every Tailwind config, every theme file in the React Native app should derive from this set. The `design-tokens.json` file alongside this doc holds the full structured set in a machine-readable format and should be the source of truth for codegen.
+The `design-tokens.json` file alongside this doc holds the full structured set in a machine-readable format and is the source of truth for codegen.
