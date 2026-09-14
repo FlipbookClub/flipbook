@@ -40,12 +40,12 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 import { ensureCachedPdf, getCachedPdfPath } from "@/lib/pdf";
+import { bookFileType, type BookFileType } from "@/lib/bookFile";
 import {
   EpubReader,
   type EpubReaderHandle,
   type TocEntry,
 } from "@/screens/reader/EpubReader";
-import { bookFileType, type BookFileType } from "@/lib/bookFile";
 import {
   PROGRESS_SYNC_INTERVAL_MS,
   readCachedProgress,
