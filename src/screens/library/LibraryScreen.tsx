@@ -22,7 +22,8 @@ import { typography } from "@/theme/typography";
 
 import type { LibraryStackParamList } from "@/navigation/LibraryStack";
 import { api } from "../../../convex/_generated/api";
-import { progressPercent, progressLabel } from "@/lib/progressDisplay";
+import { progressPercent, progressCardLabel } from "@/lib/progressDisplay";
+import { isEpub } from "@/lib/bookFile";
 import { bookGenres } from "@/lib/genres";
 
 type Props = NativeStackScreenProps<LibraryStackParamList, "LibraryHome">;
@@ -163,14 +164,14 @@ export function LibraryScreen({ navigation }: Props) {
                 key={item._id}
                 title={item.book.title}
                 author={item.book.author}
-                pageCount={item.book.pdfPageCount}
+                pageCount={isEpub(item.book) ? null : item.book.pdfPageCount}
                 coverUrl={item.book.coverImageUrl}
                 subtitle={item.club.name}
                 surface={item.finishedAt ? "primary" : "secondary"}
                 progress={
                   item.finishedAt
                     ? undefined
-                    : { label: progressLabel(item), pct }
+                    : { label: progressCardLabel(item), pct }
                 }
                 genres={bookGenres(item.book)}
                 onOpen={() => navigation.navigate("Reader", { bookId: item.book._id })}

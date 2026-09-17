@@ -10,6 +10,11 @@ export interface CachedProgress {
   bookId: string;
   page: number;
   totalPages: number;
+  // EPUB only. Pages mean nothing for reflowable text, so resume rides on the
+  // CFI; cached locally as well as on the server so an offline open can decide
+  // where to start without waiting for a query that will never resolve.
+  locationCfi?: string;
+  percentComplete?: number;
   updatedAt: number;
 }
 

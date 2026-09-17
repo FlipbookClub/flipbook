@@ -68,6 +68,14 @@ async function registerOnce(): Promise<string | null> {
  * (idempotent — server-side patch no-ops when unchanged) and listens for
  * token rotation events.
  */
+// P5-T2. Minutes to ADD to a UTC timestamp to get local time, which is the
+// sign opposite to getTimezoneOffset(). Sent with the push token because the
+// server cannot otherwise know when 19:00 is for this user, and riding the
+// existing launch call means it self-corrects across travel and DST.
+function tzOffset(): number {
+  return -new Date().getTimezoneOffset();
+}
+
 export function usePushTokenRegistration(meExists: boolean): void {
   const updatePushToken = useMutation(api.users.updatePushToken);
   const tried = useRef(false);
@@ -78,7 +86,7 @@ export function usePushTokenRegistration(meExists: boolean): void {
     registerOnce()
       .then((token) => {
         if (token) {
-          updatePushToken({ pushToken: token }).catch((err) => {
+          updatePushToken({ pushToken: token, tzOffsetMinutes: tzOffset() }).catch((err) => {
             console.warn("expo push: failed to persist token", err);
           });
         }
@@ -89,7 +97,9 @@ export function usePushTokenRegistration(meExists: boolean): void {
 
     // FR-028 acceptance: token is updated if it changes (rotation).
     const sub = Notifications.addPushTokenListener((event) => {
-      updatePushToken({ pushToken: event.data }).catch(() => undefined);
+      updatePushToken({ pushToken: event.data, tzOffsetMinutes: tzOffset() }).catch(
+        () => undefined,
+      );
     });
     return () => sub.remove();
   }, [meExists, updatePushToken]);

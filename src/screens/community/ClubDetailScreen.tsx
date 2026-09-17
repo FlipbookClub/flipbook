@@ -29,8 +29,9 @@ import { MAX_PDF_BYTES, pickBookFile, type PickedPdf } from "@/lib/pdf";
 import {
   progressPercent,
   progressLabel,
-  progressLabelShort,
+  progressCardLabel,
 } from "@/lib/progressDisplay";
+import { isEpub } from "@/lib/bookFile";
 import { palette } from "@/theme/palette";
 import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
@@ -135,7 +136,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
   const currentProgress =
     myProgress && myProgress.totalPages > 0
       ? {
-          label: progressLabelShort(myProgress),
+          label: progressCardLabel(myProgress),
           pct: progressPercent(myProgress),
         }
       : undefined;
@@ -453,7 +454,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                     <BookListCard
                       title={currentBook.title}
                       author={currentBook.author}
-                      pageCount={currentBook.pdfPageCount}
+                      pageCount={isEpub(currentBook) ? null : currentBook.pdfPageCount}
                       coverUrl={currentBook.coverImageUrl}
                       genres={bookGenres(currentBook)}
                       onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}
@@ -485,7 +486,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         key={b._id}
                         title={b.title}
                         author={b.author}
-                        pageCount={b.pdfPageCount}
+                        pageCount={isEpub(b) ? null : b.pdfPageCount}
                         coverUrl={b.coverImageUrl}
                         genres={bookGenres(b)}
                         onOpen={() => navigation.navigate("Reader", { bookId: b._id })}
@@ -505,7 +506,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                         key={b._id}
                         title={b.title}
                         author={b.author}
-                        pageCount={b.pdfPageCount}
+                        pageCount={isEpub(b) ? null : b.pdfPageCount}
                         coverUrl={b.coverImageUrl}
                         surface="primary"
                         genres={bookGenres(b)}
@@ -710,7 +711,7 @@ export function ClubDetailScreen({ navigation, route }: Props) {
                   <BookListCard
                     title={currentBook.title}
                     author={currentBook.author}
-                    pageCount={currentBook.pdfPageCount}
+                    pageCount={isEpub(currentBook) ? null : currentBook.pdfPageCount}
                     coverUrl={currentBook.coverImageUrl}
                     genres={bookGenres(currentBook)}
                     onOpen={() => navigation.navigate("Reader", { bookId: currentBook._id })}

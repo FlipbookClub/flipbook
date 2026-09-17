@@ -25,6 +25,24 @@ export default defineSchema({
         reactionReplies: v.boolean(),
       }),
     ),
+    // P5-T2 reading reminders. All optional so existing rows need no
+    // migration: absent reminderEnabled reads as ON, absent reminderHour as
+    // 19:00 local. reminderTzOffsetMinutes is reported by the client (see
+    // users.updatePushToken) because the server cannot know a user's local
+    // hour without it; until it arrives, that user is simply skipped rather
+    // than reminded at the wrong time.
+    // P5-T5. Re-engagement email opt-outs. Absent means both on, matching the
+    // newsletter's opt-out posture; the unsubscribe link in every send writes
+    // here, so honouring it is a data fact rather than a manual promise.
+    emailPrefs: v.optional(
+      v.object({
+        weeklyDigest: v.boolean(),
+        progressNote: v.boolean(),
+      }),
+    ),
+    reminderEnabled: v.optional(v.boolean()),
+    reminderHour: v.optional(v.number()),
+    reminderTzOffsetMinutes: v.optional(v.number()),
     createdAt: v.number(),
     lastActiveAt: v.number(),
   })
@@ -212,6 +230,11 @@ export default defineSchema({
     .index("by_club", ["clubId"])
     .index("by_book_and_page", ["bookId", "page"])
     .index("by_chapter_and_page", ["chapterId", "page"])
+    // Discussions read chronologically, newest first. The _page_ indexes sort
+    // by position in the book, which is right for the reader margin and wrong
+    // for a conversation.
+    .index("by_book_and_created", ["bookId", "createdAt"])
+    .index("by_chapter_and_created", ["chapterId", "createdAt"])
     .index("by_user", ["userId"])
     .index("by_parent", ["parentReactionId"])
     // Rate-limit lookup (FR: max 10 reactions/min per user).
@@ -267,6 +290,8 @@ export default defineSchema({
     userId: v.id("users"),
     type: v.union(
       v.literal("chapter_drop"),
+      v.literal("new_book_in_club"),
+      v.literal("reading_reminder"),
       v.literal("reaction_reply"),
       v.literal("club_invite"),
       v.literal("milestone"),

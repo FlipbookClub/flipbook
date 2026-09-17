@@ -29,6 +29,13 @@ export function progressLabel(p: ProgressLike | null | undefined): string {
   return `Page ${p.currentPage} of ${p.totalPages}`;
 }
 
+// For cards, which render the percentage themselves. Empty for EPUBs so the
+// percentage is not printed twice.
+export function progressCardLabel(p: ProgressLike | null | undefined): string {
+  if (!p || p.percentComplete != null) return "";
+  return `Page ${p.currentPage} of ${p.totalPages}`;
+}
+
 // Compact form for tight rows: "Pg 12 | 340" / "38%".
 export function progressLabelShort(p: ProgressLike | null | undefined): string {
   if (!p) return "Not started";

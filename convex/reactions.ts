@@ -285,15 +285,19 @@ export const listForBook = query({
 
     const limit = Math.min(args.limit ?? 20, 50);
 
+    // Newest first. This used to read the by_*_and_page indexes, which sort by
+    // position in the book: page 200's reaction outranked one posted minutes
+    // ago. That is the right order for the reader's margin and the wrong one
+    // for a discussion feed. Over-fetch because replies are filtered out below.
     const rows = args.bookId
       ? await ctx.db
           .query("reactions")
-          .withIndex("by_book_and_page", (q) => q.eq("bookId", args.bookId))
+          .withIndex("by_book_and_created", (q) => q.eq("bookId", args.bookId))
           .order("desc")
           .take(limit * 4)
       : await ctx.db
           .query("reactions")
-          .withIndex("by_chapter_and_page", (q) => q.eq("chapterId", args.chapterId))
+          .withIndex("by_chapter_and_created", (q) => q.eq("chapterId", args.chapterId))
           .order("desc")
           .take(limit * 4);
     // Founder decision: no spoiler gating — all members see every reaction.

@@ -270,6 +270,9 @@ const libraryItemValidator = v.object({
     title: v.string(),
     author: v.string(),
     pdfPageCount: v.number(),
+    // The Library card hides the page count for EPUBs, where it is a
+    // placeholder rather than a real length.
+    fileType: v.optional(v.union(v.literal("pdf"), v.literal("epub"))),
     coverImageUrl: v.optional(v.string()),
     isRemoved: v.boolean(),
     genre: v.optional(v.string()),
@@ -314,6 +317,7 @@ export const listMyLibrary = query({
           title: book.title,
           author: book.author,
           pdfPageCount: book.pdfPageCount,
+          fileType: book.fileType,
           coverImageUrl: book.coverImageUrl,
           isRemoved: book.isRemoved,
           genre: book.genre,
