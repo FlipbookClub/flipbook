@@ -7,12 +7,16 @@ import { radius, spacing } from "@/theme/spacing";
 import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
+import { progressPercent } from "@/lib/progressDisplay";
+
 interface MemberProgress {
   userId: string;
   displayName: string;
   avatarUrl?: string;
   currentPage: number;
   totalPages: number;
+  // Present on EPUB rows only; when set it is the authoritative figure.
+  percentComplete?: number;
 }
 
 interface Props {
@@ -33,10 +37,10 @@ export function ProgressVisualization({ rows, bookTitle }: Props) {
   const points = useMemo(() => {
     if (!rows) return [];
     return rows
-      .filter((r) => r.totalPages > 0)
+      .filter((r) => r.totalPages > 0 || r.percentComplete != null)
       .map((r) => ({
         ...r,
-        fraction: Math.max(0, Math.min(1, r.currentPage / r.totalPages)),
+        fraction: progressPercent(r) / 100,
       }));
   }, [rows]);
 

@@ -4,6 +4,11 @@ import { mutation, query } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
 import { getCurrentUser } from "./users";
 
+// An EPUB rarely reports a clean 100%: the last spine item is often a colophon
+// or copyright page the reader never scrolls through, so requiring 100 would
+// leave books permanently unfinished.
+const EPUB_FINISHED_PERCENT = 98;
+
 const progressValidator = v.object({
   _id: v.id("progress"),
   _creationTime: v.number(),
@@ -14,6 +19,12 @@ const progressValidator = v.object({
   currentPage: v.number(),
   totalPages: v.number(),
   furthestPageReached: v.number(),
+  // Must mirror the progress table in schema.ts. Strict object: a field on the
+  // document but missing here fails return validation and breaks every query
+  // that returns progress. progressWithUserValidator and libraryItemValidator
+  // both spread these fields, so adding here covers all three.
+  locationCfi: v.optional(v.string()),
+  percentComplete: v.optional(v.number()),
   finishedAt: v.optional(v.number()),
   updatedAt: v.number(),
 });
@@ -37,6 +48,10 @@ export const update = mutation({
     chapterId: v.optional(v.id("chapters")),
     currentPage: v.number(),
     totalPages: v.number(),
+    // P4-T4, EPUB only. New optional args; PDF callers omit them and are
+    // completely unaffected.
+    locationCfi: v.optional(v.string()),
+    percentComplete: v.optional(v.number()),
   },
   returns: v.null(),
   handler: async (ctx, args) => {
@@ -47,6 +62,12 @@ export const update = mutation({
     }
     if (args.currentPage < 1 || args.totalPages < 1 || args.currentPage > args.totalPages) {
       throw new ConvexError({ code: "invalid_page" });
+    }
+    if (
+      args.percentComplete !== undefined &&
+      (args.percentComplete < 0 || args.percentComplete > 100)
+    ) {
+      throw new ConvexError({ code: "invalid_percent" });
     }
 
     // Only members can report progress. Anonymous progress is meaningless and
@@ -79,15 +100,28 @@ export const update = mutation({
       : args.currentPage;
     // finishedAt sticks once set — re-reading earlier pages shouldn't
     // un-finish a book in the Library's Finished tab.
-    const finishedAt =
-      existing?.finishedAt ??
-      (nextFurthest >= args.totalPages ? now : undefined);
+    //
+    // EPUBs are judged on percentComplete, not pages. They report
+    // currentPage/totalPages as 1/1 (reflowable text has no page count), which
+    // satisfies `nextFurthest >= totalPages` on the very first write and would
+    // otherwise mark every EPUB finished the moment it was opened.
+    const isEpubProgress = args.percentComplete !== undefined;
+    const reachedEnd = isEpubProgress
+      ? args.percentComplete! >= EPUB_FINISHED_PERCENT
+      : nextFurthest >= args.totalPages;
+    const finishedAt = existing?.finishedAt ?? (reachedEnd ? now : undefined);
 
     if (existing) {
       await ctx.db.patch(existing._id, {
         currentPage: nextCurrent,
         totalPages: args.totalPages,
         furthestPageReached: nextFurthest,
+        // Last-write-wins, like currentPage: this is "where I am now", and a
+        // patch with these omitted leaves the stored values alone.
+        ...(args.locationCfi !== undefined ? { locationCfi: args.locationCfi } : {}),
+        ...(args.percentComplete !== undefined
+          ? { percentComplete: args.percentComplete }
+          : {}),
         finishedAt,
         updatedAt: now,
       });
@@ -100,6 +134,8 @@ export const update = mutation({
         currentPage: nextCurrent,
         totalPages: args.totalPages,
         furthestPageReached: nextFurthest,
+        locationCfi: args.locationCfi,
+        percentComplete: args.percentComplete,
         finishedAt,
         updatedAt: now,
       });
