@@ -38,6 +38,12 @@ yarn-error.*
 # headers; ignoring them keeps `git status` honest.
 session-notes-*.md
 
+# Business, strategy, brand and people documents. Deliberately NOT tracked:
+# they are not code, they should never appear in a code review, and they must
+# not vanish when a branch is switched or cleaned. See business/README.md.
+# Back these up outside git — nothing here is version-controlled.
+business/
+
 # typescript
 *.tsbuildinfo
 
