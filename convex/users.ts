@@ -225,6 +225,23 @@ export const updatePushToken = mutation({
     // Was an early return on an unchanged token, which would have dropped a
     // timezone update on every launch after the first.
     if (user.pushToken === next && !tzChanged) return null;
+
+    // A push token belongs to a device, not to a person. Two accounts signed
+    // in on the same phone both held the same token, so whichever one a
+    // notification was for, it landed on that device — a real account of
+    // someone else's reading turning up in your notification shade. The most
+    // recent account to register a token is the one that owns it.
+    if (next) {
+      const previousHolders = await ctx.db
+        .query("users")
+        .withIndex("by_push_token", (q) => q.eq("pushToken", next))
+        .collect();
+      for (const other of previousHolders) {
+        if (other._id === user._id) continue;
+        await ctx.db.patch(other._id, { pushToken: undefined });
+      }
+    }
+
     await ctx.db.patch(user._id, {
       pushToken: next,
       ...(tzChanged ? { reminderTzOffsetMinutes: args.tzOffsetMinutes } : {}),

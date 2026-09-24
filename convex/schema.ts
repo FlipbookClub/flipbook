@@ -47,6 +47,10 @@ export default defineSchema({
     lastActiveAt: v.number(),
   })
     .index("by_clerk_id", ["clerkId"])
+    // An Expo push token identifies a DEVICE, not a person. When a second
+    // account signs in on the same phone, both rows would otherwise keep the
+    // same token and both would receive pushes there. See users.updatePushToken.
+    .index("by_push_token", ["pushToken"])
     .index("by_display_name", ["displayName"])
     .index("by_last_active", ["lastActiveAt"]),
 
