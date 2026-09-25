@@ -1,6 +1,6 @@
 import { ConvexError, v } from "convex/values";
 
-import { mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
+import { internalMutation, mutation, query, type MutationCtx, type QueryCtx } from "./_generated/server";
 import type { Doc } from "./_generated/dataModel";
 import { isBetaInviteRequired, normalizeCode, redeemForUser } from "./invites";
 
@@ -224,23 +224,30 @@ export const updatePushToken = mutation({
       user.reminderTzOffsetMinutes !== args.tzOffsetMinutes;
     // Was an early return on an unchanged token, which would have dropped a
     // timezone update on every launch after the first.
-    if (user.pushToken === next && !tzChanged) return null;
-
     // A push token belongs to a device, not to a person. Two accounts signed
     // in on the same phone both held the same token, so whichever one a
-    // notification was for, it landed on that device — a real account of
-    // someone else's reading turning up in your notification shade. The most
-    // recent account to register a token is the one that owns it.
+    // notification was for, it landed on that device — someone else's reading
+    // turning up in your notification shade. The most recent account to
+    // register a token owns it.
+    //
+    // This runs BEFORE the unchanged-token early return on purpose. Placing it
+    // after meant it only fired when a token actually changed, which left every
+    // already-shared token shared forever: the common case is a launch where
+    // nothing changed at all.
+    let released = false;
     if (next) {
-      const previousHolders = await ctx.db
+      const otherHolders = await ctx.db
         .query("users")
         .withIndex("by_push_token", (q) => q.eq("pushToken", next))
         .collect();
-      for (const other of previousHolders) {
+      for (const other of otherHolders) {
         if (other._id === user._id) continue;
         await ctx.db.patch(other._id, { pushToken: undefined });
+        released = true;
       }
     }
+
+    if (user.pushToken === next && !tzChanged && !released) return null;
 
     await ctx.db.patch(user._id, {
       pushToken: next,
@@ -248,6 +255,47 @@ export const updatePushToken = mutation({
       lastActiveAt: Date.now(),
     });
     return null;
+  },
+});
+
+// One-off repair for tokens that were already shared before updatePushToken
+// started releasing them. Keeps the most recently active holder, since that is
+// the best available guess at who is actually carrying the phone, and clears
+// the rest. Losing a token is cheap: the next launch re-registers it.
+//
+// Admin op, run from the CLI:
+//   npx convex run users:releaseDuplicatePushTokens '{"dryRun":true}' --prod
+export const releaseDuplicatePushTokens = internalMutation({
+  args: { dryRun: v.boolean() },
+  returns: v.object({
+    sharedTokens: v.number(),
+    cleared: v.array(v.string()),
+  }),
+  handler: async (ctx, args) => {
+    const all = await ctx.db.query("users").collect();
+    const byToken = new Map<string, typeof all>();
+    for (const u of all) {
+      if (!u.pushToken) continue;
+      const list = byToken.get(u.pushToken) ?? [];
+      list.push(u);
+      byToken.set(u.pushToken, list);
+    }
+
+    const cleared: string[] = [];
+    let sharedTokens = 0;
+    for (const holders of byToken.values()) {
+      if (holders.length < 2) continue;
+      sharedTokens += 1;
+      const keep = holders.reduce((a, b) =>
+        (a.lastActiveAt ?? 0) >= (b.lastActiveAt ?? 0) ? a : b,
+      );
+      for (const u of holders) {
+        if (u._id === keep._id) continue;
+        cleared.push(`${u.displayName} (kept: ${keep.displayName})`);
+        if (!args.dryRun) await ctx.db.patch(u._id, { pushToken: undefined });
+      }
+    }
+    return { sharedTokens, cleared };
   },
 });
 
