@@ -348,13 +348,20 @@ export const collectReminderAudience = internalQuery({
 });
 
 export const sendReadingReminders = internalAction({
-  args: {},
+  // dryRun resolves the audience and sends nothing. It exists so that testing
+  // this never requires arming the real thing: READING_REMINDERS_ENABLED was
+  // once set on the DEV deployment to try it out, and because a phone that has
+  // run a dev client is in dev's users table with its real Expo token, dev's
+  // hourly cron pushed seed data ("You're on page 40 of Give and Take") to a
+  // real device. Nothing about push tokens is environment-scoped. Use dryRun.
+  args: { dryRun: v.optional(v.boolean()) },
   returns: v.object({ sent: v.number(), skipped: v.string() }),
-  handler: async (ctx): Promise<{ sent: number; skipped: string }> => {
+  handler: async (ctx, args): Promise<{ sent: number; skipped: string }> => {
+    const dryRun = args.dryRun ?? false;
     // Hard off-switch. This is a daily push to every user, so it stays inert
     // until someone deliberately turns it on, rather than starting the moment
     // this merges. `npx convex env set READING_REMINDERS_ENABLED true --prod`.
-    if (process.env.READING_REMINDERS_ENABLED !== "true") {
+    if (!dryRun && process.env.READING_REMINDERS_ENABLED !== "true") {
       return { sent: 0, skipped: "READING_REMINDERS_ENABLED is not 'true'" };
     }
 
@@ -364,6 +371,9 @@ export const sendReadingReminders = internalAction({
       { nowMs: now },
     );
     if (audience.length === 0) return { sent: 0, skipped: "nobody due this hour" };
+    if (dryRun) {
+      return { sent: 0, skipped: `dry run: ${audience.length} due this hour` };
+    }
 
     const pushMessages: Parameters<typeof sendExpoBatch>[0] = [];
     for (const r of audience) {

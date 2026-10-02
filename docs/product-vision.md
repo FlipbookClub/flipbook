@@ -1,6 +1,6 @@
 # Product Vision — Flipbook
 
-**Version:** v2.1 (August 15, 2026)
+**Version:** v2.2 (September 25, 2026 — third cofounder joined; global positioning frame recorded)
 **Companion docs:** `prd.md`, `product-roadmap.md`, `go-to-market.md`, `model-math.md`, `vision.json`, `design-tokens.json`, `synthesis-aug-2026.md`
 **Change note:** v2.0 (Jul 15) was the business-model pivot to a licensed rental library with community. v2.1 (Aug 15) implements the growth-ideology revision agreed in `synthesis-aug-2026.md` Theme D — daily-return optimization, habit mechanics permitted (marked "Revised Aug 15" inline) — and adds Masobe App to the competitive narrative.
 
@@ -24,17 +24,21 @@ Flipbook is the collision of two things: serious product craft applied to a cate
 
 ### Founding Team
 
-Flipbook is a **two-cofounder company**.
+Flipbook is a **three-cofounder company** as of September 2026.
 
-**Moks** (designer-founder) owns product direction, vision, design, frontend build, growth, and hands-on supply-side outreach with individual authors. Five years of product design in healthcare, based in Lagos. Ships alongside AI coding agents (Claude Code) and managed services (Convex, Clerk, RevenueCat) — the tech stack is picked so a designer-led team can move fast without hiring a backend engineer prematurely.
+**Moks** (designer-founder) owns product direction, vision, design, frontend build, and hands-on supply-side outreach with individual authors. Five years of product design in healthcare, based in Lagos. Ships alongside AI coding agents (Claude Code) and managed services (Convex, Clerk, RevenueCat) — the tech stack is picked so a designer-led team can move fast without hiring a backend engineer prematurely.
 
-**Ayodeji** (operations cofounder) runs operations and process, and is the team's relationship engine — business development, partnerships, and the pitching that unlocks doors a heads-down designer can't. Former Programs Manager at a gaming company with a deep network, a gift for pitching, and hands-on operational exposure to age-gating, parental controls, and child-safety compliance that directly de-risks the minors-safety work on the roadmap.
+**Ayodeji** (operations cofounder) runs operations and process, and is a relationship engine — business development, partnerships, and the pitching that unlocks doors a heads-down designer can't. Former Programs Manager at a gaming company with a deep network, a gift for pitching, and hands-on operational exposure to age-gating, parental controls, and child-safety compliance that directly de-risks the minors-safety work on the roadmap.
 
-The two-cofounder split is deliberate and structural: an introverted product-and-vision founder paired with an extroverted operations-and-network founder. In the v2 (rentals + catalog + community) model, Ayodeji's role is even more strategically valuable than in v1 — small-publisher licensing conversations (Cassava Republic, Farafina, Masobe, etc.) are relationship work, the founding-30 author cohort onboarding and monthly statement/payout operations are ops work, and campus-surface expansion is warm-intro work. All three land on his side of the split. Moks focuses on product, catalog editorial, and frontend velocity.
+**Sharon "Ronnie" Ariyo-Adeoye** (brand cofounder, joined September 2026) owns brand, story and community — Flipbook's public voice and narrative, reader acquisition and retention, and the community function the whole retention thesis rests on. Founder of Lenora, a career storytelling and personal branding agency with 200+ clients; co-founder of HERcelerate. Former PR at Bendada (now Condia). Her working thesis — build locally, position globally, without sanding off what made you distinctive — is the exact strategic question at the centre of the company, which is why brand is a cofounder seat rather than a hire.
 
-For planning purposes: assume ~50-60 hours/week combined across both cofounders, part-time around day jobs. That number is real, not aspirational — it's what the model math assumes and the 90-day plan is scoped against.
+The three-way split is deliberate and structural. **Moks builds the product. Ayodeji builds the business. Sharon builds the audience.** Supply-side relationship work (small-publisher licensing, founding-author onboarding, campus expansion) sits with Ayodeji; catalog editorial and frontend velocity with Moks; positioning, growth, and community culture with Sharon.
 
-**Near-term hiring plan.** The team is deliberately capped at two cofounders through Year 1 to preserve unit economics. First hire triggers on either (a) first fund raise, or (b) sustained monthly cash breakeven, whichever comes first — not before. The first hire is likely a backend engineer (to lift Convex and payment-rails build load off Moks) or a community/author-success lead (to scale the founding-cohort operations Ayodeji currently runs). Priority is decided by the bottleneck of the moment.
+For planning purposes: all three are part-time around other commitments. Sharon continues to run Lenora, and the arrangement is built around ownership of outcomes rather than an hours commitment — presence at the weekly review, reachable within a day, fully available through launch windows.
+
+⚠️ **No founder agreement exists yet.** As of late September 2026 there is no executed paperwork between the three cofounders — no documented equity split, vesting, IP assignment, or leaver terms. This is the single largest unmanaged risk in the company and it grows more expensive to fix the longer it runs. See `business/people/founder-agreement-checklist.md`.
+
+**Near-term hiring plan.** No hires before either (a) a first fund raise, or (b) sustained monthly cash breakeven. The first hire is likely a backend engineer (to lift Convex and payment-rails load off Moks) or a community/author-success lead. Priority decided by the bottleneck of the moment.
 
 ### Core Values
 
@@ -428,7 +432,32 @@ Success criteria: 8+ course communities live by month 6, none using it as an LMS
 
 ### Positioning Statement
 
-For African readers in their 20s–40s who want a home for the book they're reading right now, **Flipbook** is the *reading library* that pairs a curated catalog of African indie voices and world classics with rental prices matched to local income and communities that make finishing a book feel shared. Unlike Kindle — Western catalog, USD pricing, no community — and unlike Goodreads — a graveyard of past reviews — Flipbook is priced for Lagos, curated by taste, and built around the book you're reading right now with the people reading it with you.
+*(Revised September 2026 — the global frame. See "Two layers, two ceilings" below for why this changed.)*
+
+For readers anywhere who want company in the book they're reading right now, **Flipbook** is where people read the same book together — reactions and conversation anchored to the exact paragraph that provoked them, in a reader built for phones. Around that sits a curated library of African independent voices and world classics, priced for the markets it serves.
+
+**Kindle is where you read. Flipbook is where you read together.**
+
+Kindle owns solo reading — the store, the device, a decade of muscle memory — and we are not fighting that. Nobody owns *together*. Goodreads sat on that ground for fifteen years and let it rot into a graveyard of past reviews; Fable is American and feed-shaped. The territory is vacant, globally uncontested, and it happens to be the half of the product that needs nothing from anyone.
+
+Built from Lagos — an origin and a point of view, not a boundary.
+
+> **Note on ownership:** the strategic frame above is a founder-level decision and is settled. The *expression* of it — final headline, tagline, campaign language — belongs to Sharon as brand cofounder. The lines in the Messaging Framework below are the previous v1-era copy and should be treated as a starting point for her to replace, not as settled brand.
+
+### Two layers, two ceilings
+
+The single most important structural fact about Flipbook, and the reason the positioning changed:
+
+**The room is a global product.** Reading together — communities, in-margin reactions, shared progress, arguing about chapter eleven — needs no licence, no rights deal, no territory negotiation. It works identically in Lagos, Lisbon, Jakarta and Lima. There is no gate.
+
+**The library is a local business.** Licensed books are territory-bound and rights-bound. It grows market by market, deal by deal, starting with African independent authors and public-domain classics. It is distinctive precisely because it starts somewhere specific — the worst catalogs are the ones with no point of view.
+
+Two consequences the plan must respect:
+
+1. **Positioning must not inherit the library's constraint.** Describing Flipbook as a library *for African readers* tells a reader in Jakarta she isn't invited, when the half of the product that would serve her best is available to her today. Origin is an asset; target-market-as-identity is a ceiling.
+2. **Monetisation is not gated on the licensed catalog.** Public domain is globally public domain. App-store billing is globally available. Community needs nothing. Flipbook Pro — community creation, unlimited joins, longer shelves, audio on PD titles — is sellable to a book club in Manila without a single rights conversation. This is a live sequencing question for the roadmap, not a settled plan.
+
+**The discipline: global architecture, local go-to-market.** Build so nothing structurally prevents a São Paulo club from working. Spend marketing energy where the loop is proven until it is genuinely proven. "The product can scale globally" and "we should market globally now" are different claims, and only the first is true today.
 
 ### Brand Personality
 

@@ -1,6 +1,6 @@
 # Product Roadmap — Flipbook
 
-**Version:** v2.1 (August 15, 2026 — Phase 7.5 v1 Beta Hardening added as the active workstream)
+**Version:** v2.2 (September 25, 2026 — Phase 7.5 complete; active phase undecided pending a founder call)
 **Companion docs:** `product-vision.md` v2.0, `prd.md` v2.0, `go-to-market.md`, `model-math.md`, `vision.json` v2.0.
 **Change note:** v2.0 layers a new set of phases (11–17) on top of the shipped v1 foundation (Phases 0–7). v1 continues to run in beta to hold user acquisition warm while v2 supply, catalog, rentals, Pro, audio, author ops, and campus surfaces are built. Cutover happens at Phase 17.
 
@@ -113,17 +113,33 @@ Some Phase 7 tasks (TASK-082/090/090b) remain deferred to closed-beta QA. Do not
 
 ---
 
-## Phase 7.5 — v1 Beta Hardening (ACTIVE — added Aug 15, 2026)
+## Phase 7.5 — v1 Beta Hardening (✅ COMPLETE — Sept 2026)
 
-**The current active v1 workstream.** Full spec lives in `docs/execution-prd-next-batch.md` — that doc is the working context for Claude Code on this phase; this block exists so the roadmap reflects reality.
+**Delivered in full.** Spec and task-level record in `docs/execution-prd-next-batch.md` (39/40 tasks complete; the one unchecked item is a "do not build" instruction). That document is now a closed work order — do not treat it as an active spec.
 
-Beta status: 163 users (88 Android / 75 iOS — **Android is the majority platform**). iOS build 10 live on TestFlight. Two regressions in the wild.
+**Beta status (Sept 25, 2026): 188 signups — 96 iOS / 92 Android — across 16+ communities.**
 
-- [ ] **Build 11 (iOS):** BUG-002 resume-at-last-page fix + BUG-001 press-and-hold selection fix. (Public commitment to flagship beta user rides on this.)
-- [ ] **Build 11.5 (Android):** native reader integration — continuous scroll added to the proven highlight module, wired into ReaderScreen, full parity with iOS reader.
-- [ ] **Build 12 (both):** EPUB upload + epub.js reader (v1 back-port, de-risks v2 TASK-125/126) · multi-genre tagging · notifications completion · reading-reminder push · bookmark polish · re-engagement emails.
+- [x] **Build 11 (iOS):** BUG-002 resume-at-last-page fixed (start page now applied after document load, not at prop-set) · BUG-001 press-and-hold selection restored.
+- [x] **Build 11.5 (Android):** native reader integrated — continuous scroll added to the highlight module, wired into `ReaderScreen.tsx`, full parity with iOS including highlight render and tap-to-thread.
+- [x] **Build 12 (both):** EPUB upload + epub.js WebView reader · multi-genre tagging · notifications completion (new-book-in-club fanout, reaction-reply push) · reading-reminder push · bookmark polish · offline reaction echo (BUG-003) · re-engagement email pair with one-click unsubscribe.
 
-**Interaction with v2 phases:** Phase 7.5 shares the reader surface with Phase 11 (TASK-125/126 EPUB reader decision). The epub.js WebView approach chosen for v1 EPUB is the leading candidate for the v2 catalog reader — evaluate against react-native-readium with real v1 usage data before committing TASK-125.
+**Android growth recovered.** Android was flat at 88 signups between Aug 15 and Sept 11 while iOS added 22 — the working hypothesis being that shipping Android a reader without the app's signature feature, then not shipping again for six weeks, suppressed word of mouth. Since reader parity landed, Android has moved 88 → 92 while iOS went 97 → 96. Early and small, but directionally consistent with the hypothesis. Keep watching it.
+
+**What this unblocks for v2.** The epub.js WebView reader is now battle-tested on both platforms, which substantially de-risks TASK-125/126 — evaluate it against react-native-readium with real v1 usage data before committing. EPUB highlights and reactions have a written design proposal in `docs/epub-annotations-design.md` (proposed, not built).
+
+---
+
+## ⚠️ Active phase: undecided
+
+Phase 7.5 is done and **no v2 phase has started** — Phases 11-17 have produced no code, only the documentation rewrite. Meanwhile `go-to-market.md` still carries an Oct 13 target for first paying reader, 30 signed authors and 500+ ingested titles, which is not reachable from here.
+
+**This needs a founder decision, not a drift.** The options, roughly:
+
+1. **Move the date.** Keep the v2 plan intact, re-baseline to a realistic window.
+2. **Split the launch.** Ship the ungated half first — community + public-domain catalog + Flipbook Pro through the app stores — which needs no licensing and is sellable globally today. Layer licensed rentals per market afterwards. This is the sequencing consequence of the two-layer insight in `product-vision.md`.
+3. **Hold v1, build audience.** With a brand cofounder now in seat, spend the next window on growth against the product that already exists before adding catalog surface area.
+
+Record the decision here once made.
 
 ---
 

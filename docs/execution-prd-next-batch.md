@@ -1,5 +1,13 @@
 # Execution PRD — Next Batch (Builds 11 & 12)
 
+> ## ✅ CLOSED — delivered September 2026
+>
+> **39 of 40 tasks complete.** The single unchecked item (P4-T10) is a "do not build" instruction and is correctly never ticked. Phases 0-5 all shipped: both reader regressions fixed, Android reader at parity, EPUB upload and reader live on both platforms, multi-genre tagging, and the full retention layer (notification fanout, reading-reminder push, bookmark polish, offline reaction echo, re-engagement email with one-click unsubscribe).
+>
+> **This is a historical record, not an active spec.** Do not start work from this document. The next batch has not been written — see `docs/product-roadmap.md` § "Active phase: undecided".
+>
+> **Beta as of Sept 25, 2026:** 188 signups — 96 iOS / 92 Android — across 16+ communities. Android growth recovered after reader parity shipped (88 → 92, while iOS went 97 → 96).
+
 **Date:** August 15, 2026
 **Audience:** Claude Code (primary executor) + Moks (reviewer, device tester)
 **Source decisions:** `docs/synthesis-aug-2026.md` (as amended Aug 15) + founder overrides: Android must reach reader parity; EPUB upload ships in v1 now.

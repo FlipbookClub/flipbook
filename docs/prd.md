@@ -1,6 +1,11 @@
 # PRD — Flipbook
 
-**Version:** v2.1 (August 15, 2026 — FR-112 revised per growth-ideology change; v1 interim EPUB/multi-genre noted in § 9)
+**Version:** v2.2 (September 25, 2026)
+
+> **Three unresolved risks were added to this document in September 2026 and are flagged inline where the build will hit them.** Read them before scheduling any v2 work:
+> - **§ 4.3** — in-app Paystack rental checkout will likely fail Apple review outside the US. Highest severity; affects the business model, not just the code.
+> - **§ 4.5** — reaction anchoring and spoiler gating are page-keyed and break on reflowable EPUB. Resume is already solved; reactions are not.
+> - **§ 4.6 / § 9** — community creation is Pro-gated in FR-050, and hosts are the acquisition engine. Legacy clubs lose uploads at cutover with no stated migration path for the *people*, only the data.
 **Companion docs:** `product-vision.md`, `product-roadmap.md`, `go-to-market.md`, `model-math.md`, `vision.json`, `design-tokens.json`
 **Change note:** v2.0 is a business-model pivot. The `books` model shifts from user-uploaded PDFs to a centrally-licensed catalog of EPUBs rented for 4-week periods. Author onboarding, royalty statements + payouts, Flipbook Pro subscriptions, Flipbook Specials, and neural-TTS audio narration are all new surfaces. Course communities (educator surface) are added as a bounded extension of the community primitive. Payment rails add Paystack (NGN) alongside the existing RevenueCat for Pro subscriptions.
 
@@ -547,6 +552,23 @@ Each FR has an ID, priority (P0 = must-have for launch; P1 = should-have, ship i
 
 ### 4.3 Rentals
 
+> ## 🔴 In-app Paystack rental checkout will likely be rejected by Apple — verify before building
+>
+> **Added Sept 2026. This is the highest-severity open risk in the PRD.** FR-020/FR-021 specify an in-app Paystack checkout for rentals. A rented ebook read inside the app is digital content, and Apple's Guideline 3.1.1 requires in-app purchase for digital content unlocked in-app. Since the May 2025 Epic ruling the **US storefront** permits external purchase links without entitlement — but **other storefronts, Nigeria included, do not**. You may sell on the web, but you may not promote or link to it from inside the app. Nigeria is the primary market, so the current spec is the non-compliant case.
+>
+> **Verify current policy directly before writing any rental-payment code.** These rules have changed repeatedly and app review is discretionary. Read Apple Guideline 3.1.1 and 3.1.3(a), and Google Play's Payments policy, at the time of building — not this note.
+>
+> **Options, each with a cost:**
+>
+> | Route | Consequence |
+> |---|---|
+> | **Rentals via store IAP** | Apple/Google take 15% (Small Business Program — Flipbook qualifies at zero revenue) or 30%. At 15% on a ₦1,500 rental: ₦225 to the store, ₦1,275 left. If the author keeps 70% of *gross* (₦1,050), Flipbook nets ₦225 before costs — roughly half the planned ₦450. If instead the author takes 70% of *net* (₦892), the author loses ~15% and the "70% to the author" pitch weakens to ~59% of gross. **Either way `model-math.md` and the author term sheet need re-running.** |
+> | **Reader-app route (3.1.3(a))** | Apple's reader-app category exists for apps accessing content bought elsewhere — Kindle is the canonical case. With the External Link Account entitlement, a reader app can link out to the web. Requires application and approval, and reader apps generally cannot sell content in-app at all. Changes the checkout flow and kills the 45-second rental promise. Worth investigating seriously — it may be the best fit. |
+> | **Web-only rental purchase, no in-app link** | Compliant outside the US but adds real friction in the exact market where conversion matters most. |
+> | **Split monetisation** | **Pro subscription through store IAP (already compliant), rentals on the web.** Likely the most workable architecture, and it is a strong argument for shipping Pro before the rental catalogue. |
+>
+> **Consequence for sequencing:** Pro through the app stores has no such problem. Any release plan that ships Pro first is the lower-risk path, and that should be weighed in the active-phase decision (`product-roadmap.md`).
+
 **FR-020 (P0) — Rent a book.** From the book detail page, "Rent" button initiates checkout. Free users: charged the band price via Paystack. Pro users: Band A → free (paymentSource: `pro_included`); Bands B/C/D → 15% discount, charged via Paystack. Successful payment creates a `rentals` row with `startedAt = now`, `expiresAt = now + 4w` (Free) or `now + 6w` (Pro), and returns a signed URL for the EPUB.
 
 **FR-021 (P0) — Rental checkout via Paystack (NGN).** Paystack Standard integration. Card, bank transfer, and USSD options. Success and failure webhooks handled at `/webhooks/paystack`. Idempotency key on reference.
@@ -583,6 +605,19 @@ Each FR has an ID, priority (P0 = must-have for launch; P1 = should-have, ship i
 
 ### 4.5 In-Margin Reactions
 
+> ## ⚠️ Anchoring model is PDF-era and breaks on EPUB — unresolved, on the critical path
+>
+> **Added Sept 2026.** Everything in § 4.5 anchors a reaction to `page` (+ optional `paragraphIndex`), and spoiler protection filters on `progress.furthestPageReached`. Both assume a stable page number. **Reflowable EPUB text has none** — page count changes with font size, device and orientation, so the same reaction lands in different places for different readers and spoiler-gating leaks or over-hides.
+>
+> **Partly solved already.** P4-T4 shipped `progress.locationCfi` and `progress.percentComplete`, so EPUB *resume* and *progress display* are handled. PDF rows keep using `currentPage`. **Do not re-do that work.**
+>
+> **Still unsolved, and this is the blocking half:**
+> - Reaction anchoring for EPUB — needs a CFI range or a stable paragraph identifier, not a page number.
+> - Spoiler gating for EPUB — `furthestPageReached` has no EPUB equivalent; needs a furthest-CFI or percentage comparison, with a defined ordering rule.
+> - Cross-format communities — a club where one member reads the PDF and another the EPUB of the same work. Reactions must either reconcile across formats or be explicitly scoped per format. **Decide this before building; it changes the schema.**
+>
+> `docs/epub-annotations-design.md` is a proposal, not a decision. EPUB reactions cannot be scheduled until it is accepted or replaced.
+
 **FR-040 (P0) — Drop a reaction.** In a community-linked read, long-press a paragraph → emoji picker (6 curated) OR "Add comment" for a short comment (≤200 chars). Reaction is persisted with `communityId`, `bookId`, `page`, optional `paragraphIndex`, `userId`, `type`, `emoji` or `text`, `createdAt`.
 
 **FR-041 (P0) — Render reactions in the margin.** As reader reaches a page, any reactions from other community members visible so far (i.e., they've reached that page too) render in the margin. Never shows reactions from pages the reader hasn't reached (spoiler protection).
@@ -596,6 +631,8 @@ Each FR has an ID, priority (P0 = must-have for launch; P1 = should-have, ship i
 **FR-045 (P1) — Author badge.** If the reactor's `userId` matches the linked `authorAccounts.userId` for a book they authored, render a small Golden Sand author badge.
 
 ### 4.6 Communities
+
+> ⚠️ **FR-050's Pro gate is contested — do not build it without an explicit decision.** *(Added Sept 2026.)* 16 communities formed from 188 users with no marketing; the people who created them are the acquisition engine. Charging them first taxes the only growth loop currently working, and the model math assumes Pro conversion is the primary lever without accounting for the top-of-funnel loss. Alternatives: keep creation free and charge for the extras (Specials, audio, unlimited Band A), or cap *member count* on Free communities rather than blocking creation. Recommendation is to keep creation free until there is evidence the gate converts more than it costs.
 
 **FR-050 (P0) — Create a community.** Pro users can create communities of type `book`, `genre`, or `private`. Free users can only join. Community requires a name, optional description, visibility (private/unlisted/public), and (if type == book) a bookId.
 
@@ -712,7 +749,7 @@ Each FR has an ID, priority (P0 = must-have for launch; P1 = should-have, ship i
 
 Full spec preserved from v1. Summary here:
 
-**FR-140 (P1) — Neutral DOB age gate.** Required before opening beta to public. Segments to `adult | teen | child`. See `product-vision.md` § 3 for the full compliance narrative.
+**FR-140** — *withdrawn as a duplicate of **FR-004** (§ 4.1), which is canonical for the age gate.* This section keeps only the compliance narrative and the minor-specific requirements below; the gate itself is specified once, at FR-004. See `product-vision.md` § 3 for the regulatory background.
 
 **FR-141 (P2) — Under-13 (child) VPC.** Requires KWS or k-ID integration and legal review. Staged behind Phase 10.
 
@@ -832,7 +869,7 @@ Full spec preserved from v1. Summary here:
 
 Every question here is a decision the team hasn't finalized. Each has an owner.
 
-1. **Which EPUB reader library?** Options: react-native-readium (mature but heavy), Foliate.js in a WebView, custom-built on epub.js. Owner: Moks. Decide by: end of July 2026. Impact: cascades into reader UX and margin-reactions implementation.
+1. ~~**Which EPUB reader library?**~~ **RESOLVED Sept 2026 — epub.js in a `react-native-webview`.** Shipped in Phase 4B and device-verified on both iOS and Android; one implementation serves both platforms. Re-evaluate against react-native-readium only if real usage exposes a limitation. *(Kept visible rather than deleted so nobody re-opens a settled question.)*
 2. **Paystack Transfers vs. manual bank transfer for author NGN payouts?** Transfers automates but has KYC requirements. Manual is simpler for first 5-10 authors. Owner: Ayodeji. Decide by: first author signed.
 3. **Wise vs. PayPal for USD author payouts?** Wise is cheaper for larger amounts; PayPal is faster to set up. Owner: Ayodeji. Decide by: first USD author signed.
 4. **Standard-Ebooks vs. Project-Gutenberg-direct for PD ingestion?** Standard Ebooks are beautifully typeset but a smaller catalog. Gutenberg is the full corpus but raw. Owner: Moks. Decide by: catalog ingestion begins.
@@ -878,6 +915,8 @@ This is a **coexistence** migration, not a hard cutover. v1 (clubs + user-upload
 - New v2 catalog UI rolled out alongside v1 club-management UI (feature-flagged).
 
 **Phase B interim note (added Aug 15, 2026):** while v2 builds, v1 continues shipping improvements per `execution-prd-next-batch.md` — notably **EPUB upload in v1** (clubs upload PDF or EPUB; additive `books.fileType` field; epub.js WebView reader on both platforms) and **multi-genre tagging** (additive `books.genres` array alongside legacy `genre` string). These v1 additions are designed to be v2-compatible: the epub.js reader work directly de-risks TASK-125/126, and the `genres` array matches v2's `genreTags` shape (rename at migration).
+
+> ⚠️ **The migration plan covers the data, not the people.** *(Added Sept 2026.)* All 16 existing communities read via uploads today. Cutover removes uploads. If the catalogue does not contain what a club is actually reading, that club has nowhere to go — and these are the only users proving the product works. **Before freezing uploads:** ask every active club what they are reading and what they want next, and either license it, confirm a public-domain substitute, or grandfather that club's upload rights indefinitely. A host who loses their club's book is a host who leaves, and takes ~11 readers with them.
 
 **Phase C — cutover (Week 8).**
 

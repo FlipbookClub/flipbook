@@ -1,6 +1,8 @@
 @AGENTS.md
 
-**ACTIVE WORKSTREAM:** `docs/execution-prd-next-batch.md` — the working spec for the current v1 batch (Builds 11/12: bug fixes, Android reader, EPUB, multi-genre, retention). If you're writing app code right now, start there.
+**NO ACTIVE WORKSTREAM SPEC.** The last batch (`docs/execution-prd-next-batch.md`, Builds 11/12) shipped in full and is now a closed historical record — do not start work from it. The next batch has not been written; the active phase is an open founder decision recorded in `docs/product-roadmap.md` § "Active phase: undecided". If you are asked to write app code without a spec, say so and ask which phase you're working.
+
+**Team:** three cofounders — Moks (product & design), Ayodeji (business & operations), Sharon Ariyo-Adeoye (brand, story & community, joined Sept 2026).
 
 **Where documents live.** Engineering artifacts are tracked in `docs/`. Strategy, money, brand and people documents live in `business/`, which is **gitignored on purpose** — never add it to a commit, a branch or a PR. The test: *if a coding agent reads or writes it, it belongs in `docs/`; otherwise `business/`.* See `business/README.md`.
 

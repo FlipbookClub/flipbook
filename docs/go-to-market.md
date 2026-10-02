@@ -1,16 +1,37 @@
 # Flipbook — Go-to-Market & Launch Plan (v2)
 
-**Owner:** Moks + Ayodeji
-**Status:** v2.1, August 15 2026
+**Owner:** Sharon (brand cofounder, from Sept 2026) · with Moks and Ayodeji
+**Status:** v2.2, September 25 2026
 
-> **Reality-check addendum (Aug 15, 2026).** One month into the 90-day window, actuals vs. plan:
-> - **Real beta base: 163 users/downloads/signups — 88 Android, 75 iOS.** Android is the majority platform (the roadmap and build plan now reflect this — see `execution-prd-next-batch.md`). The larger waitlist figures assumed in § 3 and § 9 predate this count; **re-baseline all waitlist/user targets at the next Sunday review** against real numbers rather than the July projections.
-> - **Masobe App has launched** (single-publisher subscription reading, ₦1,999–₦5,999/mo, physical-paperback ordering). Market validation + supply-side urgency lever. See § 2 wedge below and `product-vision.md` § 4 competitive narrative. Collaboration-first, compete-if-declined.
-> - **Flagship beta user identified:** Oyinadé Balógun (Lumee Book Club) — most engaged tester, active feedback loop, founding-partner treatment. First design-partner candidate for the v2 catalog beta.
-> - The week-by-week plan in § 7 (written Jul 15) is partially elapsed; treat the remaining weeks as directional and re-baseline dates at the Sunday review. The Oct 13 launch target stands until explicitly moved.
-**Companion docs:** `product-vision.md` v2.0, `prd.md` v2.0, `product-roadmap.md` v2.0, `model-math.md`, `docs/supply/*`, `landing-page-copy.md`.
-**Window covered:** July 15 → October 13, 2026 (90-day supply + build + public-launch sprint) plus the first 30 days post-cutover.
-**North-star outcome by October 13:** first paying reader on v2, 30 signed indie authors, 500+ public-domain titles ingested, 5,000+ pre-launch waitlist converted at 30%+, and a coordinated public launch across X, Instagram, LinkedIn, WhatsApp, and the founding-author network.
+> ## ⚠️ Read this before anything below
+>
+> **This plan is materially out of date and is kept for its playbooks, not its schedule.** Sections 5-7 (channel strategy, content pillars, week-by-week) were written in July for a two-cofounder team against an Oct 13 launch. Three things have changed since.
+>
+> **1. The Oct 13 target is not reachable and needs an explicit decision.** No v2 catalog code exists — Phases 11-17 have produced documentation only. The last six weeks went entirely into v1 hardening, which was the right call and consumed the runway. The original north star (first paying reader, 30 signed authors, 500+ ingested titles by Oct 13) should be moved, split, or replaced — see `product-roadmap.md` § "Active phase: undecided" for the three options. **Do not let this drift; decide it and record it here.**
+>
+> **2. Sharon owns this document now.** Brand, story, positioning, acquisition and community moved to a cofounder seat in September. Section 5's Moks/Ayodeji channel split is superseded by § 5.0 below. The positioning in § 2 predates the global reframe in `product-vision.md` and should be treated as raw material for Sharon to replace, not settled strategy.
+>
+> **3. Actuals as of Sept 25, 2026:**
+> - **188 signups — 96 iOS / 92 Android — across 16+ communities.** Android growth has recovered since reader parity shipped (88 → 92 while iOS went 97 → 96).
+> - **v1 is materially better than when this plan was written:** both reader regressions fixed, Android at feature parity, EPUB reading live on both platforms, retention infrastructure shipped (reminder push, re-engagement email, notification fanout).
+> - **Masobe App launched** — single-publisher subscription reading, ₦1,999–₦5,999/mo. Validation plus a supply-side urgency lever. Collaboration-first, compete-if-declined.
+> - **Oyinadé Balógun (Lumee Book Club)** remains the flagship beta user and first design-partner candidate.
+> - The waitlist figures in §§ 3 and 9 are July projections and were never re-baselined. Treat them as void until Sharon sets real targets.
+
+**Companion docs:** `product-vision.md` v2.2 (global positioning, two-layer strategy), `prd.md` v2.1, `product-roadmap.md` v2.2, `model-math.md`, `business/supply/*`, `business/brand/*`.
+**Window originally covered:** July 15 → October 13, 2026. **Superseded; awaiting re-baseline.**
+
+---
+
+## 5.0 Channel ownership (supersedes § 5)
+
+| Cofounder | Owns |
+|---|---|
+| **Sharon** | Brand and narrative · all public channels (X, Instagram/Threads, LinkedIn, TikTok) · reader acquisition, activation, retention · community strategy, culture and early community leaders · the positioning decision itself |
+| **Ayodeji** | Supply-side outreach (founding-30 authors) · small-publisher licensing · campus expansion · warm-network activation · author ops |
+| **Moks** | Product and design · catalog editorial · build-in-public from the maker's seat, in support of Sharon's narrative rather than parallel to it |
+
+The July split in § 5 divided marketing between Moks and Ayodeji because there was nobody else. That constraint is gone. Sharon sets the strategy; the others feed it.
 
 ---
 

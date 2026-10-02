@@ -1,0 +1,1870 @@
+{
+  "Surfaces": {
+    "Primary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.23137254901960785,
+          0.22745098039215686,
+          0.42745098039215684
+        ],
+        "alpha": 1,
+        "hex": "#3B3A6D"
+      },
+      "$description": "App background.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:1738",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Surfaces/Primary",
+          "ANDROID": "Surfaces/Primary",
+          "iOS": "Surfaces/Primary"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:de7f05628940d39379e83303cc61a6b48b84f0e9/-1:-1",
+          "targetVariableName": "DeepIndigo/900",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Secondary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2823529411764706,
+          0.26666666666666666,
+          0.5607843137254902
+        ],
+        "alpha": 1,
+        "hex": "#48448F"
+      },
+      "$description": "Cards, sheets and secondary surfaces.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:1756",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Surfaces/Secondary",
+          "ANDROID": "Surfaces/Secondary",
+          "iOS": "Surfaces/Secondary"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:2ff968ad48732d55dfff165ed898d08a84cf45dd/-1:-1",
+          "targetVariableName": "DeepIndigo/800",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Accent": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.4196078431372549,
+          0.4196078431372549
+        ],
+        "alpha": 1,
+        "hex": "#FF6B6B"
+      },
+      "$description": "Decorative accent shapes. Not for text.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:1924",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Surfaces/Accent",
+          "ANDROID": "Surfaces/Accent",
+          "iOS": "Surfaces/Accent"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:af6348ffe4b4a62609b5051fb7445560287818a5/-1:-1",
+          "targetVariableName": "VibrantCoral/400",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Borders": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5882352941176471,
+          0.6196078431372549,
+          0.8901960784313725
+        ],
+        "alpha": 1,
+        "hex": "#969EE3"
+      },
+      "$description": "Input and control borders. Meets 3:1 against Surfaces/Primary. Use Divider for decorative card edges.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:35:13798",
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Surfaces/Borders",
+          "ANDROID": "Surfaces/Borders",
+          "iOS": "Surfaces/Borders"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "DeepIndigo/400",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Divider": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3411764705882353,
+          0.3215686274509804,
+          0.6901960784313725
+        ],
+        "alpha": 1,
+        "hex": "#5752B0"
+      },
+      "$description": "Hairline separators between list rows and sections. Decorative only.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Surfaces/Divider",
+          "ANDROID": "Surfaces/Divider",
+          "iOS": "Surfaces/Divider"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:d9cf2d0f3e6c866c7d8183366e9a2094a3811194/-1:-1",
+          "targetVariableName": "DeepIndigo/700",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Text": {
+    "Primary-text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9921568627450981,
+          0.9921568627450981,
+          0.9921568627450981
+        ],
+        "alpha": 1,
+        "hex": "#FDFDFD"
+      },
+      "$description": "Headings and primary text.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:1734",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Text/Primary-text",
+          "ANDROID": "Text/Primary-text",
+          "iOS": "Text/Primary-text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:802cb138225791a1ca9157d1c84d783c4c00eb71/-1:-1",
+          "targetVariableName": "Neutral/50",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Secondary-text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8196078431372549,
+          0.8470588235294118,
+          0.8784313725490196
+        ],
+        "alpha": 1,
+        "hex": "#D1D8E0"
+      },
+      "$description": "Subheadings and secondary text.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:1735",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Text/Secondary-text",
+          "ANDROID": "Text/Secondary-text",
+          "iOS": "Text/Secondary-text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:edaef561d588a01dcfc5653369847fc153797173/-1:-1",
+          "targetVariableName": "BrandSecondary/PaleSky",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Accent-text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9215686274509803,
+          0.7725490196078432,
+          0.5176470588235295
+        ],
+        "alpha": 1,
+        "hex": "#EBC584"
+      },
+      "$description": "Accent text and secondary emphasis. Meets 4.5:1. Never used for errors.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:1736",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Text/Accent-text",
+          "ANDROID": "Text/Accent-text",
+          "iOS": "Text/Accent-text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/GoldenSand/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Alt-text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9686274509803922,
+          0.9529411764705882,
+          0.8901960784313725
+        ],
+        "alpha": 1,
+        "hex": "#F7F3E3"
+      },
+      "$description": "Alternate text on secondary surfaces.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:1737",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Text/Alt-text",
+          "ANDROID": "Text/Alt-text",
+          "iOS": "Text/Alt-text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:009b75b6402f395b3734ff5e50bdd6bfcee1393c/-1:-1",
+          "targetVariableName": "BrandSecondary/WarmIvory",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Muted-text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7058823529411765,
+          0.7490196078431373,
+          0.9294117647058824
+        ],
+        "alpha": 1,
+        "hex": "#B4BFED"
+      },
+      "$description": "Timestamps, captions, helper text. Meets 4.5:1 on Primary and Secondary surfaces.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:35:13746",
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Text/Muted-text",
+          "ANDROID": "Text/Muted-text",
+          "iOS": "Text/Muted-text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b0acf5d6f8e2d79f749e98764415c2915b46603c/-1:-1",
+          "targetVariableName": "DeepIndigo/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Button": {
+    "Text": {
+      "Primary-default": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.07058823529411765,
+            0.07058823529411765,
+            0.07058823529411765
+          ],
+          "alpha": 1,
+          "hex": "#121212"
+        },
+        "$description": "Primary button label.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1916",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Primary-default",
+            "ANDROID": "Button/Text/Primary-default",
+            "iOS": "Button/Text/Primary-default"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d9d97d502bc239087407837b67a1e24a5a9dcf16/-1:-1",
+            "targetVariableName": "BrandSecondary/BackgroundBlack",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Primary-muted": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.7568627450980392,
+            0.0784313725490196,
+            0.0784313725490196
+          ],
+          "alpha": 1,
+          "hex": "#C11414"
+        },
+        "$description": "Primary button label, disabled.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1917",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Primary-muted",
+            "ANDROID": "Button/Text/Primary-muted",
+            "iOS": "Button/Text/Primary-muted"
+          },
+          "com.figma.aliasData": {
+            "targetVariableName": "VibrantCoral/700",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Secondary-default": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.07058823529411765,
+            0.07058823529411765,
+            0.07058823529411765
+          ],
+          "alpha": 1,
+          "hex": "#121212"
+        },
+        "$description": "Secondary button label.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1918",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Secondary-default",
+            "ANDROID": "Button/Text/Secondary-default",
+            "iOS": "Button/Text/Secondary-default"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:d9d97d502bc239087407837b67a1e24a5a9dcf16/-1:-1",
+            "targetVariableName": "BrandSecondary/BackgroundBlack",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Secondary-muted": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.5882352941176471,
+            0.6196078431372549,
+            0.8901960784313725
+          ],
+          "alpha": 1,
+          "hex": "#969EE3"
+        },
+        "$description": "Secondary button label, disabled.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1919",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Secondary-muted",
+            "ANDROID": "Button/Text/Secondary-muted",
+            "iOS": "Button/Text/Secondary-muted"
+          },
+          "com.figma.aliasData": {
+            "targetVariableName": "DeepIndigo/400",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Alt-default": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9215686274509803,
+            0.7725490196078432,
+            0.5176470588235295
+          ],
+          "alpha": 1,
+          "hex": "#EBC584"
+        },
+        "$description": "Text-only (ghost) button.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1920",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Alt-default",
+            "ANDROID": "Button/Text/Alt-default",
+            "iOS": "Button/Text/Alt-default"
+          },
+          "com.figma.aliasData": {
+            "targetVariableName": "AccentScales/GoldenSand/300",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Alt-hover": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9529411764705882,
+            0.8666666666666667,
+            0.7098039215686275
+          ],
+          "alpha": 1,
+          "hex": "#F3DDB5"
+        },
+        "$description": "Text-only button, hover (web only).",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1921",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Alt-hover",
+            "ANDROID": "Button/Text/Alt-hover",
+            "iOS": "Button/Text/Alt-hover"
+          },
+          "com.figma.aliasData": {
+            "targetVariableName": "AccentScales/GoldenSand/100",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Alt-pressed": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686274509803922,
+            0.9529411764705882,
+            0.8901960784313725
+          ],
+          "alpha": 1,
+          "hex": "#F7F3E3"
+        },
+        "$description": "Text-only button, pressed.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1922",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Alt-pressed",
+            "ANDROID": "Button/Text/Alt-pressed",
+            "iOS": "Button/Text/Alt-pressed"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:009b75b6402f395b3734ff5e50bdd6bfcee1393c/-1:-1",
+            "targetVariableName": "BrandSecondary/WarmIvory",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Alt-muted": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.48627450980392156,
+            0.5019607843137255,
+            0.8470588235294118
+          ],
+          "alpha": 1,
+          "hex": "#7C80D8"
+        },
+        "$description": "Text-only button, disabled.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1923",
+          "com.figma.scopes": [
+            "TEXT_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Text/Alt-muted",
+            "ANDROID": "Button/Text/Alt-muted",
+            "iOS": "Button/Text/Alt-muted"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:fd92c4d832844b3864e63802c69d4c1c7279a60a/-1:-1",
+            "targetVariableName": "DeepIndigo/500",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      }
+    },
+    "Surface": {
+      "Primary-default": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1.0,
+            0.4196078431372549,
+            0.4196078431372549
+          ],
+          "alpha": 1,
+          "hex": "#FF6B6B"
+        },
+        "$description": "Primary button.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1906",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Primary-default",
+            "ANDROID": "Button/Surface/Primary-default",
+            "iOS": "Button/Surface/Primary-default"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:af6348ffe4b4a62609b5051fb7445560287818a5/-1:-1",
+            "targetVariableName": "VibrantCoral/400",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Primary-hover": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1.0,
+            0.6274509803921569,
+            0.6274509803921569
+          ],
+          "alpha": 1,
+          "hex": "#FFA0A0"
+        },
+        "$description": "Primary button, hover (web only).",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1907",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Primary-hover",
+            "ANDROID": "Button/Surface/Primary-hover",
+            "iOS": "Button/Surface/Primary-hover"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:c9f4cc2a8fbee236ae1fcd09de13d1e1208e4172/-1:-1",
+            "targetVariableName": "VibrantCoral/300",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Primary-pressed": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9725490196078431,
+            0.23137254901960785,
+            0.23137254901960785
+          ],
+          "alpha": 1,
+          "hex": "#F83B3B"
+        },
+        "$description": "Primary button, pressed or loading.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1908",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Primary-pressed",
+            "ANDROID": "Button/Surface/Primary-pressed",
+            "iOS": "Button/Surface/Primary-pressed"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:4d04f2568b94a5ae0cf33af64a5499b6322587ac/-1:-1",
+            "targetVariableName": "VibrantCoral/500",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Primary-muted": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            1.0,
+            0.8823529411764706,
+            0.8823529411764706
+          ],
+          "alpha": 1,
+          "hex": "#FFE1E1"
+        },
+        "$description": "Primary button, disabled.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1911",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Primary-muted",
+            "ANDROID": "Button/Surface/Primary-muted",
+            "iOS": "Button/Surface/Primary-muted"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:a2dc5712fffbedba895feea477156403d4ffee6d/-1:-1",
+            "targetVariableName": "VibrantCoral/100",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Secondary-default": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9921568627450981,
+            0.9921568627450981,
+            0.9921568627450981
+          ],
+          "alpha": 1,
+          "hex": "#FDFDFD"
+        },
+        "$description": "Secondary button.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1912",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Secondary-default",
+            "ANDROID": "Button/Surface/Secondary-default",
+            "iOS": "Button/Surface/Secondary-default"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:802cb138225791a1ca9157d1c84d783c4c00eb71/-1:-1",
+            "targetVariableName": "Neutral/50",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Secondary-hover": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.9686274509803922,
+            0.9529411764705882,
+            0.8901960784313725
+          ],
+          "alpha": 1,
+          "hex": "#F7F3E3"
+        },
+        "$description": "Secondary button, hover (web only).",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1913",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Secondary-hover",
+            "ANDROID": "Button/Surface/Secondary-hover",
+            "iOS": "Button/Surface/Secondary-hover"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:009b75b6402f395b3734ff5e50bdd6bfcee1393c/-1:-1",
+            "targetVariableName": "BrandSecondary/WarmIvory",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Secondary-pressed": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.8196078431372549,
+            0.8470588235294118,
+            0.8784313725490196
+          ],
+          "alpha": 1,
+          "hex": "#D1D8E0"
+        },
+        "$description": "Secondary button, pressed or loading.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1914",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Secondary-pressed",
+            "ANDROID": "Button/Surface/Secondary-pressed",
+            "iOS": "Button/Surface/Secondary-pressed"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:edaef561d588a01dcfc5653369847fc153797173/-1:-1",
+            "targetVariableName": "BrandSecondary/PaleSky",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      },
+      "Secondary-muted": {
+        "$type": "color",
+        "$value": {
+          "colorSpace": "srgb",
+          "components": [
+            0.2823529411764706,
+            0.26666666666666666,
+            0.5607843137254902
+          ],
+          "alpha": 1,
+          "hex": "#48448F"
+        },
+        "$description": "Secondary button, disabled.",
+        "$extensions": {
+          "com.figma.variableId": "VariableID:11:1915",
+          "com.figma.scopes": [
+            "FRAME_FILL",
+            "STROKE"
+          ],
+          "com.figma.codeSyntax": {
+            "WEB": "Button/Surface/Secondary-muted",
+            "ANDROID": "Button/Surface/Secondary-muted",
+            "iOS": "Button/Surface/Secondary-muted"
+          },
+          "com.figma.aliasData": {
+            "targetVariableId": "VariableID:2ff968ad48732d55dfff165ed898d08a84cf45dd/-1:-1",
+            "targetVariableName": "DeepIndigo/800",
+            "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+            "targetVariableSetName": "Flipbook–Brand–Colors"
+          }
+        }
+      }
+    }
+  },
+  "Feedback": {
+    "Positive": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5607843137254902,
+          0.8666666666666667,
+          0.7137254901960784
+        ],
+        "alpha": 1,
+        "hex": "#8FDDB6"
+      },
+      "$description": "Icon and inline text for success and confirmation. Always pair with an icon.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:2019",
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Positive",
+          "ANDROID": "Feedback/Positive",
+          "iOS": "Feedback/Positive"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/EmeraldGreen/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Positive-surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.058823529411764705,
+          0.23921568627450981,
+          0.1568627450980392
+        ],
+        "alpha": 1,
+        "hex": "#0F3D28"
+      },
+      "$description": "Container background for success and confirmation (banners, toasts, field messages).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Positive-surface",
+          "ANDROID": "Feedback/Positive-surface",
+          "iOS": "Feedback/Positive-surface"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/EmeraldGreen/950",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Positive-on-surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8901960784313725,
+          0.9607843137254902,
+          0.9254901960784314
+        ],
+        "alpha": 1,
+        "hex": "#E3F5EC"
+      },
+      "$description": "Text and icon inside a positive container.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Positive-on-surface",
+          "ANDROID": "Feedback/Positive-on-surface",
+          "iOS": "Feedback/Positive-on-surface"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/EmeraldGreen/100",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Warning": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.7725490196078432,
+          0.6196078431372549
+        ],
+        "alpha": 1,
+        "hex": "#FFC59E"
+      },
+      "$description": "Icon and inline text for warnings. Always pair with an icon.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:2020",
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Warning",
+          "ANDROID": "Feedback/Warning",
+          "iOS": "Feedback/Warning"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/SunsetOrange/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Warning-surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2901960784313726,
+          0.13725490196078433,
+          0.027450980392156862
+        ],
+        "alpha": 1,
+        "hex": "#4A2307"
+      },
+      "$description": "Container background for warnings (banners, toasts, field messages).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Warning-surface",
+          "ANDROID": "Feedback/Warning-surface",
+          "iOS": "Feedback/Warning-surface"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/SunsetOrange/950",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Warning-on-surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.8627450980392157,
+          0.7686274509803922
+        ],
+        "alpha": 1,
+        "hex": "#FFDCC4"
+      },
+      "$description": "Text and icon inside a warning container.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Warning-on-surface",
+          "ANDROID": "Feedback/Warning-on-surface",
+          "iOS": "Feedback/Warning-on-surface"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/SunsetOrange/200",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Error": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.6274509803921569,
+          0.6274509803921569
+        ],
+        "alpha": 1,
+        "hex": "#FFA0A0"
+      },
+      "$description": "Icon and inline text for errors. Always pair with an icon.",
+      "$extensions": {
+        "com.figma.variableId": "VariableID:11:2021",
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Error",
+          "ANDROID": "Feedback/Error",
+          "iOS": "Feedback/Error"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c9f4cc2a8fbee236ae1fcd09de13d1e1208e4172/-1:-1",
+          "targetVariableName": "VibrantCoral/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Error-surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2823529411764706,
+          0.027450980392156862,
+          0.027450980392156862
+        ],
+        "alpha": 1,
+        "hex": "#480707"
+      },
+      "$description": "Container background for errors (banners, toasts, field messages).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Error-surface",
+          "ANDROID": "Feedback/Error-surface",
+          "iOS": "Feedback/Error-surface"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "VibrantCoral/950",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Error-on-surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.7803921568627451,
+          0.7803921568627451
+        ],
+        "alpha": 1,
+        "hex": "#FFC7C7"
+      },
+      "$description": "Text and icon inside a error container.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Feedback/Error-on-surface",
+          "ANDROID": "Feedback/Error-on-surface",
+          "iOS": "Feedback/Error-on-surface"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:3e6dc720d5e209dc5a128cc9d1febc0f410a5b6c/-1:-1",
+          "targetVariableName": "VibrantCoral/200",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Reader": {
+    "Page": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.23137254901960785,
+          0.22745098039215686,
+          0.42745098039215684
+        ],
+        "alpha": 1,
+        "hex": "#3B3A6D"
+      },
+      "$description": "Reading page background.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Reader/Page",
+          "ANDROID": "Reader/Page",
+          "iOS": "Reader/Page"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:de7f05628940d39379e83303cc61a6b48b84f0e9/-1:-1",
+          "targetVariableName": "DeepIndigo/900",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.9686274509803922,
+          0.9529411764705882,
+          0.8901960784313725
+        ],
+        "alpha": 1,
+        "hex": "#F7F3E3"
+      },
+      "$description": "Book body text (Literata).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Reader/Text",
+          "ANDROID": "Reader/Text",
+          "iOS": "Reader/Text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:009b75b6402f395b3734ff5e50bdd6bfcee1393c/-1:-1",
+          "targetVariableName": "BrandSecondary/WarmIvory",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Text-secondary": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7058823529411765,
+          0.7490196078431373,
+          0.9294117647058824
+        ],
+        "alpha": 1,
+        "hex": "#B4BFED"
+      },
+      "$description": "Running heads, chapter numbers, position labels.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Reader/Text-secondary",
+          "ANDROID": "Reader/Text-secondary",
+          "iOS": "Reader/Text-secondary"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b0acf5d6f8e2d79f749e98764415c2915b46603c/-1:-1",
+          "targetVariableName": "DeepIndigo/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Highlight": {
+    "Sand": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8941176470588236,
+          0.7019607843137254,
+          0.38823529411764707
+        ],
+        "alpha": 0.32,
+        "hex": "#E4B363"
+      },
+      "$description": "Private highlight fill (Sand). Reader/Text stays readable on top. Raw value: BrandAccents/GoldenSand at 32% opacity (opacity cannot be carried by an alias).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "SHAPE_FILL",
+          "FRAME_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Highlight/Sand",
+          "ANDROID": "Highlight/Sand",
+          "iOS": "Highlight/Sand"
+        }
+      }
+    },
+    "Aqua": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.45098039215686275,
+          0.8235294117647058,
+          0.8705882352941177
+        ],
+        "alpha": 0.32,
+        "hex": "#73D2DE"
+      },
+      "$description": "Private highlight fill (Aqua). Reader/Text stays readable on top. Raw value: BrandAccents/SereneAqua at 32% opacity (opacity cannot be carried by an alias).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "SHAPE_FILL",
+          "FRAME_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Highlight/Aqua",
+          "ANDROID": "Highlight/Aqua",
+          "iOS": "Highlight/Aqua"
+        }
+      }
+    },
+    "Rose": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.4196078431372549,
+          0.4196078431372549
+        ],
+        "alpha": 0.32,
+        "hex": "#FF6B6B"
+      },
+      "$description": "Private highlight fill (Rose). Reader/Text stays readable on top. Raw value: VibrantCoral/400 at 32% opacity (opacity cannot be carried by an alias).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "SHAPE_FILL",
+          "FRAME_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Highlight/Rose",
+          "ANDROID": "Highlight/Rose",
+          "iOS": "Highlight/Rose"
+        }
+      }
+    },
+    "Mint": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.22745098039215686,
+          0.7098039215686275,
+          0.4823529411764706
+        ],
+        "alpha": 0.32,
+        "hex": "#3AB57B"
+      },
+      "$description": "Private highlight fill (Mint). Reader/Text stays readable on top. Raw value: BrandAccents/EmeraldGreen at 32% opacity (opacity cannot be carried by an alias).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "SHAPE_FILL",
+          "FRAME_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Highlight/Mint",
+          "ANDROID": "Highlight/Mint",
+          "iOS": "Highlight/Mint"
+        }
+      }
+    },
+    "Lavender": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5882352941176471,
+          0.6196078431372549,
+          0.8901960784313725
+        ],
+        "alpha": 0.32,
+        "hex": "#969EE3"
+      },
+      "$description": "Private highlight fill (Lavender). Reader/Text stays readable on top. Raw value: DeepIndigo/400 at 32% opacity (opacity cannot be carried by an alias).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "SHAPE_FILL",
+          "FRAME_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Highlight/Lavender",
+          "ANDROID": "Highlight/Lavender",
+          "iOS": "Highlight/Lavender"
+        }
+      }
+    }
+  },
+  "Margin": {
+    "Reaction": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.4196078431372549,
+          0.4196078431372549
+        ],
+        "alpha": 1,
+        "hex": "#FF6B6B"
+      },
+      "$description": "Marker for other members' reactions in the margin.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Margin/Reaction",
+          "ANDROID": "Margin/Reaction",
+          "iOS": "Margin/Reaction"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:af6348ffe4b4a62609b5051fb7445560287818a5/-1:-1",
+          "targetVariableName": "VibrantCoral/400",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Own": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8941176470588236,
+          0.7019607843137254,
+          0.38823529411764707
+        ],
+        "alpha": 1,
+        "hex": "#E4B363"
+      },
+      "$description": "Marker for my own reactions.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Margin/Own",
+          "ANDROID": "Margin/Own",
+          "iOS": "Margin/Own"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:aa08073e0530683bf8d0c61e878cb7fb08cdb5fa/-1:-1",
+          "targetVariableName": "BrandAccents/GoldenSand",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Thread": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.45098039215686275,
+          0.8235294117647058,
+          0.8705882352941177
+        ],
+        "alpha": 1,
+        "hex": "#73D2DE"
+      },
+      "$description": "Reply and new-reply indicator on a reaction.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Margin/Thread",
+          "ANDROID": "Margin/Thread",
+          "iOS": "Margin/Thread"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c41e3db16a4dd98f67f96e95520aca4918aed7c6/-1:-1",
+          "targetVariableName": "BrandAccents/SereneAqua",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Ahead": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.7058823529411765,
+          0.7490196078431373,
+          0.9294117647058824
+        ],
+        "alpha": 1,
+        "hex": "#B4BFED"
+      },
+      "$description": "The ahead-of-you hint. Quiet by design.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Margin/Ahead",
+          "ANDROID": "Margin/Ahead",
+          "iOS": "Margin/Ahead"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:b0acf5d6f8e2d79f749e98764415c2915b46603c/-1:-1",
+          "targetVariableName": "DeepIndigo/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Overlay": {
+    "Scrim": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.07058823529411765,
+          0.07058823529411765,
+          0.07058823529411765
+        ],
+        "alpha": 0.56,
+        "hex": "#121212"
+      },
+      "$description": "Dims content behind sheets and dialogs. Raw value: BrandSecondary/BackgroundBlack at 56% opacity (opacity cannot be carried by an alias).",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Overlay/Scrim",
+          "ANDROID": "Overlay/Scrim",
+          "iOS": "Overlay/Scrim"
+        }
+      }
+    },
+    "Veil": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2823529411764706,
+          0.26666666666666666,
+          0.5607843137254902
+        ],
+        "alpha": 1,
+        "hex": "#48448F"
+      },
+      "$description": "Spoiler veil over chat messages, voice notes and quote cards.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Overlay/Veil",
+          "ANDROID": "Overlay/Veil",
+          "iOS": "Overlay/Veil"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:2ff968ad48732d55dfff165ed898d08a84cf45dd/-1:-1",
+          "targetVariableName": "DeepIndigo/800",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Veil-text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8196078431372549,
+          0.8509803921568627,
+          0.9568627450980393
+        ],
+        "alpha": 1,
+        "hex": "#D1D9F4"
+      },
+      "$description": "Text on the spoiler veil (e.g. 'Ada is in Chapter 9').",
+      "$extensions": {
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Overlay/Veil-text",
+          "ANDROID": "Overlay/Veil-text",
+          "iOS": "Overlay/Veil-text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:244cdaaade93db8082a7d774b24037c8f3e576d2/-1:-1",
+          "targetVariableName": "DeepIndigo/200",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Status": {
+    "Live": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.5607843137254902,
+          0.8666666666666667,
+          0.7137254901960784
+        ],
+        "alpha": 1,
+        "hex": "#8FDDB6"
+      },
+      "$description": "Live session and speaking indicator.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Status/Live",
+          "ANDROID": "Status/Live",
+          "iOS": "Status/Live"
+        },
+        "com.figma.aliasData": {
+          "targetVariableName": "AccentScales/EmeraldGreen/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Recording": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          1.0,
+          0.6274509803921569,
+          0.6274509803921569
+        ],
+        "alpha": 1,
+        "hex": "#FFA0A0"
+      },
+      "$description": "Recording indicator. Always shown with a 'REC' label.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Status/Recording",
+          "ANDROID": "Status/Recording",
+          "iOS": "Status/Recording"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:c9f4cc2a8fbee236ae1fcd09de13d1e1208e4172/-1:-1",
+          "targetVariableName": "VibrantCoral/300",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Badge": {
+    "Founding-host-surface": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8941176470588236,
+          0.7019607843137254,
+          0.38823529411764707
+        ],
+        "alpha": 1,
+        "hex": "#E4B363"
+      },
+      "$description": "Founding Host badge fill.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Badge/Founding-host-surface",
+          "ANDROID": "Badge/Founding-host-surface",
+          "iOS": "Badge/Founding-host-surface"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:aa08073e0530683bf8d0c61e878cb7fb08cdb5fa/-1:-1",
+          "targetVariableName": "BrandAccents/GoldenSand",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Founding-host-text": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.23137254901960785,
+          0.22745098039215686,
+          0.42745098039215684
+        ],
+        "alpha": 1,
+        "hex": "#3B3A6D"
+      },
+      "$description": "Text and icon on the Founding Host badge.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "TEXT_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Badge/Founding-host-text",
+          "ANDROID": "Badge/Founding-host-text",
+          "iOS": "Badge/Founding-host-text"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:de7f05628940d39379e83303cc61a6b48b84f0e9/-1:-1",
+          "targetVariableName": "DeepIndigo/900",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Author": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8941176470588236,
+          0.7019607843137254,
+          0.38823529411764707
+        ],
+        "alpha": 1,
+        "hex": "#E4B363"
+      },
+      "$description": "Author badge next to a name in the margin.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "ALL_FILLS",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Badge/Author",
+          "ANDROID": "Badge/Author",
+          "iOS": "Badge/Author"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:aa08073e0530683bf8d0c61e878cb7fb08cdb5fa/-1:-1",
+          "targetVariableName": "BrandAccents/GoldenSand",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Progress": {
+    "Track": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2823529411764706,
+          0.26666666666666666,
+          0.5607843137254902
+        ],
+        "alpha": 1,
+        "hex": "#48448F"
+      },
+      "$description": "Progress track and Lobby position rail.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Progress/Track",
+          "ANDROID": "Progress/Track",
+          "iOS": "Progress/Track"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:2ff968ad48732d55dfff165ed898d08a84cf45dd/-1:-1",
+          "targetVariableName": "DeepIndigo/800",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Fill": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8941176470588236,
+          0.7019607843137254,
+          0.38823529411764707
+        ],
+        "alpha": 1,
+        "hex": "#E4B363"
+      },
+      "$description": "Progress fill and member position markers.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL",
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Progress/Fill",
+          "ANDROID": "Progress/Fill",
+          "iOS": "Progress/Fill"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:aa08073e0530683bf8d0c61e878cb7fb08cdb5fa/-1:-1",
+          "targetVariableName": "BrandAccents/GoldenSand",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Focus": {
+    "Ring": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.8941176470588236,
+          0.7019607843137254,
+          0.38823529411764707
+        ],
+        "alpha": 1,
+        "hex": "#E4B363"
+      },
+      "$description": "Keyboard and accessibility focus ring.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "STROKE"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Focus/Ring",
+          "ANDROID": "Focus/Ring",
+          "iOS": "Focus/Ring"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:aa08073e0530683bf8d0c61e878cb7fb08cdb5fa/-1:-1",
+          "targetVariableName": "BrandAccents/GoldenSand",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "Skeleton": {
+    "Base": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.2823529411764706,
+          0.26666666666666666,
+          0.5607843137254902
+        ],
+        "alpha": 1,
+        "hex": "#48448F"
+      },
+      "$description": "Loading placeholder.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Skeleton/Base",
+          "ANDROID": "Skeleton/Base",
+          "iOS": "Skeleton/Base"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:2ff968ad48732d55dfff165ed898d08a84cf45dd/-1:-1",
+          "targetVariableName": "DeepIndigo/800",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    },
+    "Shimmer": {
+      "$type": "color",
+      "$value": {
+        "colorSpace": "srgb",
+        "components": [
+          0.3411764705882353,
+          0.3215686274509804,
+          0.6901960784313725
+        ],
+        "alpha": 1,
+        "hex": "#5752B0"
+      },
+      "$description": "Loading shimmer highlight.",
+      "$extensions": {
+        "com.figma.scopes": [
+          "FRAME_FILL",
+          "SHAPE_FILL"
+        ],
+        "com.figma.codeSyntax": {
+          "WEB": "Skeleton/Shimmer",
+          "ANDROID": "Skeleton/Shimmer",
+          "iOS": "Skeleton/Shimmer"
+        },
+        "com.figma.aliasData": {
+          "targetVariableId": "VariableID:d9cf2d0f3e6c866c7d8183366e9a2094a3811194/-1:-1",
+          "targetVariableName": "DeepIndigo/700",
+          "targetVariableSetId": "VariableCollectionId:ce905e484cd266a740e4948e74eaebd04e0816d6/-1:-1",
+          "targetVariableSetName": "Flipbook–Brand–Colors"
+        }
+      }
+    }
+  },
+  "$extensions": {
+    "com.figma.modeName": "Flipbook"
+  }
+}
