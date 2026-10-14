@@ -16,6 +16,11 @@
   ],
   "exclude": [
     "node_modules",
-    "web"
+    "web",
+    // business/ is gitignored and holds documents, plus whatever gets copied
+    // in beside them. It is not app source and must never be typechecked:
+    // a copy of this repo landed there and broke `tsc` on the real project
+    // with errors about files that are not part of it.
+    "business"
   ]
 }
