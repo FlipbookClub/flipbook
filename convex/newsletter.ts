@@ -50,25 +50,51 @@ const CARD_BG = "#ffffff";
 const TEXT = "#3b3a6d"; // brand.deepIndigo.900 / text.primary
 const MUTED = "#989898"; // text.muted
 
-const SUBJECT = "A new month, a new chapter";
+const SUBJECT = "I owe you an explanation (and a favour)";
+
+// Inbox preview line. Rendered as a hidden preheader at the top of the HTML
+// body, which is where Gmail, Apple Mail and Outlook read it from.
+const PREVIEW_TEXT = "A confession, two small favours, and a hint of v2.";
 
 // Identifies the campaign in `newsletterSends`. Bump this (and the copy below)
-// for next month's send; leaving it unchanged means the broadcast correctly
+// for the next send; leaving it unchanged means the broadcast correctly
 // treats everyone as already-mailed and does nothing.
-const CAMPAIGN = "2026-09";
+const CAMPAIGN = "2026-11-explanation";
 
-const PARAGRAPHS: string[] = [
-  "Hello Flipfolk,",
-  "September is here!",
-  "I hope the new month is meeting you well. Before we get too far into it, I wanted to pop in and say thank you.",
-  "Thank you for being here, for opening Flipbook, reading with your people, sending us feedback, and helping us build this thing one page at a time. We're still early, but seeing people actually use Flipbook to read together makes all the late nights, bugs, fixes, and endless tweaks worth it.",
-  "This month, I hope you find a book that pulls you in completely.",
-  "One that makes you laugh, keeps you up a little too late, teaches you something new, or has you rushing to tell someone, “You need to read this.”",
-  "And when you find it, don't keep it to yourself. Bring your people along.",
-  "Here's to more books, more conversations, and more pages turned together.",
-  "Happy reading, Flipfolk.",
-  "Stay jiggy,",
+// `lead` renders bold ahead of `text` (the numbered favours).
+type Block = { lead?: string; text: string };
+
+const BLOCKS: Block[] = [
+  { text: "Hi Flipfolk," },
+  {
+    text: "It’s Moks here, writing from Lagos. Yes, that Moks who disappeared for two months like someone who borrowed money. 😅",
+  },
+  {
+    text: "Confession time: I thought building a startup would be a walk in the park. Turns out building the app is the easy part. Keeping in touch? Marketing? Social media? I’m failing all three, and I’m sorry.",
+  },
+  {
+    text: "But I promise we’ve been cooking. Same mission as day one: helping readers and book clubs connect properly and build stronger reading communities. The pot has been on the fire the whole time. I just forgot to tell you what’s inside.",
+  },
+  { text: "Now, small favours (I’m not asking for jollof money):" },
+  {
+    lead: "1. Come read again, and bring a friend.",
+    text: "I know life has been lifeing. But open a book, nudge one person, drop a reaction in the margin. Reading alone is fine. Reading together is better.",
+  },
+  {
+    lead: "2. Tell one person about Flipbook.",
+    text: "A post on X, LinkedIn or Instagram, or a gentle “you should try this” to your book club. I’m a very bad marketer, so your word means more than my posts ever will.",
+  },
+  {
+    text: "And the gist: Flipbook v2 is coming. I won’t spoil it, but trust me, you’ll like this one. 👀",
+  },
+  {
+    text: "Till then, stay jiggy (it means stay well, stay lively, stay you). And if you have feedback, just reply. It comes straight to me, and I read every one.",
+  },
+  { text: "Yours intellectually," },
 ];
+
+const FOOTER_REASON =
+  "You're getting this because you signed up for Flipbook.";
 
 function escapeHtml(s: string): string {
   return s
@@ -78,33 +104,41 @@ function escapeHtml(s: string): string {
 }
 
 export function buildText(): string {
-  return `${PARAGRAPHS.join("\n\n")}
+  const body = BLOCKS.map((b) => (b.lead ? `${b.lead} ${b.text}` : b.text));
+  return `${body.join("\n\n")}
 
 Victory Moks
 Co-founder, Flipbook
 
 ---
-You're getting this because you have a Flipbook account. To stop receiving
-these monthly notes, reply with "unsubscribe" or email ${REPLY_TO} and I'll
-take you off the list.`;
+${FOOTER_REASON} To stop receiving these notes, reply with "unsubscribe"
+or email ${REPLY_TO} and I'll take you off the list.`;
 }
 
 export function buildHtml(): string {
   // Inline styles only — email clients strip <style> and external CSS.
   // Div-based rather than table-based, matching the shipped welcome email;
   // border-radius degrades to a square card in Outlook desktop, which is fine.
-  const body = PARAGRAPHS.map(
-    (p) =>
-      `<p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:${TEXT};">${escapeHtml(p)}</p>`,
-  ).join("\n    ");
+  const body = BLOCKS.map((b) => {
+    const lead = b.lead
+      ? `<strong style="font-weight:600;">${escapeHtml(b.lead)}</strong> `
+      : "";
+    return `<p style="margin:0 0 20px;font-size:16px;line-height:1.6;color:${TEXT};">${lead}${escapeHtml(b.text)}</p>`;
+  }).join("\n    ");
 
-  return `<!doctype html><html><body style="margin:0;padding:0;background:${PAGE_BG};">
+  // Hidden preheader: shown as the inbox preview, invisible in the open email.
+  // The trailing zero-width joiners stop clients padding the preview with the
+  // first lines of the body.
+  const preheader = `<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;mso-hide:all;">${escapeHtml(PREVIEW_TEXT)}${"&#8204;&nbsp;".repeat(60)}</div>`;
+
+  return `<!doctype html><html><head><meta charset="utf-8" /></head><body style="margin:0;padding:0;background:${PAGE_BG};">
+  ${preheader}
   <div style="padding:32px 16px;background:${PAGE_BG};">
   <div style="max-width:600px;margin:0 auto;background:${CARD_BG};border-radius:24px;padding:44px 40px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;color:${TEXT};">
     <img src="${LOGO_URL}" alt="Flipbook" width="176" height="42" style="display:block;width:176px;height:auto;margin-bottom:36px;border:0;" />
     ${body}
     <p style="margin:0;font-size:16px;line-height:1.5;color:${TEXT};">Victory Moks<br/>Co-founder, Flipbook</p>
-    <p style="margin:32px 0 0;font-size:12px;line-height:1.5;color:${MUTED};">You're getting this because you have a Flipbook account. <a href="mailto:${UNSUBSCRIBE_MAILTO}" style="color:${MUTED};">Unsubscribe</a>.</p>
+    <p style="margin:32px 0 0;font-size:12px;line-height:1.5;color:${MUTED};">${escapeHtml(FOOTER_REASON)} <a href="mailto:${UNSUBSCRIBE_MAILTO}" style="color:${MUTED};">Unsubscribe</a>.</p>
   </div>
   </div></body></html>`;
 }
@@ -229,25 +263,45 @@ export const listAccountClerkIds = internalQuery({
   },
 });
 
+// Every waitlist address (marketing-site signups, reader and creator). A
+// different population from Clerk: it includes people who grabbed the install
+// links but never made an account. Opt-in via `includeWaitlist` below.
+export const listWaitlistEmails = internalQuery({
+  args: {},
+  returns: v.array(v.string()),
+  handler: async (ctx) => {
+    const rows = await ctx.db.query("waitlist").collect();
+    return rows.map((r) => r.email);
+  },
+});
+
 // Needs CLERK_SECRET_KEY set on the Convex deployment (`npx convex env set`).
 //
 // onlyAppAccounts (default true) intersects Clerk against the `users` table on
 // clerkId, so the result is "people who actually have a Flipbook account",
 // not "everyone who ever hit the Clerk signup screen". Pass false to reach
 // every Clerk identity instead.
+//
+// includeWaitlist (default false) adds every `waitlist` address on top, for
+// sends meant to reach everyone who has ever signed up, not just accounts.
 export const listRecipientEmails = internalAction({
-  args: { onlyAppAccounts: v.optional(v.boolean()) },
+  args: {
+    onlyAppAccounts: v.optional(v.boolean()),
+    includeWaitlist: v.optional(v.boolean()),
+  },
   returns: v.object({
     emails: v.array(v.string()),
     total: v.number(),
     clerkTotal: v.number(),
     skippedNoAppAccount: v.number(),
+    waitlistTotal: v.number(),
   }),
   handler: async (ctx, args): Promise<{
     emails: string[];
     total: number;
     clerkTotal: number;
     skippedNoAppAccount: number;
+    waitlistTotal: number;
   }> => {
     const onlyAppAccounts = args.onlyAppAccounts ?? true;
     const emails: string[] = [];
@@ -263,6 +317,16 @@ export const listRecipientEmails = internalAction({
     }
     for (const u of kept) emails.push(u.email);
 
+    let waitlistTotal = 0;
+    if (args.includeWaitlist) {
+      const waitlist = await ctx.runQuery(
+        internal.newsletter.listWaitlistEmails,
+        {},
+      );
+      waitlistTotal = waitlist.length;
+      emails.push(...waitlist);
+    }
+
     // Dedupe case-insensitively; the same human can hold two Clerk accounts.
     const seen = new Set<string>();
     const deduped = emails.filter((e) => {
@@ -277,6 +341,7 @@ export const listRecipientEmails = internalAction({
       total: deduped.length,
       clerkTotal,
       skippedNoAppAccount: clerkTotal - kept.length,
+      waitlistTotal,
     };
   },
 });
@@ -464,6 +529,7 @@ export const broadcastMonthlyNewsletter = internalAction({
     dryRun: v.boolean(),
     emails: v.optional(v.array(v.string())),
     onlyAppAccounts: v.optional(v.boolean()),
+    includeWaitlist: v.optional(v.boolean()),
     delayMs: v.optional(v.number()),
     campaign: v.optional(v.string()),
     // Escape hatch for a deliberate re-send. Off by default, because the
@@ -475,6 +541,7 @@ export const broadcastMonthlyNewsletter = internalAction({
     recipients: v.number(),
     clerkTotal: v.number(),
     skippedNoAppAccount: v.number(),
+    waitlistTotal: v.number(),
     skippedAlreadySent: v.number(),
     sample: v.array(v.string()),
     sent: v.number(),
@@ -485,6 +552,7 @@ export const broadcastMonthlyNewsletter = internalAction({
     recipients: number;
     clerkTotal: number;
     skippedNoAppAccount: number;
+    waitlistTotal: number;
     skippedAlreadySent: number;
     sample: string[];
     sent: number;
@@ -493,6 +561,7 @@ export const broadcastMonthlyNewsletter = internalAction({
     const campaign = args.campaign ?? CAMPAIGN;
     let clerkTotal = 0;
     let skippedNoAppAccount = 0;
+    let waitlistTotal = 0;
     let recipients: string[];
 
     if (args.emails) {
@@ -500,11 +569,15 @@ export const broadcastMonthlyNewsletter = internalAction({
     } else {
       const resolved = await ctx.runAction(
         internal.newsletter.listRecipientEmails,
-        { onlyAppAccounts: args.onlyAppAccounts ?? true },
+        {
+          onlyAppAccounts: args.onlyAppAccounts ?? true,
+          includeWaitlist: args.includeWaitlist ?? false,
+        },
       );
       recipients = resolved.emails;
       clerkTotal = resolved.clerkTotal;
       skippedNoAppAccount = resolved.skippedNoAppAccount;
+      waitlistTotal = resolved.waitlistTotal;
     }
 
     // Drop anyone the ledger already has for this campaign. This is what makes
@@ -528,6 +601,7 @@ export const broadcastMonthlyNewsletter = internalAction({
       console.log(
         `[newsletter] DRY RUN. ${recipients.length} to send, nothing sent. ` +
           `Clerk identities: ${clerkTotal}, no app account: ${skippedNoAppAccount}, ` +
+          `waitlist rows: ${waitlistTotal}, ` +
           `already sent this campaign: ${skippedAlreadySent}.`,
       );
       return {
@@ -535,6 +609,7 @@ export const broadcastMonthlyNewsletter = internalAction({
         recipients: recipients.length,
         clerkTotal,
         skippedNoAppAccount,
+        waitlistTotal,
         skippedAlreadySent,
         sample,
         sent: 0,
@@ -578,6 +653,7 @@ export const broadcastMonthlyNewsletter = internalAction({
       recipients: recipients.length,
       clerkTotal,
       skippedNoAppAccount,
+      waitlistTotal,
       skippedAlreadySent,
       sample,
       sent,
