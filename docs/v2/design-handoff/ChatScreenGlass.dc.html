@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}@keyframes fbRecPulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.45);opacity:0}}@keyframes fbCaret{50%{opacity:0}}@media (prefers-reduced-motion:reduce){.fb-motion{animation:none!important}}</style>
+</helmet>
+<div data-theme="{{ theme }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <div style="position:absolute;left:0;right:0;top:0;bottom:{{ composerH }}px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end">
+    <div style="display:flex;flex-direction:column;gap:14px;padding:12px 16px 14px">
+
+      <sc-if value="{{ loading }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <sc-for list="{{ skel }}" as="s" hint-placeholder-count="5">
+            <div style="display:flex;gap:8px;align-items:flex-end;flex-direction:{{ s.dir }}"><span style="width:28px;height:28px;border-radius:9999px;flex:none;background:var(--skeleton)"></span><div style="display:flex;flex-direction:column;gap:6px;align-items:{{ s.align }}"><span style="width:70px;height:10px;border-radius:9999px;background:var(--skeleton)"></span><span style="width:{{ s.w }}px;height:{{ s.h }}px;border-radius:20px;background:var(--skeleton)"></span></div></div>
+          </sc-for>
+          <span class="t-caption" style="align-self:center;color:var(--text-muted)">Opening chat</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ empty }}">
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;padding:28px 20px;margin-bottom:24px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+          <span style="width:52px;height:52px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.chatLg }}</span>
+          <span class="t-h2" style="color:var(--text);margin-top:6px">Start the conversation</span>
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Everyone here is reading Pride and Prejudice. Each message shows where its sender is, so nobody gets spoiled.</span>
+        </div>
+      </sc-if>
+
+      <sc-for list="{{ msgs }}" as="m" hint-placeholder-count="5">
+        <sc-if value="{{ m.day }}"><span class="t-caption" style="align-self:center;height:24px;padding:0 12px;border-radius:9999px;display:flex;align-items:center;color:var(--text-secondary);background:color-mix(in oklab, var(--text) 7%, transparent)">{{ m.dayText }}</span></sc-if>
+        <sc-if value="{{ m.sys }}"><span class="t-caption" style="align-self:center;display:flex;align-items:center;gap:6px;color:var(--text-muted)">{{ m.sysIcon }}{{ m.sysText }}</span></sc-if>
+        <sc-if value="{{ m.row }}">
+          <div style="display:flex;flex-direction:{{ m.dir }};align-items:flex-end;gap:8px">
+            <span class="t-caption" style="width:28px;height:28px;flex:none;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:{{ m.av }};margin-bottom:{{ m.avMb }}px">{{ m.init }}</span>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:{{ m.align }};max-width:78%;min-width:0">
+              <span class="t-caption" style="color:var(--text-secondary);display:flex;align-items:center;gap:6px;padding:0 6px">{{ m.name }} · {{ m.pos }}<sc-if value="{{ m.host }}"><span style="height:18px;padding:0 7px;border-radius:9999px;display:inline-flex;align-items:center;font:700 10px/1 var(--font-sans);background:var(--founding-host);color:var(--on-founding-host)">Host</span></sc-if><sc-if value="{{ m.revealed }}"><span style="height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;gap:4px;font:600 11px/1 var(--font-sans);color:var(--text-secondary);background:color-mix(in oklab, var(--text) 8%, transparent)">{{ ic.eyeXs }}Ahead of you · Hide</span></sc-if></span>
+              <div style="display:flex;flex-direction:column;gap:8px;max-width:100%;box-sizing:border-box;padding:{{ m.pad }};border-radius:{{ m.rad }};background:{{ m.bg }};box-shadow:{{ m.ring }};color:{{ m.color }};min-width:0">
+                <sc-if value="{{ m.reply }}">
+                  <div style="display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden;padding:8px 10px;border-radius:12px;background:color-mix(in oklab, var(--text) 8%, transparent)"><span class="t-caption" style="color:var(--text);font-weight:700">{{ m.replyName }}</span><span class="t-caption" style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ m.replyText }}</span></div>
+                </sc-if>
+                <sc-if value="{{ m.text }}">
+                  <span class="t-body" style="color:inherit;text-wrap:pretty;overflow-wrap:anywhere"><sc-for list="{{ m.parts }}" as="p" hint-placeholder-count="1"><span style="color:{{ p.color }};font-weight:{{ p.w }}">{{ p.t }}</span></sc-for></span>
+                </sc-if>
+                <sc-if value="{{ m.voice }}">
+                  <div style="display:flex;align-items:center;gap:10px;width:220px">
+                    <span style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 12%, transparent)">{{ m.playIcon }}</span>
+                    <div style="flex:1;height:28px;display:flex;align-items:center;gap:2px"><sc-for list="{{ m.bars }}" as="b" hint-placeholder-count="24"><span style="flex:1;height:{{ b.h }}px;border-radius:9999px;background:{{ b.c }}"></span></sc-for></div>
+                  </div>
+                  <div style="display:flex;align-items:center;gap:8px;padding-left:46px"><span class="t-caption" style="color:var(--text-secondary);white-space:nowrap">{{ m.dur }}</span><span style="height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);color:var(--text);background:color-mix(in oklab, var(--text) 10%, transparent)">{{ m.speed }}</span><sc-if value="{{ m.saved }}"><span class="t-caption" style="color:var(--text-muted);display:flex;align-items:center;gap:4px">{{ ic.checkCircleXs }}On your phone</span></sc-if></div>
+                </sc-if>
+                <sc-if value="{{ m.quote }}">
+                  <div style="display:flex;flex-direction:column;gap:10px;width:236px">
+                    <span style="font:italic 400 16px/24px var(--font-serif);color:var(--text);text-wrap:pretty">{{ m.qText }}</span>
+                    <span class="t-caption" style="color:var(--text-secondary)">{{ m.qSrc }}</span>
+                    <span class="t-label" style="align-self:flex-start;height:32px;padding:0 12px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--text) 10%, transparent)">{{ ic.bookXs }}Open in the book</span>
+                  </div>
+                </sc-if>
+                <sc-if value="{{ m.veil }}">
+                  <div style="display:flex;gap:10px;align-items:flex-start;max-width:240px"><span style="display:flex;margin-top:1px">{{ m.veilIcon }}</span><div style="display:flex;flex-direction:column;gap:2px"><span class="t-label" style="color:var(--veil-text);text-wrap:pretty">{{ m.veilText }}</span><sc-if value="{{ m.veilSub }}"><span class="t-caption" style="color:var(--veil-text);opacity:.8">{{ m.veilSub }}</span></sc-if></div></div>
+                </sc-if>
+                <sc-if value="{{ m.removed }}"><span class="t-body" style="font-style:italic;color:var(--text-muted)">This message was removed</span></sc-if>
+              </div>
+              <sc-if value="{{ m.status }}"><span class="t-caption" style="color:var(--text-muted);display:flex;align-items:center;gap:4px;padding:0 6px">{{ m.statusIcon }}{{ m.status }}</span></sc-if>
+              <sc-if value="{{ m.hasReacts }}">
+                <div style="display:flex;gap:4px;margin-top:-10px;padding:0 8px;position:relative;z-index:1"><sc-for list="{{ m.reacts }}" as="r" hint-placeholder-count="2"><span style="height:24px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;gap:4px;font:600 12px/1 var(--font-sans);color:var(--text);background:{{ r.bg }};box-shadow:{{ r.ring }}">{{ r.e }}<span>{{ r.n }}</span></span></sc-for></div>
+              </sc-if>
+            </div>
+          </div>
+        </sc-if>
+      </sc-for>
+    </div>
+  </div>
+
+  <sc-if value="{{ pinned }}">
+    <div style="position:absolute;left:20px;right:20px;top:{{ stripTop }}px;z-index:28;min-height:44px;padding:0 8px 0 14px;border-radius:9999px;display:flex;align-items:center;gap:10px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.14)">
+      <span style="color:var(--text-accent);display:flex">{{ ic.pinSm }}</span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:700 11px/14px var(--font-sans);color:var(--text-muted)">Pinned by Ada</span><span class="t-caption" style="color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ pinText }}</span></div>
+      <span style="width:32px;height:32px;display:grid;place-items:center;color:var(--text-secondary)">{{ ic.chevronRightSm }}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ offline }}">
+    <div style="position:absolute;left:20px;right:20px;top:{{ stripTop }}px;z-index:28;min-height:44px;padding:8px 14px;border-radius:22px;display:flex;align-items:center;gap:10px;background:var(--warning-surface);box-sizing:border-box">
+      <span style="color:var(--warning);display:flex">{{ ic.wifiOffSm }}</span>
+      <span class="t-caption" style="flex:1;color:var(--on-warning-surface)">You’re offline. Messages send when you’re back, and saved voice notes still play.</span>
+    </div>
+  </sc-if>
+
+  <div style="position:absolute;top:0;left:0;right:0;padding:{{ statusH }}px 16px 10px;display:flex;align-items:flex-end;gap:10px;z-index:30;background:color-mix(in oklab, var(--surface) 72%, transparent);backdrop-filter:blur(24px) saturate(180%);height:{{ headerH }}px;box-sizing:border-box">
+    <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">{{ backIcon }}</span>
+    <span style="width:40px;height:40px;flex:none;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold);box-shadow:0 0 0 1px var(--divider)"><span style="position:absolute;right:0;bottom:0;width:20px;height:20px;border-top-left-radius:20px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:12px;height:12px;border-bottom-right-radius:12px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 19px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;min-height:44px"><span class="t-h3" style="color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Lumee Book Club</span><span class="t-caption" style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ hSub }}</span></div>
+    <div style="height:44px;border-radius:9999px;display:flex;align-items:center;padding:0 4px;flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">
+      <span style="width:40px;height:40px;display:grid;place-items:center;color:var(--text)">{{ ic.bellSm }}</span>
+      <span style="width:40px;height:40px;display:grid;place-items:center;color:var(--text)">{{ ic.moreSm }}</span>
+    </div>
+  </div>
+
+  <div style="position:absolute;left:20px;right:20px;top:{{ tabsTop }}px;z-index:29;height:44px;padding:4px;border-radius:9999px;display:flex;background:color-mix(in oklab, var(--surface-raised) 60%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.2)">
+    <span class="t-label" style="flex:1;border-radius:9999px;display:grid;place-items:center;color:var(--text-secondary)">Lobby</span>
+    <span class="t-label" style="flex:1;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)">Chat</span>
+    <span class="t-label" style="flex:1;border-radius:9999px;display:grid;place-items:center;color:var(--text-secondary)">Sessions</span>
+  </div>
+
+  <div style="position:absolute;left:0;right:0;bottom:0;z-index:28;padding:10px 16px {{ footPad }}px;display:flex;flex-direction:column;gap:10px;background:color-mix(in oklab, var(--surface) 72%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 1px 0 color-mix(in oklab, var(--text) 8%, transparent)">
+    <sc-if value="{{ mentionList }}">
+      <div style="display:flex;flex-direction:column;padding:6px;border-radius:24px;background:color-mix(in oklab, var(--surface-raised) 80%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),0 14px 30px -12px rgba(8,6,30,.5)">
+        <sc-for list="{{ mentions }}" as="u" hint-placeholder-count="4">
+          <div style="height:44px;padding:0 10px;border-radius:18px;display:flex;align-items:center;gap:10px;background:{{ u.bg }}"><span class="t-caption" style="width:28px;height:28px;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:{{ u.av }}">{{ u.init }}</span><span class="t-label" style="flex:1;color:var(--text)">{{ u.name }}</span><span class="t-caption" style="color:var(--text-muted)">{{ u.pos }}</span></div>
+        </sc-for>
+      </div>
+    </sc-if>
+    <sc-if value="{{ replyPrev }}">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 6px 8px 14px;border-radius:20px;background:color-mix(in oklab, var(--text) 7%, transparent)"><span style="color:var(--text-secondary);display:flex">{{ ic.replySm }}</span><div style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="t-caption" style="color:var(--text);font-weight:700">Replying to Chidi</span><span class="t-caption" style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Mr Collins proposing is the most uncomfortable I’ve been all year.</span></div><span style="width:32px;height:32px;display:grid;place-items:center;color:var(--text-secondary)">{{ ic.xSm }}</span></div>
+    </sc-if>
+    <sc-if value="{{ quotePrev }}">
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 8px 12px 14px;border-radius:20px;background:color-mix(in oklab, var(--text) 7%, transparent)"><div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><span style="font:italic 400 15px/22px var(--font-serif);color:var(--text);text-wrap:pretty">“He sat down for a few moments, and then getting up, walked about the room.”</span><span class="t-caption" style="color:var(--text-secondary)">Pride and Prejudice · Ch 34</span><span class="t-caption" style="color:var(--text-muted);display:flex;align-items:center;gap:6px">{{ ic.eyeOffXs }}Veiled for readers before Ch 34</span></div><span style="width:32px;height:32px;flex:none;display:grid;place-items:center;color:var(--text-secondary)">{{ ic.xSm }}</span></div>
+    </sc-if>
+    <sc-if value="{{ spoilerRow }}">
+      <div style="display:flex;align-items:center;gap:10px"><span class="t-label" style="height:36px;padding:0 14px 0 10px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--veil-text);background:var(--veil);box-shadow:inset 0 0 0 1.5px var(--focus-ring)">{{ ic.eyeOffSm }}Spoiler</span><span class="t-caption" style="flex:1;color:var(--text-secondary);text-wrap:pretty">Everyone sees a veil and chooses whether to reveal.</span></div>
+    </sc-if>
+
+    <sc-if value="{{ cIdle }}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="flex:1;height:48px;padding:0 16px;border-radius:9999px;display:flex;align-items:center;background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 8%, transparent)"><span class="t-body" style="color:var(--text-muted)">{{ placeholder }}</span></div>
+        <span style="width:48px;height:48px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 10%, transparent)">{{ ic.micSm }}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ cTyping }}">
+      <div style="display:flex;align-items:flex-end;gap:8px">
+        <div style="flex:1;min-height:48px;padding:12px 16px;box-sizing:border-box;border-radius:24px;display:flex;align-items:center;background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:inset 0 0 0 1.5px var(--focus-ring)"><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ draft }}<span class="fb-motion" style="display:inline-block;width:2px;height:18px;margin-left:1px;vertical-align:-3px;background:var(--focus-ring);animation:fbCaret 1s steps(1) infinite"></span></span></div>
+        <span style="width:48px;height:48px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--on-primary);background:var(--primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)">{{ ic.sendSm }}</span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ cRec }}">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div style="flex:1;height:56px;padding:0 16px;border-radius:9999px;display:flex;align-items:center;gap:10px;background:color-mix(in oklab, var(--recording) 14%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--recording) 30%, transparent)">
+          <span style="width:8px;height:8px;border-radius:9999px;background:var(--recording);flex:none"></span>
+          <span class="t-label" style="color:var(--text);font-variant-numeric:tabular-nums">0:14</span>
+          <div style="flex:1;height:24px;display:flex;align-items:center;gap:2px"><sc-for list="{{ recBars }}" as="b" hint-placeholder-count="20"><span style="flex:1;height:{{ b.h }}px;border-radius:9999px;background:{{ b.c }}"></span></sc-for></div>
+        </div>
+        <span style="width:64px;height:64px;flex:none;border-radius:9999px;position:relative;display:grid;place-items:center;color:var(--surface);background:var(--recording)">{{ recHalo }}<span style="position:relative;display:flex">{{ ic.mic }}</span></span>
+      </div>
+      <span class="t-caption" style="align-self:center;display:flex;align-items:center;gap:6px;color:var(--text-secondary)">{{ ic.chevronLeftXs }}Slide to cancel · up to 2:00</span>
+    </sc-if>
+    <sc-if value="{{ cReview }}">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="width:44px;height:44px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.deleteSm }}</span>
+        <div style="flex:1;min-width:0;height:48px;padding:0 14px 0 6px;border-radius:9999px;display:flex;align-items:center;gap:10px;background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 8%, transparent)">
+          <span style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 12%, transparent)">{{ ic.playSm }}</span>
+          <div style="flex:1;height:22px;display:flex;align-items:center;gap:2px"><sc-for list="{{ reviewBars }}" as="b" hint-placeholder-count="18"><span style="flex:1;height:{{ b.h }}px;border-radius:9999px;background:{{ b.c }}"></span></sc-for></div>
+          <span class="t-caption" style="color:var(--text-secondary)">0:42</span>
+        </div>
+        <span style="width:44px;height:44px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.micSm }}</span>
+        <span style="width:48px;height:48px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--on-primary);background:var(--primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)">{{ ic.sendSm }}</span>
+      </div>
+      <span class="t-caption" style="align-self:center;color:var(--text-secondary)">Delete, listen back, record again or send</span>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ toast }}">
+    <div style="position:absolute;left:50%;bottom:{{ toastBottom }}px;transform:translateX(-50%);z-index:35;display:flex;align-items:center;gap:10px;padding:10px 20px 10px 12px;border-radius:9999px;white-space:nowrap;background:color-mix(in oklab, var(--surface-raised) 72%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+      <span style="width:32px;height:32px;border-radius:9999px;display:grid;place-items:center;background:var(--positive-surface);color:var(--positive)">{{ ic.checkCircleSm }}</span>
+      <div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">{{ toastTitle }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ toastSub }}</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ scrim }}"><div style="position:absolute;inset:0;z-index:40;background:color-mix(in oklab, #121212 {{ scrimPct }}%, transparent);backdrop-filter:blur({{ scrimBlur }}px)"></div></sc-if>
+
+  <sc-if value="{{ focus }}">
+    <div style="position:absolute;left:16px;right:16px;top:{{ focusTop }}px;z-index:47;display:flex;flex-direction:column;gap:10px;align-items:flex-start">
+      <div style="display:flex;align-items:center;gap:2px;padding:4px;border-radius:9999px;background:var(--surface-raised);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.55)">
+        <sc-for list="{{ reactionSet }}" as="e" hint-placeholder-count="6"><span style="width:42px;height:42px;border-radius:9999px;display:grid;place-items:center;font-size:22px;line-height:1">{{ e }}</span></sc-for>
+      </div>
+      <div style="display:flex;gap:8px;align-items:flex-end;max-width:86%">
+        <span class="t-caption" style="width:28px;height:28px;flex:none;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:{{ focusAv }}">{{ focusInit }}</span>
+        <div style="display:flex;flex-direction:column;gap:4px"><span class="t-caption" style="align-self:flex-start;height:22px;padding:0 10px;border-radius:9999px;display:flex;align-items:center;color:var(--text);background:var(--surface-raised)">{{ focusMeta }}</span><span class="t-body" style="padding:10px 14px;border-radius:22px 22px 22px 8px;color:var(--text);background:var(--surface-raised);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 12%, transparent);text-wrap:pretty">{{ focusText }}</span></div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sheet }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:46;border-radius:36px;padding:10px 20px {{ sheetPad }}px;display:flex;flex-direction:column;gap:14px;background:color-mix(in oklab, var(--surface) 76%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <div style="width:36px;height:5px;border-radius:9999px;background:color-mix(in oklab, var(--text) 22%, transparent);align-self:center"></div>
+
+      <sc-if value="{{ sActions }}">
+        <div style="display:flex;flex-direction:column;padding:4px 0">
+          <sc-for list="{{ actionRows }}" as="a" hint-placeholder-count="4">
+            <div style="height:52px;padding:0 6px;display:flex;align-items:center;gap:14px;color:{{ a.color }}"><span style="display:flex">{{ a.icon }}</span><span class="t-body" style="flex:1;font-weight:600;color:{{ a.color }}">{{ a.t }}</span><sc-if value="{{ a.sub }}"><span class="t-caption" style="color:var(--text-muted)">{{ a.sub }}</span></sc-if></div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sOptions }}">
+        <div style="display:flex;flex-direction:column;gap:4px;padding-top:4px"><span class="t-h2" style="color:var(--text)">{{ oTitle }}</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ oBody }}</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ options }}" as="o" hint-placeholder-count="3">
+            <div style="min-height:56px;padding:10px 16px;box-sizing:border-box;border-radius:22px;display:flex;align-items:center;gap:12px;background:{{ o.bg }};box-shadow:{{ o.ring }}">
+              <div style="flex:1;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">{{ o.t }}</span><sc-if value="{{ o.s }}"><span class="t-caption" style="color:var(--text-secondary)">{{ o.s }}</span></sc-if></div>
+              <span style="width:22px;height:22px;flex:none;border-radius:9999px;display:grid;place-items:center;box-shadow:inset 0 0 0 2px {{ o.rc }}"><span style="width:{{ o.dot }}px;height:{{ o.dot }}px;border-radius:9999px;background:var(--focus-ring)"></span></span>
+            </div>
+          </sc-for>
+        </div>
+        <sc-if value="{{ oNote }}"><span class="t-caption" style="color:var(--text-secondary);display:flex;gap:8px;align-items:flex-start;text-wrap:pretty"><span style="display:flex">{{ ic.infoXs }}</span>{{ oNote }}</span></sc-if>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="height:52px;border-radius:9999px;display:flex;align-items:center;justify-content:center;background:var(--primary);color:var(--on-primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">{{ oPrimary }}</span></div>
+          <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--text)"><span style="font:700 15px/20px var(--font-sans)">Cancel</span></div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text)">
+      <span style="font:600 16px/20px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text)">
+      <span style="font:500 14px/18px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;chat&quot;,&quot;mention&quot;,&quot;actions&quot;,&quot;reply&quot;,&quot;veiled&quot;,&quot;revealed&quot;,&quot;spoiler&quot;,&quot;caughtUp&quot;,&quot;recording&quot;,&quot;review&quot;,&quot;voicePlay&quot;,&quot;quote&quot;,&quot;quoteShare&quot;,&quot;hostActions&quot;,&quot;pinned&quot;,&quot;mute&quot;,&quot;report&quot;,&quot;notif&quot;,&quot;loading&quot;,&quot;offline&quot;,&quot;empty&quot;],&quot;default&quot;:&quot;chat&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const HG_NAMES = {
+  chevronLeft: 'ArrowLeft01Icon', arrowLeft: 'ArrowLeft02Icon', chevronRight: 'ArrowRight01Icon', x: 'Cancel01Icon', checkCircle: 'CheckmarkCircle02Icon',
+  pin: 'PinIcon', more: 'MoreHorizontalIcon', bell: 'Notification01Icon', mic: 'Mic01Icon', send: 'SentIcon', play: 'PlayIcon', pause: 'PauseIcon',
+  delete: 'Delete02Icon', reply: 'ArrowTurnBackwardIcon', copy: 'Copy01Icon', flag: 'Flag02Icon', mute: 'VolumeOffIcon', eyeOff: 'ViewOffSlashIcon', eye: 'ViewIcon',
+  book: 'BookOpen01Icon', clock: 'Clock01Icon', wifiOff: 'WifiOff01Icon', info: 'InformationCircleIcon', chat: 'BubbleChatIcon',
+};
+const HG_URL = 'https://esm.sh/@hugeicons/core-free-icons';
+window.__fbHG7 = window.__fbHG7 || { data: null, p: import(HG_URL + '?exports=' + Object.values(HG_NAMES).join(',')).catch(() => import(HG_URL)).then(m => { window.__fbHG7.data = m; return m; }).catch(() => null) };
+const h = React.createElement;
+function icon(name, size = 24) {
+  const m = window.__fbHG7.data, nodes = (m && m[HG_NAMES[name]]) || [];
+  return h('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true, style: { display: 'block', flex: 'none' } },
+    nodes.map(([tag, a], i) => { const { key, ...rest } = a; const out = { ...rest, key: i, strokeWidth: 1.5 }; if (rest.stroke) out.stroke = 'currentColor'; if (rest.fill && rest.fill !== 'none') out.fill = 'currentColor'; return h(tag, out); }));
+}
+let IC = null;
+function buildIC() {
+  if (IC) return IC;
+  const ic = {};
+  Object.keys(HG_NAMES).forEach(n => { ic[n + 'Sm'] = icon(n, 20); ic[n + 'Xs'] = icon(n, 14); });
+  ic.chevronLeft = icon('chevronLeft', 22); ic.arrowLeft = icon('arrowLeft', 22); ic.mic = icon('mic', 26); ic.chatLg = icon('chat', 26);
+  ic.signal = h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 })));
+  ic.wifi = h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' }));
+  ic.battery = h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 }));
+  if (window.__fbHG7.data) IC = ic;
+  return ic;
+}
+const AV = { Ada: 'sand', Bolu: 'mint', Chidi: 'mint', Funmi: 'sand', Ifeoma: 'aqua', Jide: 'rose', 'Ọlá': 'lavender', Tolu: 'aqua', You: 'lavender' };
+const POS = { Ada: 14, Bolu: 4, Chidi: 11, Funmi: 22, Ifeoma: 12, Jide: 7, 'Ọlá': 19, Tolu: 9 };
+const WAVE = [6, 10, 16, 12, 20, 14, 8, 18, 24, 16, 10, 14, 22, 18, 12, 8, 14, 20, 16, 10, 6, 12, 18, 14, 8, 10];
+const bars = (n, played, on = 'var(--text)', off = 'color-mix(in oklab, var(--text) 30%, transparent)') => WAVE.slice(0, n).map((v, i) => ({ h: v, c: i < played ? on : off }));
+const PIN = 'Saturday’s call is at 7 this week. Bring one line you underlined.';
+// message library
+const L = {
+  day: { day: 'Today' },
+  chidi: { who: 'Chidi', text: 'Mr Collins proposing is the most uncomfortable I’ve been all year.', reacts: [['😂', 4], ['♥', 2]] },
+  ifeoma: { who: 'Ifeoma', reply: ['Chidi', 'Mr Collins proposing is the most uncomfortable I’ve been all year.'], text: '“The violence of my affection.” I had to put my phone down.', reacts: [['😮', 1]] },
+  tolu: { who: 'Tolu', voice: '0:38' },
+  jide: { who: 'Jide', parts: [['@Lara', 1], [' is the meetup still at Jazzhole? Saw it here: jazzhole.ng/events']] },
+  mine: { who: 'You', text: 'Still Jazzhole, 7 pm Saturday. Bring one line you underlined.', reacts: [['♥', 3, 1]] },
+  adaVeil: { who: 'Ada', veil: 'text' },
+  olaVeil: { who: 'Ọlá', veil: 'voice', dur: '0:51' },
+  ifeMarked: { who: 'Ifeoma', veil: 'marked' },
+  adaOpen: { who: 'Ada', text: 'Wait until you read the letter. Everything you think about Darcy is about to move.', revealed: true },
+  adaCaught: { who: 'Ada', text: 'Wait until you read the letter. Everything you think about Darcy is about to move.', reacts: [['🔥', 2]] },
+  adaCaught2: { who: 'Ada', text: 'Chapter 14 is where Austen starts showing her hand. Read it slowly.' },
+  mineCaught: { who: 'You', me: 14, text: 'Just read the letter. You were right.' },
+  quoteMine: { who: 'You', quote: ['“It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.”', 'Pride and Prejudice · Ch 1'] },
+  quoteAda: { who: 'Ada', veil: 'quote' },
+  quoteSent: { who: 'You', quote: ['“He sat down for a few moments, and then getting up, walked about the room.”', 'Pride and Prejudice · Ch 34'], status: 'Veiled for readers before Ch 34', statusEye: true },
+  quoteSentNote: { who: 'You', text: 'This line, every time.' },
+  bolu: { who: 'Bolu', text: 'Just started. Is it fine to skip ahead to the ball?' },
+  boluRemoved: { who: 'Bolu', removed: true },
+  sysPin: { sys: 'You pinned a message', sysIcon: 'pin' },
+  pending: { who: 'You', text: 'On the bus, catching up on Chapter 12 now.', status: 'Waiting to send' },
+  toluPlay: { who: 'Tolu', voice: '0:38', playing: true, speed: '1.5×', saved: true },
+};
+const BASE = ['day', 'chidi', 'ifeoma', 'tolu', 'jide', 'mine', 'adaVeil'];
+const CONF = {
+  chat: { list: BASE },
+  mention: { list: ['chidi', 'ifeoma', 'tolu', 'jide', 'mine'], comp: 'typing', draft: 'See you all there @', mention: true },
+  actions: { list: BASE, sheet: 'actions', focus: 'chidi' },
+  reply: { list: ['day', 'chidi', 'ifeoma', 'tolu', 'jide', 'mine'], comp: 'typing', draft: 'And Charlotte saying yes to him a chapter later.', reply: true },
+  veiled: { list: ['day', 'ifeoma', 'adaVeil', 'tolu', 'olaVeil', 'ifeMarked'] },
+  revealed: { list: ['day', 'ifeoma', 'adaOpen', 'tolu', 'olaVeil', 'ifeMarked'] },
+  spoiler: { list: ['day', 'chidi', 'ifeoma', 'tolu', 'adaVeil'], comp: 'typing', draft: 'Rereading, so I know how this ends. He comes good.', spoiler: true },
+  caughtUp: { list: ['day', 'tolu', 'adaCaught', 'adaCaught2', 'mineCaught', 'olaVeil'], me: 14, toast: ['You’ve reached Chapter 14', 'Ada’s 2 messages are unveiled'] },
+  recording: { list: BASE, comp: 'rec' },
+  review: { list: BASE, comp: 'review' },
+  voicePlay: { list: ['day', 'chidi', 'ifeoma', 'jide', 'mine', 'toluPlay'] },
+  quote: { list: ['day', 'ifeoma', 'tolu', 'quoteMine', 'quoteAda'] },
+  quoteShare: { list: ['day', 'chidi', 'ifeoma', 'tolu', 'jide'], comp: 'typing', draft: 'This line, every time.', quote: true, me: 34 },
+  quoteSent: { list: ['day', 'chidi', 'tolu', 'jide', 'quoteSent', 'quoteSentNote'], me: 34 },
+  hostActions: { host: true, list: ['day', 'chidi', 'tolu', 'bolu'], sheet: 'hostActions', focus: 'bolu' },
+  pinned: { host: true, list: ['day', 'chidi', 'tolu', 'boluRemoved', 'sysPin'], toast: ['Message pinned', 'It shows at the top of chat and in the Lobby'] },
+  mute: { host: true, list: ['day', 'chidi', 'tolu', 'bolu'], sheet: 'mute' },
+  report: { list: BASE, sheet: 'report' },
+  notif: { list: BASE, sheet: 'notif' },
+  loading: { list: [], loading: true, noPin: true },
+  offline: { list: ['day', 'chidi', 'ifeoma', 'toluPlay', 'pending'], offline: true, saved: true },
+  empty: { list: [], empty: true, noPin: true },
+};
+const CARD = 'color-mix(in oklab, var(--text) 6%, transparent)';
+const OPTS = {
+  mute: ['Mute Bolu in chat?', 'Bolu keeps reading, reacting in the margin and joining sessions. Only posting in chat pauses.', [['For 24 hours', ''], ['For 7 days', '', 1], ['Until you unmute', '']], 'Bolu sees a calm note, never a public message.', 'Mute Bolu'],
+  report: ['Report this message', 'Ada, the host, and Flipbook’s safety team will see it. Chidi won’t know who reported it.', [['It spoils the book', 'Ahead of the chapter it was posted from', 1], ['It’s unkind or harassing', ''], ['It’s spam or a scam', ''], ['Something else', '']], '', 'Send report'],
+  notif: ['Chat notifications', 'For Lumee Book Club only. Other communities keep their own setting.', [['All messages', ''], ['Mentions and replies', 'Recommended', 1], ['Off', 'Unread chat still shows as a quiet dot']], '', 'Save'],
+};
+
+class Component extends DCLogic {
+  componentDidMount() { if (!window.__fbHG7.data) window.__fbHG7.p.then(() => this.forceUpdate()); }
+  renderVals() {
+    const p = this.props, c = CONF[p.screen] || CONF.chat, ic = buildIC();
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, theme = p.theme || 'flip';
+    const host = !!c.host, me = c.me || (host ? 14 : 12);
+    const headerH = statusH + 62, tabsTop = headerH + 4, stripTop = headerH + 56;
+    const strip = (!c.noPin) || c.offline;
+    const contentTop = strip ? stripTop + 44 : headerH + 52;
+    const footPad = ios ? 30 : 20;
+    const comp = c.comp || 'idle';
+    const posOf = n => n === 'You' ? me : POS[n];
+    const msgs = c.list.map((k, i) => {
+      const o = L[k];
+      if (o.day) return { key: k + i, day: true, dayText: o.day };
+      if (o.sys) return { key: k + i, sys: true, sysText: o.sys, sysIcon: ic[o.sysIcon + 'Xs'] };
+      let who = o.who, mine = who === 'You' || (host && who === 'Ada');
+      const name = mine ? 'You' : who, ps = o.me || posOf(who === 'You' ? 'You' : who);
+      const ahead = !mine && ps > me;
+      const veil = o.veil && (o.veil === 'marked' || ahead);
+      const parts = (o.parts || [[o.text || '']]).map(([t, m]) => ({ t, color: m ? 'var(--text-accent)' : 'inherit', w: m ? 700 : 'inherit' }));
+      let veilText = '', veilSub = '', veilIcon = ic.eyeOffSm;
+      if (o.veil === 'text') veilText = `${who} is in Chapter ${ps}. Tap to reveal.`;
+      if (o.veil === 'voice') { veilText = `${who} is in Chapter ${ps}. Tap to reveal.`; veilSub = 'Voice note · ' + o.dur; veilIcon = ic.micSm; }
+      if (o.veil === 'marked') { veilText = `${who} marked this as a spoiler. Tap to reveal.`; }
+      if (o.veil === 'quote') { veilText = `${who} shared a passage from Chapter ${ps}. Tap to reveal.`; veilIcon = ic.bookSm; }
+      const bg = veil ? 'var(--veil)' : o.removed ? 'transparent' : mine ? 'color-mix(in oklab, var(--primary) 24%, var(--surface))' : 'color-mix(in oklab, var(--surface-raised) 72%, transparent)';
+      const ring = o.removed ? 'inset 0 0 0 1.5px color-mix(in oklab, var(--text) 16%, transparent)' : veil ? 'none' : 'inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.1)';
+      const reacts = (o.reacts || []).map(([e, n, own]) => ({ e, n, bg: own ? 'color-mix(in oklab, var(--focus-ring) 22%, var(--surface))' : 'var(--surface-raised)', ring: own ? 'inset 0 0 0 1.5px var(--focus-ring), 0 0 0 2px var(--surface)' : '0 0 0 2px var(--surface)' }));
+      return {
+        key: k + i, row: true, dir: mine ? 'row-reverse' : 'row', align: mine ? 'flex-end' : 'flex-start',
+        init: mine ? (host ? 'A' : 'L') : who[0], av: `var(--highlight-${AV[mine ? 'You' : who] || 'sand'})`, avMb: reacts.length ? 18 : (o.status ? 22 : 0),
+        name, pos: 'Ch ' + ps, host: who === 'Ada' && !mine, revealed: !!o.revealed,
+        bg, ring, color: veil ? 'var(--veil-text)' : 'var(--text)', rad: mine ? '22px 22px 8px 22px' : '22px 22px 22px 8px', pad: o.voice ? '10px 14px 10px 10px' : '10px 14px',
+        reply: !!o.reply && !veil, replyName: o.reply ? o.reply[0] : '', replyText: o.reply ? o.reply[1] : '',
+        text: !veil && !o.voice && !o.quote && !o.removed, parts,
+        voice: !!o.voice && !veil, bars: bars(24, o.playing ? 10 : 0), dur: o.playing ? '0:15 / 0:38' : o.voice, speed: o.speed || '1×', saved: !!(o.saved || c.saved), playIcon: o.playing ? ic.pauseSm : ic.playSm,
+        quote: !!o.quote, qText: o.quote ? o.quote[0] : '', qSrc: o.quote ? o.quote[1] : '',
+        veil: !!veil, veilText, veilSub, veilIcon, removed: !!o.removed, status: o.status || '', statusIcon: o.statusEye ? ic.eyeOffXs : ic.clockXs,
+        hasReacts: reacts.length > 0 && !veil, reacts,
+      };
+    });
+    const extra = (c.reply ? 66 : 0) + (c.quote ? 98 : 0) + (c.spoiler ? 46 : 0) + (c.mention ? 194 : 0) + (comp === 'rec' ? 26 + 8 : 0) + (comp === 'review' ? 26 : 0) + (comp === 'typing' && c.draft.length > 34 ? 22 : 0);
+    const composerH = 10 + footPad + (comp === 'rec' ? 64 : 48) + extra;
+    const sheet = c.sheet || '';
+    const fo = c.focus ? L[c.focus] : null;
+    const actionRows = sheet === 'hostActions'
+      ? [[ic.replySm, 'Reply'], [ic.pinSm, 'Pin message', 'Replaces the current pin'], [ic.copySm, 'Copy text'], [ic.muteSm, 'Mute Bolu in chat'], [ic.flagSm, 'Report'], [ic.deleteSm, 'Delete message', '', 'var(--error)']]
+      : [[ic.replySm, 'Reply'], [ic.copySm, 'Copy text'], [ic.flagSm, 'Report message']];
+    const op = OPTS[sheet];
+    const recHalo = h('span', { className: 'fb-motion', style: { position: 'absolute', inset: 0, borderRadius: 9999, background: 'var(--recording)', animation: 'fbRecPulse 1.4s ease-out infinite' } });
+    const mentions = ['Ada', 'Bolu', 'Chidi', 'Funmi'].map((n, i) => ({ name: n, init: n[0], av: `var(--highlight-${AV[n]})`, pos: 'Ch ' + POS[n], bg: i === 0 ? 'color-mix(in oklab, var(--text) 9%, transparent)' : 'transparent' }));
+    return {
+      theme, ios, android: !ios, radius: ios ? 52 : 34, statusH, ic, backIcon: ios ? ic.chevronLeft : ic.arrowLeft,
+      headerH, tabsTop, stripTop, contentTop, composerH, footPad,
+      hSub: host ? 'You host · 14 members' : 'Ada hosts · 14 members',
+      pinned: strip && !c.offline, pinText: PIN, offline: !!c.offline,
+      loading: !!c.loading, empty: !!c.empty, msgs,
+      skel: [[200, 40, 0], [150, 56, 0], [120, 40, 1], [220, 40, 0], [170, 56, 1]].map(([w, hh, m]) => ({ w, h: hh, dir: m ? 'row-reverse' : 'row', align: m ? 'flex-end' : 'flex-start' })),
+      cIdle: comp === 'idle', cTyping: comp === 'typing', cRec: comp === 'rec', cReview: comp === 'review',
+      placeholder: c.empty ? 'Say hello · you’re in Ch ' + me : 'Message · you’re in Ch ' + me, draft: c.draft || '',
+      mentionList: !!c.mention, mentions, replyPrev: !!c.reply, quotePrev: !!c.quote, spoilerRow: !!c.spoiler,
+      recBars: bars(20, 20, 'var(--recording)'), reviewBars: bars(18, 0), recHalo,
+      toast: !!c.toast, toastTitle: c.toast ? c.toast[0] : '', toastSub: c.toast ? c.toast[1] : '', toastBottom: p.screen === 'pinned' ? 844 - contentTop - 64 : composerH + 12,
+      scrim: !!sheet, scrimPct: fo ? 64 : 48, scrimBlur: fo ? 14 : 0, sheet: !!sheet, sheetPad: ios ? 26 : 20,
+      sActions: sheet === 'actions' || sheet === 'hostActions', actionRows: actionRows.map(([icon, t, sub, color]) => ({ icon, t, sub: sub || '', color: color || 'var(--text)' })),
+      focus: !!fo, focusTop: statusH + (sheet === 'hostActions' ? 120 : 190), reactionSet: ['♥', '😂', '😮', '😢', '🔥', '🤔'],
+      focusAv: fo ? `var(--highlight-${AV[fo.who]})` : '', focusInit: fo ? fo.who[0] : '', focusMeta: fo ? `${fo.who} · Ch ${POS[fo.who]}` : '', focusText: fo ? fo.text : '',
+      sOptions: !!op, oTitle: op ? op[0] : '', oBody: op ? op[1] : '', oNote: op ? op[3] : '', oPrimary: op ? op[4] : '',
+      options: op ? op[2].map(([t, s, on]) => ({ t, s, bg: on ? 'color-mix(in oklab, var(--focus-ring) 12%, transparent)' : CARD, ring: on ? 'inset 0 0 0 1.5px var(--focus-ring)' : 'none', dot: on ? 10 : 0, rc: on ? 'var(--focus-ring)' : 'color-mix(in oklab, var(--text) 30%, transparent)' })) : [],
+    };
+  }
+}
+</script>
+</body>
+</html>

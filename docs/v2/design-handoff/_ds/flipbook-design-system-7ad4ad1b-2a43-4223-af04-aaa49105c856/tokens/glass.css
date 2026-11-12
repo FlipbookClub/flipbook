@@ -1,0 +1,122 @@
+/* Glass material + style switch. Glass tokens re-derive on every themed or styled element so they follow the nearest data-theme. */
+:root,[data-theme],[data-style]{
+  --glass-fill:color-mix(in oklab,var(--surface-raised) 70%,transparent); /* Floating glass: toasts, pills, theirs bubbles. */
+  --glass-fill-strong:color-mix(in oklab,var(--surface-raised) 82%,transparent); /* Menus, reaction bar. */
+  --glass-chrome:color-mix(in oklab,var(--surface) 72%,transparent); /* Header, composer, footers, tab bar. */
+  --glass-sheet:color-mix(in oklab,var(--surface) 76%,transparent); /* Bottom sheets. */
+  --glass-blur:blur(24px) saturate(180%); /* @kind other */
+  --glass-blur-sheet:blur(36px) saturate(180%); /* @kind other */
+  --glass-hairline:inset 0 0 0 1px color-mix(in oklab,var(--text) 9%,transparent); /* @kind shadow */
+  --glass-highlight:inset 0 1px 0 rgba(255,255,255,.12); /* @kind shadow */ /* Cards and chrome. */
+  --glass-highlight-float:inset 0 1px 0 rgba(255,255,255,.22); /* @kind shadow */ /* Floating pills. */
+  --glass-highlight-sheet:inset 0 1px 0 rgba(255,255,255,.25); /* @kind shadow */ /* Sheets. */
+  --glass-float:0 14px 30px -10px rgba(8,6,30,.5); /* @kind shadow */
+  --glass-sheet-shadow:0 -10px 40px -10px rgba(8,6,30,.5); /* @kind shadow */
+  --tint-1:color-mix(in oklab,var(--text) 6%,transparent); /* Quiet fills, option rows. */
+  --tint-2:color-mix(in oklab,var(--text) 10%,transparent); /* Secondary pill buttons. */
+  --tint-3:color-mix(in oklab,var(--text) 12%,transparent); /* Active segment. */
+  --selected-fill:color-mix(in oklab,var(--focus-ring) 12%,transparent);
+  --selected-ring:inset 0 0 0 1.5px var(--focus-ring); /* @kind shadow */
+  --bubble-mine:color-mix(in oklab,var(--primary) 24%,var(--surface));
+  --recording-surface:color-mix(in oklab,var(--recording) 14%,var(--surface));
+  --scrim-focus:color-mix(in oklab,#121212 64%,transparent); /* Long-press focus, with --scrim-focus-blur. */
+  --scrim-focus-blur:blur(14px); /* @kind other */
+  --no-ring:0 0 0 0 transparent; /* @kind shadow */
+}
+/* Style-scoped tokens. Glass is the default; data-style="classic" restores the flat style. Components read only these. */
+:root,[data-theme],[data-style],[data-style="classic"] [data-style="glass"],[data-style="classic"] [data-style="glass"] [data-theme],[data-style="classic"] [data-theme][data-style="glass"]{
+  --look:glass; /* @kind other */
+  --radius-button:var(--radius-full);
+  --radius-card:var(--radius-card-glass);
+  --radius-bubble-main:var(--radius-bubble);
+  --radius-bubble-corner:var(--radius-bubble-tail);
+  --radius-sheet:var(--radius-sheet-glass);
+  --radius-sheet-bottom:var(--radius-sheet-glass);
+  --radius-option:var(--radius-row);
+  --radius-float:var(--radius-full);
+  --radius-inner:16px;
+  --radius-field:var(--radius-full);
+  --radius-segment:var(--radius-full);
+  --sheet-inset:8px;
+  --tabbar-inset:16px;
+  --tabbar-radius:var(--radius-full);
+  --chrome-fill:var(--glass-chrome);
+  --chrome-blur:var(--glass-blur); /* @kind other */
+  --chrome-edge:var(--glass-hairline),var(--glass-highlight); /* @kind shadow */
+  --control-fill:var(--glass-fill);
+  --control-ring:var(--glass-hairline),var(--glass-highlight-float); /* @kind shadow */
+  --float-fill:var(--glass-fill);
+  --float-fill-strong:var(--glass-fill-strong);
+  --float-blur:var(--glass-blur); /* @kind other */
+  --float-ring:var(--glass-hairline),var(--glass-highlight-float); /* @kind shadow */
+  --float-shadow:var(--glass-float); /* @kind shadow */
+  --sheet-fill:var(--glass-sheet);
+  --sheet-blur:var(--glass-blur-sheet); /* @kind other */
+  --sheet-ring:var(--glass-hairline),var(--glass-highlight-sheet); /* @kind shadow */
+  --sheet-shadow:var(--glass-sheet-shadow); /* @kind shadow */
+  --card-fill:var(--glass-fill);
+  --card-ring:var(--glass-hairline),var(--glass-highlight); /* @kind shadow */
+  --bubble-theirs:var(--glass-fill);
+  --bubble-theirs-ring:var(--glass-hairline); /* @kind shadow */
+  --bubble-mine-fill:var(--bubble-mine);
+  --on-bubble-mine:var(--text);
+  --button-secondary:var(--tint-2);
+  --button-secondary-hover:var(--tint-3);
+  --button-secondary-pressed:var(--tint-3);
+  --button-secondary-disabled:var(--tint-1);
+  --on-button-secondary:var(--text);
+  --on-button-secondary-disabled:var(--text-muted);
+  --segment-track:var(--glass-chrome);
+  --segment-active:var(--tint-3);
+  --tab-active-fill:var(--tint-3);
+  --option-fill:var(--tint-1);
+  --field-fill:var(--tint-1);
+}
+[data-style="classic"],[data-style="classic"] [data-theme]{
+  --look:classic; /* @kind other */
+  --radius-button:var(--radius-md);
+  --radius-card:var(--radius-md);
+  --radius-bubble-main:var(--radius-md);
+  --radius-bubble-corner:var(--radius-md);
+  --radius-sheet:var(--radius-lg);
+  --radius-sheet-bottom:0px;
+  --radius-option:var(--radius-md);
+  --radius-float:var(--radius-md);
+  --radius-inner:var(--radius-sm);
+  --radius-field:var(--radius-sm);
+  --radius-segment:var(--radius-sm);
+  --sheet-inset:0px;
+  --tabbar-inset:0px;
+  --tabbar-radius:0px;
+  --chrome-fill:var(--surface);
+  --chrome-blur:none; /* @kind other */
+  --chrome-edge:inset 0 -1px 0 var(--divider); /* @kind shadow */
+  --control-fill:transparent;
+  --control-ring:var(--no-ring); /* @kind shadow */
+  --float-fill:var(--surface-raised);
+  --float-fill-strong:var(--surface-raised);
+  --float-blur:none; /* @kind other */
+  --float-ring:var(--no-ring); /* @kind shadow */
+  --float-shadow:var(--shadow-float); /* @kind shadow */
+  --sheet-fill:var(--surface);
+  --sheet-blur:none; /* @kind other */
+  --sheet-ring:var(--no-ring); /* @kind shadow */
+  --sheet-shadow:var(--shadow-sheet); /* @kind shadow */
+  --card-fill:var(--surface-raised);
+  --card-ring:var(--no-ring); /* @kind shadow */
+  --bubble-theirs:var(--surface-raised);
+  --bubble-theirs-ring:var(--no-ring); /* @kind shadow */
+  --bubble-mine-fill:var(--primary);
+  --on-bubble-mine:var(--on-primary);
+  --button-secondary:var(--secondary);
+  --button-secondary-hover:var(--secondary-hover);
+  --button-secondary-pressed:var(--secondary-pressed);
+  --button-secondary-disabled:var(--secondary-disabled);
+  --on-button-secondary:var(--on-secondary);
+  --on-button-secondary-disabled:var(--on-secondary-disabled);
+  --segment-track:var(--surface-raised);
+  --segment-active:var(--surface);
+  --tab-active-fill:transparent;
+  --option-fill:var(--surface-raised);
+  --field-fill:var(--surface-raised);
+}

@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/glass.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" data-style="{{ look }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:{{ ground }};color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ sBook }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ bookFootH }}px;overflow:hidden;padding:4px 20px 0;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:18px;align-items:flex-end">
+        <div style="position:relative;flex:none"><sc-if value="{{ bk.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 18px 30px -14px rgba(8,6,30,.6)"><dc-import name="Cover" book="{{ bk.art }}" width="{{ 116 }}" hint-size="116px,174px"></dc-import></div></sc-if><sc-if value="{{ bk.tone }}"><div style="border-radius:4px;box-shadow:0 18px 30px -14px rgba(8,6,30,.6)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ bk.t }}" author="{{ bk.a }}" tone="{{ bk.tone }}" width="{{ 116 }}" hint-size="116px,174px"></x-import></div></sc-if><span style="position:absolute;right:6px;bottom:6px;height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.02em;white-space:nowrap;color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ bk.band }}</span></div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;padding-bottom:2px"><span class="t-h1" style="color:var(--text);text-wrap:balance">{{ bk.t }}</span><span class="t-body" style="color:var(--text-secondary)">{{ bk.a }}</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:14px 0;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <sc-for list="{{ bk.facts }}" as="x" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:{{ x.line }}"><span style="font:700 17px/24px var(--font-sans);color:var(--text)">{{ x.v }}</span><span class="t-caption" style="color:var(--text-muted)">{{ x.l }}</span></div></sc-for>
+      </div>
+      <sc-if value="{{ bk.social }}"><div style="display:flex;align-items:center;gap:10px"><div style="display:flex;flex:none"><sc-for list="{{ faces }}" as="f" hint-placeholder-count="3"><span class="t-caption" style="width:28px;height:28px;margin-left:{{ f.ml }}px;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:{{ f.bg }};box-shadow:0 0 0 2px var(--surface)">{{ f.i }}</span></sc-for></div><span class="t-label" style="color:var(--text)">{{ bk.social }}</span></div></sc-if>
+      <sc-if value="{{ bk.back }}"><div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--radius-row);background:var(--option-fill)"><span style="display:flex;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="book-open" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ bk.back }}</span></div></sc-if>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" icon="{{ giftIcon }}" hint-size="100%,48px">Gift a copy</x-import>
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" icon="{{ commIcon }}" hint-size="100%,48px">Start a community</x-import>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary)">About this book</span><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ bk.desc }}</span></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <div style="display:flex;justify-content:center;gap:6px;align-items:baseline"><sc-if value="{{ bk.was }}"><span style="font:500 13px/18px var(--font-sans);color:var(--text-muted);text-decoration:line-through">{{ bk.was }}</span></sc-if><span style="font:600 13px/18px var(--font-sans);color:{{ bk.lineColor }}">{{ bk.priceLine }}</span></div>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">{{ bk.primary }}</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sReader }}">
+    <div style="position:absolute;left:0;right:0;top:0;z-index:20;padding:{{ statusH }}px 8px 6px;display:flex;align-items:center;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <span style="width:44px;height:44px;flex:none;display:grid;place-items:center;color:var(--reader-text)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-left" hint-size="24px,24px"></x-import></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center"><span class="t-label" style="color:var(--reader-text)">{{ rd.t }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ rd.ch }}</span></div>
+      <span style="width:44px;height:44px;flex:none"></span>
+    </div>
+    <div style="position:absolute;left:0;right:0;top:{{ readerTop }}px;bottom:0;overflow:hidden;padding:0 28px;display:flex;flex-direction:column;gap:18px;color:var(--reader-text)">
+      <span class="t-caption" style="color:var(--text-muted);letter-spacing:.14em;padding-top:16px">{{ rd.label }}</span>
+      <sc-for list="{{ rd.paras }}" as="p" hint-placeholder-count="3"><p style="margin:0;font:400 18px/30px var(--font-serif);text-wrap:pretty">{{ p }}</p></sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sShelf }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;bottom:0;overflow:hidden;padding:8px 20px 0;display:flex;flex-direction:column;gap:16px">
+      <h1 class="t-h1" style="margin:4px 0 0;color:var(--text)">Shelf</h1>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.SegmentedTabs" items="{{ shelfTabs }}" value="{{ shelfTab }}" hint-size="100%,44px"></x-import>
+      <sc-if value="{{ shelfOffline }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,64px">You’re offline. Books on this phone still open.</x-import></sc-if>
+      <sc-if value="{{ expiring }}">
+        <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h3" style="color:var(--text)">Pride and Prejudice ends in 2 days</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">You’re in Chapter 12. Keep it 4 more weeks for ₦500, and your place stays put.</span></div>
+          <div style="display:flex;gap:8px"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" hint-size="130px,40px">Keep reading</x-import><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="sm" hint-size="90px,40px">Not now</x-import></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ shelfEmpty }}">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:24px 20px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <span class="t-h2" style="color:var(--text)">Read this with someone</span>
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Books you get, gifts and club copies all land here, ready to read offline. Chapter 1 of every book is free.</span>
+          <div style="display:flex;gap:8px;padding-top:8px"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="sm" hint-size="120px,40px">Find a book</x-import><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="sm" hint-size="130px,40px">Invite a friend</x-import></div>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ rows }}" as="r" hint-placeholder-count="4">
+          <div style="display:flex;gap:14px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill);opacity:{{ r.op }}">
+            <div style="flex:none"><sc-if value="{{ r.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ r.art }}" width="{{ 56 }}" hint-size="56px,84px"></dc-import></div></sc-if><sc-if value="{{ r.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ r.t }}" author="{{ r.a }}" tone="{{ r.tone }}" width="{{ 56 }}" hint-size="56px,84px"></x-import></sc-if></div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+              <sc-if value="{{ r.label }}"><span style="align-self:flex-start;height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);white-space:nowrap;color:var(--text);background:var(--tint-2)">{{ r.label }}</span></sc-if>
+              <span style="font:600 15px/20px var(--font-sans);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ r.t }}</span>
+              <span class="t-caption" style="font-size:13px;color:{{ r.progColor }}">{{ r.prog }}</span>
+              <sc-if value="{{ r.bar }}"><div style="height:4px;border-radius:9999px;background:var(--progress-track)"><div style="width:{{ r.pct }}%;height:4px;border-radius:9999px;background:var(--progress-fill)"></div></div></sc-if>
+              <span class="t-caption" style="color:{{ r.subColor }}">{{ r.sub }}</span>
+            </div>
+            <sc-if value="{{ r.btn }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" disabled="{{ r.off }}" hint-size="80px,40px">{{ r.btn }}</x-import></sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sLobby }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Emblem" name="Lagos Night Readers" size="{{ 56 }}" hint-size="56px,56px"></x-import>
+        <div style="display:flex;flex-direction:column;gap:2px"><span class="t-h2" style="color:var(--text)">Lagos Night Readers</span><span class="t-caption" style="color:var(--text-muted)">12 members</span></div>
+      </div>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.SegmentedTabs" items="{{ lobbyTabs }}" value="lobby" hint-size="100%,44px"></x-import>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,80px">The publisher withdrew Freshwater on 6 Oct, so it can’t be opened here. Everyone who had a copy got a credit. Chat and sessions carry on.</x-import>
+      <div style="display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <div style="flex:none;opacity:.5"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="Freshwater" author="Akwaeke Emezi" tone="indigo" width="{{ 56 }}" hint-size="56px,84px"></x-import></div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span class="t-caption" style="color:var(--text-muted)">This community’s book</span><span style="font:600 15px/20px var(--font-sans);color:var(--text)">Freshwater</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">No longer available</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h3" style="color:var(--text)">Choose the next book</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Only you can set it, Lara. Members keep their highlights and reactions from Freshwater.</span></div>
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="md" full-width="{{ true }}" hint-size="100%,48px">Set the next book</x-import>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sGift }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ giftFootH }}px;overflow:hidden;padding:24px 28px 0;display:flex;flex-direction:column;align-items:center;gap:24px;text-align:center">
+      <div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 22px 40px -16px rgba(8,6,30,.65)"><dc-import name="Cover" book="stay" width="{{ 148 }}" hint-size="148px,222px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="t-h1" style="color:var(--text);text-wrap:balance">Ada got you a copy of <em style="font-family:var(--font-serif);font-weight:600">Stay With Me</em></span><span class="t-body" style="color:var(--text-secondary)">From Lagos Night Readers</span></div>
+      <div style="align-self:stretch;display:flex;flex-direction:column;gap:8px;padding:18px 20px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring);text-align:left">
+        <span style="font:italic 400 16px/24px var(--font-serif);color:var(--text);text-wrap:pretty">“Saturday’s meet-up is about this one. Thought you’d want your own copy.”</span>
+        <span class="t-caption" style="color:var(--text-muted)">Ada</span>
+      </div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <span class="t-caption" style="text-align:center;color:var(--text-secondary)">On your Shelf as “Gift from Ada” · 4-week rental</span>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Open it</x-import>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">Say thanks in chat</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sWeb }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;bottom:0;padding:8px 16px 0;display:flex;flex-direction:column;gap:14px">
+      <div style="height:44px;border-radius:9999px;border:1.5px dashed var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;color:var(--text-muted)"><span class="t-caption">Done</span><span class="t-caption">flipbook.ng/checkout</span><span style="width:28px"></span></div>
+      <span style="align-self:flex-start;height:24px;padding:0 10px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.08em;color:var(--text-secondary);border:1.5px dashed var(--border)">WIREFRAME · WEB CHECKOUT</span>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:16px;border:1.5px dashed var(--border)">
+        <span class="t-label" style="color:var(--text-secondary)">Order</span>
+        <div style="display:flex;justify-content:space-between"><span class="t-body" style="color:var(--text-secondary)">Small Rain in Yaba · 4-week rental</span><span class="t-body" style="color:var(--text-secondary)">₦1,500</span></div>
+        <span class="t-caption" style="color:var(--text-muted)">Signed in as lara@…</span>
+      </div>
+      <sc-for list="{{ webFields }}" as="f" hint-placeholder-count="4"><div style="display:flex;flex-direction:column;gap:6px"><span class="t-caption" style="color:var(--text-muted)">{{ f }}</span><div style="height:48px;border-radius:12px;border:1.5px dashed var(--border)"></div></div></sc-for>
+      <div style="height:52px;border-radius:9999px;display:grid;place-items:center;background:var(--tint-2)"><span class="t-label" style="color:var(--text-secondary)">Pay ₦1,500</span></div>
+      <span class="t-caption" style="text-align:center;color:var(--text-muted);text-wrap:pretty">Card, bank transfer or USSD, by the payment provider. On success the browser returns to Flipbook.</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ header }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.AppHeader" title="" on-back="{{ noop }}" actions="{{ hActions }}" dc-props="{{ hProps }}" hint-size="100%,60px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabbar }}">
+    <div style="position:absolute;left:0;right:0;bottom:{{ tabBottom }}px;z-index:24">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.TabBar" items="{{ tabItems }}" value="shelf" hint-size="100%,80px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}">
+    <div style="position:absolute;left:16px;right:16px;bottom:{{ footPad }}px;z-index:30">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Toast" kind="positive" hint-size="100%,56px">{{ toast }}</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ push }}">
+    <div style="position:absolute;left:8px;right:8px;top:{{ pushTop }}px;z-index:50;display:flex;gap:12px;padding:14px;border-radius:24px;background:var(--glass-fill-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--float-ring), var(--float-shadow)">
+      <img src="assets/flipbook-icon-flip-primary.svg" alt="" style="width:38px;height:38px;border-radius:9px;flex:none">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+        <div style="display:flex;justify-content:space-between"><span class="t-caption" style="color:var(--text-muted);letter-spacing:.04em">FLIPBOOK</span><span class="t-caption" style="color:var(--text-muted)">now</span></div>
+        <span class="t-label" style="font-size:15px;line-height:20px;color:var(--text)">Pride and Prejudice ends in 2 days</span>
+        <span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">You’re in Chapter 12. Keep it 4 more weeks for ₦500, or finish before Monday.</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sh }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="{{ sh.title }}" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <sc-if value="{{ sh.done }}"><span style="width:56px;height:56px;border-radius:9999px;display:grid;place-items:center;color:var(--on-positive-surface);background:var(--positive-surface)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="check" hint-size="24px,24px"></x-import></span></sc-if>
+          <sc-if value="{{ sh.body }}"><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ sh.body }}</span></sc-if>
+          <sc-if value="{{ sh.book }}">
+            <div style="display:flex;gap:14px;align-items:center">
+              <div style="position:relative;flex:none"><sc-if value="{{ sh.book.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ sh.book.art }}" width="{{ 48 }}" hint-size="48px,72px"></dc-import></div></sc-if><sc-if value="{{ sh.book.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ sh.book.t }}" author="{{ sh.book.a }}" tone="{{ sh.book.tone }}" width="{{ 48 }}" hint-size="48px,72px"></x-import></sc-if></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ sh.book.t }}</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ sh.book.a }}</span></div>
+              <span style="flex:none;height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ sh.book.band }}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ sh.person }}">
+            <div style="display:flex;gap:12px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill)">
+              <span class="t-label" style="width:40px;height:40px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--highlight-sand)">A</span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">Ada Okafor</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">Lagos Night Readers</span></div>
+              <span class="t-label" style="color:var(--ghost)">Change</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{ sh.field }}">
+            <div style="height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;gap:10px;background:var(--field-fill)"><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ sh.field.icon }}" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="flex:1;color:{{ sh.field.color }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ sh.field.text }}</span></div>
+          </sc-if>
+          <sc-if value="{{ sh.options }}">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <sc-if value="{{ sh.optLabel }}"><span class="t-label" style="color:var(--text-secondary)">{{ sh.optLabel }}</span></sc-if>
+              <sc-for list="{{ sh.options }}" as="o" hint-placeholder-count="3"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.OptionRow" label="{{ o.l }}" description="{{ o.d }}" selected="{{ o.sel }}" hint-size="100%,56px"></x-import></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ sh.banner }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="{{ sh.banner.kind }}" hint-size="100%,64px">{{ sh.banner.text }}</x-import></sc-if>
+          <sc-if value="{{ sh.cells }}">
+            <div style="display:grid;grid-template-columns:repeat({{ sh.cols }},minmax(0,1fr));padding:14px 0;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+              <sc-for list="{{ sh.cells }}" as="c" hint-placeholder-count="2"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:{{ c.line }}"><div style="display:flex;gap:6px;align-items:baseline"><sc-if value="{{ c.was }}"><span style="font:500 14px/20px var(--font-sans);color:var(--text-muted);text-decoration:line-through">{{ c.was }}</span></sc-if><span style="font:700 20px/28px var(--font-sans);color:{{ c.color }}">{{ c.v }}</span></div><span class="t-caption" style="color:var(--text-muted)">{{ c.l }}</span></div></sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{ sh.noteField }}">
+            <div style="display:flex;flex-direction:column;gap:6px"><span class="t-label" style="color:var(--text-secondary)">Add a note</span><div style="min-height:72px;padding:12px 16px;border-radius:16px;background:var(--field-fill)"><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ sh.noteField }}</span></div></div>
+          </sc-if>
+          <sc-if value="{{ sh.note }}"><span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">{{ sh.note }}</span></sc-if>
+          <div style="display:flex;flex-direction:column;gap:8px;padding-top:2px">
+            <sc-for list="{{ sh.buttons }}" as="b" hint-placeholder-count="1"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="{{ b.variant }}" size="lg" full-width="{{ true }}" loading="{{ b.loading }}" disabled="{{ b.disabled }}" hint-size="100%,52px">{{ b.l }}</x-import></sc-for>
+          </div>
+          <sc-if value="{{ sh.foot }}"><span class="t-caption" style="text-align:center;color:var(--text-muted);text-wrap:pretty">{{ sh.foot }}</span></sc-if>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ store }}">
+    <div style="position:absolute;inset:0;z-index:45;background:var(--scrim)"></div>
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:46;padding:18px 20px {{ footPad }}px;border-radius:32px;background:var(--surface-raised);border:1.5px dashed var(--border);display:flex;flex-direction:column;gap:14px">
+      <span style="align-self:flex-start;height:24px;padding:0 10px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.08em;color:var(--text-secondary);border:1.5px dashed var(--border)">WIREFRAME · {{ storeName }} SHEET</span>
+      <div style="display:flex;gap:12px;align-items:center"><span style="width:48px;height:48px;border-radius:12px;border:1.5px dashed var(--border)"></span><div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text-secondary)">Small Rain in Yaba · 4-week rental</span><span class="t-caption" style="color:var(--text-muted)">Flipbook · in-app purchase</span></div></div>
+      <sc-for list="{{ storeRows }}" as="r" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1.5px dashed var(--border)"><span class="t-caption" style="color:var(--text-muted)">{{ r.l }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ r.v }}</span></div></sc-for>
+      <div style="height:52px;border-radius:14px;display:grid;place-items:center;background:var(--tint-2)"><span class="t-label" style="color:var(--text-secondary)">{{ storeCta }}</span></div>
+      <span class="t-caption" style="text-align:center;color:var(--text-muted)">System UI. On success the book opens; on cancel the confirmation sheet returns.</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text);pointer-events:none"><span style="font:600 16px/20px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text);pointer-events:none"><span style="font:500 14px/18px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;confirm&quot;,&quot;opening&quot;,&quot;opened&quot;,&quot;storeSheet&quot;,&quot;webHandoff&quot;,&quot;webPage&quot;,&quot;webReturn&quot;,&quot;proConfirm&quot;,&quot;proIncluded&quot;,&quot;proOpened&quot;,&quot;failed&quot;,&quot;methods&quot;,&quot;shelf&quot;,&quot;shelfFinished&quot;,&quot;shelfExpired&quot;,&quot;shelfEmpty&quot;,&quot;shelfOffline&quot;,&quot;expiryPush&quot;,&quot;expiryShelf&quot;,&quot;expirySheet&quot;,&quot;expiredBook&quot;,&quot;takedownShelf&quot;,&quot;takedownLobby&quot;,&quot;giftPick&quot;,&quot;giftOwned&quot;,&quot;giftConfirm&quot;,&quot;giftSent&quot;,&quot;giftLink&quot;,&quot;giftReceived&quot;],&quot;default&quot;:&quot;confirm&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;glass&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;glass&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const h = React.createElement;
+const IC = {
+  signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+  wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+  battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+};
+const BK = {
+  yaba: { t: 'Small Rain in Yaba', a: 'Tọ́lá Adéwálé', tone: 'aqua', band: 'Band B', facts: [['6 hr', 'Reading time'], ['28', 'Chapters'], ['4 weeks', 'Rental']], desc: 'Bísí moves back into her mother’s flat in Yaba for one rainy season and finds the street has kept every secret she left behind.', priceLine: 'You read Chapter 1 · 4-week rental', primary: 'Get it ₦1,500' },
+  yabaPro: { t: 'Small Rain in Yaba', a: 'Tọ́lá Adéwálé', tone: 'aqua', band: 'Band B', facts: [['6 hr', 'Reading time'], ['28', 'Chapters'], ['6 weeks', 'With Pro']], desc: 'Bísí moves back into her mother’s flat in Yaba for one rainy season and finds the street has kept every secret she left behind.', was: '₦1,500', priceLine: '15% off with Pro · 6-week rental', accent: true, primary: 'Get it ₦1,275' },
+  middlemarch: { t: 'Middlemarch', a: 'George Eliot', art: 'middlemarch', band: 'Band A', facts: [['32 hr', 'Reading time'], ['86', 'Chapters'], ['Unlimited', 'With Pro']], desc: 'A provincial town, an idealistic young woman and a marriage she gets badly wrong. Eliot’s portrait of how ordinary lives shape each other.', priceLine: 'Included with Pro', accent: true, primary: 'Read' },
+  north: { t: 'North and South', a: 'Elizabeth Gaskell', art: 'north', band: 'Band A', facts: [['19 hr', 'Reading time'], ['52', 'Chapters'], ['Ended', 'Rental']], back: 'Read again and you’re back in Chapter 9, with your 6 highlights and the 12 reactions you left.', desc: 'Margaret Hale leaves the soft south of England for a northern mill town, and argues with a mill owner about almost everything.', priceLine: 'Rental ended 30 Sep · Ch 9 · 41%', primary: 'Read again ₦500' },
+  stay: { t: 'Stay With Me', a: 'Ayọ̀bámi Adébáyọ̀', art: 'stay', band: 'Band C', facts: [['7 hr', 'Reading time'], ['34', 'Chapters'], ['4 weeks', 'Rental']], social: 'Ada and 2 others are reading this', desc: 'A marriage in 1980s Ilesa, told by husband and wife in turn, and the pressure on both of them to have a child. Funny, tender and hard to put down.', priceLine: '4-week rental', primary: 'Get it ₦2,500' },
+};
+const ROW = {
+  pp: { art: 'pp', t: 'Pride and Prejudice', a: 'Jane Austen', prog: 'Ch 12 · 34% · 7 hr left', pct: 34, sub: 'On this phone · until 9 Nov', btn: 'Read' },
+  yaba: { tone: 'aqua', t: 'Small Rain in Yaba', a: 'Tọ́lá Adéwálé', prog: 'Ch 2 · 6% · 5 hr 40 min left', pct: 6, sub: 'Downloading 40% · until 5 Nov', btn: 'Read' },
+  stay: { art: 'stay', t: 'Stay With Me', a: 'Ayọ̀bámi Adébáyọ̀', label: 'Gift from Ada', prog: 'Not started · 7 hr', pct: 0, sub: 'Not on this phone · until 5 Nov', btn: 'Read' },
+  things: { tone: 'coral', t: 'Things Fall Apart', a: 'Chinua Achebe', label: 'Club copy', prog: 'Ch 4 · 22% · 4 hr left', pct: 22, sub: 'On this phone', btn: 'Read' },
+  fresh: { tone: 'indigo', t: 'Freshwater', a: 'Akwaeke Emezi', prog: 'No longer available', pct: 0, nobar: true, sub: '₦1,500 credit added', subAccent: true, btn: '', op: .7 },
+  emma: { art: 'emma', t: 'Emma', a: 'Jane Austen', prog: 'Finished 12 Sep', nobar: true, sub: 'Highlights and reactions kept', btn: 'Read again' },
+  persuasion: { art: 'persuasion', t: 'Persuasion', a: 'Jane Austen', label: 'Club copy', prog: 'Finished 3 Aug', nobar: true, sub: 'Highlights and reactions kept', btn: 'Read again' },
+  northX: { art: 'north', t: 'North and South', a: 'Elizabeth Gaskell', prog: 'Ended 30 Sep · Ch 9 · 41%', pct: 41, sub: 'Your place and 12 reactions come back', btn: 'Read again' },
+  sisterX: { tone: 'plum', t: 'My Sister, the Serial Killer', a: 'Oyinkan Braithwaite', prog: 'Ended 2 Sep · Ch 20 · 88%', pct: 88, sub: 'Your place and 4 highlights come back', btn: 'Read again' },
+};
+const YABA_ROW = { t: 'Small Rain in Yaba', a: 'Tọ́lá Adéwálé', tone: 'aqua', band: 'Band B' };
+const cell = (v, l, o = {}) => ({ v, l, ...o });
+const SHEETS = {
+  confirm: { title: 'Get this book', book: YABA_ROW, cells: [cell('₦1,500', '4-week rental'), cell('5 Nov', 'Rental ends')], note: 'You’ve read Chapter 1, so you’ll carry on from Chapter 2.', buttons: [{ l: 'Get it ₦1,500' }], foot: 'It opens as soon as payment goes through.' },
+  opening: { title: 'Get this book', book: YABA_ROW, cells: [cell('₦1,500', '4-week rental'), cell('5 Nov', 'Rental ends')], note: 'You’ve read Chapter 1, so you’ll carry on from Chapter 2.', buttons: [{ l: 'Opening', loading: true }], foot: 'It opens as soon as payment goes through.' },
+  proConfirm: { title: 'Get this book', book: YABA_ROW, cells: [cell('₦1,275', '15% off with Pro', { was: '₦1,500', accent: true }), cell('19 Nov', '6-week rental')], note: 'You’ve read Chapter 1, so you’ll carry on from Chapter 2.', buttons: [{ l: 'Get it ₦1,275' }], foot: 'It opens as soon as payment goes through.' },
+  webHandoff: { title: 'Finish paying on the web', body: 'A secure checkout opens in your browser. When it’s done, you come straight back to Chapter 2.', book: YABA_ROW, cells: [cell('₦1,500', '4-week rental'), cell('5 Nov', 'Rental ends')], buttons: [{ l: 'Pay ₦1,500 on the web' }], foot: 'Card, bank transfer or USSD. Your place is kept.' },
+  webReturn: { title: 'Welcome back', body: 'Confirming your payment. This usually takes a few seconds, then Chapter 2 opens.', book: YABA_ROW, buttons: [{ l: 'Opening', loading: true }] },
+  failed: { title: 'Get this book', book: YABA_ROW, banner: { kind: 'error', text: 'Your bank didn’t approve this one.' }, note: 'Nothing was charged, and your place in Chapter 1 is kept.', buttons: [{ l: 'Try again ₦1,500' }, { l: 'Pay another way', variant: 'secondary' }] },
+  methods: { title: 'Pay another way', options: [{ l: 'Card ending 4821', d: 'Didn’t go through just now' }, { l: 'Bank transfer', d: 'Pay from your banking app', sel: true }, { l: 'USSD', d: 'Dial a short code on this phone' }, { l: 'Add a new card' }], buttons: [{ l: 'Pay ₦1,500' }], foot: 'Web route only. With the store route, the store handles methods.' },
+  expiry: { title: 'Keep reading', book: { t: 'Pride and Prejudice', a: 'Jane Austen', art: 'pp', band: 'Band A' }, cells: [cell('₦500', '4 more weeks'), cell('7 Dec', 'New end date')], note: 'Your place in Chapter 12, your highlights and your reactions stay where they are.', buttons: [{ l: 'Keep it ₦500' }, { l: 'Read it with Pro', variant: 'ghost' }], foot: 'Classics are included with Pro, for as long as you have it.' },
+  takedown: { title: 'Freshwater is no longer available', body: 'The publisher withdrew it from Flipbook on 6 Oct, so it can’t be opened any more. What you paid is now a credit.', cells: [cell('₦1,500', 'Credit for your next book', { accent: true })], note: 'Your highlights and reactions are kept, in case it comes back.', buttons: [{ l: 'Find a book' }, { l: 'Done', variant: 'ghost' }] },
+  giftPick: { title: 'Gift Stay With Me', body: 'Choose someone from your communities. They get their own copy, at full price.', field: { icon: 'search', text: 'Search your communities', muted: true }, optLabel: 'From your communities', options: [{ l: 'Ada Okafor', d: 'Lagos Night Readers', sel: true }, { l: 'Chidi Eze', d: 'Lumee Book Club' }, { l: 'Kemi Bello', d: 'Lagos Night Readers' }], buttons: [{ l: 'Continue' }, { l: 'Send a gift link instead', variant: 'ghost' }] },
+  giftOwned: { title: 'Gift Stay With Me', body: 'Choose someone from your communities. They get their own copy, at full price.', field: { icon: 'search', text: 'Search your communities', muted: true }, optLabel: 'From your communities', options: [{ l: 'Ada Okafor', d: 'Lagos Night Readers' }, { l: 'Chidi Eze', d: 'Lumee Book Club' }, { l: 'Kemi Bello', d: 'Lagos Night Readers', sel: true }], banner: { kind: 'warning', text: 'Kemi already has Stay With Me. Choose someone else, or send a gift link.' }, buttons: [{ l: 'Continue', disabled: true }] },
+  giftConfirm: { title: 'Gift to Ada', person: true, noteField: 'Saturday’s meet-up is about this one. Thought you’d want your own copy.', cells: [cell('₦2,500', 'Full price'), cell('4 weeks', 'Ada’s rental')], buttons: [{ l: 'Gift it ₦2,500' }], foot: 'Ada gets your note and opens the book in one tap.' },
+  giftSent: { title: 'Sent to Ada', done: true, body: 'She’ll get your note now. Stay With Me is on her Shelf as “Gift from Lara”, ready to open.', buttons: [{ l: 'Done' }, { l: 'Gift someone else', variant: 'ghost' }] },
+  giftLink: { title: 'Your gift link is ready', done: true, body: 'The first person to open this link gets a copy of Stay With Me. Send it however you like.', field: { icon: 'share', text: 'flipbook.ng/gift/7Q2K-WX' }, buttons: [{ l: 'Share link' }, { l: 'Copy link', variant: 'secondary' }], foot: 'Paid ₦2,500. You’ll hear when it’s opened.' },
+};
+const READ = {
+  yaba: { t: 'Small Rain in Yaba', ch: 'Chapter 2', label: 'CHAPTER 2', paras: ['The rain came in sideways off the lagoon, and by the time Bísí reached the bus stop on Herbert Macaulay Way her sandals had given up. She stood under a pharmacy awning with three strangers and a goat, all of them pretending not to look at one another.', '“It will stop,” said the woman beside her, in the voice of someone who had said it every rainy season of her life.', 'It did not stop. It went on until the gutters sang.'] },
+  middlemarch: { t: 'Middlemarch', ch: 'Chapter 1', label: 'CHAPTER 1', paras: ['Miss Brooke had that kind of beauty which seems to be thrown into relief by poor dress. Her hand and wrist were so finely formed that she could wear sleeves not less bare of style than those in which the Blessed Virgin appeared to Italian painters.', 'She was usually spoken of as being remarkably clever, but with the addition that her sister Celia had more common-sense.'] },
+};
+const S = {
+  confirm: { v: 'book', b: 'yaba', sh: 'confirm' }, opening: { v: 'book', b: 'yaba', sh: 'opening' },
+  opened: { v: 'reader', r: 'yaba', toast: 'It’s yours until 5 Nov. Carrying on from Chapter 2.' },
+  storeSheet: { v: 'book', b: 'yaba', store: true },
+  webHandoff: { v: 'book', b: 'yaba', sh: 'webHandoff' }, webPage: { v: 'web' }, webReturn: { v: 'book', b: 'yaba', sh: 'webReturn' },
+  proConfirm: { v: 'book', b: 'yabaPro', sh: 'proConfirm' }, proIncluded: { v: 'book', b: 'middlemarch' },
+  proOpened: { v: 'reader', r: 'middlemarch', toast: 'Included with Pro. Middlemarch is on your Shelf.' },
+  failed: { v: 'book', b: 'yaba', sh: 'failed' }, methods: { v: 'book', b: 'yaba', sh: 'methods' },
+  shelf: { v: 'shelf', tab: 'reading', rows: ['pp', 'yaba', 'stay', 'things'] },
+  shelfFinished: { v: 'shelf', tab: 'finished', rows: ['emma', 'persuasion'] },
+  shelfExpired: { v: 'shelf', tab: 'expired', rows: ['northX', 'sisterX'] },
+  shelfEmpty: { v: 'shelf', tab: 'reading', rows: [], empty: true },
+  shelfOffline: { v: 'shelf', tab: 'reading', rows: ['pp', 'yaba', 'stay', 'things'], offline: true },
+  expiryPush: { v: 'shelf', tab: 'reading', rows: ['pp', 'yaba', 'stay', 'things'], push: true },
+  expiryShelf: { v: 'shelf', tab: 'reading', rows: ['pp', 'yaba', 'stay'], expiring: true },
+  expirySheet: { v: 'shelf', tab: 'reading', rows: ['pp', 'yaba', 'stay'], expiring: true, sh: 'expiry' },
+  expiredBook: { v: 'book', b: 'north' },
+  takedownShelf: { v: 'shelf', tab: 'reading', rows: ['pp', 'fresh', 'yaba', 'stay'], sh: 'takedown' },
+  takedownLobby: { v: 'lobby' },
+  giftPick: { v: 'book', b: 'stay', sh: 'giftPick' }, giftOwned: { v: 'book', b: 'stay', sh: 'giftOwned' },
+  giftConfirm: { v: 'book', b: 'stay', sh: 'giftConfirm' }, giftSent: { v: 'book', b: 'stay', sh: 'giftSent' },
+  giftLink: { v: 'book', b: 'stay', sh: 'giftLink' }, giftReceived: { v: 'gift' },
+};
+const face = (i, tone, ml) => ({ key: i, i, bg: `var(--highlight-${tone})`, ml });
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, c = S[p.screen] || S.confirm, v = c.v;
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, footPad = ios ? 34 : 24;
+    const b = BK[c.b] || BK.yaba;
+    const bk = { ...b, art: b.art || '', tone: b.tone || '', social: b.social || '', back: b.back || '', was: b.was || '',
+      facts: b.facts.map(([v, l], i) => ({ key: i, v, l, line: i ? 'inset 1px 0 0 var(--divider)' : 'none' })),
+      lineColor: b.accent ? 'var(--text-accent)' : 'var(--text-secondary)' };
+    const raw = c.sh ? SHEETS[c.sh] : null;
+    const sh = raw ? {
+      title: raw.title, body: raw.body || '', done: !!raw.done, person: !!raw.person, note: raw.note || '', foot: raw.foot || '', noteField: raw.noteField || '',
+      book: raw.book ? { art: '', tone: '', ...raw.book } : null,
+      field: raw.field ? { ...raw.field, color: raw.field.muted ? 'var(--text-muted)' : 'var(--text)' } : null,
+      optLabel: raw.optLabel || '', options: raw.options ? raw.options.map((o, i) => ({ key: i, l: o.l, d: o.d || '', sel: !!o.sel })) : null,
+      banner: raw.banner || null,
+      cols: raw.cells ? raw.cells.length : 1,
+      cells: raw.cells ? raw.cells.map((x, i) => ({ key: i, v: x.v, l: x.l, was: x.was || '', color: x.accent ? 'var(--text-accent)' : 'var(--text)', line: i ? 'inset 1px 0 0 var(--divider)' : 'none' })) : null,
+      buttons: raw.buttons.map((x, i) => ({ key: i, l: x.l, variant: x.variant || 'primary', loading: !!x.loading, disabled: !!x.disabled })),
+    } : null;
+    const off = !!c.offline;
+    const rows = (c.rows || []).map(k => {
+      const r = { ...ROW[k] };
+      if (off && k === 'stay') { r.sub = 'Needs signal to download'; r.off = true; r.op = .6; }
+      if (off && k === 'yaba') r.sub = 'Download paused at 40% · until 5 Nov';
+      if (c.expiring && k === 'pp') { r.sub = 'On this phone · ends in 2 days'; r.subWarn = true; }
+      return { key: k, art: r.art || '', tone: r.tone || '', t: r.t, a: r.a, label: r.label || '', prog: r.prog, pct: r.pct || 0, bar: !r.nobar && r.pct > 0,
+        sub: r.sub, btn: r.btn, off: !!r.off, op: r.op || 1,
+        progColor: k === 'fresh' ? 'var(--text)' : 'var(--text-secondary)',
+        subColor: r.subAccent ? 'var(--text-accent)' : r.subWarn ? 'var(--warning)' : 'var(--text-muted)' };
+    });
+    const storeName = ios ? 'APP STORE' : 'GOOGLE PLAY';
+    return {
+      theme: p.theme || 'flip', look: p.look || 'glass', ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, noop: () => {}, footPad,
+      ground: v === 'reader' ? 'var(--reader-page)' : 'var(--surface)',
+      bodyTop: statusH + 64, readerTop: statusH + 56, sheetPad: footPad - 16, pushTop: statusH + 6,
+      hProps: { style: { background: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } },
+      hActions: v === 'book' ? [{ icon: 'share', label: 'Share' }] : [],
+      header: v === 'book' || v === 'lobby' || v === 'gift',
+      giftIcon: window.FlipbookDesignSystem_7ad4ad ? h(window.FlipbookDesignSystem_7ad4ad.Icon, { name: 'send', size: 'sm' }) : null,
+      commIcon: window.FlipbookDesignSystem_7ad4ad ? h(window.FlipbookDesignSystem_7ad4ad.Icon, { name: 'users', size: 'sm' }) : null,
+      sBook: v === 'book', bk, bookFootH: 12 + 52 + 26 + footPad, faces: [face('A', 'sand', 0), face('K', 'aqua', -6), face('C', 'mint', -6)],
+      sReader: v === 'reader', rd: READ[c.r] || READ.yaba, toast: c.toast || '',
+      sShelf: v === 'shelf', shelfTab: c.tab || 'reading', shelfTabs: [{ value: 'reading', label: 'Reading' }, { value: 'finished', label: 'Finished' }, { value: 'expired', label: 'Expired' }],
+      rows, shelfOffline: off, shelfEmpty: !!c.empty, expiring: !!c.expiring, push: !!c.push,
+      tabbar: v === 'shelf', tabBottom: ios ? 18 : 12, tabItems: [{ value: 'home', label: 'Home', icon: 'house' }, { value: 'shelf', label: 'Shelf', icon: 'shelf' }, { value: 'comm', label: 'Communities', icon: 'users' }, { value: 'you', label: 'You', icon: 'user' }],
+      sLobby: v === 'lobby', lobbyTabs: [{ value: 'lobby', label: 'Lobby' }, { value: 'chat', label: 'Chat' }, { value: 'sessions', label: 'Sessions' }],
+      sGift: v === 'gift', giftFootH: 12 + 52 + 60 + 26 + footPad,
+      sWeb: v === 'web', webFields: ['Card number', 'Expiry and CVV', 'Name on card'],
+      sh, store: !!c.store, storeName, storeCta: ios ? 'Double-click to pay' : 'Buy',
+      storeRows: [{ key: 1, l: 'Price', v: '₦1,500' }, { key: 2, l: 'Account', v: 'lara@…' }, { key: 3, l: 'Payment', v: ios ? 'Apple Pay / card on file' : 'Google Pay / card on file' }],
+    };
+  }
+}
+</script>
+</body>
+</html>

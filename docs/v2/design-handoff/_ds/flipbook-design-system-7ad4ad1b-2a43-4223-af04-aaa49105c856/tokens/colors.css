@@ -1,0 +1,258 @@
+/* Flipbook colour tokens. Brand scale on :root (alias only, never use directly). Semantic tokens per theme: Light is the default; scope Flip or Dark with data-theme on any element. */
+:root{
+  --indigo-50:#f1f4fc; /* DeepIndigo 50. */
+  --indigo-100:#e6eaf9; /* DeepIndigo 100. */
+  --indigo-200:#d1d9f4; /* DeepIndigo 200. */
+  --indigo-300:#b4bfed; /* DeepIndigo 300. */
+  --indigo-400:#969ee3; /* DeepIndigo 400. */
+  --indigo-500:#7c80d8; /* DeepIndigo 500. */
+  --indigo-600:#6662c9; /* DeepIndigo 600. */
+  --indigo-700:#5752b0; /* DeepIndigo 700. */
+  --indigo-800:#48448f; /* DeepIndigo 800. */
+  --indigo-900:#3b3a6d; /* DeepIndigo 900. Base of the scale. Headers, buttons, and key interactive elements. */
+  --indigo-950:#252442; /* DeepIndigo 950. */
+  --coral-50:#fff1f1; /* VibrantCoral 50. */
+  --coral-100:#ffe1e1; /* VibrantCoral 100. */
+  --coral-200:#ffc7c7; /* VibrantCoral 200. */
+  --coral-300:#ffa0a0; /* VibrantCoral 300. */
+  --coral-400:#ff6b6b; /* VibrantCoral 400. Base of the scale. Call-to-action buttons, alerts, and highlights. */
+  --coral-500:#f83b3b; /* VibrantCoral 500. */
+  --coral-600:#e51d1d; /* VibrantCoral 600. */
+  --coral-700:#c11414; /* VibrantCoral 700. */
+  --coral-800:#a01414; /* VibrantCoral 800. */
+  --coral-900:#841818; /* VibrantCoral 900. */
+  --coral-950:#480707; /* VibrantCoral 950. */
+  --neutral-50:#fdfdfd; /* Neutral 50. Backgrounds, input fields, and shadows. */
+  --neutral-100:#efefef; /* Neutral 100. */
+  --neutral-200:#dcdcdc; /* Neutral 200. */
+  --neutral-300:#bdbdbd; /* Neutral 300. */
+  --neutral-400:#989898; /* Neutral 400. */
+  --neutral-500:#7c7c7c; /* Neutral 500. */
+  --neutral-600:#656565; /* Neutral 600. */
+  --neutral-700:#525252; /* Neutral 700. */
+  --neutral-800:#464646; /* Neutral 800. */
+  --neutral-900:#3d3d3d; /* Neutral 900. */
+  --neutral-950:#2f2f2f; /* Neutral 950. Primary text color, icons, and borders. */
+  --ivory:#f7f3e3; /* Warm Ivory. Light reading page; text on Flip. */
+  --pale-sky:#d1d8e0; /* Pale Sky. Secondary text on dark grounds. */
+  --black:#121212; /* Background Black. Dark-theme ground; text on bright fills. */
+  --aqua:#73d2de; /* Serene Aqua. Threads, Dark secondary button. */
+  --aqua-100:#c9eef3; /* Light highlight (Aqua). */
+  --aqua-300:#a6e4eb; /* Dark-mode secondary button hover. */
+  --aqua-700:#3e9fab; /* Dark-mode secondary button pressed. */
+  --gold:#e4b363; /* Golden Sand. Badges, Flip accent, progress on Flip. */
+  --gold-100:#f3ddb5; /* Light highlight (Sand). */
+  --gold-300:#ebc584; /* Gold text on Flip surfaces (meets 4.5:1 on indigo cards). */
+  --gold-700:#8a5e14; /* Gold for text and markers on light surfaces. */
+  --plum:#5d3a5a; /* Muted Plum. Decorative accent shapes in Light. */
+  --green:#3ab57b; /* Emerald Green. Base of the positive and live scales. */
+  --green-100:#e3f5ec; /* Positive container (light) and Mint highlight. */
+  --green-300:#8fddb6; /* Positive and Live on Flip. */
+  --green-400:#6fcf9f; /* Positive and Live on Dark. */
+  --green-700:#1f7a50; /* Positive text and Live on light surfaces. */
+  --green-800:#145c3b; /* Text on positive container (light). */
+  --green-950:#0f3d28; /* Positive container (Flip, Dark). */
+  --orange:#ff944d; /* Sunset Orange. Base of the warning scale. */
+  --orange-100:#ffede0; /* Warning container (light). */
+  --orange-200:#ffdcc4; /* Text on warning container (Flip, Dark). */
+  --orange-300:#ffc59e; /* Warning on Flip. */
+  --orange-400:#ffb27f; /* Warning on Dark. */
+  --orange-700:#a34a00; /* Warning text on light surfaces. */
+  --orange-800:#7a3700; /* Text on warning container (light). */
+  --orange-950:#4a2307; /* Warning container (Flip, Dark). */
+}
+:root,[data-theme="light"]{
+  color-scheme:light;
+  --surface:var(--neutral-50);
+  --surface-raised:var(--indigo-50);
+  --surface-accent:var(--plum);
+  --border:var(--indigo-500);
+  --divider:var(--neutral-100);
+  --text:var(--indigo-900);
+  --text-secondary:var(--neutral-800);
+  --text-accent:var(--coral-700);
+  --text-alt:var(--neutral-950);
+  --text-muted:var(--neutral-600);
+  --on-primary:var(--neutral-50);
+  --on-primary-disabled:var(--indigo-50);
+  --on-secondary:var(--neutral-50);
+  --on-secondary-disabled:var(--coral-50);
+  --ghost:var(--coral-700);
+  --ghost-hover:var(--coral-600);
+  --ghost-pressed:var(--coral-800);
+  --ghost-disabled:var(--coral-200);
+  --primary:var(--indigo-900);
+  --primary-hover:var(--indigo-800);
+  --primary-pressed:var(--indigo-950);
+  --primary-disabled:var(--indigo-300);
+  --secondary:var(--coral-600);
+  --secondary-hover:var(--coral-700);
+  --secondary-pressed:var(--coral-800);
+  --secondary-disabled:var(--coral-200);
+  --positive:var(--green-700);
+  --positive-surface:var(--green-100);
+  --on-positive-surface:var(--green-800);
+  --warning:var(--orange-700);
+  --warning-surface:var(--orange-100);
+  --on-warning-surface:var(--orange-800);
+  --error:var(--coral-700);
+  --error-surface:var(--coral-50);
+  --on-error-surface:var(--coral-800);
+  --reader-page:var(--ivory);
+  --reader-text:var(--neutral-950);
+  --reader-text-secondary:var(--neutral-600);
+  --highlight-sand:var(--gold-100);
+  --highlight-aqua:var(--aqua-100);
+  --highlight-rose:var(--coral-100);
+  --highlight-mint:var(--green-100);
+  --highlight-lavender:var(--indigo-100);
+  --margin-reaction:var(--coral-600);
+  --margin-own:var(--indigo-900);
+  --margin-thread:var(--plum);
+  --margin-ahead:var(--gold-700);
+  --scrim:#1212127a;
+  --veil:var(--indigo-100);
+  --veil-text:var(--indigo-900);
+  --live:var(--green-700);
+  --recording:var(--coral-700);
+  --founding-host:var(--gold);
+  --on-founding-host:var(--indigo-900);
+  --author:var(--gold-700);
+  --progress-track:var(--indigo-100);
+  --progress-fill:var(--indigo-600);
+  --focus-ring:var(--indigo-600);
+  --skeleton:var(--neutral-100);
+  --skeleton-shimmer:var(--indigo-50);
+  --shadow-sheet:0 -4px 24px #3b3a6d1f;
+  --shadow-float:0 4px 16px #3b3a6d26;
+}
+[data-theme="flip"]{
+  color-scheme:dark;
+  --surface:var(--indigo-900);
+  --surface-raised:var(--indigo-800);
+  --surface-accent:var(--coral-400);
+  --border:var(--indigo-400);
+  --divider:var(--indigo-700);
+  --text:var(--neutral-50);
+  --text-secondary:var(--pale-sky);
+  --text-accent:var(--gold-300);
+  --text-alt:var(--ivory);
+  --text-muted:var(--indigo-300);
+  --on-primary:var(--black);
+  --on-primary-disabled:var(--coral-700);
+  --on-secondary:var(--black);
+  --on-secondary-disabled:var(--indigo-400);
+  --ghost:var(--gold-300);
+  --ghost-hover:var(--gold-100);
+  --ghost-pressed:var(--ivory);
+  --ghost-disabled:var(--indigo-500);
+  --primary:var(--coral-400);
+  --primary-hover:var(--coral-300);
+  --primary-pressed:var(--coral-500);
+  --primary-disabled:var(--coral-100);
+  --secondary:var(--neutral-50);
+  --secondary-hover:var(--ivory);
+  --secondary-pressed:var(--pale-sky);
+  --secondary-disabled:var(--indigo-800);
+  --positive:var(--green-300);
+  --positive-surface:var(--green-950);
+  --on-positive-surface:var(--green-100);
+  --warning:var(--orange-300);
+  --warning-surface:var(--orange-950);
+  --on-warning-surface:var(--orange-200);
+  --error:var(--coral-300);
+  --error-surface:var(--coral-950);
+  --on-error-surface:var(--coral-200);
+  --reader-page:var(--indigo-900);
+  --reader-text:var(--ivory);
+  --reader-text-secondary:var(--indigo-300);
+  --highlight-sand:#e4b36352;
+  --highlight-aqua:#73d2de52;
+  --highlight-rose:#ff6b6b52;
+  --highlight-mint:#3ab57b52;
+  --highlight-lavender:#969ee352;
+  --margin-reaction:var(--coral-400);
+  --margin-own:var(--gold);
+  --margin-thread:var(--aqua);
+  --margin-ahead:var(--indigo-300);
+  --scrim:#1212128f;
+  --veil:var(--indigo-800);
+  --veil-text:var(--indigo-200);
+  --live:var(--green-300);
+  --recording:var(--coral-300);
+  --founding-host:var(--gold);
+  --on-founding-host:var(--indigo-900);
+  --author:var(--gold);
+  --progress-track:var(--indigo-800);
+  --progress-fill:var(--gold);
+  --focus-ring:var(--gold);
+  --skeleton:var(--indigo-800);
+  --skeleton-shimmer:var(--indigo-700);
+  --shadow-sheet:0 -4px 24px #12121259;
+  --shadow-float:0 4px 16px #12121266;
+}
+[data-theme="dark"]{
+  color-scheme:dark;
+  --surface:var(--black);
+  --surface-raised:var(--neutral-950);
+  --surface-accent:var(--gold);
+  --border:var(--neutral-600);
+  --divider:var(--neutral-900);
+  --text:var(--neutral-50);
+  --text-secondary:var(--pale-sky);
+  --text-accent:var(--gold);
+  --text-alt:var(--ivory);
+  --text-muted:var(--neutral-400);
+  --on-primary:var(--neutral-50);
+  --on-primary-disabled:var(--neutral-600);
+  --on-secondary:var(--black);
+  --on-secondary-disabled:var(--neutral-600);
+  --ghost:var(--gold);
+  --ghost-hover:var(--gold-100);
+  --ghost-pressed:var(--ivory);
+  --ghost-disabled:var(--neutral-600);
+  --primary:var(--indigo-600);
+  --primary-hover:var(--indigo-700);
+  --primary-pressed:var(--indigo-800);
+  --primary-disabled:var(--neutral-950);
+  --secondary:var(--aqua);
+  --secondary-hover:var(--aqua-300);
+  --secondary-pressed:var(--aqua-700);
+  --secondary-disabled:var(--neutral-950);
+  --positive:var(--green-400);
+  --positive-surface:var(--green-950);
+  --on-positive-surface:var(--green-100);
+  --warning:var(--orange-400);
+  --warning-surface:var(--orange-950);
+  --on-warning-surface:var(--orange-200);
+  --error:var(--coral-300);
+  --error-surface:var(--coral-950);
+  --on-error-surface:var(--coral-200);
+  --reader-page:var(--black);
+  --reader-text:var(--pale-sky);
+  --reader-text-secondary:var(--neutral-400);
+  --highlight-sand:#e4b3634c;
+  --highlight-aqua:#73d2de4c;
+  --highlight-rose:#ff6b6b4c;
+  --highlight-mint:#3ab57b4c;
+  --highlight-lavender:#969ee34c;
+  --margin-reaction:var(--coral-400);
+  --margin-own:var(--indigo-500);
+  --margin-thread:var(--aqua);
+  --margin-ahead:var(--gold-100);
+  --scrim:#121212a3;
+  --veil:var(--neutral-900);
+  --veil-text:var(--neutral-200);
+  --live:var(--green-400);
+  --recording:var(--coral-300);
+  --founding-host:var(--gold);
+  --on-founding-host:var(--black);
+  --author:var(--gold);
+  --progress-track:var(--neutral-950);
+  --progress-fill:var(--indigo-500);
+  --focus-ring:var(--aqua);
+  --skeleton:var(--neutral-950);
+  --skeleton-shimmer:var(--neutral-900);
+  --shadow-sheet:0 -4px 24px #00000080;
+  --shadow-float:0 4px 16px #00000099;
+}
