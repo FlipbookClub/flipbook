@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/glass.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}@keyframes fbCaret{50%{opacity:0}}@media (prefers-reduced-motion:reduce){.fb-motion{animation:none!important}}</style>
+</helmet>
+<div data-theme="{{ theme }}" data-style="{{ look }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:{{ ground }};color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ sHome }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;bottom:0;overflow:hidden">
+      <div style="display:flex;flex-direction:column;gap:24px;padding:8px 0 140px;transform:translateY({{ shift }}px)">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:0 20px">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px;padding-top:4px">
+            <h1 class="t-h1" style="margin:0;color:var(--text)">Good morning, Lara</h1>
+            <span style="font:italic 400 16px/24px var(--font-serif);color:var(--text-secondary);text-wrap:pretty">“{{ quote.q }}”</span>
+            <span class="t-caption" style="color:var(--text-muted)">{{ quote.by }}</span>
+          </div>
+          <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--float-fill);box-shadow:var(--float-ring)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="search" hint-size="24px,24px"></x-import></span>
+        </div>
+        <sc-if value="{{ offline }}"><div style="padding:0 20px"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,64px">You’re offline. These shelves are from this morning; books on your Shelf still open.</x-import></div></sc-if>
+
+        <sc-if value="{{ loading }}">
+          <div style="display:flex;flex-direction:column;gap:24px;padding:0 20px">
+            <div style="height:132px;border-radius:var(--radius-card);background:var(--skeleton)"></div>
+            <sc-for list="{{ skelShelves }}" as="s" hint-placeholder-count="2">
+              <div style="display:flex;flex-direction:column;gap:12px"><span style="width:150px;height:16px;border-radius:9999px;background:var(--skeleton)"></span><div style="display:flex;gap:14px"><sc-for list="{{ s.items }}" as="i" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:8px"><span style="width:112px;height:168px;border-radius:4px;background:var(--skeleton)"></span><span style="width:90px;height:12px;border-radius:9999px;background:var(--skeleton)"></span><span style="width:60px;height:10px;border-radius:9999px;background:var(--skeleton)"></span></div></sc-for></div></div>
+            </sc-for>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ continueCard }}">
+          <div style="margin:0 20px;display:flex;gap:16px;padding:16px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+            <div style="flex:none;border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="pp" width="{{ 76 }}" hint-size="76px,114px"></dc-import></div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+              <span class="t-caption" style="color:var(--text-muted)">Continue reading</span>
+              <span class="t-h3" style="color:var(--text)">Pride and Prejudice</span>
+              <span class="t-caption" style="color:var(--text-secondary)">Lumee Book Club · Ch 12 · 34%</span>
+              <div style="height:4px;border-radius:9999px;background:var(--progress-track);margin:6px 0 0"><div style="width:34%;height:4px;border-radius:9999px;background:var(--progress-fill)"></div></div>
+              <div style="margin-top:auto;padding-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px"><span class="t-caption" style="color:var(--text-muted)">18 min left in chapter</span><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="sm" hint-size="100px,40px">Continue</x-import></div>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ newUser }}">
+          <div style="margin:0 20px;display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:20px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+            <span class="t-h2" style="color:var(--text)">Read this with someone</span>
+            <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">When friends join, the books they’re reading show up here. Every chapter 1 is free while you look around.</span>
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" style="margin-top:8px" hint-size="130px,40px">Invite a friend</x-import>
+          </div>
+        </sc-if>
+
+        <sc-for list="{{ shelves }}" as="sh" hint-placeholder-count="2">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 20px;gap:12px">
+              <div style="display:flex;flex-direction:column"><span class="t-h3" style="color:var(--text)">{{ sh.t }}</span><sc-if value="{{ sh.sub }}"><span class="t-caption" style="color:var(--text-muted)">{{ sh.sub }}</span></sc-if></div>
+              <span class="t-label" style="color:var(--ghost)">See all</span>
+            </div>
+            <div style="display:flex;gap:14px;padding:0 20px">
+              <sc-for list="{{ sh.books }}" as="b" hint-placeholder-count="4">
+                <div style="width:112px;flex:none;display:flex;flex-direction:column;gap:10px">
+                  <div style="position:relative"><sc-if value="{{ b.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ b.art }}" width="{{ 112 }}" hint-size="112px,168px"></dc-import></div></sc-if>
+                  <sc-if value="{{ b.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ b.t }}" author="{{ b.a }}" tone="{{ b.tone }}" width="{{ 112 }}" hint-size="112px,168px"></x-import></sc-if><span style="position:absolute;right:6px;bottom:6px;height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.02em;white-space:nowrap;color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ b.band }}</span></div>
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font:600 15px/20px var(--font-sans);color:var(--text);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">{{ b.t }}</span><span style="font:400 13px/18px var(--font-sans);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.a }}</span></div>
+                  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap"><span style="font:700 14px/18px var(--font-sans);color:{{ b.pc }}">{{ b.price }}</span></div>
+                  <sc-if value="{{ b.social }}"><div style="display:flex;align-items:center;gap:6px;min-width:0"><div style="display:flex;flex:none"><sc-for list="{{ b.faces }}" as="f" hint-placeholder-count="2"><span style="width:18px;height:18px;margin-left:{{ f.ml }}px;border-radius:9999px;display:grid;place-items:center;font:700 9px/1 var(--font-sans);color:var(--text);background:{{ f.bg }};box-shadow:0 0 0 1.5px var(--surface)">{{ f.i }}</span></sc-for></div><span style="font:500 12px/16px var(--font-sans);color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.social }}</span></div></sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sSpecials }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">Specials</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">A members’ shelf, picked each month. Every book here is included with Pro.</span></div>
+      <sc-for list="{{ specials }}" as="b" hint-placeholder-count="5">
+        <div style="display:flex;gap:14px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill)">
+          <div style="position:relative;flex:none"><sc-if value="{{ b.art }}"><div style="flex:none;border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ b.art }}" width="{{ 56 }}" hint-size="56px,84px"></dc-import></div></sc-if>
+          <sc-if value="{{ b.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ b.t }}" author="{{ b.a }}" tone="{{ b.tone }}" width="{{ 56 }}" hint-size="56px,84px"></x-import></sc-if><sc-if value="{{ b.band }}"><span style="position:absolute;right:4px;bottom:4px;height:16px;padding:0 5px;border-radius:9999px;display:inline-flex;align-items:center;font:700 8px/1 var(--font-sans);letter-spacing:.02em;white-space:nowrap;color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ b.band }}</span></sc-if></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ b.t }}</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ b.a }}</span><div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="font:700 14px/18px var(--font-sans);color:var(--text-accent)">Included with Pro</span></div></div>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" color="var(--text-muted)" hint-size="20px,20px"></x-import>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sBook }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ bookFootH }}px;overflow:hidden;padding:4px 20px 0;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:18px;align-items:flex-end">
+        <div style="position:relative;flex:none"><sc-if value="{{ bk.art }}"><div style="flex:none;border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 18px 30px -14px rgba(8,6,30,.6)"><dc-import name="Cover" book="{{ bk.art }}" width="{{ 116 }}" hint-size="116px,174px"></dc-import></div></sc-if>
+        <sc-if value="{{ bk.tone }}"><div style="flex:none;border-radius:4px;box-shadow:0 18px 30px -14px rgba(8,6,30,.6)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ bk.t }}" author="{{ bk.a }}" tone="{{ bk.tone }}" width="{{ 116 }}" hint-size="116px,174px"></x-import></div></sc-if><span style="position:absolute;right:6px;bottom:6px;height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.02em;white-space:nowrap;color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ bk.band }}</span></div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding-bottom:2px">
+          <span class="t-h1" style="color:var(--text);text-wrap:balance">{{ bk.t }}</span>
+          <span class="t-body" style="color:var(--text-secondary)">{{ bk.a }}</span>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:14px 0;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <sc-for list="{{ bk.facts }}" as="x" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:{{ x.line }}"><span style="font:700 17px/24px var(--font-sans);color:var(--text)">{{ x.v }}</span><span class="t-caption" style="color:var(--text-muted)">{{ x.l }}</span></div></sc-for>
+      </div>
+      <sc-if value="{{ bk.social }}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex;flex:none"><sc-for list="{{ socialFaces }}" as="f" hint-placeholder-count="3"><span class="t-caption" style="width:28px;height:28px;margin-left:{{ f.ml }}px;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:{{ f.bg }};box-shadow:0 0 0 2px var(--surface)">{{ f.i }}</span></sc-for></div>
+          <span class="t-label" style="color:var(--text)">{{ bk.social }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ bk.unavailable }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,64px">The publisher has paused this book in Nigeria. If it comes back, it’ll show here.</x-import></sc-if>
+      <sc-if value="{{ bk.extras }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" icon="{{ giftIcon }}" hint-size="100%,48px">Gift a copy</x-import>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" icon="{{ commIcon }}" hint-size="100%,48px">Start a community</x-import>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <span class="t-label" style="color:var(--text-secondary)">About this book</span>
+        <span class="t-body" style="color:var(--text);text-wrap:pretty">{{ bk.desc }}</span>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ bk.genres }}" as="g" hint-placeholder-count="2"><span class="t-label" style="height:32px;padding:0 14px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--card-fill);box-shadow:var(--card-ring)">{{ g }}</span></sc-for></div>
+      
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <sc-if value="{{ bk.priceLine }}"><div style="display:flex;justify-content:center;gap:6px;align-items:baseline"><sc-if value="{{ bk.was }}"><span style="font:500 13px/18px var(--font-sans);color:var(--text-muted);text-decoration:line-through">{{ bk.was }}</span></sc-if><span style="font:600 13px/18px var(--font-sans);color:{{ bk.lineColor }}">{{ bk.priceLine }}</span></div></sc-if>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" disabled="{{ bk.unavailable }}" hint-size="100%,52px">{{ bk.primary }}</x-import>
+      <sc-if value="{{ bk.secondary }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">{{ bk.secondary }}</x-import></sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sBands }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px;padding-bottom:4px"><span class="t-h1" style="color:var(--text)">How book prices work</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Editors place every book in a band. The band sets the price.</span></div>
+      <sc-for list="{{ bandCards }}" as="b" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:14px;padding:14px 16px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:6px">
+            <span style="height:24px;padding:0 10px;border-radius:9999px;display:inline-flex;align-items:center;font:700 12px/1 var(--font-sans);color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ b.n }}</span>
+            <span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">{{ b.d }}</span>
+          </div>
+          <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end"><span style="font:700 20px/26px var(--font-sans);color:var(--text)">{{ b.p }}</span><span style="font:600 12px/16px var(--font-sans);color:var(--text-accent)">{{ b.pro }}</span></div>
+        </div>
+      </sc-for>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:6px 4px 0">
+        <span class="t-label" style="color:var(--text-secondary)">Good to know</span>
+        <sc-for list="{{ bandNotes }}" as="t" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:flex-start"><span style="display:flex;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="check" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ t }}</span></div></sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sSearch }}">
+    <div style="position:absolute;left:16px;right:16px;top:{{ searchTop }}px;z-index:20;display:flex;align-items:center;gap:12px">
+      <div style="flex:1;height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;gap:10px;background:var(--field-fill);box-shadow:{{ fieldRing }}">
+        <span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="search" size="sm" hint-size="20px,20px"></x-import></span>
+        <span class="t-body" style="color:{{ qColor }};white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ query }}</span>
+        <sc-if value="{{ caret }}"><span class="fb-motion" style="width:2px;height:20px;margin-left:-8px;background:var(--focus-ring);animation:fbCaret 1s steps(1) infinite"></span></sc-if>
+      </div>
+      <span class="t-label" style="color:var(--ghost)">Cancel</span>
+    </div>
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <sc-if value="{{ sOffline }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,64px">You’re offline, so this searches your Shelf only.</x-import></sc-if>
+      <sc-if value="{{ sIdle }}">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="t-label" style="color:var(--text-secondary);padding:0 4px 4px">Recent</span>
+          <sc-for list="{{ recents }}" as="r" hint-placeholder-count="3"><div style="height:44px;padding:0 4px;display:flex;align-items:center;gap:12px;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="search" size="sm" hint-size="20px,20px"></x-import><span class="t-body" style="color:var(--text)">{{ r }}</span></div></sc-for>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <span class="t-label" style="color:var(--text-secondary);padding:0 4px">Browse by genre</span>
+          <div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ genres }}" as="g" hint-placeholder-count="10"><span class="t-label" style="height:40px;padding:0 16px;border-radius:var(--radius-button);display:grid;place-items:center;color:var(--text);background:var(--option-fill)">{{ g }}</span></sc-for></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sResults }}">
+        <div style="display:flex;gap:8px;margin:0 -20px;padding:0 20px;overflow:hidden">
+          <sc-for list="{{ filterChips }}" as="c" hint-placeholder-count="4"><span class="t-label" style="height:36px;flex:none;padding:0 14px;border-radius:var(--radius-button);display:flex;align-items:center;gap:4px;color:var(--text);background:{{ c.bg }};box-shadow:{{ c.ring }}">{{ c.t }}<sc-if value="{{ c.chev }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-down" size="{{ 16 }}" hint-size="16px,16px"></x-import></sc-if></span></sc-for>
+        </div>
+        <span class="t-caption" style="color:var(--text-muted);padding:0 4px">{{ resultCount }}</span>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ results }}" as="b" hint-placeholder-count="5">
+            <div style="display:flex;gap:14px;align-items:center;padding:6px 0">
+              <div style="position:relative;flex:none"><sc-if value="{{ b.art }}"><div style="flex:none;border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ b.art }}" width="{{ 56 }}" hint-size="56px,84px"></dc-import></div></sc-if>
+              <sc-if value="{{ b.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ b.t }}" author="{{ b.a }}" tone="{{ b.tone }}" width="{{ 56 }}" hint-size="56px,84px"></x-import></sc-if><sc-if value="{{ b.band }}"><span style="position:absolute;right:4px;bottom:4px;height:16px;padding:0 5px;border-radius:9999px;display:inline-flex;align-items:center;font:700 8px/1 var(--font-sans);letter-spacing:.02em;white-space:nowrap;color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ b.band }}</span></sc-if></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ b.t }}</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ b.a }}</span><div style="display:flex;align-items:center;gap:6px;margin-top:4px"><span style="font:700 14px/18px var(--font-sans);color:{{ b.pc }}">{{ b.price }}</span></div></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ sNone }}">
+        <div style="display:flex;flex-direction:column;gap:6px;padding:8px 4px 0"><span class="t-h2" style="color:var(--text)">No books called “purple hibiscuss”</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Purple Hibiscus isn’t on Flipbook yet. These are close:</span></div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ near }}" as="b" hint-placeholder-count="3">
+            <div style="display:flex;gap:14px;align-items:center;padding:6px 0">
+              <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ b.t }}" author="{{ b.a }}" tone="{{ b.tone }}" width="{{ 56 }}" hint-size="56px,84px"></x-import>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ b.t }}</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ b.a }}</span><span class="t-caption" style="color:var(--text-muted)">{{ b.why }}</span></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sReader }}">
+    <div style="position:absolute;left:0;right:0;top:0;z-index:20;padding:{{ statusH }}px 8px 6px;display:flex;align-items:center;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <span style="width:44px;height:44px;flex:none;display:grid;place-items:center;color:var(--reader-text)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-left" hint-size="24px,24px"></x-import></span>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:center"><span class="t-label" style="color:var(--reader-text)">Middlemarch</span><span class="t-caption" style="color:var(--text-secondary)">{{ rSub }}</span></div>
+      <span style="width:44px;height:44px;flex:none"></span>
+    </div>
+    <div style="position:absolute;left:0;right:0;top:{{ readerTop }}px;bottom:0;overflow:hidden;padding:0 28px;display:flex;flex-direction:column;gap:18px;color:var(--reader-text)">
+      <sc-if value="{{ rStart }}">
+        <span class="t-caption" style="color:var(--text-muted);letter-spacing:.14em;padding-top:16px">CHAPTER 1</span>
+        <p style="margin:0;font:400 18px/30px var(--font-serif)">Miss Brooke had that kind of beauty which seems to be thrown into relief by poor dress. Her hand and wrist were so finely formed that she could wear sleeves not less bare of style than those in which the Blessed Virgin appeared to Italian painters; and her profile as well as her stature and bearing seemed to gain the more dignity from her plain garments.</p>
+        <p style="margin:0;font:400 18px/30px var(--font-serif)">She was usually spoken of as being remarkably clever, but with the addition that her sister Celia had more common-sense.</p>
+      </sc-if>
+      <sc-if value="{{ rEnd }}">
+        <p style="margin:0;padding-top:20px;font:400 18px/30px var(--font-serif);color:var(--text-secondary)">She was usually spoken of as being remarkably clever, but with the addition that her sister Celia had more common-sense.</p>
+        <div style="display:flex;align-items:center;gap:12px;color:var(--text-muted)"><span style="flex:1;height:1px;background:var(--divider)"></span><span class="t-caption" style="letter-spacing:.14em">END OF CHAPTER 1</span><span style="flex:1;height:1px;background:var(--divider)"></span></div>
+        <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring);color:var(--text);font-family:var(--font-sans)">
+          <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h2" style="color:var(--text)">That’s the free chapter</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Get Middlemarch and carry on from Chapter 2. Your place is kept.</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Get it ₦500</x-import>
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Read it with Pro</x-import>
+          </div>
+          <span class="t-caption" style="text-align:center;color:var(--text-muted)">Classics are included with Pro.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ rGot }}">
+        <span class="t-caption" style="color:var(--text-muted);letter-spacing:.14em;padding-top:16px">CHAPTER 2</span>
+        <p style="margin:0;font:400 18px/30px var(--font-serif)">“Sir Humphry Davy?” said Mr. Brooke, over the soup, in his easy smiling way, taking up Sir James Chettam’s remark that he was studying Davy’s Agricultural Chemistry.</p>
+      </sc-if>
+    </div>
+    <sc-if value="{{ rChip }}">
+      <div style="position:absolute;left:16px;right:16px;bottom:{{ chipBottom }}px;z-index:22;display:flex;align-items:center;gap:10px;padding:6px 6px 6px 18px;min-height:48px;border-radius:9999px;background:var(--float-fill);backdrop-filter:var(--float-blur);-webkit-backdrop-filter:var(--float-blur);box-shadow:var(--float-ring), var(--float-shadow)">
+        <span style="flex:1;font:600 13px/18px var(--font-sans);color:var(--text)">Free preview · 7 min left in chapter</span>
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="pill" hint-size="110px,36px">Get it ₦500</x-import>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{ header }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.AppHeader" title="" on-back="{{ noop }}" actions="{{ hActions }}" dc-props="{{ hProps }}" hint-size="100%,60px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabbar }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;bottom:{{ tabBottom }}px;z-index:24">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.TabBar" items="{{ tabItems }}" value="home" hint-size="100%,80px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}">
+    <div style="position:absolute;left:16px;right:16px;bottom:{{ toastBottom }}px;z-index:30">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Toast" kind="positive" hint-size="100%,56px">It’s yours. Carrying on from Chapter 2.</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ filterSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Filter and sort" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-bottom:{{ sheetPad }}px">
+          <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary)">Genre</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ fGenres }}" as="g" hint-placeholder-count="5"><span class="t-label" style="height:36px;padding:0 14px;border-radius:var(--radius-button);display:flex;align-items:center;gap:4px;color:var(--text);background:{{ g.bg }};box-shadow:{{ g.ring }}">{{ g.t }}</span></sc-for></div></div>
+          <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary)">Band</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ fPrices }}" as="g" hint-placeholder-count="3"><span class="t-label" style="height:36px;padding:0 14px;border-radius:var(--radius-button);display:flex;align-items:center;color:var(--text);background:{{ g.bg }};box-shadow:{{ g.ring }}">{{ g.t }}</span></sc-for></div></div>
+          
+          <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary)">Sort</span><sc-for list="{{ sorts }}" as="o" hint-placeholder-count="3"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.OptionRow" label="{{ o.l }}" selected="{{ o.sel }}" hint-size="100%,56px"></x-import></sc-for></div>
+          <div style="display:flex;gap:8px;padding-top:4px">
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" hint-size="100px,52px">Clear</x-import>
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Show 8 books</x-import>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ bandSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Band C" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Standout indie and small-press books, novellas from established writers, and Flipbook Editions.</span>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:14px 0;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font:700 20px/28px var(--font-sans);color:var(--text)">₦2,500</span><span class="t-caption" style="color:var(--text-muted)">4-week rental</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:inset 1px 0 0 var(--divider)"><span style="font:700 20px/28px var(--font-sans);color:var(--text-accent)">₦2,125</span><span class="t-caption" style="color:var(--text-muted)">With Pro, 6 weeks</span></div>
+          </div>
+          <span class="t-caption" style="color:var(--text-secondary);text-wrap:pretty">Editors choose each book’s band. If it moves, your current rental keeps the price you paid.</span>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="lg" full-width="{{ true }}" hint-size="100%,52px">How book prices work</x-import>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text);pointer-events:none"><span style="font:600 16px/20px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text);pointer-events:none"><span style="font:500 14px/18px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;home&quot;,&quot;homeScrolled&quot;,&quot;homeNew&quot;,&quot;homeOffline&quot;,&quot;homeLoading&quot;,&quot;specials&quot;,&quot;bookPreview&quot;,&quot;bookGet&quot;,&quot;bookProDiscount&quot;,&quot;bookPro&quot;,&quot;bookClassic&quot;,&quot;bookIndie&quot;,&quot;bookPublisher&quot;,&quot;bookContinue&quot;,&quot;bookFinished&quot;,&quot;bookUnavailable&quot;,&quot;bands&quot;,&quot;bandsD&quot;,&quot;bandSheet&quot;,&quot;search&quot;,&quot;searchResults&quot;,&quot;searchFilter&quot;,&quot;searchNone&quot;,&quot;searchOffline&quot;,&quot;previewReader&quot;,&quot;previewEnd&quot;,&quot;previewGot&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;glass&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;glass&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const h = React.createElement;
+const IC = {
+  signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+  wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+  battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+};
+const BANDS = { A: ['Band A', '₦500', 'Included with Pro'], B: ['Band B', '₦1,500', '₦1,275'], C: ['Band C', '₦2,500', '₦2,125'], D: ['Band D', '₦4,000', '₦3,400'] };
+const B = {
+  pp: ['Pride and Prejudice', 'Jane Austen', { art: 'pp', band: 'A' }],
+  stay: ['Stay With Me', 'Ayọ̀bámi Adébáyọ̀', { art: 'stay', band: 'C' }],
+  persuasion: ['Persuasion', 'Jane Austen', { art: 'persuasion', band: 'A' }],
+  middlemarch: ['Middlemarch', 'George Eliot', { art: 'middlemarch', band: 'A' }],
+  north: ['North and South', 'Elizabeth Gaskell', { art: 'north', band: 'A' }],
+  emma: ['Emma', 'Jane Austen', { art: 'emma', band: 'A' }],
+  spell: ['A Spell of Good Things', 'Ayọ̀bámi Adébáyọ̀', { tone: 'gold', band: 'D' }],
+  yellow: ['Half of a Yellow Sun', 'Chimamanda Ngozi Adichie', { tone: 'coral', band: 'D' }],
+  fishermen: ['The Fishermen', 'Chigozie Obioma', { tone: 'aqua', band: 'C', special: true }],
+  sister: ['My Sister, the Serial Killer', 'Oyinkan Braithwaite', { tone: 'plum', band: 'B' }],
+  freshwater: ['Freshwater', 'Akwaeke Emezi', { tone: 'indigo', band: 'B' }],
+  babasegi: ['The Secret Lives of Baba Segi’s Wives', 'Lola Shoneyin', { tone: 'ivory', band: 'C', special: true }],
+  things: ['Things Fall Apart', 'Chinua Achebe', { tone: 'coral', band: 'C', special: true }],
+  yaba: ['Small Rain in Yaba', 'Tọ́lá Adéwálé', { tone: 'aqua', band: 'B' }],
+  kano: ['Letters to Kano', 'Hauwa Bello', { tone: 'gold', band: 'B' }],
+  oba: ['The House on Ọba Road', 'Kémi Ọlátúnjí', { tone: 'plum', band: 'C', special: true }],
+};
+const SOCIAL_FACES = { 'Ada and 2 others': [['A', 'sand'], ['K', 'aqua'], ['C', 'mint']], Kemi: [['K', 'aqua']], 'Lumee Book Club': [['A', 'sand'], ['B', 'lavender']], Chidi: [['C', 'mint']] };
+const card = (k, social) => {
+  const [t, a, o] = B[k], band = BANDS[o.band], inc = o.special;
+  return { key: k, t, a, art: o.art || '', tone: o.tone || '', band: band[0], price: inc ? 'Included with Pro' : band[1], pc: inc ? 'var(--text-accent)' : 'var(--text)', social: social || '',
+    faces: (SOCIAL_FACES[social] || []).map(([i, tone], j) => ({ key: j, i, bg: `var(--highlight-${tone})`, ml: j ? -5 : 0 })) };
+};
+const SHELVES = {
+  friends: { t: 'From your communities', sub: 'What people you read with have open', books: [['stay', 'Ada and 2 others'], ['sister', 'Kemi'], ['pp', 'Lumee Book Club'], ['fishermen', 'Chidi']] },
+  fresh: { t: 'New this week', books: [['yaba'], ['oba'], ['freshwater'], ['kano']] },
+  specials: { t: 'Specials', sub: 'A members’ shelf, picked each month', books: [['things'], ['fishermen'], ['babasegi'], ['oba']] },
+  classics: { t: 'Classics', sub: '₦500 for 4 weeks, or included with Pro', books: [['persuasion'], ['middlemarch'], ['north'], ['emma']] },
+  genres: { t: 'In your genres', sub: 'African fiction · Romance · Classics', books: [['babasegi'], ['sister'], ['yaba'], ['things']] },
+};
+const BOOK = {
+  bookPreview: { k: 'stay', social: 'Ada and 2 others are reading this', primary: 'Read chapter 1 free', secondary: 'Get it ₦2,500', priceLine: '4-week rental', extras: true },
+  bookGet: { k: 'stay', social: 'Ada and 2 others are reading this', primary: 'Get it ₦2,500', priceLine: 'You read Chapter 1 · 4-week rental', extras: true },
+  bookProDiscount: { k: 'stay', pro: true, social: 'Ada and 2 others are reading this', primary: 'Get it ₦2,125', was: '₦2,500', priceLine: '15% off with Pro · 6-week rental', accent: true, extras: true },
+  bookPro: { k: 'middlemarch', pro: true, primary: 'Read', priceLine: 'Included with Pro', accent: true, extras: true },
+  bookClassic: { k: 'middlemarch', primary: 'Get it ₦500', priceLine: '4-week rental · free with Pro', extras: true },
+  bookIndie: { k: 'sister', social: 'Kemi is reading this', primary: 'Get it ₦1,500', priceLine: '4-week rental · ₦1,275 with Pro', extras: true },
+  bookPublisher: { k: 'spell', primary: 'Get it ₦4,000', priceLine: '4-week rental · ₦3,400 with Pro', extras: true },
+  bookContinue: { k: 'pp', social: 'Lumee Book Club is reading this', primary: 'Continue · Ch 12', priceLine: 'Ch 12 · 34% · rental ends 9 Nov', extras: true, owned: true },
+  bookFinished: { k: 'emma', primary: 'Read again', priceLine: 'You finished this on 12 Sep · ₦500 for 4 weeks', extras: true },
+  bookUnavailable: { k: 'yellow', primary: 'Not available', unavailable: true },
+};
+const DETAIL = {
+  stay: ['7 hr', '34', 'A marriage in 1980s Ilesa, told by husband and wife in turn, and the pressure on both of them to have a child. Funny, tender and hard to put down.', ['Literary fiction', 'African fiction']],
+  middlemarch: ['32 hr', '86', 'A provincial town, an idealistic young woman and a marriage she gets badly wrong. Eliot’s portrait of how ordinary lives shape each other.', ['Classics', 'Literary fiction']],
+  pp: ['11 hr', '61', 'Five sisters, one overheard insult at a dance, and a long argument about pride on both sides.', ['Classics', 'Romance']],
+  emma: ['14 hr', '55', 'A clever, comfortable young woman decides to arrange everyone’s love lives, and gets almost all of it wrong.', ['Classics', 'Romance']],
+  yellow: ['16 hr', '37', 'Three lives pulled together and apart by the Nigerian civil war.', ['Historical fiction', 'African fiction']],
+  sister: ['4 hr', '62', 'Korede keeps cleaning up after her younger sister, until her sister starts dating the man Korede loves.', ['Thrillers', 'African fiction']],
+  spell: ['12 hr', '40', 'Two families in a Nigerian town, one wealthy and one not, and what an election season does to both.', ['Literary fiction', 'African fiction']],
+};
+const S = {
+  home: { v: 'home' }, homeScrolled: { v: 'home', shift: -500 }, homeNew: { v: 'home', newUser: true }, homeOffline: { v: 'home', offline: true }, homeLoading: { v: 'home', loading: true },
+  specials: { v: 'specials' },
+  search: { v: 'search', s: 'idle' }, searchResults: { v: 'search', s: 'results' }, searchFilter: { v: 'search', s: 'results', sheet: true }, searchNone: { v: 'search', s: 'none' }, searchOffline: { v: 'search', s: 'offline' },
+  bands: { v: 'bands' }, bandsD: { v: 'bands', d: true }, bandSheet: { v: 'book', b: 'bookGet', bandSheet: true },
+  previewReader: { v: 'reader', r: 'start' }, previewEnd: { v: 'reader', r: 'end' }, previewGot: { v: 'reader', r: 'got' },
+};
+Object.keys(BOOK).forEach(k => { S[k] = { v: 'book', b: k }; });
+const BAND_INFO = [
+  ['Band A', '₦500', 'Public-domain classics', 'Free with Pro'],
+  ['Band B', '₦1,500', 'Books from independent authors', '₦1,275 with Pro'],
+  ['Band C', '₦2,500', 'Standout indie and small-press books, and Flipbook Editions', '₦2,125 with Pro'],
+  ['Band D', '₦4,000', 'Books from major publishers', '₦3,400 with Pro'],
+];
+const face = (i, tone, ml) => ({ i, bg: `var(--highlight-${tone})`, ml });
+
+const QUOTES = [
+  ['The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.', 'Jane Austen, Northanger Abbey'],
+  ['Reading is to the mind what exercise is to the body.', 'Richard Steele'],
+  ['Books are a uniquely portable magic.', 'Stephen King'],
+  ['I declare after all there is no enjoyment like reading.', 'Caroline Bingley, who was not reading'],
+  ['It is a great thing to start life with a small number of really good books which are your very own.', 'Arthur Conan Doyle'],
+];
+class Component extends DCLogic {
+  qi = Math.floor(Math.random() * QUOTES.length);
+  renderVals() {
+    const p = this.props, c = S[p.screen] || S.home, v = c.v;
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, theme = p.theme || 'flip', footPad = ios ? 34 : 24;
+    let shelves = [];
+    if (v === 'home' && !c.loading) shelves = (c.newUser ? ['fresh', 'genres', 'classics', 'specials'] : ['friends', 'fresh', 'specials', 'classics', 'genres']).map(k => ({ key: k, t: SHELVES[k].t, sub: SHELVES[k].sub || '', books: SHELVES[k].books.map(([b, s]) => card(b, s)) }));
+    const bc = BOOK[c.b] || BOOK.bookPreview, [bt, ba, bo] = B[bc.k], d = DETAIL[bc.k] || ['', '', '', []];
+    const rental = bc.owned ? ['9 Nov', 'Rental ends'] : bc.pro && bo.band === 'A' ? ['Unlimited', 'With Pro'] : [bc.pro ? '6 weeks' : '4 weeks', 'Rental'];
+    const facts = [[d[0], 'Reading time'], [d[1], 'Chapters'], rental].map(([v, l], i) => ({ key: i, v, l, line: i ? 'inset 1px 0 0 var(--divider)' : 'none' }));
+    const bk = { t: bt, a: ba, art: bo.art || '', tone: bo.tone || '', band: BANDS[bo.band][0], facts, desc: d[2], genres: d[3], social: bc.social || '', unavailable: !!bc.unavailable, extras: !!bc.extras, primary: bc.primary, secondary: bc.secondary || '', priceLine: bc.priceLine || '', was: bc.was || '', lineColor: bc.accent ? 'var(--text-accent)' : 'var(--text-secondary)' };
+    const bookFootH = 12 + 52 + (bk.secondary ? 60 : 0) + (bk.priceLine ? 26 : 0) + footPad;
+    const sr = c.s;
+    const results = sr === 'offline' ? ['stay', 'pp', 'emma'].map(k => card(k)).map((b, i) => ({ ...b, price: ['Ch 1 · preview', 'Ch 12 · 34%', 'Finished'][i], pc: 'var(--text-secondary)', band: '' })) : ['stay', 'sister', 'fishermen', 'yaba', 'freshwater', 'oba'].map(k => card(k));
+    const chip = (t, on, chev) => ({ t, chev: !!chev, bg: on ? 'var(--selected-fill)' : 'var(--option-fill)', ring: on ? 'var(--selected-ring)' : 'none' });
+    return {
+      theme, look: p.look || 'glass', ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, noop: () => {}, footPad,
+      ground: v === 'reader' ? 'var(--reader-page)' : 'var(--surface)',
+      hProps: { style: { background: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } },
+      giftIcon: window.FlipbookDesignSystem_7ad4ad ? h(window.FlipbookDesignSystem_7ad4ad.Icon, { name: 'send', size: 'sm' }) : null,
+      commIcon: window.FlipbookDesignSystem_7ad4ad ? h(window.FlipbookDesignSystem_7ad4ad.Icon, { name: 'users', size: 'sm' }) : null,
+      sBands: v === 'bands', bandCards: BAND_INFO.slice(0, c.d ? 4 : 3).map(([n, p, d, pro], i) => ({ key: i, n, p, d, pro })),
+      bandNotes: ['Prices are for a 4-week rental, or 6 weeks with Pro.', 'Chapter 1 of every book is free.', 'If a book moves band, your rental keeps its price.'],
+      bandSheet: !!c.bandSheet,
+      quote: { q: QUOTES[this.qi][0], by: QUOTES[this.qi][1] },
+      sHome: v === 'home', shift: c.shift || 0, offline: !!c.offline, loading: !!c.loading, continueCard: v === 'home' && !c.newUser && !c.loading, newUser: !!c.newUser,
+      skelShelves: [0, 1].map(i => ({ key: i, items: [0, 1, 2].map(j => ({ key: j })) })), shelves,
+      tabbar: v === 'home', tabBottom: ios ? 18 : 12, tabItems: [{ value: 'home', label: 'Home', icon: 'house' }, { value: 'shelf', label: 'Shelf', icon: 'shelf' }, { value: 'comm', label: 'Communities', icon: 'users' }, { value: 'you', label: 'You', icon: 'user' }],
+      header: v === 'book' || v === 'specials' || v === 'bands', hActions: v === 'book' ? [{ icon: 'share', label: 'Share' }] : [],
+      bodyTop: v === 'search' ? statusH + 72 : statusH + 64,
+      sSpecials: v === 'specials', specials: ['things', 'fishermen', 'babasegi', 'oba'].map(k => card(k)),
+      sBook: v === 'book', bk, bookFootH, socialFaces: [face('A', 'sand', 0), face('K', 'aqua', -6), face('C', 'mint', -6)],
+      sSearch: v === 'search', searchTop: statusH + 10, query: sr === 'idle' ? 'Title, author or genre' : sr === 'none' ? 'purple hibiscuss' : sr === 'offline' ? 'stay' : 'African fiction',
+      qColor: sr === 'idle' ? 'var(--text-muted)' : 'var(--text)', caret: sr === 'idle' || sr === 'none', fieldRing: sr === 'idle' || sr === 'none' ? 'var(--selected-ring)' : 'none',
+      sIdle: sr === 'idle', recents: ['Adichie', 'Austen', 'Short stories'],
+      genres: ['Literary fiction', 'African fiction', 'Romance', 'Thrillers', 'Classics', 'Fantasy', 'Poetry', 'Memoir', 'Non-fiction', 'Young adult'],
+      sResults: sr === 'results' || sr === 'offline', sOffline: sr === 'offline',
+      filterChips: sr === 'offline' ? [chip('On your Shelf', true)] : [chip('African fiction', true, true), chip('Band', false, true), chip('Popular this month', false, true)],
+      resultCount: sr === 'offline' ? '3 books on your Shelf' : '8 books · popular this month', results,
+      sNone: sr === 'none', near: [{ key: 1, t: 'Half of a Yellow Sun', a: 'Chimamanda Ngozi Adichie', tone: 'coral', why: 'Same author' }, { key: 2, t: 'Americanah', a: 'Chimamanda Ngozi Adichie', tone: 'gold', why: 'Same author' }, { key: 3, t: 'Stay With Me', a: 'Ayọ̀bámi Adébáyọ̀', tone: 'coral', why: 'Readers of Adichie liked this' }],
+      filterSheet: !!c.sheet, sheetPad: footPad - 16,
+      fGenres: ['Literary fiction', 'African fiction', 'Romance', 'Thrillers', 'Classics'].map((t, i) => ({ key: i, ...chip(t, i === 1) })),
+      fPrices: ['Any band', 'Band A', 'Band B', 'Band C'].map((t, i) => ({ key: i, ...chip(t, i === 0) })),
+      sorts: ['Popular this month', 'Newest', 'A to Z'].map((l, i) => ({ key: i, l, sel: i === 0 })),
+      sReader: v === 'reader', readerTop: statusH + 56, rStart: c.r === 'start', rEnd: c.r === 'end', rGot: c.r === 'got', rChip: c.r === 'start',
+      rSub: c.r === 'got' ? 'Chapter 2' : 'Free preview · Chapter 1', chipBottom: ios ? 34 : 24,
+      toast: c.r === 'got', toastBottom: ios ? 34 : 24,
+    };
+  }
+}
+</script>
+</body>
+</html>

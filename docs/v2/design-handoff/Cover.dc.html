@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+</helmet>
+<div style="width:{{ w }}px;height:{{ h }}px;position:relative;flex:none;border-radius:4px;overflow:hidden">
+  <div style="position:absolute;left:0;top:0;width:200px;height:300px;transform:scale({{ s }});transform-origin:0 0">
+    <sc-if value="{{ pp }}">
+      <div style="position:absolute;inset:0;background:var(--ivory)"></div>
+      <div style="position:absolute;left:0;bottom:0;width:160px;height:160px;background:var(--indigo-900);border-top-right-radius:160px"></div>
+      <div style="position:absolute;right:0;top:0;width:56px;height:56px;background:var(--coral-400);border-bottom-left-radius:56px"></div>
+      <div style="position:absolute;left:160px;bottom:0;width:40px;height:40px;background:var(--gold);border-top-left-radius:40px"></div>
+      <div style="position:absolute;left:20px;top:24px;color:var(--indigo-900)">
+        <div style="font:600 32px/34px var(--font-serif);letter-spacing:-0.015em">Pride</div>
+        <div style="font:italic 400 19px/26px var(--font-serif)">and</div>
+        <div style="font:600 32px/34px var(--font-serif);letter-spacing:-0.015em">Prejudice</div>
+      </div>
+      <div style="position:absolute;left:20px;bottom:22px;font:700 9px/12px var(--font-sans);letter-spacing:.24em;color:var(--ivory)">JANE AUSTEN</div>
+    </sc-if>
+    <sc-if value="{{ persuasion }}">
+      <div style="position:absolute;inset:0;background:var(--plum)"></div>
+      <div style="position:absolute;right:0;top:120px;width:100px;height:100px;background:var(--gold);border-top-left-radius:100px"></div>
+      <div style="position:absolute;right:0;top:220px;width:80px;height:80px;background:var(--coral-300);border-top-left-radius:80px"></div>
+      <div style="position:absolute;left:20px;top:24px;color:var(--ivory)"><div style="font:600 30px/34px var(--font-serif);letter-spacing:-0.01em">Persuasion</div><div style="font:italic 400 15px/22px var(--font-serif);opacity:.8">a novel</div></div>
+      <div style="position:absolute;left:20px;bottom:22px;font:700 9px/12px var(--font-sans);letter-spacing:.24em;color:var(--ivory)">JANE AUSTEN</div>
+    </sc-if>
+    <sc-if value="{{ emma }}">
+      <div style="position:absolute;inset:0;background:var(--gold)"></div>
+      <div style="position:absolute;left:0;bottom:0;width:100px;height:100px;background:var(--indigo-900);border-top-left-radius:100px"></div>
+      <div style="position:absolute;left:100px;bottom:0;width:100px;height:100px;background:var(--indigo-900);border-top-right-radius:100px"></div>
+      <div style="position:absolute;left:20px;top:22px;font:italic 500 68px/72px var(--font-serif);color:var(--indigo-900);letter-spacing:-0.02em">Emma</div>
+      <div style="position:absolute;left:0;right:0;bottom:30px;text-align:center;font:700 9px/12px var(--font-sans);letter-spacing:.24em;color:var(--gold)">JANE AUSTEN</div>
+    </sc-if>
+    <sc-if value="{{ stay }}">
+      <div style="position:absolute;inset:0;background:var(--coral-400)"></div>
+      <div style="position:absolute;right:0;bottom:0;width:128px;height:128px;background:var(--ivory);border-top-left-radius:128px"></div>
+      <div style="position:absolute;right:0;top:0;width:48px;height:48px;background:var(--indigo-900);border-bottom-left-radius:48px"></div>
+      <div style="position:absolute;left:20px;top:26px;font:800 34px/36px var(--font-sans);color:var(--black);letter-spacing:-0.02em">Stay<br>With Me</div>
+      <div style="position:absolute;left:20px;bottom:22px;font:700 8.5px/12px var(--font-sans);letter-spacing:.2em;color:var(--black)">AYỌ̀BÁMI ADÉBÁYỌ̀</div>
+    </sc-if>
+    <sc-if value="{{ middlemarch }}">
+      <div style="position:absolute;inset:0;background:var(--aqua)"></div>
+      <div style="position:absolute;left:0;top:0;width:128px;height:128px;background:var(--indigo-900);border-bottom-right-radius:128px"></div>
+      <div style="position:absolute;left:128px;top:0;width:40px;height:40px;background:var(--ivory);border-bottom-right-radius:40px"></div>
+      <div style="position:absolute;left:20px;bottom:46px;font:600 30px/32px var(--font-serif);color:var(--indigo-900);letter-spacing:-0.01em">Middle-<br>march</div>
+      <div style="position:absolute;left:20px;bottom:22px;font:700 9px/12px var(--font-sans);letter-spacing:.24em;color:var(--indigo-900)">GEORGE ELIOT</div>
+    </sc-if>
+    <sc-if value="{{ north }}">
+      <div style="position:absolute;inset:0;background:var(--indigo-900)"></div>
+      <div style="position:absolute;left:0;top:0;width:96px;height:96px;background:var(--aqua);border-bottom-right-radius:96px"></div>
+      <div style="position:absolute;right:0;bottom:0;width:96px;height:96px;background:var(--ivory);border-top-left-radius:96px"></div>
+      <div style="position:absolute;left:20px;top:118px;color:var(--ivory)"><div style="font:600 30px/32px var(--font-serif);letter-spacing:-0.01em">North</div><div style="font:italic 400 22px/30px var(--font-serif)">and South</div></div>
+      <div style="position:absolute;left:20px;bottom:22px;font:700 9px/12px var(--font-sans);letter-spacing:.24em;color:var(--ivory)">E. GASKELL</div>
+    </sc-if>
+  </div>
+  <div style="position:absolute;top:0;bottom:0;left:{{ spine }}px;width:1px;background:#1212121f"></div>
+  <div style="position:absolute;inset:0;border-radius:4px;box-shadow:inset 0 0 0 1px #1212121a,inset 0 0 0 1px var(--divider)"></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;200px&quot;,&quot;height&quot;:&quot;300px&quot;},&quot;book&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;pp&quot;,&quot;persuasion&quot;,&quot;emma&quot;,&quot;stay&quot;,&quot;middlemarch&quot;,&quot;north&quot;],&quot;default&quot;:&quot;pp&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;width&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:200,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const w = Number(this.props.width ?? 120), b = this.props.book ?? 'pp';
+    return { w, h: Math.round(w * 1.5), s: w / 200, spine: Math.max(3, Math.round(w * 0.035)),
+      pp: b === 'pp', persuasion: b === 'persuasion', emma: b === 'emma', stay: b === 'stay', middlemarch: b === 'middlemarch', north: b === 'north' };
+  }
+}
+</script>
+</body>
+</html>

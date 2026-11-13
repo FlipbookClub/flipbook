@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--reader-page);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <div style="position:absolute;left:0;right:0;top:{{ readerTop }}px;bottom:{{ textBottom }}px;overflow:hidden;padding:56px 14px 0 24px;margin-top:-56px;display:flex;flex-direction:column;gap:16px">
+    <sc-if value="{{ showHead }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:6px;padding-right:52px">
+        <span class="t-caption" style="color:var(--reader-text-secondary);letter-spacing:.16em;text-transform:uppercase">{{ volume }}</span>
+        <h2 class="t-reading-chapter" style="margin:0;color:var(--reader-text)">Chapter {{ ch }}</h2>
+        <span style="width:28px;height:2px;border-radius:2px;background:var(--reader-text-secondary);opacity:.5;margin-top:4px"></span>
+      </div>
+    </sc-if>
+    <sc-if value="{{ quiet }}">
+      <div style="display:flex;gap:10px;align-items:center;margin-right:52px;padding:10px 14px;border-radius:9999px;background:var(--veil);color:var(--veil-text)">{{ ic.eyeOffSm }}<span class="t-caption">You haven't reached this part, so the margin stays quiet.</span></div>
+    </sc-if>
+    <sc-for list="{{ paras }}" as="p" hint-placeholder-count="4">
+      <div style="display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:12px;position:relative;opacity:{{ p.op }}">
+        <p style="margin:0;padding:{{ p.pad }};border-radius:16px;background:{{ p.bg }};box-shadow:{{ p.ring }};color:var(--reader-text);font-family:var(--font-serif);font-size:18px;line-height:30px;font-variation-settings:'opsz' 18;text-wrap:pretty">{{ p.text }}</p>
+        <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding-top:4px">
+          <sc-for list="{{ p.marks }}" as="m" hint-placeholder-count="1">
+            <sc-if value="{{ m.isReaction }}" hint-placeholder-val="{{ true }}">
+              <span style="position:relative;height:28px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;gap:4px;font:600 12px/16px var(--font-sans);color:var(--reader-text);border:1.5px solid {{ m.border }};box-shadow:{{ m.glow }};opacity:{{ m.op }};transform:scale({{ m.scale }});transform-origin:0 50%">{{ m.emoji }}<span>{{ m.countTxt }}</span>
+                <sc-if value="{{ m.author }}"><span style="position:absolute;top:-5px;right:-5px;width:12px;height:12px;border-radius:9999px;background:var(--author);box-shadow:0 0 0 2px var(--reader-page)"></span></sc-if>
+              </span>
+            </sc-if>
+            <sc-if value="{{ m.isThread }}">
+              <span style="position:relative;height:28px;padding:0 6px 0 4px;border-radius:9999px;display:inline-flex;align-items:center;gap:3px;font:600 12px/16px var(--font-sans);color:{{ m.color }};box-shadow:{{ m.glow }}">{{ ic.replyXs }}{{ m.countTxt }}
+                <sc-if value="{{ m.author }}"><span style="position:absolute;top:-3px;right:-5px;width:12px;height:12px;border-radius:9999px;background:var(--author);box-shadow:0 0 0 2px var(--reader-page)"></span></sc-if>
+              </span>
+            </sc-if>
+          </sc-for>
+        </div>
+        <sc-if value="{{ p.picker }}">
+          <div style="position:absolute;bottom:100%;left:-10px;right:0;display:flex;justify-content:center;margin-bottom:10px;z-index:6;opacity:{{ pickerOp }}">
+            <div style="display:flex;align-items:center;gap:0;padding:5px;border-radius:9999px;background:color-mix(in oklab, var(--surface-raised) 60%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+              <sc-for list="{{ emojis }}" as="e" hint-placeholder-count="6">
+                <span style="width:42px;height:42px;border-radius:9999px;display:grid;place-items:center;font-size:22px;line-height:1;background:{{ e.bg }};transform:scale({{ e.scale }})">{{ e.e }}</span>
+              </sc-for>
+              <span style="width:1px;height:24px;background:color-mix(in oklab, var(--text) 14%, transparent);margin:0 4px"></span>
+              <span style="width:42px;height:42px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 8%, transparent)">{{ ic.commentSm }}</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ p.fly }}">
+          <div style="position:absolute;top:-34px;right:18px;z-index:7;display:flex;align-items:center;gap:8px;pointer-events:none">
+            <span style="width:5px;height:5px;border-radius:9999px;background:var(--margin-own);opacity:.25"></span>
+            <span style="width:7px;height:7px;border-radius:9999px;background:var(--margin-own);opacity:.45"></span>
+            <span style="width:9px;height:9px;border-radius:9999px;background:var(--margin-own);opacity:.7"></span>
+            <span style="width:60px;height:60px;border-radius:9999px;display:grid;place-items:center;font-size:30px;line-height:1;transform:rotate(-8deg);background:color-mix(in oklab, var(--surface-raised) 60%, transparent);backdrop-filter:blur(20px) saturate(180%);box-shadow:inset 0 0 0 1.5px var(--margin-own),inset 0 1px 0 rgba(255,255,255,.3),0 16px 30px -10px rgba(8,6,30,.5)">♥</span>
+          </div>
+        </sc-if>
+      </div>
+    </sc-for>
+    <sc-if value="{{ ahead }}">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:16px;padding:20px 52px 0 0">
+        <span style="width:28px;height:2px;border-radius:2px;background:var(--reader-text-secondary);opacity:.5"></span>
+        <span class="t-caption" style="color:var(--reader-text-secondary);letter-spacing:.16em;text-transform:uppercase">End of Chapter 34</span>
+        <div style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px 0 12px;border-radius:9999px;color:var(--margin-ahead);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--margin-ahead) 30%, transparent),inset 0 1px 0 rgba(255,255,255,.2)">{{ ic.sparkSm }}<span class="t-label">The room is busy in Chapter 35</span></div>
+      </div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ noChrome }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;bottom:{{ footBottom }}px;display:flex;justify-content:center;gap:12px;z-index:15">
+      <span class="t-caption" style="color:var(--reader-text-secondary)">Ch {{ ch }} · {{ pct }}%</span>
+      <span class="t-caption" style="color:var(--reader-text-secondary);opacity:.6">·</span>
+      <span class="t-caption" style="color:var(--reader-text-secondary)">{{ minsLeft }}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ solo }}">
+    <div style="position:absolute;left:50%;bottom:{{ soloBottom }}px;transform:translateX(-50%);z-index:18;display:flex;align-items:center;gap:8px;height:44px;padding:0 12px 0 14px;border-radius:9999px;white-space:nowrap;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 10px 24px -10px rgba(8,6,30,.45)">{{ ic.userAddSm }}<span class="t-label">Read this with someone</span><span style="color:var(--text-muted);display:flex">{{ ic.chevronRightSm }}</span></div>
+  </sc-if>
+
+  <sc-if value="{{ chrome }}">
+    <div style="position:absolute;top:0;left:0;right:0;padding:{{ statusH }}px 16px 0;display:flex;align-items:center;gap:8px;z-index:30">
+      <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">{{ backIcon }}</span>
+      <div style="flex:1;min-width:0;height:44px;border-radius:9999px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:{{ titleBg }};backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">
+        <span class="t-label" style="color:var(--text);line-height:16px">Pride and Prejudice</span>
+        <span style="display:flex;align-items:center;gap:2px;font:600 11px/14px var(--font-sans);color:var(--text-secondary)">{{ communityLabel }}{{ ic.chevronDownXs }}</span>
+      </div>
+      <div style="height:44px;border-radius:9999px;display:flex;align-items:center;padding:0 4px;flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">
+        <span style="width:40px;height:40px;display:grid;place-items:center;color:var(--text)">{{ ic.headphonesSm }}</span>
+        <span style="width:40px;height:40px;display:grid;place-items:center;color:var(--text)">{{ ic.typeSm }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}">
+    <div style="position:absolute;left:50%;bottom:{{ toastBottom }}px;transform:translateX(-50%);z-index:35;display:flex;align-items:center;gap:10px;padding:10px 20px 10px 12px;border-radius:9999px;white-space:nowrap;background:color-mix(in oklab, var(--surface) 65%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+      <span style="width:32px;height:32px;border-radius:9999px;display:grid;place-items:center;background:var(--positive-surface);color:var(--positive)">{{ ic.checkCircleSm }}</span>
+      <div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">{{ toastTitle }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ toastSub }}</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ scrim }}"><div style="position:absolute;inset:0;z-index:40;background:color-mix(in oklab, #121212 {{ scrimPct }}%, transparent)"></div></sc-if>
+
+  <sc-if value="{{ switcher }}">
+    <div style="position:absolute;left:16px;right:16px;top:{{ switcherTop }}px;z-index:45;border-radius:30px;padding:14px 8px 10px;display:flex;flex-direction:column;background:color-mix(in oklab, var(--surface) 66%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 24px 50px -16px rgba(8,6,30,.6)">
+      <span class="t-caption" style="color:var(--text-muted);text-transform:uppercase;letter-spacing:.16em;padding:0 14px 8px">Whose margin</span>
+      <sc-for list="{{ communities }}" as="c" hint-placeholder-count="3">
+        <div style="display:flex;align-items:center;gap:12px;height:60px;padding:0 14px 0 8px;border-radius:9999px;background:{{ c.bg }}">
+          <span style="width:44px;height:44px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:{{ c.av }};font:700 15px/1 var(--font-sans)">{{ c.init }}{{ c.icon }}</span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">{{ c.name }}</span><span class="t-caption" style="color:var(--text-muted)">{{ c.meta }}</span></div>
+          <sc-if value="{{ c.on }}"><span style="width:28px;height:28px;border-radius:9999px;display:grid;place-items:center;background:var(--primary);color:var(--on-primary)">{{ ic.checkSm }}</span></sc-if>
+        </div>
+      </sc-for>
+      <span class="t-caption" style="color:var(--text-muted);text-align:center;padding:10px 14px 2px">Remembered for Pride and Prejudice</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ thread }}">
+    <div style="position:absolute;left:0;right:0;top:{{ sheetTop }}px;bottom:{{ sheetBottom }}px;z-index:45;border-radius:{{ sheetRadius }};display:flex;flex-direction:column;overflow:hidden;background:color-mix(in oklab, var(--surface) 70%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <div style="width:36px;height:5px;border-radius:9999px;background:color-mix(in oklab, var(--text) 22%, transparent);align-self:center;margin-top:10px;flex:none"></div>
+      <div style="display:flex;align-items:flex-start;gap:12px;padding:12px 20px 0;flex:none">
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">
+          <span class="t-caption" style="color:var(--text-muted)">Ch 34 · {{ communityLabel }}</span>
+          <span style="color:var(--text);font:italic 400 16px/24px var(--font-serif);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">“to her utter amazement, she saw Mr. Darcy walk into the room.”</span>
+        </div>
+        <span style="width:36px;height:36px;flex:none;border-radius:9999px;background:color-mix(in oklab, var(--text) 10%, transparent);display:grid;place-items:center;color:var(--text)">{{ ic.xSm }}</span>
+      </div>
+      <div style="display:flex;gap:6px;padding:12px 20px 6px;flex:none">
+        <sc-for list="{{ threadChips }}" as="t" hint-placeholder-count="3">
+          <span style="height:34px;padding:0 12px;border-radius:9999px;display:flex;align-items:center;gap:6px;font:600 13px/16px var(--font-sans);color:var(--text);background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:{{ t.ring }}">{{ t.e }}<span>{{ t.n }}</span></span>
+        </sc-for>
+        <span style="height:34px;width:34px;border-radius:9999px;display:grid;place-items:center;color:var(--text-secondary);background:color-mix(in oklab, var(--text) 7%, transparent)">{{ ic.smileSm }}</span>
+      </div>
+      <div style="flex:1;min-height:0;overflow:hidden;position:relative">
+        <div style="display:flex;flex-direction:column;gap:6px;padding:6px 12px 12px;transform:translateY({{ listShift }}px)">
+          <sc-for list="{{ comments }}" as="c" hint-placeholder-count="2">
+            <div style="position:relative;display:flex;flex-direction:column;gap:12px;padding:12px;border-radius:24px;background:{{ c.bg }};box-shadow:{{ c.sh }};opacity:{{ c.op }};z-index:{{ c.z }}">
+              <sc-if value="{{ c.normal }}" hint-placeholder-val="{{ true }}">
+                <div style="display:flex;gap:10px">
+                  <span class="t-label" style="width:32px;height:32px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:{{ c.av }}">{{ c.init }}{{ c.avIc }}</span>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <div style="display:flex;align-items:center;gap:6px"><span class="t-label" style="color:{{ c.nameColor }}">{{ c.name }}</span><sc-if value="{{ c.author }}"><span style="height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.02em;color:var(--author);box-shadow:inset 0 0 0 1.5px var(--author)">Author</span></sc-if><span class="t-caption" style="color:var(--text-muted)">{{ c.time }}</span></div>
+                    <span style="color:var(--text);font:400 15px/22px var(--font-sans);text-wrap:pretty">{{ c.text }}</span>
+                    <span class="t-caption" style="color:var(--text-secondary);font-weight:700;margin-top:4px">Reply</span>
+                  </div>
+                </div>
+              </sc-if>
+              <sc-if value="{{ c.hidden }}">
+                <div style="display:flex;align-items:center;gap:10px;padding:4px 2px;color:var(--text-muted)">{{ ic.eyeOffSm }}<span class="t-caption">You reported this comment. It's hidden for you.</span></div>
+              </sc-if>
+              <sc-if value="{{ c.removed }}">
+                <div style="display:flex;align-items:center;gap:10px;padding:4px 2px;color:var(--text-muted)"><span style="width:32px;height:32px;flex:none;border-radius:9999px;display:grid;place-items:center;background:color-mix(in oklab, var(--text) 7%, transparent)">{{ ic.removedSm }}</span><span style="font:italic 400 15px/22px var(--font-sans)">This comment was removed</span></div>
+              </sc-if>
+              <sc-for list="{{ c.replies }}" as="r" hint-placeholder-count="1">
+                <div style="display:flex;gap:10px;margin-left:42px;padding:{{ r.pad }};border-radius:18px;background:{{ r.bg }};box-shadow:{{ r.sh }}">
+                  <span style="width:26px;height:26px;flex:none;border-radius:9999px;display:grid;place-items:center;font:700 11px/1 var(--font-sans);color:var(--text);background:{{ r.av }}">{{ r.init }}{{ r.avIc }}</span>
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                    <div style="display:flex;align-items:center;gap:6px"><span class="t-label" style="color:{{ r.nameColor }}">{{ r.name }}</span><sc-if value="{{ r.author }}"><span style="height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.02em;color:var(--author);box-shadow:inset 0 0 0 1.5px var(--author)">Author</span></sc-if><span class="t-caption" style="color:var(--text-muted)">{{ r.time }}</span></div>
+                    <span style="color:var(--text);font:400 15px/22px var(--font-sans);text-wrap:pretty">{{ r.text }}</span>
+                  </div>
+                </div>
+              </sc-for>
+              <sc-if value="{{ c.menu }}">
+                <div style="position:absolute;top:calc(100% + 8px);right:12px;width:212px;z-index:5;border-radius:24px;padding:6px;display:flex;flex-direction:column;background:color-mix(in oklab, var(--surface-raised) 72%, transparent);backdrop-filter:blur(30px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 20px 40px -12px rgba(8,6,30,.6)">
+                  <div style="height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:9999px;color:var(--text)">{{ ic.replySm }}<span class="t-label">Reply</span></div>
+                  <div style="height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:9999px;color:var(--text)">{{ ic.copySm }}<span class="t-label">Copy text</span></div>
+                  <div style="height:1px;margin:2px 14px;background:color-mix(in oklab, var(--text) 10%, transparent)"></div>
+                  <div style="height:46px;display:flex;align-items:center;gap:12px;padding:0 14px;border-radius:9999px;color:var(--error);background:color-mix(in oklab, var(--error) 10%, transparent)">{{ ic.flagSm }}<span class="t-label">Report</span></div>
+                </div>
+              </sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+      <div style="flex:none;padding:10px 14px {{ composerPad }}px;display:flex;flex-direction:column;gap:8px;box-shadow:inset 0 1px 0 color-mix(in oklab, var(--text) 8%, transparent)">
+        <sc-if value="{{ replyTo }}">
+          <span style="align-self:flex-start;height:28px;padding:0 6px 0 12px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--text) 8%, transparent)"><span class="t-caption">Replying to <b>{{ replyTo }}</b></span>{{ ic.xXs }}</span>
+        </sc-if>
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="flex:1;min-width:0;min-height:44px;border-radius:22px;display:flex;align-items:center;padding:10px 16px;background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:{{ inputRing }}">
+            <span style="font:400 15px/22px var(--font-sans);color:{{ inputColor }}">{{ inputText }}</span><sc-if value="{{ replyTo }}"><span style="display:inline-block;width:2px;height:20px;border-radius:2px;background:var(--focus-ring);margin-left:1px;vertical-align:middle"></span></sc-if>
+          </div>
+          <span style="width:44px;height:44px;flex:none;border-radius:9999px;display:grid;place-items:center;background:{{ sendBg }};color:{{ sendColor }}">{{ ic.sendSm }}</span>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ compose }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:{{ composeBottom }}px;z-index:46;border-radius:28px;padding:14px 14px 12px 18px;display:flex;flex-direction:column;gap:10px;background:color-mix(in oklab, var(--surface) 66%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.45)">
+      <div style="display:flex;align-items:center;justify-content:space-between"><span class="t-caption" style="color:var(--text-muted);text-transform:uppercase;letter-spacing:.16em">Comment</span><span class="t-caption" style="color:var(--text-muted);font-variant-numeric:tabular-nums">61 / 200</span></div>
+      <span style="font:400 16px/24px var(--font-sans);color:var(--text);text-wrap:pretty">Austen saves his entrance for the exact moment she's angriest.<span style="display:inline-block;width:2px;height:20px;border-radius:2px;background:var(--focus-ring);margin-left:2px;vertical-align:-4px"></span></span>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+        <span class="t-caption" style="color:var(--text-secondary);display:flex;align-items:center;gap:6px">{{ ic.usersXs }}Lumee Book Club sees this at this paragraph</span>
+        <span style="width:44px;height:44px;flex:none;border-radius:9999px;display:grid;place-items:center;background:var(--primary);color:var(--on-primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 8px 20px -8px var(--primary)">{{ ic.sendSm }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ kb }}">
+    <div style="position:absolute;left:0;right:0;bottom:0;height:{{ kbH }}px;z-index:50;padding:10px 3px 0;display:flex;flex-direction:column;gap:12px;background:color-mix(in oklab, var(--surface-raised) 80%, transparent);backdrop-filter:blur(30px) saturate(180%);box-shadow:inset 0 1px 0 color-mix(in oklab, var(--text) 10%, transparent)">
+      <sc-for list="{{ kbRows }}" as="row" hint-placeholder-count="4">
+        <div style="display:flex;gap:6px;padding:0 {{ row.pad }}px">
+          <sc-for list="{{ row.keys }}" as="k" hint-placeholder-count="10">
+            <span style="flex:{{ k.f }};height:42px;border-radius:8px;display:grid;place-items:center;font:{{ k.font }} var(--font-sans);color:var(--text);background:{{ k.bg }};box-shadow:0 1px 0 rgba(0,0,0,.22)">{{ k.t }}</span>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ locked }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:46;border-radius:36px;padding:36px 22px {{ sheetPadIn }}px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;background:color-mix(in oklab, var(--surface) 70%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <span style="width:68px;height:68px;border-radius:9999px;color:var(--text);display:grid;place-items:center;margin-bottom:6px;background:color-mix(in oklab, var(--text) 9%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)">{{ ic.lock }}</span>
+      <span class="t-h1" style="color:var(--text)">This reply is further on</span>
+      <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Ada replied in Chapter 38. You're in Chapter 34, so it opens when you get there.</span>
+      <div style="width:100%;margin-top:16px;height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">Keep reading</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ reportSheet }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:48;border-radius:36px;padding:10px 18px {{ sheetPadIn }}px;display:flex;flex-direction:column;gap:14px;background:color-mix(in oklab, var(--surface) 74%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <div style="width:36px;height:5px;border-radius:9999px;background:color-mix(in oklab, var(--text) 22%, transparent);align-self:center"></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h2" style="color:var(--text)">Report this comment</span><span class="t-caption" style="color:var(--text-secondary)">Priya won't know who reported it.</span></div>
+        <span style="width:36px;height:36px;flex:none;border-radius:9999px;background:color-mix(in oklab, var(--text) 10%, transparent);display:grid;place-items:center;color:var(--text)">{{ ic.xSm }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-for list="{{ reasons }}" as="r" hint-placeholder-count="4">
+          <div style="height:56px;display:flex;align-items:center;gap:12px;padding:0 18px;border-radius:9999px;background:{{ r.bg }};box-shadow:{{ r.ring }}">
+            <span style="width:22px;height:22px;flex:none;border-radius:9999px;box-shadow:inset 0 0 0 {{ r.dot }}px var(--focus-ring),inset 0 0 0 2px color-mix(in oklab, var(--text) 30%, transparent)"></span>
+            <span class="t-body" style="color:var(--text)">{{ r.t }}</span>
+          </div>
+        </sc-for>
+      </div>
+      <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">Send report</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ banner }}">
+    <div style="position:absolute;left:10px;right:10px;top:{{ bannerTop }}px;z-index:70;border-radius:28px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;background:color-mix(in oklab, var(--surface-raised) 62%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 20px 40px -14px rgba(8,6,30,.55)">
+      <img src="assets/flipbook-icon-flip-primary.svg" alt="" style="width:40px;height:40px;border-radius:11px;flex:none;display:block">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px">
+        <div style="display:flex;justify-content:space-between"><span class="t-label" style="color:var(--text)">{{ bannerTitle }}</span><span class="t-caption" style="color:var(--text-muted)">now</span></div>
+        <span class="t-caption" style="color:var(--text);text-wrap:pretty">{{ bannerBody }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:{{ sbColor }};opacity:{{ sbOp }}">
+      <span style="font:600 16px/20px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:{{ sbColor }};z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:{{ sbColor }};opacity:{{ sbOp }}">
+      <span style="font:500 14px/18px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:{{ sbColor }};z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hold&quot;,&quot;flying&quot;,&quot;reacted&quot;,&quot;compose&quot;,&quot;commented&quot;,&quot;reveal1&quot;,&quot;reveal2&quot;,&quot;quiet&quot;,&quot;ahead&quot;,&quot;live1&quot;,&quot;live2&quot;,&quot;liveReduced&quot;,&quot;thread&quot;,&quot;replying&quot;,&quot;notif&quot;,&quot;notifOpen&quot;,&quot;notifAhead&quot;,&quot;locked&quot;,&quot;switcher&quot;,&quot;switched&quot;,&quot;solo&quot;,&quot;authorMargin&quot;,&quot;author&quot;,&quot;reportMenu&quot;,&quot;reportSheet&quot;,&quot;reported&quot;,&quot;removed&quot;],&quot;default&quot;:&quot;hold&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const PARAS = [
+  { id: 'a', text: 'When they were gone, Elizabeth, as if intending to exasperate herself as much as possible against Mr. Darcy, chose for her employment the examination of all the letters which Jane had written to her since her being in Kent.' },
+  { id: 'b', text: 'But this idea was soon banished, and her spirits were very differently affected, when, to her utter amazement, she saw Mr. Darcy walk into the room.' },
+  { id: 'c', text: 'In an hurried manner he immediately began an inquiry after her health. She answered him with cold civility. He sat down for a few moments, and then getting up, walked about the room.' },
+  { id: 'd', text: '“In vain I have struggled. It will not do. My feelings will not be repressed. You must allow me to tell you how ardently I admire and love you.”' },
+  { id: 'e', text: 'Elizabeth’s astonishment was beyond expression. She stared, coloured, doubted, and was silent. This he considered sufficient encouragement; and the avowal of all that he felt, and had long felt for her, immediately followed.' },
+  { id: 'f', text: 'He spoke well; but there were feelings besides those of the heart to be detailed; and he was not more eloquent on the subject of tenderness than of pride.' },
+];
+const MARGINS = {
+  lumee: { a: [['🤔', 4]], b: [['😮', 16], ['🔥', 7]], c: [['😂', 5]], d: [['♥', 23], ['😮', 11]], e: [['😂', 8]], f: [['🔥', 6]] },
+  thursday: { a: [['😢', 2]], c: [['🤔', 3]], d: [['♥', 9]], f: [['😮', 2]] },
+};
+const THREADS = { lumee: { b: 9, d: 18, f: 4 }, thursday: { d: 3 } };
+const EMOJI = ['♥', '😂', '😮', '😢', '🔥', '🤔'];
+const CONF = {
+  hold: { focus: 'b', picker: true },
+  flying: { focus: 'b', picker: true, fly: true },
+  reacted: { ownR: 'b', glow: 'b', toast: 'reacted' },
+  compose: { focus: 'b', from: 1, compose: true, kb: true },
+  commented: { ownR: 'b', ownC: 'b', glow: 'b', toast: 'commented' },
+  reveal1: { reveal: 2.5 }, reveal2: { reveal: 6 }, quiet: { ch: 44 },
+  ahead: { from: 3, ahead: true },
+  live1: { live: 1 }, live2: { live: 2 }, liveReduced: { live: 3 },
+  thread: { thread: true, from: 1 }, replying: { thread: true, from: 1, kb: true, replyTo: 'Priya' },
+  notif: { banner: 'reply', ownR: 'b', ownC: 'b' }, notifOpen: { thread: true, from: 1, freshReply: true, shift: -150 },
+  notifAhead: { banner: 'ahead' }, locked: { locked: true },
+  switcher: { chrome: true, switcher: true }, switched: { chrome: true, community: 'thursday', toast: 'switched' },
+  solo: { community: 'solo' },
+  authorMargin: { author: true, ownR: 'b', ownC: 'b' }, author: { thread: true, from: 1, author: true, shift: -150 },
+  reportMenu: { thread: true, from: 1, menu: true }, reportSheet: { thread: true, from: 1, reportSheet: true },
+  reported: { thread: true, from: 1, hidden: true, toast: 'reported' }, removed: { thread: true, from: 1, removed: true, former: true },
+};
+const TOASTS = {
+  reacted: ['♥ added to the margin', 'Lumee Book Club sees it at this paragraph'],
+  commented: ['Comment added', 'Anchored to this paragraph for everyone'],
+  switched: ['Showing Thursday Readers', 'Remembered for this book'],
+  reported: ['Reported. Thank you', 'A moderator will look at it within a day'],
+};
+const HG_NAMES = {
+  headphones: 'HeadphonesIcon', type: 'TextFontIcon', chevronLeft: 'ArrowLeft01Icon', chevronRight: 'ArrowRight01Icon', chevronDown: 'ArrowDown01Icon', arrowLeft: 'ArrowLeft02Icon',
+  x: 'Cancel01Icon', check: 'Tick02Icon', checkCircle: 'CheckmarkCircle02Icon', smile: 'SmileIcon', eyeOff: 'ViewOffSlashIcon', comment: 'BubbleChatIcon',
+  reply: 'ArrowTurnBackwardIcon', send: 'SentIcon', flag: 'Flag02Icon', copy: 'Copy01Icon', users: 'UserGroup02Icon', user: 'User02Icon', userAdd: 'UserAdd01Icon',
+  spark: 'SparklesIcon', lock: 'LockIcon', removed: 'Cancel01Icon',
+};
+window.__fbHG5 = window.__fbHG5 || { data: null, p: import('https://esm.sh/@hugeicons/core-free-icons?exports=' + Object.values(HG_NAMES).join(',')).then(m => { window.__fbHG5.data = m; return m; }).catch(() => null) };
+const h = React.createElement;
+function icon(name, size = 24) {
+  const m = window.__fbHG5.data, nodes = (m && m[HG_NAMES[name]]) || [];
+  return h('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true, style: { display: 'block', flex: 'none' } },
+    nodes.map(([tag, a], i) => { const { key, ...rest } = a; const out = { ...rest, key: i, strokeWidth: 1.5 }; if (rest.stroke) out.stroke = 'currentColor'; if (rest.fill && rest.fill !== 'none') out.fill = 'currentColor'; return h(tag, out); }));
+}
+let IC_CACHE = null;
+function buildIC() {
+  if (IC_CACHE) return IC_CACHE;
+  const ic = {
+    headphonesSm: icon('headphones', 20), typeSm: icon('type', 20), chevronLeft: icon('chevronLeft', 22), arrowLeft: icon('arrowLeft', 22),
+    chevronRightSm: icon('chevronRight', 16), chevronDownXs: icon('chevronDown', 12), xSm: icon('x', 20), xXs: icon('x', 14), checkSm: icon('check', 16),
+    checkCircleSm: icon('checkCircle', 20), smileSm: icon('smile', 18), eyeOffSm: icon('eyeOff', 16), commentSm: icon('comment', 20),
+    replyXs: icon('reply', 15), replySm: icon('reply', 20), sendSm: icon('send', 20), flagSm: icon('flag', 20), copySm: icon('copy', 20),
+    usersXs: icon('users', 14), userXs: icon('user', 14), userSm: icon('user', 18), userAddSm: icon('userAdd', 18), usersSm: icon('users', 20),
+    sparkSm: icon('spark', 18), lock: icon('lock', 30), removedSm: icon('removed', 14),
+    signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+    wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+    battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+  };
+  if (window.__fbHG5.data) IC_CACHE = ic;
+  return ic;
+}
+const lift = 'color-mix(in oklab, var(--surface-raised) 70%, transparent)';
+const liftSh = 'inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent), inset 0 1px 0 rgba(255,255,255,.2), 0 12px 28px -12px rgba(8,6,30,.5)';
+const person = (name, init, av, extra = {}) => ({ name, init, av: `var(--highlight-${av})`, avIc: '', nameColor: 'var(--text)', author: false, ...extra });
+
+class Component extends DCLogic {
+  componentDidMount() { if (!window.__fbHG5.data) window.__fbHG5.p.then(() => this.forceUpdate()); }
+  renderVals() {
+    const p = this.props, c = CONF[p.screen] || CONF.hold, IC = buildIC();
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, theme = p.theme || 'flip';
+    const ch = c.ch || 34, comm = c.community || 'lumee', showMargin = ch === 34 && comm !== 'solo';
+    const marg = MARGINS[comm] || {}, threads = THREADS[comm] || {};
+    const sheetOpen = !!(c.thread || c.locked || c.compose);
+    const paras = PARAS.slice(c.from || 0).map((x, i0) => {
+      const i = i0 + (c.from || 0);
+      let marks = [];
+      const rev = c.reveal == null ? 1 : (i < Math.floor(c.reveal) ? 1 : i < c.reveal ? 0.4 : 0);
+      if (showMargin && rev > 0) {
+        (marg[x.id] || []).forEach(([e, n]) => marks.push({ isReaction: true, emoji: e, countTxt: n > 1 ? n : '', border: 'var(--margin-reaction)', glow: 'none', op: rev, scale: 1 }));
+        if (c.ownR === x.id) marks.unshift({ isReaction: true, emoji: '♥', countTxt: '', border: 'var(--margin-own)', glow: c.glow === x.id ? '0 0 0 5px color-mix(in oklab, var(--margin-own) 22%, transparent)' : 'none', op: 1, scale: c.glow === x.id ? 1.08 : 1 });
+        if (c.live && x.id === 'a') {
+          const s = c.live;
+          marks.push({ isReaction: true, emoji: '😂', countTxt: '', border: 'var(--margin-reaction)', op: s === 1 ? 0.5 : 1, scale: s === 1 ? 0.86 : 1,
+            glow: s === 1 ? '0 0 0 7px color-mix(in oklab, var(--margin-reaction) 22%, transparent)' : s === 2 ? '0 0 0 3px color-mix(in oklab, var(--margin-reaction) 14%, transparent)' : 'none' });
+        }
+        if (threads[x.id]) {
+          const own = c.ownC === x.id;
+          marks.push({ isThread: true, countTxt: threads[x.id] + (own ? 1 : 0) + (c.author && x.id === 'b' ? 1 : 0), color: own ? 'var(--margin-own)' : 'var(--margin-thread)', author: !!(c.author && x.id === 'b'),
+            glow: own && c.glow === x.id ? '0 0 0 5px color-mix(in oklab, var(--margin-own) 22%, transparent)' : 'none' });
+        }
+        marks.forEach(m => { if (m.author == null) m.author = false; });
+      }
+      const foc = c.focus === x.id;
+      return { text: x.text, marks, picker: foc && !!c.picker, fly: foc && !!c.fly,
+        op: c.focus && !foc && !c.compose ? 0.35 : (c.compose && !foc ? 0.35 : 1),
+        bg: foc ? 'color-mix(in oklab, var(--focus-ring) 14%, transparent)' : 'transparent',
+        ring: foc ? 'inset 0 0 0 1.5px color-mix(in oklab, var(--focus-ring) 60%, transparent)' : 'none', pad: foc ? '6px 10px' : '0', };
+    });
+    // Thread
+    const fresh = 'color-mix(in oklab, var(--margin-own) 16%, transparent)';
+    const ada = c.former ? person('Former reader', '', 'sand', { av: 'color-mix(in oklab, var(--text) 10%, transparent)', avIc: IC.userXs, nameColor: 'var(--text-secondary)' }) : person('Ada', 'A', 'sand');
+    const priyaReplies = [{ ...ada, time: '4h', text: 'Warn her about what, though? She’s right about him so far.' }];
+    const youReplies = [{ ...person('Mateo', 'M', 'aqua'), time: c.freshReply ? 'now' : '12m', text: 'And she’s holding Jane’s letters when he walks in. Brutal.', fresh: !!c.freshReply }];
+    if (c.author) youReplies.push({ ...person('Imogen Hart', 'I', 'mint', { author: true }), time: '5m', text: 'I moved this scene three times before it landed here. Glad it hit.' });
+    const rep = r => ({ ...r, author: !!r.author, bg: r.fresh ? fresh : 'transparent', sh: r.fresh ? 'inset 0 0 0 1.5px color-mix(in oklab, var(--margin-own) 45%, transparent)' : 'none', pad: r.fresh ? '8px 10px' : '0' });
+    const priya = { ...person('Priya', 'P', 'rose'), time: '5h', text: 'Every time I reread this I want to warn her.', replies: priyaReplies.map(rep),
+      normal: !c.hidden && !c.removed, hidden: !!c.hidden, removed: !!c.removed, menu: !!c.menu,
+      bg: c.menu ? lift : 'transparent', sh: c.menu ? liftSh : 'none', op: 1, z: c.menu ? 3 : 1 };
+    const you = { ...person('You', 'L', 'lavender'), time: '2h', text: 'Austen saves his entrance for the exact moment she’s angriest.', replies: youReplies.map(rep),
+      normal: true, hidden: false, removed: false, menu: false, bg: 'transparent', sh: 'none', op: c.menu ? 0.3 : 1, z: 1 };
+    const comments = [priya, you];
+    const kbH = ios ? 291 : 280;
+    const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+    const keyBg = 'color-mix(in oklab, var(--surface) 70%, transparent)', modBg = 'color-mix(in oklab, var(--text) 14%, transparent)';
+    const kbRows = rows.map((r, i) => ({ pad: i === 1 ? 18 : 0, keys: [
+      ...(i === 2 ? [{ t: '⇧', f: 1.4, bg: modBg, font: '400 18px/1' }] : []),
+      ...r.split('').map(t => ({ t, f: 1, bg: keyBg, font: '400 21px/1' })),
+      ...(i === 2 ? [{ t: '⌫', f: 1.4, bg: modBg, font: '400 18px/1' }] : []),
+    ] }));
+    kbRows.push({ pad: 0, keys: [{ t: '123', f: 1.3, bg: modBg, font: '500 15px/1' }, { t: 'space', f: 5, bg: keyBg, font: '400 15px/1' }, { t: 'return', f: 1.8, bg: modBg, font: '500 15px/1' }] });
+    const tt = TOASTS[c.toast] || ['', ''];
+    const communities = [
+      { name: 'Lumee Book Club', meta: '14 reading this book', init: 'L', icon: '', av: 'var(--highlight-sand)', on: comm === 'lumee' },
+      { name: 'Thursday Readers', meta: '5 reading this book', init: 'T', icon: '', av: 'var(--highlight-aqua)', on: comm === 'thursday' },
+      { name: 'Just me', meta: 'Read with a quiet margin', init: '', icon: IC.userSm, av: 'color-mix(in oklab, var(--text) 9%, transparent)', on: comm === 'solo' },
+    ].map(x => ({ ...x, bg: x.on ? 'color-mix(in oklab, var(--text) 8%, transparent)' : 'transparent' }));
+    const reasons = ['It gives away what happens later', 'It’s unkind or harassing', 'It’s spam', 'Something else'].map((t, i) => ({ t, bg: i === 0 ? 'color-mix(in oklab, var(--focus-ring) 12%, transparent)' : 'color-mix(in oklab, var(--text) 6%, transparent)', ring: i === 0 ? 'inset 0 0 0 1.5px var(--focus-ring)' : 'none', dot: i === 0 ? 7 : 0 }));
+    const label = { lumee: 'Lumee Book Club', thursday: 'Thursday Readers', solo: 'Reading solo' }[comm];
+    const chrome = !!c.chrome;
+    return {
+      theme, ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, backIcon: ios ? IC.chevronLeft : IC.arrowLeft,
+      readerTop: statusH + 70, showHead: !c.from, ch, volume: ch > 42 ? 'Volume III' : 'Volume II', quiet: ch !== 34, paras, ahead: !!c.ahead,
+      pickerOp: c.fly ? 0.35 : 1, emojis: EMOJI.map(e => ({ e, bg: c.fly && e === '♥' ? 'color-mix(in oklab, var(--margin-own) 20%, transparent)' : 'transparent', scale: c.fly && e === '♥' ? 1.12 : 1 })),
+      noChrome: !chrome && !sheetOpen, textBottom: !chrome && !sheetOpen ? (comm === 'solo' ? (ios ? 112 : 102) : (ios ? 56 : 46)) : 0, footBottom: ios ? 26 : 20, pct: ch === 34 ? (c.ahead ? 56 : 55) : 71, minsLeft: c.ahead ? 'Chapter 35 next' : ch === 34 ? '9 min left in chapter' : '12 min left in chapter',
+      solo: comm === 'solo' && !chrome, soloBottom: ios ? 62 : 54,
+      chrome, titleBg: c.switcher ? 'color-mix(in oklab, var(--surface-raised) 85%, transparent)' : 'color-mix(in oklab, var(--surface-raised) 55%, transparent)', communityLabel: label,
+      toast: !!c.toast, toastTitle: tt[0], toastSub: tt[1], toastBottom: c.thread ? (ios ? 104 : 96) : (ios ? 60 : 52),
+      scrim: !!(c.switcher || c.locked || c.reportSheet || c.menu), scrimPct: c.switcher ? 22 : 40,
+      switcher: !!c.switcher, switcherTop: statusH + 54, communities,
+      thread: !!c.thread, sheetTop: c.kb ? statusH + 24 : statusH + 232, sheetBottom: c.kb ? kbH : 0, sheetRadius: '36px 36px 0 0', listShift: c.shift || 0,
+      threadChips: [{ e: '♥', n: 1, ring: 'inset 0 0 0 1.5px var(--margin-own)' }, { e: '😮', n: 16, ring: 'none' }, { e: '🔥', n: 7, ring: 'none' }],
+      comments, replyTo: c.replyTo || '', inputText: c.replyTo ? 'Same, every single time' : 'Add to the conversation', inputColor: c.replyTo ? 'var(--text)' : 'var(--text-muted)',
+      inputRing: c.replyTo ? 'inset 0 0 0 1.5px var(--focus-ring)' : 'none', sendBg: c.replyTo ? 'var(--primary)' : 'color-mix(in oklab, var(--text) 8%, transparent)', sendColor: c.replyTo ? 'var(--on-primary)' : 'var(--text-muted)',
+      composerPad: c.kb ? 10 : (ios ? 34 : 26),
+      compose: !!c.compose, composeBottom: kbH + 8, kb: !!c.kb, kbH, kbRows,
+      locked: !!c.locked, sheetPadIn: ios ? 26 : 20, reportSheet: !!c.reportSheet, reasons,
+      banner: !!c.banner, bannerTop: ios ? 56 : 40,
+      bannerTitle: c.banner === 'ahead' ? 'Ada replied to you' : 'Mateo replied to you',
+      bannerBody: c.banner === 'ahead' ? 'Pride and Prejudice · Open Flipbook to see where.' : '“And she’s holding Jane’s letters when he walks in. Brutal.”',
+      sbColor: chrome || sheetOpen || c.reportSheet ? 'var(--text)' : 'var(--reader-text)', sbOp: chrome || sheetOpen || c.banner ? 1 : 0.35,
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/glass.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" data-style="{{ look }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ sHub }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;bottom:0;overflow:hidden;padding:8px 20px 0;display:flex;flex-direction:column;gap:22px">
+      <sc-if value="{{ hubGrace }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" action-label="Fix" hint-size="100%,64px">Your Pro renewal didn’t go through. Pro stays on until 15 Oct.</x-import></sc-if>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center">
+        <span style="width:88px;height:88px;border-radius:9999px;display:grid;place-items:center;font:700 32px/1 var(--font-sans);color:var(--text);background:var(--highlight-lavender);box-shadow:0 0 0 4px var(--surface),0 0 0 5px var(--divider)">L</span>
+        <div style="display:flex;flex-direction:column;gap:2px"><span class="t-h2" style="color:var(--text)">Lara Adéyẹmí</span><span class="t-body" style="color:var(--text-secondary)">Night reader in Surulere</span></div>
+        <sc-if value="{{ hubBadges }}"><div style="display:flex;gap:6px;justify-content:center"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Badge" kind="founding-host" hint-size="110px,22px">Founding Host</x-import><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Badge" kind="pro" hint-size="44px,22px">Pro</x-import></div></sc-if>
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="pill" hint-size="110px,36px">View profile</x-import>
+      </div>
+      <sc-if value="{{ hubPromo }}">
+        <div style="display:flex;align-items:center;gap:14px;padding:16px 16px 16px 18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span class="t-h3" style="color:var(--text)">Flipbook Pro</span><span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">Free classics, 15% off other books, audio and your own communities.</span></div>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" hint-size="96px,40px">See plans</x-import>
+        </div>
+      </sc-if>
+      <sc-for list="{{ hubGroups }}" as="g" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span class="t-label" style="color:var(--text-secondary);padding:0 4px">{{ g.t }}</span>
+          <div style="border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring);overflow:hidden">
+            <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+              <div style="min-height:56px;padding:0 14px 0 12px;display:flex;align-items:center;gap:12px">
+                <span style="width:32px;height:32px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--tint-2)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ r.icon }}" size="sm" hint-size="20px,20px"></x-import></span>
+                <div style="flex:1;min-width:0;min-height:56px;display:flex;align-items:center;gap:10px;box-shadow:{{ r.line }}">
+                  <span style="flex:1;font:600 15px/20px var(--font-sans);color:var(--text)">{{ r.t }}</span>
+                  <sc-if value="{{ r.v }}"><span class="t-caption" style="color:{{ r.vc }};white-space:nowrap">{{ r.v }}</span></sc-if>
+                  <sc-if value="{{ r.dot }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.UnreadDot" hint-size="7px,7px"></x-import></sc-if>
+                  <span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sProfile }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center">
+        <span style="width:96px;height:96px;border-radius:9999px;display:grid;place-items:center;font:700 36px/1 var(--font-sans);color:var(--text);background:{{ pf.av }}">{{ pf.init }}</span>
+        <span class="t-h1" style="color:var(--text)">{{ pf.name }}</span>
+        <div style="display:flex;gap:6px;justify-content:center"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Badge" kind="founding-host" hint-size="110px,22px">Founding Host</x-import><sc-if value="{{ pf.pro }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Badge" kind="pro" hint-size="44px,22px">Pro</x-import></sc-if></div>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty;max-width:300px">{{ pf.bio }}</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px"><span class="t-label" style="color:var(--text-secondary)">Favourite genres</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ pf.genres }}" as="g" hint-placeholder-count="3"><span class="t-label" style="height:32px;padding:0 14px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--card-fill);box-shadow:var(--card-ring)">{{ g }}</span></sc-for></div></div>
+      <sc-if value="{{ pf.reading }}">
+        <div style="display:flex;flex-direction:column;gap:10px"><span class="t-label" style="color:var(--text-secondary)">Reading now</span>
+          <div style="display:flex;gap:14px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill)"><div style="flex:none;border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="pp" width="{{ 44 }}" hint-size="44px,66px"></dc-import></div><div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">Pride and Prejudice</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">With Lumee Book Club</span></div></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ pf.shared }}">
+        <div style="display:flex;flex-direction:column;gap:10px"><span class="t-label" style="color:var(--text-secondary)">Communities you share</span>
+          <sc-for list="{{ pf.shared }}" as="c" hint-placeholder-count="2"><div style="display:flex;gap:12px;align-items:center"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Emblem" name="{{ c }}" size="{{ 36 }}" hint-size="36px,36px"></x-import><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ c }}</span></div></sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ pf.own }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" hint-size="100%,48px">Edit profile</x-import></sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sEdit }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ editFootH }}px;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:18px">
+      <span class="t-h1" style="color:var(--text)">Edit profile</span>
+      <div style="display:flex;gap:16px;align-items:center"><span style="width:72px;height:72px;flex:none;border-radius:9999px;display:grid;place-items:center;font:700 28px/1 var(--font-sans);color:var(--text);background:var(--highlight-lavender)">L</span><div style="display:flex;gap:8px"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" hint-size="120px,40px">Change photo</x-import></div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-label" style="color:var(--text-secondary)">Name</span><div style="height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;background:var(--field-fill)"><span class="t-body" style="color:var(--text)">Lara Adéyẹmí</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between"><span class="t-label" style="color:var(--text-secondary)">Bio</span><span class="t-caption" style="color:var(--text-muted)">74 / 160</span></div><div style="min-height:80px;padding:12px 16px;border-radius:16px;background:var(--field-fill);box-shadow:var(--selected-ring)"><span class="t-body" style="color:var(--text);text-wrap:pretty">Night reader in Surulere. Austen first, then anything set in Lagos.</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary)">Favourite genres</span><div style="display:flex;flex-wrap:wrap;gap:8px"><sc-for list="{{ editGenres }}" as="g" hint-placeholder-count="8"><span class="t-label" style="height:36px;padding:0 14px;border-radius:var(--radius-button);display:flex;align-items:center;color:var(--text);background:{{ g.bg }};box-shadow:{{ g.ring }}">{{ g.t }}</span></sc-for></div></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Save</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sList }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h1" style="color:var(--text)">{{ list.title }}</span><sc-if value="{{ list.sub }}"><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ list.sub }}</span></sc-if></div>
+      <sc-if value="{{ list.themes }}">
+        <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary);padding:0 4px">Theme</span><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.SegmentedTabs" items="{{ themeTabs }}" value="flip" hint-size="100%,44px"></x-import></div>
+      </sc-if>
+      <sc-if value="{{ list.reader }}">
+        <div style="display:flex;flex-direction:column;gap:12px;padding:20px;border-radius:var(--radius-card);background:var(--reader-page);box-shadow:var(--card-ring)"><span style="font:400 18px/30px var(--font-serif);color:var(--reader-text)">It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary);padding:0 4px">Typeface</span><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.SegmentedTabs" items="{{ fontTabs }}" value="literata" hint-size="100%,44px"></x-import></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary);padding:0 4px">Text size</span>
+          <div style="height:56px;padding:0 8px;border-radius:var(--radius-row);display:flex;align-items:center;justify-content:space-between;background:var(--option-fill)"><span style="width:44px;height:44px;display:grid;place-items:center;font:600 14px/1 var(--font-serif);color:var(--text)">A</span><div style="flex:1;display:flex;gap:6px;justify-content:center"><sc-for list="{{ sizes }}" as="s" hint-placeholder-count="5"><span style="width:28px;height:4px;border-radius:9999px;background:{{ s }}"></span></sc-for></div><span style="width:44px;height:44px;display:grid;place-items:center;font:600 22px/1 var(--font-serif);color:var(--text)">A</span></div>
+        </div>
+      </sc-if>
+      <sc-for list="{{ list.groups }}" as="g" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-if value="{{ g.t }}"><span class="t-label" style="color:var(--text-secondary);padding:0 4px 4px">{{ g.t }}</span></sc-if>
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+            <div style="min-height:60px;padding:10px 16px;border-radius:var(--radius-row);display:flex;align-items:center;gap:14px;background:var(--option-fill)">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:{{ r.tc }}">{{ r.t }}</span><sc-if value="{{ r.d }}"><span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">{{ r.d }}</span></sc-if></div>
+              <sc-if value="{{ r.toggle }}"><span style="width:50px;height:30px;flex:none;border-radius:9999px;padding:3px;display:flex;justify-content:{{ r.jc }};background:{{ r.track }}"><span style="width:24px;height:24px;border-radius:9999px;background:var(--surface)"></span></span></sc-if>
+              <sc-if value="{{ r.value }}"><span class="t-caption" style="color:var(--text-muted)">{{ r.value }}</span></sc-if>
+              <sc-if value="{{ r.chev }}"><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sDelete }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ delFootH }}px;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h1" style="color:var(--text)">Delete your account</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Here’s exactly what happens, so nothing surprises you later.</span></div>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,64px">{{ proWarn }}</x-import>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <span class="t-h3" style="color:var(--text)">Deleted</span>
+        <sc-for list="{{ gone }}" as="t" hint-placeholder-count="4"><div style="display:flex;gap:10px;align-items:flex-start"><span style="display:flex;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="x" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ t }}</span></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:16px 18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <span class="t-h3" style="color:var(--text)">Stays, without your name</span>
+        <sc-for list="{{ stays }}" as="t" hint-placeholder-count="2"><div style="display:flex;gap:10px;align-items:flex-start"><span style="display:flex;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="check" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ t }}</span></div></sc-for>
+      </div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Continue to delete</x-import>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">Keep my account</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sDeleted }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;bottom:{{ footPad }}px;padding:0 28px;display:flex;flex-direction:column;justify-content:center;gap:12px">
+      <span class="t-h1" style="color:var(--text)">Your account is deleted</span>
+      <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Your profile, highlights and Shelf are gone. If you come back, you’ll start fresh with a new account.</span>
+      <span style="font:italic 400 16px/24px var(--font-serif);color:var(--text-secondary);padding-top:12px">Thanks for reading together.</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sHistory }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <span class="t-h1" style="color:var(--text)">Reading history</span>
+      <sc-for list="{{ years }}" as="y" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <span class="t-label" style="color:var(--text-secondary);padding:0 4px">{{ y.t }}</span>
+          <sc-for list="{{ y.books }}" as="b" hint-placeholder-count="3">
+            <div style="display:flex;gap:14px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill)">
+              <div style="flex:none"><sc-if value="{{ b.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ b.art }}" width="{{ 44 }}" hint-size="44px,66px"></dc-import></div></sc-if><sc-if value="{{ b.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ b.t }}" author="{{ b.a }}" tone="{{ b.tone }}" width="{{ 44 }}" hint-size="44px,66px"></x-import></sc-if></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:600 15px/20px var(--font-sans);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.t }}</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ b.when }}</span></div>
+              <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" hint-size="100px,40px">Read again</x-import>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ header }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.AppHeader" title="" on-back="{{ noop }}" actions="{{ hActions }}" dc-props="{{ hProps }}" hint-size="100%,60px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabbar }}">
+    <div style="position:absolute;left:0;right:0;bottom:{{ tabBottom }}px;z-index:24">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.TabBar" items="{{ tabItems }}" value="you" hint-size="100%,80px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ delSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Delete your account?" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="error" hint-size="100%,64px">This can’t be undone. Your Shelf and highlights go for good.</x-import>
+          <div style="display:flex;flex-direction:column;gap:6px"><span class="t-label" style="color:var(--text-secondary)">Type DELETE to confirm</span><div style="height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;background:var(--field-fill);box-shadow:var(--selected-ring)"><span class="t-body" style="color:var(--text);letter-spacing:.08em">DELETE</span></div></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Delete my account</x-import>
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">Keep my account</x-import>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text);pointer-events:none"><span style="font:600 16px/20px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text);pointer-events:none"><span style="font:500 14px/18px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;hub&quot;,&quot;hubFree&quot;,&quot;hubGrace&quot;,&quot;profile&quot;,&quot;profileOther&quot;,&quot;edit&quot;,&quot;settings&quot;,&quot;readingDefaults&quot;,&quot;privacy&quot;,&quot;deleteInfo&quot;,&quot;deleteConfirm&quot;,&quot;deleted&quot;,&quot;history&quot;],&quot;default&quot;:&quot;hub&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;glass&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;glass&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const h = React.createElement;
+const IC = {
+  signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+  wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+  battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+};
+const PROFILES = {
+  own: { init: 'L', av: 'var(--highlight-lavender)', name: 'Lara Adéyẹmí', pro: true, bio: 'Night reader in Surulere. Austen first, then anything set in Lagos.', genres: ['Classics', 'Romance', 'African fiction'], reading: true, shared: null, own: true },
+  other: { init: 'A', av: 'var(--highlight-sand)', name: 'Ada Okafor', pro: false, bio: 'Hosts Lumee Book Club. Will argue about Mr Darcy for as long as you like.', genres: ['Classics', 'Literary fiction', 'Memoir'], reading: false, shared: ['Lumee Book Club', 'Lagos Night Readers'], own: false },
+};
+const row = (t, o = {}) => ({ t, d: '', chev: true, ...o });
+const tg = (t, d, on) => ({ t, d, toggle: true, on, chev: false });
+const LISTS = {
+  settings: { title: 'Settings', themes: true, groups: [
+    { t: 'Reading', rows: [row('Reading defaults', { value: 'Literata · 18' }), row('Notifications'), row('Privacy')] },
+    { t: 'Account', rows: [row('Email', { value: 'lara@…' }), row('Download my data'), row('Delete account', { tc: 'var(--error)' })] },
+  ] },
+  readingDefaults: { title: 'Reading defaults', sub: 'Every book opens like this. Change any book from its display sheet.', reader: true, groups: [
+    { t: '', rows: [tg('Show the margin', 'Reactions and notes beside the text', true), tg('Keep the screen on while reading', '', true)] },
+  ] },
+  privacy: { title: 'Privacy', groups: [
+    { t: 'Your communities', rows: [tg('Show what I’m reading', 'People in your communities see books you’ve opened. Owning a book alone never shows.', true), row('Who can gift me books', { value: 'My communities' })] },
+    { t: 'Just for you', rows: [row('Reading rhythm', { d: 'Always private. Nobody else can see it.', chev: false }), row('Highlights and private notes', { d: 'Only shared when you choose to.', chev: false })] },
+  ] },
+};
+const YEARS = [
+  { t: '2026', books: [['Emma', 'Jane Austen', 'emma', '', 'Finished 12 Sep · Lumee Book Club'], ['Persuasion', 'Jane Austen', 'persuasion', '', 'Finished 3 Aug · Lumee Book Club'], ['My Sister, the Serial Killer', 'Oyinkan Braithwaite', '', 'plum', 'Finished 18 Jun · on your own']] },
+  { t: '2025', books: [['Things Fall Apart', 'Chinua Achebe', '', 'coral', 'Finished 30 Nov · Lagos Night Readers'], ['North and South', 'Elizabeth Gaskell', 'north', '', 'Finished 2 Oct · Lumee Book Club']] },
+];
+const S = {
+  hub: { v: 'hub' }, hubFree: { v: 'hub', free: true }, hubGrace: { v: 'hub', grace: true }, profile: { v: 'profile', p: 'own' }, profileOther: { v: 'profile', p: 'other' }, edit: { v: 'edit' },
+  settings: { v: 'list', l: 'settings' }, readingDefaults: { v: 'list', l: 'readingDefaults' }, privacy: { v: 'list', l: 'privacy' },
+  deleteInfo: { v: 'delete' }, deleteConfirm: { v: 'delete', sheet: true }, deleted: { v: 'deleted' }, history: { v: 'history' },
+};
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, c = S[p.screen] || S.hub, v = c.v;
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, footPad = ios ? 34 : 24;
+    const L = LISTS[c.l] || LISTS.settings;
+    const list = { title: L.title, sub: L.sub || '', themes: !!L.themes, reader: !!L.reader,
+      groups: L.groups.map((g, i) => ({ key: i, t: g.t, rows: g.rows.map((r, j) => ({ key: j, t: r.t, d: r.d || '', tc: r.tc || 'var(--text)', toggle: !!r.toggle, value: r.value || '', chev: !!r.chev, jc: r.on ? 'flex-end' : 'flex-start', track: r.on ? 'var(--text)' : 'var(--tint-3)' })) })) };
+    const chip = (t, on) => ({ t, bg: on ? 'var(--selected-fill)' : 'var(--option-fill)', ring: on ? 'var(--selected-ring)' : 'none' });
+    const store = ios ? 'App Store' : 'Google Play';
+    return {
+      theme: p.theme || 'flip', look: p.look || 'glass', ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, noop: () => {}, footPad,
+      bodyTop: statusH + 64, sheetPad: footPad - 16,
+      hProps: { style: { background: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } },
+      hActions: c.p === 'other' ? [{ icon: 'more', label: 'More' }] : [],
+      header: v !== 'hub' && v !== 'deleted',
+      tabbar: v === 'hub', tabBottom: ios ? 18 : 12,
+      tabItems: [{ value: 'home', label: 'Home', icon: 'house' }, { value: 'shelf', label: 'Shelf', icon: 'shelf' }, { value: 'comm', label: 'Communities', icon: 'users' }, { value: 'you', label: 'You', icon: 'user' }],
+      sHub: v === 'hub', hubBadges: !c.free, hubPromo: !!c.free, hubGrace: !!c.grace,
+      hubGroups: [
+        { t: 'Reading', rows: [['bell', 'Activity', '', true], ['calendar', 'Reading rhythm', '4 days this week'], ['book', 'Reading history', '']] },
+        { t: 'Account', rows: [...(c.free ? [] : [['sparkle', 'Pro', c.grace ? 'Renewal didn’t go through' : 'Annual · renews 8 Oct 2027', false, c.grace]]), ['more', 'Settings', '']] },
+      ].map((g, i) => ({ key: i, t: g.t, rows: g.rows.map(([icon, t, v, dot, warn], j) => ({ key: j, icon, t, v, dot: !!dot, vc: warn ? 'var(--warning)' : 'var(--text-muted)', line: j ? 'inset 0 1px 0 var(--divider)' : 'none' })) })),
+      sProfile: v === 'profile', pf: PROFILES[c.p] || PROFILES.own,
+      sEdit: v === 'edit', editFootH: 12 + 52 + footPad,
+      editGenres: ['Classics', 'Romance', 'African fiction', 'Literary fiction', 'Thrillers', 'Poetry', 'Memoir', 'Fantasy'].map((t, i) => ({ key: i, ...chip(t, i < 3) })),
+      sList: v === 'list', list,
+      themeTabs: [{ value: 'light', label: 'Light' }, { value: 'flip', label: 'Flip' }, { value: 'dark', label: 'Dark' }, { value: 'auto', label: 'Auto' }],
+      fontTabs: [{ value: 'literata', label: 'Literata' }, { value: 'manrope', label: 'Manrope' }],
+      sizes: [0, 1, 2, 3, 4].map(i => i <= 2 ? 'var(--text)' : 'var(--tint-3)'),
+      sDelete: v === 'delete', delFootH: 12 + 52 + 60 + footPad, delSheet: !!c.sheet,
+      gone: ['Your profile, photo and email', 'Your Shelf, including active rentals and credits', 'Your highlights and private notes', 'Your reading rhythm and settings'],
+      stays: ['Reactions, replies and chat messages in shared books, shown as “Former reader”', 'Anonymous reading records, with nothing that points to you'],
+      proWarn: `Deleting doesn’t cancel Pro. Cancel it in the ${store} first so you aren’t charged again.`,
+      sDeleted: v === 'deleted',
+      sHistory: v === 'history', years: YEARS.map((y, i) => ({ key: i, t: y.t, books: y.books.map(([t, a, art, tone, when], j) => ({ key: j, t, a, art, tone, when })) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

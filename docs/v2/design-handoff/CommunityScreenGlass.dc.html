@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <div style="position:absolute;left:0;right:0;top:{{ contentTop }}px;bottom:{{ contentBottom }}px;overflow:hidden">
+    <div style="display:flex;flex-direction:column;gap:20px;padding:4px 20px 24px;transform:translateY({{ shift }}px)">
+
+      <sc-if value="{{ bigTitle }}">
+        <h1 style="margin:0;font:800 34px/40px var(--font-sans);letter-spacing:-0.02em;color:var(--text)">Communities</h1>
+      </sc-if>
+
+      <sc-if value="{{ loading }}">
+        <div style="display:flex;flex-direction:column;gap:20px">
+          <div style="display:flex;gap:16px;padding:16px;border-radius:28px;background:var(--skeleton)"><span style="width:76px;height:114px;border-radius:4px;background:var(--skeleton-shimmer)"></span><div style="flex:1;display:flex;flex-direction:column;gap:10px;padding-top:6px"><span style="width:60%;height:12px;border-radius:9999px;background:var(--skeleton-shimmer)"></span><span style="width:85%;height:18px;border-radius:9999px;background:var(--skeleton-shimmer)"></span><span style="width:40%;height:12px;border-radius:9999px;background:var(--skeleton-shimmer)"></span><span style="width:130px;height:40px;border-radius:9999px;background:var(--skeleton-shimmer);margin-top:auto"></span></div></div>
+          <span style="width:140px;height:16px;border-radius:9999px;background:var(--skeleton)"></span>
+          <span style="height:40px;border-radius:9999px;background:var(--skeleton)"></span>
+          <sc-for list="{{ skelRows }}" as="s" hint-placeholder-count="4">
+            <div style="display:flex;align-items:center;gap:12px"><span style="width:36px;height:36px;border-radius:9999px;background:var(--skeleton)"></span><span style="width:{{ s.w }}px;height:14px;border-radius:9999px;background:var(--skeleton)"></span></div>
+          </sc-for>
+          <div style="display:flex;align-items:center;gap:8px;justify-content:center;color:var(--text-muted)"><span class="t-caption">Opening the Lobby</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ note }}">
+        <div style="display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:24px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--text-secondary);display:flex;margin-top:1px">{{ ic.infoSm }}</span><span class="t-caption" style="color:var(--text);font-size:13px;line-height:19px;text-wrap:pretty">{{ noteText }}</span></div>
+          <sc-if value="{{ noteAction }}"><span class="t-label" style="align-self:flex-start;margin-left:30px;height:36px;padding:0 16px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--text) 10%, transparent)">{{ noteActionIcon }}{{ noteAction }}</span></sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ inviteCard }}">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:20px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+          <span class="t-h2" style="color:var(--text)">It’s just you so far</span>
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Read this with someone. Send the invite to a group chat and they’ll land right here.</span>
+          <div style="margin-top:10px;height:48px;padding:0 20px 0 16px;border-radius:9999px;display:flex;align-items:center;gap:8px;background:var(--primary);color:var(--on-primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)">{{ ic.whatsappSm }}<span style="font:700 15px/20px var(--font-sans)">Invite on WhatsApp</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ bookCard }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;gap:16px;padding:16px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+          <sc-if value="{{ clubCover }}">
+            <div style="width:76px;height:114px;flex:none;border-radius:4px;padding:10px 8px;display:flex;flex-direction:column;justify-content:space-between;background:var(--ivory);color:var(--indigo-900);box-shadow:0 0 0 1px var(--divider)"><span style="font:600 13px/16px var(--font-serif)">Ụ̀kpụrụ Street</span><span style="font:700 6px/8px var(--font-sans);letter-spacing:.2em">CLUB COPY</span></div>
+          </sc-if>
+          <sc-if value="{{ catalogueCover }}" hint-placeholder-val="{{ true }}">
+            <div style="flex:none;border-radius:4px;box-shadow:0 14px 24px -12px rgba(8,6,30,.6)"><dc-import name="Cover" book="{{ bookId }}" width="76" hint-size="76px,114px"></dc-import></div>
+          </sc-if>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+            <span class="t-caption" style="color:var(--text-accent);text-transform:uppercase;letter-spacing:.14em">{{ bookKicker }}</span>
+            <span class="t-h3" style="color:var(--text);margin-top:2px">{{ bookTitle }}</span>
+            <span class="t-caption" style="color:var(--text-secondary)">{{ bookSub }}</span>
+            <span class="t-caption" style="color:var(--text-muted);display:flex;align-items:center;gap:4px;margin-top:2px">{{ bookMetaIcon }}{{ bookMeta }}</span>
+            <div style="margin-top:auto;padding-top:10px;display:flex;align-items:center;gap:10px">
+              <span style="height:40px;padding:0 18px;border-radius:9999px;display:flex;align-items:center;font:700 14px/18px var(--font-sans);background:{{ ctaBg }};color:{{ ctaColor }};box-shadow:{{ ctaSh }}">{{ bookCta }}</span>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ betweenCard }}">
+        <div style="display:flex;flex-direction:column;gap:14px;padding:20px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+          <div style="display:flex;gap:10px">
+            <span style="width:52px;height:78px;border-radius:4px;background:color-mix(in oklab, var(--text) 8%, transparent);box-shadow:inset 0 0 0 1.5px color-mix(in oklab, var(--text) 16%, transparent)"></span>
+            <span style="width:52px;height:78px;border-radius:4px;background:color-mix(in oklab, var(--text) 5%, transparent)"></span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h2" style="color:var(--text)">The next book is coming</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Ada is choosing. You finished Pride and Prejudice together on 2 October, and your highlights are on your Shelf.</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ rail }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between"><span class="t-h3" style="color:var(--text)">Where everyone is</span><span class="t-caption" style="color:var(--text-muted)">{{ railMeta }}</span></div>
+          <div style="position:relative;height:44px;margin:0 13px">
+            <div style="position:absolute;left:-13px;right:-13px;top:19px;height:6px;border-radius:9999px;background:var(--progress-track)"></div>
+            <div style="position:absolute;left:-13px;top:19px;height:6px;border-radius:9999px;background:var(--progress-fill);width:{{ fillW }}"></div>
+            <sc-for list="{{ markers }}" as="m" hint-placeholder-count="4">
+              <span style="position:absolute;top:{{ m.top }}px;left:{{ m.left }};transform:translateX(-50%);width:26px;height:26px;border-radius:9999px;display:grid;place-items:center;font:700 11px/1 var(--font-sans);color:var(--text);background:{{ m.av }};box-shadow:{{ m.ring }}">{{ m.init }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;justify-content:space-between"><span class="t-caption" style="color:var(--text-muted)">Ch 1</span><span class="t-caption" style="color:var(--text-muted)">Ch 61</span></div>
+          <div style="display:flex;flex-direction:column">
+            <sc-for list="{{ members }}" as="m" hint-placeholder-count="5">
+              <div style="display:flex;align-items:center;gap:12px;height:48px">
+                <span class="t-label" style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:{{ m.av }}">{{ m.init }}</span>
+                <div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px"><span class="t-label" style="color:var(--text)">{{ m.name }}</span>
+                  <sc-if value="{{ m.founding }}"><span style="height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);background:var(--founding-host);color:var(--on-founding-host)">Founding Host</span></sc-if>
+                  <sc-if value="{{ m.cohost }}"><span style="height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);color:var(--text-secondary);box-shadow:inset 0 0 0 1.5px color-mix(in oklab, var(--text) 24%, transparent)">Co-host</span></sc-if>
+                </div>
+                <span class="t-caption" style="color:{{ m.posColor }}">{{ m.pos }}</span>
+              </div>
+            </sc-for>
+            <div style="display:flex;align-items:center;justify-content:space-between;height:44px;color:var(--ghost)"><span class="t-label">See all {{ memberCount }} members</span>{{ ic.chevronRightSm }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ session }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <span class="t-h3" style="color:var(--text)">Next session</span>
+          <div style="display:flex;flex-direction:column;gap:12px;padding:16px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+            <div style="display:flex;gap:12px;align-items:flex-start">
+              <span style="width:48px;height:52px;flex:none;border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:color-mix(in oklab, var(--text) 8%, transparent)"><span style="font:700 10px/12px var(--font-sans);letter-spacing:.12em;color:var(--text-accent)">SAT</span><span style="font:700 20px/24px var(--font-sans);color:var(--text)">18</span></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span class="t-label" style="color:var(--text)">Chapters 10 to 20</span><span class="t-caption" style="color:var(--text-secondary)">7:00 pm · audio · hosted by Ada</span><span class="t-caption" style="color:var(--text-muted)">You’re in Ch 12. Eight chapters to go before Saturday.</span></div>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between"><span class="t-caption" style="color:var(--text-secondary)">12 going</span><span class="t-label" style="height:36px;padding:0 16px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--text) 10%, transparent)">{{ ic.checkSm }}I’m going</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ noSession }}">
+        <div style="display:flex;align-items:center;gap:12px;height:60px;padding:0 16px;border-radius:9999px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent)"><span style="color:var(--text-secondary);display:flex">{{ ic.calendarSm }}</span><span class="t-label" style="flex:1;color:var(--text)">No session yet</span><span class="t-label" style="color:var(--ghost)">Schedule one</span></div>
+      </sc-if>
+
+      <sc-if value="{{ pinned }}" hint-placeholder-val="{{ true }}">
+        <div style="display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+          <span class="t-caption" style="color:var(--text-muted);display:flex;align-items:center;gap:6px">{{ ic.pinXs }}Pinned by Ada</span>
+          <span class="t-body" style="color:var(--text);text-wrap:pretty">{{ pinnedText }}</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ createForm }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;align-items:center;gap:16px;padding:12px 18px 12px 12px;border-radius:9999px;background:color-mix(in oklab, var(--text) 7%, transparent)">
+            <sc-if value="{{ emblemEmpty }}" hint-placeholder-val="{{ true }}">
+              <span style="width:64px;height:64px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text-secondary);box-shadow:inset 0 0 0 1.5px color-mix(in oklab, var(--text) 28%, transparent);background:color-mix(in oklab, var(--text) 5%, transparent)">{{ ic.imageAddSm }}</span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span class="t-label" style="color:var(--text)">Add an emblem</span><span class="t-caption" style="color:var(--text-secondary);text-wrap:pretty">Shows in the Lobby, your lists and every invite</span></div>
+              <span class="t-caption" style="color:var(--text-muted)">Optional</span>
+            </sc-if>
+            <sc-if value="{{ emblemSet }}">
+              <span style="width:64px;height:64px;flex:none;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold);box-shadow:0 0 0 1px var(--divider)"><span style="position:absolute;right:0;bottom:0;width:32px;height:32px;border-top-left-radius:32px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:20px;height:20px;border-bottom-right-radius:20px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 30px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span class="t-label" style="color:var(--text)">Emblem added</span><span class="t-caption" style="color:var(--text-secondary)">lumee-emblem.png</span></div>
+              <span class="t-label" style="height:36px;padding:0 14px;border-radius:9999px;display:flex;align-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 10%, transparent)">Change</span>
+            </sc-if>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding:12px 18px;border-radius:24px;background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:{{ nameRing }}">
+            <span class="t-caption" style="color:var(--text-secondary)">Name</span>
+            <span style="font:500 17px/24px var(--font-sans);color:var(--text)">Lumee Book Club<sc-if value="{{ nameCaret }}"><span style="display:inline-block;width:2px;height:20px;border-radius:2px;background:var(--focus-ring);margin-left:1px;vertical-align:-4px"></span></sc-if></span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px;padding:12px 18px 14px;border-radius:24px;background:color-mix(in oklab, var(--text) 7%, transparent)">
+            <div style="display:flex;justify-content:space-between"><span class="t-caption" style="color:var(--text-secondary)">Description</span><span class="t-caption" style="color:var(--text-muted)">Optional</span></div>
+            <span style="font:400 15px/22px var(--font-sans);color:var(--text);text-wrap:pretty">Classics with good company. One book a month, a call on Saturdays.</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <span class="t-label" style="color:var(--text);padding:4px 4px 0">Who can join</span>
+            <sc-for list="{{ visOptions }}" as="v" hint-placeholder-count="2">
+              <div style="display:flex;align-items:center;gap:14px;padding:12px 18px;border-radius:9999px;background:{{ v.bg }};box-shadow:{{ v.ring }}">
+                <span style="color:var(--text);display:flex">{{ v.icon }}</span>
+                <div style="flex:1;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">{{ v.t }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ v.s }}</span></div>
+                <span style="width:22px;height:22px;flex:none;border-radius:9999px;box-shadow:inset 0 0 0 {{ v.dot }}px var(--focus-ring),inset 0 0 0 2px color-mix(in oklab, var(--text) 30%, transparent)"></span>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ pick }}">
+        <div style="display:flex;flex-direction:column;gap:14px">
+          <div style="height:48px;border-radius:9999px;display:flex;align-items:center;gap:10px;padding:0 18px;color:var(--text-muted);background:color-mix(in oklab, var(--text) 7%, transparent)">{{ ic.searchSm }}<span class="t-body">Search the catalogue</span></div>
+          <div style="display:flex;gap:8px">
+            <sc-for list="{{ filters }}" as="f" hint-placeholder-count="3">
+              <span class="t-label" style="height:36px;padding:0 14px;border-radius:9999px;display:flex;align-items:center;color:{{ f.color }};background:{{ f.bg }}">{{ f.t }}</span>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <sc-for list="{{ books }}" as="b" hint-placeholder-count="4">
+              <div style="display:flex;align-items:center;gap:14px;padding:10px 16px 10px 10px;border-radius:24px;background:{{ b.bg }};box-shadow:{{ b.ring }}">
+                <dc-import name="Cover" book="{{ b.id }}" width="48" hint-size="48px,72px"></dc-import>
+                <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span class="t-label" style="color:var(--text)">{{ b.title }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ b.author }}</span><span class="t-caption" style="color:var(--text-muted);margin-top:3px">{{ b.access }}</span></div>
+                <sc-if value="{{ b.on }}"><span style="width:28px;height:28px;border-radius:9999px;display:grid;place-items:center;background:var(--primary);color:var(--on-primary)">{{ ic.checkSm }}</span></sc-if>
+              </div>
+            </sc-for>
+          </div>
+          <sc-if value="{{ legacy }}">
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;border-radius:9999px;box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 12%, transparent)">
+              <span style="color:var(--text-secondary);display:flex">{{ ic.uploadSm }}</span>
+              <div style="flex:1;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Upload a PDF or EPUB</span><span class="t-caption" style="color:var(--text-muted)">Members read it as Club copy</span></div>
+              <span style="height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);color:var(--text-accent);box-shadow:inset 0 0 0 1.5px var(--text-accent)">Pro</span>
+            </div>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tools }}">
+        <div style="display:flex;flex-direction:column;gap:18px">
+          <sc-for list="{{ toolGroups }}" as="g" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <span class="t-caption" style="color:var(--text-muted);text-transform:uppercase;letter-spacing:.14em;padding:0 6px">{{ g.t }}</span>
+              <div style="display:flex;flex-direction:column;padding:4px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+                <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="2">
+                  <div style="display:flex;align-items:center;gap:14px;height:52px;padding:0 14px;border-radius:9999px;color:{{ r.color }};background:{{ r.bg }}">
+                    <span style="display:flex">{{ r.icon }}</span><span class="t-label" style="flex:1">{{ r.t }}</span><span class="t-caption" style="color:var(--text-muted)">{{ r.v }}</span><span style="display:flex;color:var(--text-muted)">{{ r.chev }}</span>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ inviteView }}">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:18px;padding-top:8px">
+          <div style="padding:20px;border-radius:32px;background:var(--ivory);box-shadow:0 20px 40px -18px rgba(8,6,30,.6)">{{ qr }}</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:4px"><span class="t-caption" style="color:var(--text-muted);text-transform:uppercase;letter-spacing:.16em">Or enter the code</span><span style="font:700 30px/36px var(--font-sans);letter-spacing:.12em;color:var(--text);font-variant-numeric:tabular-nums">K7P 3QX</span></div>
+          <span class="t-body" style="color:var(--text-secondary);text-align:center;text-wrap:pretty;max-width:300px">For clubs that meet in person: show this screen and people can scan it with their camera.</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ memberList }}">
+        <div style="display:flex;flex-direction:column;gap:2px">
+          <sc-for list="{{ allMembers }}" as="m" hint-placeholder-count="8">
+            <div style="display:flex;align-items:center;gap:12px;height:56px;padding:0 12px;border-radius:9999px;background:{{ m.bg }};box-shadow:{{ m.ring }};opacity:{{ m.op }}">
+              <span class="t-label" style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:{{ m.av }}">{{ m.init }}</span>
+              <div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px"><span class="t-label" style="color:var(--text)">{{ m.name }}</span>
+                <sc-if value="{{ m.founding }}"><span style="height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);background:var(--founding-host);color:var(--on-founding-host)">Founding Host</span></sc-if>
+                <sc-if value="{{ m.cohost }}"><span style="height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);color:var(--text-secondary);box-shadow:inset 0 0 0 1.5px color-mix(in oklab, var(--text) 24%, transparent)">Co-host</span></sc-if>
+              </div>
+              <span class="t-caption" style="color:{{ m.posColor }}">{{ m.pos }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ list }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ myComms }}" as="c" hint-placeholder-count="2">
+            <div style="display:flex;align-items:center;gap:14px;padding:12px 16px 12px 12px;border-radius:28px;background:color-mix(in oklab, var(--surface-raised) 70%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.12)">
+              <div style="position:relative;flex:none"><dc-import name="Cover" book="{{ c.book }}" width="52" hint-size="52px,78px"></dc-import>
+                <sc-if value="{{ c.emblem }}"><span style="position:absolute;right:-8px;bottom:-6px;width:28px;height:28px;border-radius:9999px;overflow:hidden;background:var(--gold);box-shadow:0 0 0 2px var(--surface)"><span style="position:absolute;right:0;bottom:0;width:14px;height:14px;border-top-left-radius:14px;background:var(--coral-400)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 14px/1 var(--font-serif);color:var(--indigo-900)">L</span></span></sc-if>
+                <sc-if value="{{ c.mono }}"><span style="position:absolute;right:-8px;bottom:-6px;width:28px;height:28px;border-radius:9999px;display:grid;place-items:center;font:700 12px/1 var(--font-sans);color:var(--text);background:{{ c.monoBg }};box-shadow:0 0 0 2px var(--surface)">{{ c.mono }}</span></sc-if>
+              </div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span class="t-h3" style="color:var(--text)">{{ c.name }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ c.reading }}</span><span class="t-caption" style="color:var(--text-muted)">{{ c.meta }}</span></div>
+              <span style="color:var(--text-muted);display:flex">{{ ic.chevronRightSm }}</span>
+            </div>
+          </sc-for>
+          <sc-if value="{{ capNote }}">
+            <div style="display:flex;gap:10px;align-items:flex-start;padding:4px 8px"><span style="color:var(--text-muted);display:flex;margin-top:1px">{{ ic.infoSm }}</span><span class="t-caption" style="color:var(--text-secondary);font-size:13px;line-height:19px;text-wrap:pretty">{{ capText }}</span></div>
+          </sc-if>
+          <div style="display:flex;gap:8px;margin-top:6px">
+            <span style="flex:1;height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.plusSm }}<span style="font:700 15px/20px var(--font-sans)">Start a community</span></span>
+            <span style="height:48px;padding:0 18px;border-radius:9999px;display:flex;align-items:center;gap:8px;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.qrSm }}<span style="font:700 15px/20px var(--font-sans)">Join</span></span>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </div>
+
+  <sc-if value="{{ header }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;padding:{{ statusH }}px 16px 0;display:flex;align-items:center;gap:10px;z-index:30;background:color-mix(in oklab, var(--surface) 72%, transparent);backdrop-filter:blur(24px) saturate(180%);height:{{ headerH }}px;box-sizing:border-box;padding-bottom:10px;align-items:flex-end">
+      <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">{{ backIcon }}</span>
+      <sc-if value="{{ hEmblem }}">
+        <span style="width:40px;height:40px;flex:none;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold);box-shadow:0 0 0 1px var(--divider)"><span style="position:absolute;right:0;bottom:0;width:20px;height:20px;border-top-left-radius:20px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:12px;height:12px;border-bottom-right-radius:12px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 19px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+      </sc-if>
+      <sc-if value="{{ hMonogram }}">
+        <span class="t-label" style="width:40px;height:40px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--highlight-aqua)">I</span>
+      </sc-if>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;justify-content:center;min-height:44px"><span class="t-h3" style="color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ hTitle }}</span><span class="t-caption" style="color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ hSub }}</span></div>
+      <sc-if value="{{ hActions }}">
+        <div style="height:44px;border-radius:9999px;display:flex;align-items:center;padding:0 4px;flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">
+          <sc-for list="{{ hActionList }}" as="a" hint-placeholder-count="2"><span style="width:40px;height:40px;display:grid;place-items:center;color:var(--text)">{{ a.icon }}</span></sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabs }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:20px;right:20px;top:{{ tabsTop }}px;z-index:29;height:44px;padding:4px;border-radius:9999px;display:flex;background:color-mix(in oklab, var(--surface-raised) 60%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.2)">
+      <span class="t-label" style="flex:1;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)">Lobby</span>
+      <span class="t-label" style="flex:1;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text-secondary)">Chat<sc-if value="{{ chatDot }}"><span style="width:7px;height:7px;border-radius:9999px;background:var(--text-accent)"></span></sc-if></span>
+      <span class="t-label" style="flex:1;border-radius:9999px;display:grid;place-items:center;color:var(--text-secondary)">Sessions</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ footCta }}">
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:28;padding:14px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:10px;background:color-mix(in oklab, var(--surface) 72%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 1px 0 color-mix(in oklab, var(--text) 8%, transparent)">
+      <sc-if value="{{ footNote }}"><span class="t-caption" style="color:var(--text-secondary);display:flex;align-items:center;gap:6px;justify-content:center">{{ ic.lockXs }}{{ footNote }}</span></sc-if>
+      <div style="height:52px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--primary);color:var(--on-primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)">{{ footIcon }}<span style="font:700 16px/20px var(--font-sans)">{{ footCta }}</span></div>
+      <sc-if value="{{ footSecondary }}"><div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.copySm }}<span style="font:700 15px/20px var(--font-sans)">{{ footSecondary }}</span></div></sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabbar }}">
+    <div style="position:absolute;left:16px;right:16px;bottom:{{ tabbarBottom }}px;z-index:28;height:64px;padding:6px;border-radius:9999px;display:flex;background:color-mix(in oklab, var(--surface-raised) 62%, transparent);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -12px rgba(8,6,30,.55)">
+      <sc-for list="{{ appTabs }}" as="t" hint-placeholder-count="4">
+        <span style="flex:1;border-radius:9999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:{{ t.color }};background:{{ t.bg }}">{{ t.icon }}<span style="font:600 11px/14px var(--font-sans)">{{ t.t }}</span></span>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}">
+    <div style="position:absolute;left:50%;bottom:{{ toastBottom }}px;transform:translateX(-50%);z-index:35;display:flex;align-items:center;gap:10px;padding:10px 20px 10px 12px;border-radius:9999px;white-space:nowrap;background:color-mix(in oklab, var(--surface-raised) 72%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+      <span style="width:32px;height:32px;border-radius:9999px;display:grid;place-items:center;background:var(--positive-surface);color:var(--positive)">{{ ic.checkCircleSm }}</span>
+      <div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">{{ toastTitle }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ toastSub }}</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ scrim }}"><div style="position:absolute;inset:0;z-index:40;background:color-mix(in oklab, #121212 48%, transparent)"></div></sc-if>
+
+  <sc-if value="{{ sheet }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:46;border-radius:36px;padding:10px 20px {{ sheetPad }}px;display:flex;flex-direction:column;gap:14px;background:color-mix(in oklab, var(--surface) 76%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <div style="width:36px;height:5px;border-radius:9999px;background:color-mix(in oklab, var(--text) 22%, transparent);align-self:center"></div>
+
+      <sc-if value="{{ sProHost }}">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-top:12px">
+          <span style="width:60px;height:60px;border-radius:9999px;display:grid;place-items:center;color:var(--text-accent);background:color-mix(in oklab, var(--text-accent) 14%, transparent)">{{ ic.crown }}</span>
+          <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">Host your own room with Pro</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">You choose the book, run live sessions and keep the room together. Your members read free of the host plan.</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ proPerks }}" as="k" hint-placeholder-count="4"><div style="display:flex;align-items:center;gap:12px"><span style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 8%, transparent)">{{ k.icon }}</span><span class="t-body" style="color:var(--text)">{{ k.t }}</span></div></sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+            <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">See Pro plans</span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--text)"><span style="font:700 15px/20px var(--font-sans)">Not now</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sEdition }}">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-top:8px">
+          <div style="display:flex;gap:16px;align-items:center"><dc-import name="Cover" book="persuasion" width="64" hint-size="64px,96px"></dc-import><div style="display:flex;flex-direction:column;gap:2px"><span class="t-h2" style="color:var(--text)">Persuasion</span><span class="t-caption" style="color:var(--text-secondary)">Jane Austen · Flipbook Classics edition</span><span class="t-caption" style="color:var(--text-muted)">24 chapters · about 7 hours</span></div></div>
+          <div style="display:flex;flex-direction:column;gap:12px;padding:14px 16px;border-radius:24px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+            <div style="display:flex;gap:12px;align-items:flex-start"><span style="color:var(--text);display:flex;margin-top:1px">{{ ic.lockSm }}</span><span class="t-body" style="color:var(--text);text-wrap:pretty">This edition is locked for the whole read, so everyone’s chapters and margin line up.</span></div>
+            <div style="display:flex;gap:12px;align-items:flex-start"><span style="color:var(--text);display:flex;margin-top:1px">{{ ic.bellSm }}</span><span class="t-body" style="color:var(--text);text-wrap:pretty">All 14 members get a note to get their copy. It’s included for Pro members.</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">Set as next book</span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--text)"><span style="font:700 15px/20px var(--font-sans)">Choose another</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sShare }}">
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div style="display:flex;gap:12px;align-items:center;padding:10px;border-radius:22px;background:color-mix(in oklab, var(--text) 7%, transparent)">
+            <span style="width:56px;height:56px;flex:none;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold);box-shadow:0 0 0 1px var(--divider)"><span style="position:absolute;right:0;bottom:0;width:28px;height:28px;border-top-left-radius:28px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:17px;height:17px;border-bottom-right-radius:17px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 26px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Join Lumee Book Club on Flipbook</span><span class="t-caption" style="color:var(--text-secondary)">Reading Pride and Prejudice · 14 members</span><span class="t-caption" style="color:var(--text-muted)">flipbook.app/j/K7P3QX</span></div>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:0 4px">
+            <sc-for list="{{ shareTargets }}" as="t" hint-placeholder-count="4">
+              <div style="width:68px;display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:60px;height:60px;border-radius:9999px;display:grid;place-items:center;color:{{ t.color }};background:{{ t.bg }};box-shadow:{{ t.ring }}">{{ t.icon }}</span><span class="t-caption" style="color:var(--text)">{{ t.t }}</span></div>
+            </sc-for>
+          </div>
+          <div style="display:flex;flex-direction:column;padding:4px;border-radius:24px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+            <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;color:var(--text)"><span class="t-label">Copy link</span>{{ ic.copySm }}</div>
+            <div style="height:48px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;color:var(--text)"><span class="t-label">Show code and QR</span>{{ ic.qrSm }}</div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sMember }}">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-top:4px">
+          <div style="display:flex;align-items:center;gap:14px"><span class="t-h3" style="width:52px;height:52px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--highlight-aqua)">T</span><div style="display:flex;flex-direction:column"><span class="t-h2" style="color:var(--text)">Tolu</span><span class="t-caption" style="color:var(--text-secondary)">Member since March · Ch 9</span></div></div>
+          <div style="display:flex;flex-direction:column;padding:4px;border-radius:28px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+            <div style="height:52px;display:flex;align-items:center;gap:14px;padding:0 14px;border-radius:9999px;color:var(--text)">{{ ic.cohostSm }}<span class="t-label" style="flex:1">Make co-host</span></div>
+            <div style="height:52px;display:flex;align-items:center;gap:14px;padding:0 14px;border-radius:9999px;color:var(--text)">{{ ic.muteSm }}<span class="t-label" style="flex:1">Mute in chat</span><span class="t-caption" style="color:var(--text-muted)">Tolu keeps reading</span></div>
+            <div style="height:1px;margin:2px 14px;background:color-mix(in oklab, var(--text) 10%, transparent)"></div>
+            <div style="height:52px;display:flex;align-items:center;gap:14px;padding:0 14px;border-radius:9999px;color:var(--error);background:color-mix(in oklab, var(--error) 10%, transparent)">{{ ic.userRemoveSm }}<span class="t-label" style="flex:1">Remove from community</span></div>
+          </div>
+          <span class="t-caption" style="color:var(--text-muted);text-align:center;text-wrap:pretty">If removed, Tolu keeps the book, highlights and progress.</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sCap }}">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-top:12px">
+          <span style="width:60px;height:60px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.usersLg }}</span>
+          <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">You’re in 3 communities</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">The free plan has room for 3. To join Thursday Readers, leave one first, or get Pro and join as many as you like.</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:4px">
+            <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">See Pro plans</span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)"><span style="font:700 15px/20px var(--font-sans)">Choose one to leave</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sTakeover }}">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-top:12px">
+          <span style="width:60px;height:60px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.cohostLg }}</span>
+          <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">Ask to host Lumee Book Club</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">You have Pro, so you can set the next book and run sessions. Ada gets your request and can approve it. If Ada isn’t active for 14 days, hosting passes to you.</span></div>
+          <div style="display:flex;gap:10px;align-items:flex-start;padding:12px 14px;border-radius:20px;background:color-mix(in oklab, var(--text) 6%, transparent)"><span style="color:var(--text-secondary);display:flex">{{ ic.infoSm }}</span><span class="t-caption" style="color:var(--text-secondary);font-size:13px;line-height:19px;text-wrap:pretty">Ada stays a member and keeps the Founding Host badge.</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">Send request to Ada</span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--text)"><span style="font:700 15px/20px var(--font-sans)">Not now</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sFounding }}">
+        <div style="display:flex;flex-direction:column;gap:18px;padding-top:12px">
+          <div style="display:flex;align-items:center;gap:12px"><span style="width:60px;height:60px;border-radius:9999px;display:grid;place-items:center;background:var(--founding-host);color:var(--on-founding-host)">{{ ic.crown }}</span><span style="height:28px;padding:0 12px;border-radius:9999px;display:inline-flex;align-items:center;font:700 13px/1 var(--font-sans);background:var(--founding-host);color:var(--on-founding-host)">Founding Host</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px"><span class="t-h1" style="color:var(--text)">Thank you for starting early, Ada</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">You hosted Lumee Book Club before Flipbook had a catalogue. Pro is yours free for two months, until 7 December, and the Founding Host badge stays on your profile, in the Lobby and in the margin for good.</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px">
+            <sc-for list="{{ foundingPerks }}" as="k" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px"><span style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 8%, transparent)">{{ k.icon }}</span><span class="t-body" style="color:var(--text)">{{ k.t }}</span></div></sc-for>
+          </div>
+          <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3);margin-top:4px"><span style="font:700 16px/20px var(--font-sans)">Open Lumee Book Club</span></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sLeave }}">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-top:12px">
+          <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">{{ leaveTitle }}</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ leaveBody }}</span></div>
+          <div style="display:flex;flex-direction:column;gap:10px;padding:14px 16px;border-radius:24px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+            <sc-for list="{{ keeps }}" as="k" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px;color:var(--text)"><span style="color:var(--positive);display:flex">{{ ic.checkSm }}</span><span class="t-body">{{ k }}</span></div></sc-for>
+          </div>
+          <sc-if value="{{ leaveHostNote }}"><div style="display:flex;gap:10px;align-items:flex-start;padding:0 4px"><span style="color:var(--text-secondary);display:flex">{{ ic.cohostSm }}</span><span class="t-caption" style="color:var(--text-secondary);font-size:13px;line-height:19px;text-wrap:pretty">Hosting passes to Kemi, your co-host. With no co-host it would go to the earliest member.</span></div></sc-if>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:52px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--error);background:color-mix(in oklab, var(--error) 14%, transparent)"><span style="font:700 16px/20px var(--font-sans)">Leave community</span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--text)"><span style="font:700 15px/20px var(--font-sans)">Stay</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sEmblem }}">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-top:8px">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><span class="t-h2" style="color:var(--text)">Position your emblem</span><span class="t-caption" style="color:var(--text-secondary)">Drag to move, pinch to zoom</span></div><span style="width:36px;height:36px;flex:none;border-radius:9999px;background:color-mix(in oklab, var(--text) 10%, transparent);display:grid;place-items:center;color:var(--text)">{{ ic.xSm }}</span></div>
+          <div style="position:relative;height:260px;border-radius:28px;overflow:hidden;background:var(--gold)">
+            <span style="position:absolute;right:-20px;bottom:-20px;width:170px;height:170px;border-top-left-radius:170px;background:var(--coral-400)"></span>
+            <span style="position:absolute;left:-10px;top:-10px;width:110px;height:110px;border-bottom-right-radius:110px;background:var(--indigo-900)"></span>
+            <span style="position:absolute;inset:0;display:grid;place-items:center;font:600 120px/1 var(--font-serif);color:var(--indigo-900)">L</span>
+            <span style="position:absolute;left:50%;top:50%;width:216px;height:216px;transform:translate(-50%,-50%);border-radius:9999px;box-shadow:0 0 0 999px color-mix(in oklab, #121212 55%, transparent),inset 0 0 0 2px rgba(255,255,255,.9)"></span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;padding:0 6px;color:var(--text-secondary)"><span style="font:600 12px/1 var(--font-sans)">−</span><div style="flex:1;height:6px;border-radius:9999px;background:var(--progress-track);position:relative"><div style="width:38%;height:100%;border-radius:9999px;background:var(--progress-fill)"></div><span style="position:absolute;left:38%;top:50%;width:22px;height:22px;transform:translate(-50%,-50%);border-radius:9999px;background:var(--text-alt);box-shadow:0 2px 8px rgba(8,6,30,.4)"></span></div><span style="font:600 14px/1 var(--font-sans)">+</span></div>
+          <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:9999px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+            <span style="color:var(--text-secondary);font:600 12px/16px var(--font-sans)">Preview</span>
+            <span style="width:40px;height:40px;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold)"><span style="position:absolute;right:0;bottom:0;width:20px;height:20px;border-top-left-radius:20px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:12px;height:12px;border-bottom-right-radius:12px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 19px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+            <span style="width:28px;height:28px;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold)"><span style="position:absolute;right:0;bottom:0;width:14px;height:14px;border-top-left-radius:14px;background:var(--coral-400)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 14px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+            <span class="t-caption" style="color:var(--text-muted);flex:1;text-align:right">PNG or JPG, at least 400 px</span>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">Use this emblem</span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;color:var(--text)"><span style="font:700 15px/20px var(--font-sans)">Choose another photo</span></div>
+          </div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ sUpload }}">
+        <div style="display:flex;flex-direction:column;gap:16px;padding-top:8px">
+          <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h2" style="color:var(--text)">Upload the next book</span><span class="t-caption" style="color:var(--text-secondary)">Ikoyi Readers · members read it as Club copy</span></div>
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 16px 12px 12px;border-radius:24px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+            <span style="width:44px;height:44px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--text) 9%, transparent)">{{ ic.fileSm }}</span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:6px"><div style="display:flex;justify-content:space-between"><span class="t-label" style="color:var(--text)">ukpuru-street.epub</span><span class="t-caption" style="color:var(--text-muted)">2.4 MB</span></div><div style="height:6px;border-radius:9999px;background:var(--progress-track);overflow:hidden"><div style="width:64%;height:100%;border-radius:9999px;background:var(--progress-fill)"></div></div><span class="t-caption" style="color:var(--text-secondary)">Uploading · 64%</span></div>
+          </div>
+          <span class="t-caption" style="color:var(--text-muted);text-wrap:pretty">Only upload a book you have the right to share with your club.</span>
+          <div style="height:52px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--primary-pressed);color:var(--on-primary)"><span style="display:flex;gap:4px"><span style="width:5px;height:5px;border-radius:9999px;background:currentColor"></span><span style="width:5px;height:5px;border-radius:9999px;background:currentColor;opacity:.7"></span><span style="width:5px;height:5px;border-radius:9999px;background:currentColor;opacity:.4"></span></span><span style="font:700 16px/20px var(--font-sans)">Uploading</span></div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ banner }}">
+    <div style="position:absolute;left:10px;right:10px;top:{{ bannerTop }}px;z-index:70;border-radius:28px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;background:color-mix(in oklab, var(--surface-raised) 66%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 20px 40px -14px rgba(8,6,30,.55)">
+      <img src="assets/flipbook-icon-flip-primary.svg" alt="" style="width:40px;height:40px;border-radius:11px;flex:none;display:block">
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px">
+        <div style="display:flex;justify-content:space-between"><span class="t-label" style="color:var(--text)">{{ bannerTitle }}</span><span class="t-caption" style="color:var(--text-muted)">now</span></div>
+        <span class="t-caption" style="color:var(--text);text-wrap:pretty">{{ bannerBody }}</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text)">
+      <span style="font:600 16px/20px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text)">
+      <span style="font:500 14px/18px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;lobby&quot;,&quot;lobbyScrolled&quot;,&quot;lobbyHost&quot;,&quot;lobbyBetween&quot;,&quot;lobbyLoading&quot;,&quot;startPro&quot;,&quot;create&quot;,&quot;emblemCrop&quot;,&quot;createEmblem&quot;,&quot;createBook&quot;,&quot;created&quot;,&quot;setBook&quot;,&quot;edition&quot;,&quot;bookSet&quot;,&quot;notifCopy&quot;,&quot;getCopy&quot;,&quot;getCopyPro&quot;,&quot;inviteShare&quot;,&quot;invite&quot;,&quot;tools&quot;,&quot;members&quot;,&quot;member&quot;,&quot;capNote&quot;,&quot;capSheet&quot;,&quot;lapsed&quot;,&quot;takeover&quot;,&quot;takeoverSent&quot;,&quot;founding&quot;,&quot;reminder7&quot;,&quot;reminder1&quot;,&quot;legacyPick&quot;,&quot;upload&quot;,&quot;clubCopy&quot;,&quot;leave&quot;,&quot;leaveHost&quot;,&quot;left&quot;],&quot;default&quot;:&quot;lobby&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const HG_NAMES = {
+  chevronLeft: 'ArrowLeft01Icon', arrowLeft: 'ArrowLeft02Icon', chevronRight: 'ArrowRight01Icon', x: 'Cancel01Icon', check: 'Tick02Icon', checkCircle: 'CheckmarkCircle02Icon',
+  info: 'InformationCircleIcon', userAdd: 'UserAdd01Icon', settings: 'Settings02Icon', more: 'MoreHorizontalIcon', whatsapp: 'WhatsappIcon', calendar: 'Calendar03Icon',
+  pin: 'PinIcon', search: 'Search01Icon', upload: 'Upload04Icon', copy: 'Copy01Icon', qr: 'QrCodeIcon', plus: 'Add01Icon', crown: 'CrownIcon', lock: 'SquareLock02Icon',
+  bell: 'Notification01Icon', message: 'Message01Icon', mail: 'Mail01Icon', mute: 'VolumeOffIcon', userRemove: 'UserRemove01Icon', cohost: 'UserStar01Icon',
+  users: 'UserGroupIcon', book: 'Book02Icon', headphones: 'HeadphonesIcon', edit: 'PencilEdit02Icon', mic: 'Mic01Icon', logout: 'Logout03Icon', file: 'File01Icon',
+  globe: 'Globe02Icon', imageAdd: 'ImageAdd01Icon', home: 'Home01Icon', library: 'LibraryIcon', user: 'UserIcon', star: 'StarIcon', door: 'DoorIcon', clock: 'Clock01Icon', badge: 'CheckmarkBadge01Icon',
+};
+const HG_URL = 'https://esm.sh/@hugeicons/core-free-icons';
+window.__fbHG6 = window.__fbHG6 || { data: null, p: import(HG_URL + '?exports=' + Object.values(HG_NAMES).join(',')).catch(() => import(HG_URL)).then(m => { window.__fbHG6.data = m; return m; }).catch(() => null) };
+const h = React.createElement;
+function icon(name, size = 24) {
+  const m = window.__fbHG6.data, nodes = (m && m[HG_NAMES[name]]) || [];
+  return h('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true, style: { display: 'block', flex: 'none' } },
+    nodes.map(([tag, a], i) => { const { key, ...rest } = a; const out = { ...rest, key: i, strokeWidth: 1.5 }; if (rest.stroke) out.stroke = 'currentColor'; if (rest.fill && rest.fill !== 'none') out.fill = 'currentColor'; return h(tag, out); }));
+}
+let IC = null;
+function buildIC() {
+  if (IC) return IC;
+  const ic = {};
+  [['chevronLeft', 22], ['arrowLeft', 22], ['x', 22]].forEach(([n, s]) => ic[n] = icon(n, s));
+  ['chevronRight', 'check', 'lock', 'pin'].forEach(n => { ic[n + 'Sm'] = icon(n, n === 'check' ? 16 : 18); });
+  ic.chevronRightSm = icon('chevronRight', 18); ic.checkSm = icon('check', 16); ic.lockXs = icon('lock', 14); ic.pinXs = icon('pin', 14); ic.lockSm = icon('lock', 20);
+  ['checkCircle', 'info', 'userAdd', 'settings', 'more', 'whatsapp', 'calendar', 'search', 'upload', 'copy', 'qr', 'plus', 'bell', 'mute', 'userRemove', 'cohost', 'file', 'edit', 'mic', 'users', 'book', 'logout', 'globe', 'star', 'headphones', 'clock', 'badge', 'imageAdd'].forEach(n => ic[n + 'Sm'] = icon(n, 20));
+  ic.infoSm = icon('info', 18); ic.xSm = icon('x', 20); ic.crown = icon('crown', 28); ic.usersLg = icon('users', 28); ic.cohostLg = icon('cohost', 28);
+  ic.whatsappLg = icon('whatsapp', 28); ic.messageLg = icon('message', 26); ic.mailLg = icon('mail', 26); ic.moreLg = icon('more', 26);
+  ic.homeT = icon('home', 22); ic.libT = icon('library', 22); ic.usersT = icon('users', 22); ic.userT = icon('user', 22);
+  ic.signal = h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 })));
+  ic.wifi = h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' }));
+  ic.battery = h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 }));
+  if (window.__fbHG6.data) IC = ic;
+  return ic;
+}
+function qrSvg() {
+  const n = 25, cells = [];
+  let s = 7;
+  const rnd = () => (s = (s * 9301 + 49297) % 233280) / 233280;
+  const finder = (x, y) => (x >= 0 && x < 7 && y >= 0 && y < 7) ? (x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4)) : null;
+  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+    let v = finder(x, y); if (v === null) v = finder(x - (n - 7), y); if (v === null) v = finder(x, y - (n - 7));
+    const inF = (x < 8 && y < 8) || (x >= n - 8 && y < 8) || (x < 8 && y >= n - 8);
+    if (v === null) v = inF ? false : rnd() > 0.52;
+    if (v) cells.push(h('rect', { key: x + '-' + y, x, y, width: 1, height: 1, rx: 0.3 }));
+  }
+  return h('svg', { width: 200, height: 200, viewBox: `0 0 ${n} ${n}`, fill: '#1b1c4b', style: { display: 'block' } }, cells);
+}
+const QR = qrSvg();
+const AV = { Ada: 'sand', Bolu: 'mint', Kemi: 'rose', 'Ọlá': 'lavender', Tolu: 'aqua', You: 'lavender', Chidi: 'mint', Funmi: 'sand', Ifeoma: 'aqua', Jide: 'rose' };
+const POS = { Ada: 14, Bolu: 4, Chidi: 11, Funmi: 22, Ifeoma: 12, Jide: 7, Kemi: null, 'Ọlá': 19, Tolu: 9 };
+const CONF = {
+  lobby: { base: 'lobby' }, lobbyScrolled: { base: 'lobby', shift: -330 }, lobbyHost: { base: 'lobby', role: 'host', hostOnly: true },
+  lobbyUnread: { base: 'lobby', unread: true }, lobbyBetween: { base: 'lobby', between: true }, lobbyLoading: { base: 'lobby', loading: true },
+  startPro: { base: 'list', sheet: 'proHost' }, create: { base: 'create' }, emblemCrop: { base: 'create', sheet: 'emblem' }, createEmblem: { base: 'create', emblem: true }, createBook: { base: 'pick', step2: true },
+  created: { base: 'lobby', role: 'host', hostOnly: true, toast: 'created', emblem: true },
+  lobbyInvitee: { base: 'lobby', invitee: true, toast: 'joined' }, lobbyInviteePro: { base: 'lobby', invitee: 'pro', toast: 'joined' },
+  setBook: { base: 'pick' }, edition: { base: 'pick', sheet: 'edition' }, bookSet: { base: 'lobby', role: 'host', book: 'persuasion', toast: 'bookSet', fresh: true },
+  notifCopy: { base: 'lobby', book: 'persuasion', copy: 'free', banner: 'copy', fresh: true }, getCopy: { base: 'lobby', book: 'persuasion', copy: 'free', fresh: true }, getCopyPro: { base: 'lobby', book: 'persuasion', copy: 'pro', fresh: true },
+  inviteShare: { base: 'invite', sheet: 'share' }, invite: { base: 'invite' },
+  tools: { base: 'tools', role: 'host' }, members: { base: 'members', role: 'host' }, member: { base: 'members', role: 'host', sheet: 'member' },
+  capNote: { base: 'list', count: 2, capNote: true }, capSheet: { base: 'list', count: 3, sheet: 'cap' },
+  lapsed: { base: 'lobby', lapsed: true }, takeover: { base: 'lobby', lapsed: true, sheet: 'takeover' }, takeoverSent: { base: 'lobby', lapsed: 'sent', toast: 'asked' },
+  founding: { base: 'lobby', role: 'host', sheet: 'founding' }, reminder7: { base: 'lobby', role: 'host', banner: 'r7' }, reminder1: { base: 'lobby', role: 'host', banner: 'r1' },
+  legacyPick: { base: 'pick', legacy: true }, upload: { base: 'pick', legacy: true, sheet: 'upload' }, clubCopy: { base: 'lobby', club: true },
+  leave: { base: 'lobby', sheet: 'leave' }, leaveHost: { base: 'tools', role: 'host', sheet: 'leaveHost' }, left: { base: 'list', count: 2, toast: 'left' },
+};
+const TOASTS = {
+  created: ['Lumee Book Club is ready', 'Invite a few readers to start'],
+  joined: ['You’re in Lumee Book Club', 'Ada and 13 others are reading'],
+  bookSet: ['Persuasion is next', 'All 14 members have been told'],
+  asked: ['Request sent to Ada', 'You’ll hear when Ada replies'],
+  left: ['You left Thursday Readers', 'Your book, highlights and place stay with you'],
+};
+const BANNERS = {
+  copy: ['Lumee Book Club is reading Persuasion', 'Get your copy before the first session on Sat 25 Oct.'],
+  r7: ['Your free Pro ends in 7 days', 'From 7 Dec you can’t set the next book or schedule sessions. Lumee Book Club keeps reading, chatting and meeting.'],
+  r1: ['Your free Pro ends tomorrow', 'Members keep reading Pride and Prejudice and meeting on Saturdays. Keep Pro to set the next book.'],
+};
+const CARD = 'color-mix(in oklab, var(--text) 6%, transparent)';
+
+class Component extends DCLogic {
+  componentDidMount() { if (!window.__fbHG6.data) window.__fbHG6.p.then(() => this.forceUpdate()); }
+  renderVals() {
+    const p = this.props, c = CONF[p.screen] || CONF.lobby, ic = buildIC();
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, theme = p.theme || 'flip';
+    const base = c.base, host = c.role === 'host';
+    const headerH = statusH + 62, isLobby = base === 'lobby', tabs = isLobby;
+    const contentTop = base === 'list' ? statusH + 8 : headerH + (tabs ? 60 : 8);
+    const footCta = { create: 'Next: choose the first book', pick: c.step2 ? 'Start Lumee Book Club' : 'Set as next book', invite: 'Share to WhatsApp' }[base] || '';
+    const footH = base === 'invite' ? (ios ? 168 : 160) : base === 'pick' ? (ios ? 134 : 126) : (ios ? 100 : 92);
+    // header
+    const H = {
+      lobby: [c.club ? 'Ikoyi Readers' : 'Lumee Book Club', c.club ? 'Ada hosts · 9 members' : host ? (c.hostOnly ? 'You host · 1 member' : 'You host · 14 members') : 'Ada hosts · 14 members'],
+      create: ['Start a community', 'Step 1 of 2'], pick: [c.step2 ? 'First book' : 'Set next book', c.step2 ? 'Step 2 of 2' : (c.legacy ? 'Ikoyi Readers' : 'Lumee Book Club')],
+      invite: ['Invite readers', 'Lumee Book Club'], tools: ['Host tools', 'Lumee Book Club'], members: ['Members', '14 · A to Z'],
+    }[base] || ['', ''];
+    const hActionList = isLobby ? (host ? [{ icon: ic.userAddSm }, { icon: ic.settingsSm }] : [{ icon: ic.userAddSm }, { icon: ic.moreSm }]) : [];
+    // book card
+    const bookId = c.book || 'pp', pers = bookId === 'persuasion';
+    let bookKicker = 'Reading now', bookTitle = pers ? 'Persuasion' : 'Pride and Prejudice', bookSub = 'Jane Austen', bookMeta = 'You · Ch 12 · 20%', bookCta = 'Continue reading', ctaPrimary = true, bookMetaIcon = '';
+    if (host && !c.hostOnly && !pers) bookMeta = 'You · Ch 14 · 23%';
+    if (pers) { bookKicker = 'Next book · new'; bookMeta = 'Flipbook Classics edition · locked'; bookMetaIcon = ic.lockXs; bookCta = host ? 'Start reading' : 'Get your copy'; }
+    if (c.copy === 'free') { bookCta = 'Get it ₦500'; bookMeta = 'Flipbook Classics edition'; }
+    if (c.copy === 'pro') { bookCta = 'Start reading'; bookMeta = 'Included with Pro'; bookMetaIcon = ''; }
+    if (c.invitee) { bookMeta = c.invitee === 'pro' ? 'Included with Pro' : 'Not started · get your copy anytime'; bookCta = c.invitee === 'pro' ? 'Start reading' : 'Read chapter 1 free'; }
+    if (c.hostOnly) { ctaPrimary = false; bookMeta = 'Not started'; bookCta = 'Start reading'; }
+    if (c.club) { bookKicker = 'Club copy'; bookTitle = 'Ụ̀kpụrụ Street'; bookSub = 'Uploaded by Ada · EPUB'; bookMeta = 'You · Ch 3 · 11%'; }
+    // members
+    const roster = host ? ['Bolu', 'Kemi', 'Ọlá', 'Tolu', 'You'] : ['Ada', 'Bolu', 'Kemi', 'Ọlá', 'You'];
+    const myPos = c.invitee ? null : c.club ? 3 : host ? 14 : 12;
+    const posOf = n => c.fresh ? (n === 'Ada' || (host && n === 'You') ? 1 : null) : n === 'You' ? myPos : POS[n];
+    const total = c.club ? 28 : pers ? 24 : 61;
+    const members = roster.map(n => {
+      const ps = posOf(n);
+      return { name: n, init: n === 'You' ? (host ? 'A' : 'L') : n[0], av: `var(--highlight-${AV[n]})`, founding: (n === 'Ada' && !host) || (host && n === 'You'), cohost: host ? n === 'Kemi' : n === 'Kemi' && false,
+        pos: ps == null ? 'Not started' : 'Ch ' + ps, posColor: ps == null ? 'var(--text-muted)' : 'var(--text-secondary)' };
+    });
+    const onRail = ['Ada', 'Bolu', 'Chidi', 'Funmi', 'Ifeoma', 'Jide', 'Ọlá', 'Tolu', 'You'].map(n => ({ n, ps: n === 'You' ? myPos : posOf(n) })).filter(x => x.ps != null && !(host && x.n === 'Ada'));
+    const markers = onRail.map((x, i) => ({ left: ((x.ps - 1) / (total - 1) * 100).toFixed(1) + '%', top: 9 + (onRail.slice(0, i).some(o => Math.abs(o.ps - x.ps) < 3) ? -8 : 0), init: x.n === 'You' ? 'You'.slice(0, 1) : x.n[0],
+      av: x.n === 'You' ? 'var(--progress-fill)' : `var(--highlight-${AV[x.n] || 'sand'})`, ring: x.n === 'You' ? '0 0 0 2px var(--surface), 0 0 0 4px var(--progress-fill)' : '0 0 0 2px var(--surface)' }))
+      .map(m => m.init === 'Y' ? { ...m, init: '' } : m);
+    const fillW = myPos == null ? '0px' : `calc(${((myPos - 1) / (total - 1) * 100).toFixed(1)}% + 13px)`;
+    // pick
+    const books = (c.step2 ? [
+      { id: 'pp', title: 'Pride and Prejudice', author: 'Jane Austen', access: 'Included with Pro · 61 chapters', on: true },
+      { id: 'middlemarch', title: 'Middlemarch', author: 'George Eliot', access: 'Included with Pro · 86 chapters' },
+      { id: 'north', title: 'North and South', author: 'Elizabeth Gaskell', access: 'Included with Pro · 52 chapters' },
+      { id: 'emma', title: 'Emma', author: 'Jane Austen', access: 'Included with Pro · 55 chapters' },
+    ] : [
+      { id: 'persuasion', title: 'Persuasion', author: 'Jane Austen', access: 'Included with Pro · 24 chapters', on: true },
+      { id: 'north', title: 'North and South', author: 'Elizabeth Gaskell', access: 'Included with Pro · 52 chapters' },
+      { id: 'middlemarch', title: 'Middlemarch', author: 'George Eliot', access: 'Included with Pro · 86 chapters' },
+      ...(c.legacy ? [] : [{ id: 'emma', title: 'Emma', author: 'Jane Austen', access: 'Included with Pro · 55 chapters' }]),
+    ]).map(b => ({ ...b, on: !!b.on, bg: b.on ? 'color-mix(in oklab, var(--focus-ring) 12%, transparent)' : 'transparent', ring: b.on ? 'inset 0 0 0 1.5px var(--focus-ring)' : 'none' }));
+    const filters = ['Classics', 'New voices', 'Specials'].map((t, i) => ({ t, bg: i === 0 ? 'var(--text)' : 'color-mix(in oklab, var(--text) 8%, transparent)', color: i === 0 ? 'var(--surface)' : 'var(--text)' }));
+    // tools
+    const row = (icn, t, v = '', extra = {}) => ({ icon: icn, t, v, chev: ic.chevronRightSm, color: 'var(--text)', bg: 'transparent', ...extra });
+    const toolGroups = [
+      { t: 'Reading', rows: [row(ic.bookSm, 'Set next book', 'After Pride and Prejudice'), row(ic.calendarSm, 'Schedule a session', 'Sat 18 Oct'), row(ic.pinSm, 'Pinned message', 'On')] },
+      { t: 'People', rows: [row(ic.userAddSm, 'Invite readers'), row(ic.usersSm, 'Members', '14'), row(ic.cohostSm, 'Co-hosts', 'Kemi')] },
+      { t: 'Community', rows: [row(ic.editSm, 'Name, emblem and description'), row(ic.logoutSm, 'Leave community', '', { chev: '' }), row(ic.lockSm, 'Close community', '', { color: 'var(--error)', chev: '' })] },
+    ];
+    // members page
+    const allMembers = ['Bolu', 'Chidi', 'Funmi', 'Ifeoma', 'Jide', 'Kemi', 'Ọlá', 'Tolu', 'You'].map(n => {
+      const ps = n === 'You' ? 14 : POS[n], sel = c.sheet === 'member' && n === 'Tolu';
+      return { name: n, init: n === 'You' ? 'A' : n[0], av: `var(--highlight-${AV[n]})`, founding: n === 'You', cohost: n === 'Kemi', pos: ps == null ? 'Not started' : 'Ch ' + ps,
+        posColor: ps == null ? 'var(--text-muted)' : 'var(--text-secondary)', bg: sel ? 'color-mix(in oklab, var(--text) 9%, transparent)' : 'transparent', ring: 'none', op: 1 };
+    });
+    // list
+    const myComms = [
+      { name: 'Lumee Book Club', emblem: true, mono: '', monoBg: '', book: 'pp', reading: 'Pride and Prejudice', meta: 'You · Ch 12 · session Sat' },
+      { name: 'Office Fiction', emblem: false, mono: 'O', monoBg: 'var(--highlight-mint)', book: 'north', reading: 'North and South', meta: 'You · Ch 3' },
+      ...(c.count === 3 ? [{ name: 'Ikoyi Readers', emblem: false, mono: 'I', monoBg: 'var(--highlight-aqua)', book: 'middlemarch', reading: 'Middlemarch', meta: 'Not started' }] : []),
+    ];
+    const tt = TOASTS[c.toast] || ['', ''], bb = BANNERS[c.banner] || ['', ''];
+    const sheet = c.sheet || '';
+    const appTabs = [['Home', ic.homeT], ['Shelf', ic.libT], ['Communities', ic.usersT], ['You', ic.userT]].map(([t, icon], i) => ({ t, icon, color: i === 2 ? 'var(--text)' : 'var(--text-secondary)', bg: i === 2 ? 'color-mix(in oklab, var(--text) 11%, transparent)' : 'transparent' }));
+    const lobbyBits = isLobby && !c.loading;
+    const lapsedNote = c.lapsed === 'sent' ? 'You asked to host. Reading, reactions, chat and sessions carry on as normal while Ada decides.' : 'Ada’s Pro has ended. Reading, reactions, chat and sessions carry on as normal. A host with Pro can set the next book.';
+    return {
+      theme, ios, android: !ios, radius: ios ? 52 : 34, statusH, ic, backIcon: base === 'create' ? ic.x : ios ? ic.chevronLeft : ic.arrowLeft,
+      header: base !== 'list', headerH, hTitle: H[0], hSub: H[1], hActions: hActionList.length > 0, hActionList,
+      tabs, tabsTop: headerH + 4, chatDot: !!c.unread, contentTop, contentBottom: 0, shift: c.shift || 0, bigTitle: base === 'list',
+      loading: !!c.loading, skelRows: [180, 120, 150, 100].map(w => ({ w })),
+      note: lobbyBits && (!!c.lapsed || c.copy === 'pro'), noteText: c.copy === 'pro' ? 'Persuasion is included with your Pro. Your Pride and Prejudice highlights stay on your Shelf.' : lapsedNote,
+      noteAction: c.lapsed === true ? 'Ask to host' : '', noteActionIcon: ic.cohostSm,
+      inviteCard: lobbyBits && !!c.hostOnly,
+      bookCard: lobbyBits && !c.between, clubCover: !!c.club, catalogueCover: !c.club, bookId, bookKicker, bookTitle, bookSub, bookMeta, bookMetaIcon, bookCta,
+      ctaBg: ctaPrimary ? 'var(--primary)' : 'color-mix(in oklab, var(--text) 10%, transparent)', ctaColor: ctaPrimary ? 'var(--on-primary)' : 'var(--text)', ctaSh: ctaPrimary ? 'inset 0 1px 0 rgba(255,255,255,.3)' : 'none',
+      betweenCard: lobbyBits && !!c.between,
+      rail: lobbyBits && !c.hostOnly && !c.between, railMeta: total + ' chapters', fillW, markers, members, memberCount: c.club ? 9 : 14,
+      session: lobbyBits && !c.hostOnly && !c.between && !c.club && !pers, noSession: lobbyBits && (!!c.hostOnly || pers),
+      pinned: lobbyBits && !c.hostOnly, pinnedText: c.between ? 'Thank you for a lovely read, everyone. Vote for the next one in Chat by Friday.' : 'Saturday’s call is at 7 this week. Bring one line you underlined.',
+      createForm: base === 'create', visOptions: [
+        { t: 'Invite only', s: 'People join with your link or code', icon: ic.lockSm, on: true },
+        { t: 'Anyone can find it', s: 'Shows on the book page', icon: ic.globeSm, on: false },
+      ].map(v => ({ ...v, bg: v.on ? 'color-mix(in oklab, var(--focus-ring) 12%, transparent)' : CARD, ring: v.on ? 'inset 0 0 0 1.5px var(--focus-ring)' : 'none', dot: v.on ? 7 : 0 })),
+      pick: base === 'pick', books, filters, legacy: !!c.legacy,
+      tools: base === 'tools', toolGroups,
+      inviteView: base === 'invite', qr: QR,
+      memberList: base === 'members', allMembers,
+      list: base === 'list', myComms, capNote: !!c.capNote, capText: 'You’re in 2 of 3 communities on the free plan. Pro removes the limit.',
+      footCta, footPad: ios ? 34 : 24, footNote: base === 'pick' ? 'One edition for the whole read' : '', footIcon: base === 'invite' ? ic.whatsappSm : '',
+      footSecondary: base === 'invite' ? 'Copy link' : '',
+      tabbar: base === 'list', tabbarBottom: ios ? 24 : 18,
+      toast: !!c.toast, toastTitle: tt[0], toastSub: tt[1], toastBottom: base === 'list' ? (ios ? 104 : 96) : (ios ? 40 : 32),
+      banner: !!c.banner, bannerTitle: bb[0], bannerBody: bb[1], bannerTop: ios ? 56 : 40,
+      scrim: !!sheet, sheet: !!sheet, sheetPad: ios ? 26 : 20,
+      sProHost: sheet === 'proHost', sEdition: sheet === 'edition', sShare: sheet === 'share', sMember: sheet === 'member', sCap: sheet === 'cap',
+      sTakeover: sheet === 'takeover', sFounding: sheet === 'founding', sLeave: sheet === 'leave' || sheet === 'leaveHost', sUpload: sheet === 'upload', sEmblem: sheet === 'emblem',
+      emblemEmpty: base === 'create' && !c.emblem, emblemSet: base === 'create' && !!c.emblem, nameRing: c.emblem || c.sheet ? 'none' : 'inset 0 0 0 1.5px var(--focus-ring)', nameCaret: !c.emblem && !c.sheet,
+      hEmblem: isLobby && !c.club, hMonogram: isLobby && !!c.club,
+      leaveTitle: 'Leave Lumee Book Club?', leaveBody: sheet === 'leaveHost' ? 'You’ll stop seeing the room’s margin, chat and sessions.' : 'You’ll stop seeing the room’s margin, chat and sessions. You can rejoin with the link.',
+      keeps: ['Your copy of Pride and Prejudice', 'Your highlights and notes', 'Your place in the book'], leaveHostNote: sheet === 'leaveHost',
+      proPerks: [{ icon: ic.bookSm, t: 'Choose each book from the catalogue' }, { icon: ic.micSm, t: 'Schedule live sessions' }, { icon: ic.pinSm, t: 'Pin messages and add co-hosts' }, { icon: ic.starSm, t: 'Classics and Specials included for you' }],
+      foundingPerks: [{ icon: ic.bookSm, t: 'Set the next book from the catalogue' }, { icon: ic.headphonesSm, t: 'Listen to included books' }, { icon: ic.clockSm, t: 'A reminder 7 days and 1 day before it ends' }],
+      shareTargets: [
+        { t: 'WhatsApp', icon: ic.whatsappLg, bg: 'var(--positive-surface)', color: 'var(--positive)', ring: 'none' },
+        { t: 'Messages', icon: ic.messageLg, bg: CARD, color: 'var(--text)', ring: 'none' },
+        { t: 'Mail', icon: ic.mailLg, bg: CARD, color: 'var(--text)', ring: 'none' },
+        { t: 'More', icon: ic.moreLg, bg: CARD, color: 'var(--text)', ring: 'none' },
+      ],
+      appTabs,
+    };
+  }
+}
+</script>
+</body>
+</html>

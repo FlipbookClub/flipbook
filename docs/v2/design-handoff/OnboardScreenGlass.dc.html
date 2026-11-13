@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/glass.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}@keyframes fbCaret{50%{opacity:0}}@media (prefers-reduced-motion:reduce){.fb-motion{animation:none!important}}</style>
+</helmet>
+<div data-theme="{{ theme }}" data-style="{{ look }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ browser }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20;padding:6px 16px 10px;display:flex;align-items:center;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <div style="flex:1;height:40px;border-radius:var(--radius-field);display:flex;align-items:center;justify-content:center;gap:6px;background:var(--field-fill);color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="lock" size="{{ 14 }}" hint-size="14px,14px"></x-import><span class="t-caption" style="color:var(--text)">flipbook.app/i/lumee-k2</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ header }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.AppHeader" title="{{ hTitle }}" subtitle="{{ hSub }}" on-back="{{ noop }}" dc-props="{{ hProps }}" hint-size="100%,60px"></x-import>
+    </div>
+  </sc-if>
+
+  <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ footH }}px;overflow:hidden;display:flex;flex-direction:column;justify-content:{{ bodyJustify }};padding:0 20px;gap:20px">
+
+    <sc-if value="{{ sInvite }}">
+      <div style="display:flex;justify-content:center;padding-bottom:4px"><img src="{{ logo }}" alt="Flipbook" style="height:26px;display:block"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px;padding:24px 20px 22px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <div style="display:flex;align-items:center;gap:10px"><span class="t-label" style="width:32px;height:32px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--highlight-sand)">A</span><span class="t-label" style="color:var(--text)">Ada invited you to read together</span></div>
+        <div style="position:relative;margin-top:6px">
+          <div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 18px 30px -14px rgba(8,6,30,.6)"><dc-import name="Cover" book="pp" width="132" hint-size="132px,198px"></dc-import></div>
+          <span style="position:absolute;right:-14px;bottom:-12px;width:48px;height:48px;border-radius:9999px;overflow:hidden;background:var(--gold);box-shadow:0 0 0 3px var(--surface-raised)"><span style="position:absolute;right:0;bottom:0;width:24px;height:24px;border-top-left-radius:24px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:14px;height:14px;border-bottom-right-radius:14px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 23px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;margin-top:8px"><span class="t-h1" style="color:var(--text)">Lumee Book Club</span><span class="t-body" style="color:var(--text-secondary)">Reading Pride and Prejudice by Jane Austen</span></div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="display:flex"><span class="t-caption" style="width:26px;height:26px;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:var(--highlight-sand);box-shadow:0 0 0 2px var(--surface-raised)">A</span><span class="t-caption" style="width:26px;height:26px;margin-left:-6px;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:var(--highlight-mint);box-shadow:0 0 0 2px var(--surface-raised)">B</span><span class="t-caption" style="width:26px;height:26px;margin-left:-6px;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:var(--highlight-lavender);box-shadow:0 0 0 2px var(--surface-raised)">Ọ</span></div>
+          <span class="t-caption" style="color:var(--text-secondary)">14 reading · session Sat 18 Oct</span>
+        </div>
+      </div>
+      <span class="t-caption" style="align-self:center;text-align:center;max-width:300px;color:var(--text-secondary);text-wrap:pretty">{{ inviteNote }}</span>
+    </sc-if>
+
+    <sc-if value="{{ sEdge }}">
+      <div style="display:flex;justify-content:center"><img src="{{ logo }}" alt="Flipbook" style="height:26px;display:block"></div>
+      <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;padding:28px 22px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <span style="width:56px;height:56px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--tint-2)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ edgeIcon }}" size="{{ 26 }}" hint-size="26px,26px"></x-import></span>
+        <span class="t-h1" style="color:var(--text);margin-top:4px;text-wrap:pretty">{{ edgeTitle }}</span>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ edgeBody }}</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ sWelcome }}">
+      <div style="display:flex;justify-content:center;padding-top:12px"><img src="{{ logo }}" alt="Flipbook" style="height:30px;display:block"></div>
+      <div style="height:230px;position:relative;margin:12px 0 4px">
+        <div style="position:absolute;left:50%;top:22px;transform:translateX(-142px) rotate(-8deg);border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 16px 28px -14px rgba(8,6,30,.6)"><dc-import name="Cover" book="persuasion" width="112" hint-size="112px,168px"></dc-import></div>
+        <div style="position:absolute;left:50%;top:22px;transform:translateX(30px) rotate(8deg);border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 16px 28px -14px rgba(8,6,30,.6)"><dc-import name="Cover" book="middlemarch" width="112" hint-size="112px,168px"></dc-import></div>
+        <div style="position:absolute;left:50%;top:0;transform:translateX(-64px);border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 22px 34px -14px rgba(8,6,30,.7)"><dc-import name="Cover" book="pp" width="128" hint-size="128px,192px"></dc-import></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;text-align:center"><span class="t-display" style="color:var(--text);text-wrap:balance">Kindle is where you read. Flipbook is where you read together.</span></div>
+    </sc-if>
+
+    <sc-if value="{{ sSignup }}">
+      <sc-if value="{{ joining }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 16px 10px 10px;border-radius:var(--radius-option);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <span style="width:40px;height:40px;flex:none;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold)"><span style="position:absolute;right:0;bottom:0;width:20px;height:20px;border-top-left-radius:20px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:12px;height:12px;border-bottom-right-radius:12px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 19px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Joining Lumee Book Club</span><span class="t-caption" style="color:var(--text-secondary)">With Ada and 13 others</span></div>
+          <span class="t-caption" style="color:var(--text-muted)">2 of 3</span>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:8px"><span class="t-h1" style="color:var(--text)">{{ suTitle }}</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ suBody }}</span></div>
+    </sc-if>
+
+    <sc-if value="{{ sContact }}">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">Phone or email</span><span class="t-body" style="color:var(--text-secondary)">{{ contactBody }}</span></div>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.SegmentedTabs" items="{{ contactTabs }}" value="{{ contactMode }}" hint-size="100%,44px"></x-import>
+    </sc-if>
+    <sc-if value="{{ sEmail }}">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-label" style="color:var(--text-secondary);padding-left:4px">Email</span><div style="height:56px;padding:0 18px;border-radius:var(--radius-field);display:flex;align-items:center;background:var(--field-fill);box-shadow:var(--selected-ring)"><span class="t-body" style="font-size:17px;color:var(--text)">lara.okafor@gmail.com</span><span class="fb-motion" style="width:2px;height:20px;margin-left:2px;background:var(--focus-ring);animation:fbCaret 1s steps(1) infinite"></span></div></div>
+    </sc-if>
+    <sc-if value="{{ sPhone }}">
+      <div style="display:flex;gap:8px">
+        <span class="t-body" style="height:56px;padding:0 14px;border-radius:var(--radius-field);display:flex;align-items:center;gap:6px;font-weight:600;color:var(--text);background:var(--field-fill)">+234<x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-down" size="{{ 16 }}" hint-size="16px,16px"></x-import></span>
+        <div style="flex:1;height:56px;padding:0 18px;border-radius:var(--radius-field);display:flex;align-items:center;background:var(--field-fill);box-shadow:var(--selected-ring)"><span style="font:600 18px/24px var(--font-sans);letter-spacing:.02em;color:var(--text)">803 555 0142</span><span class="fb-motion" style="width:2px;height:22px;margin-left:2px;background:var(--focus-ring);animation:fbCaret 1s steps(1) infinite"></span></div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ sOtp }}">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">Enter the code</span><span class="t-body" style="color:var(--text-secondary)">{{ otpTo }}</span></div>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px">
+        <sc-for list="{{ otp }}" as="d" hint-placeholder-count="6"><span style="height:60px;border-radius:var(--radius-inner);display:grid;place-items:center;font:700 24px/1 var(--font-sans);color:var(--text);background:var(--field-fill);box-shadow:{{ d.ring }}">{{ d.v }}</span></sc-for>
+      </div>
+      <span class="t-caption" style="color:var(--text-secondary)">Didn’t get it? Resend in 0:24</span>
+    </sc-if>
+
+    <sc-if value="{{ sName }}">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">{{ nameTitle }}</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ nameBody }}</span></div>
+      <sc-if value="{{ avatarPick }}">
+        <div style="display:flex;align-items:center;gap:14px"><span style="width:72px;height:72px;border-radius:9999px;display:grid;place-items:center;font:700 26px/1 var(--font-sans);color:var(--text);background:var(--highlight-lavender);box-shadow:0 0 0 1px var(--divider)">L</span><div style="display:flex;flex-direction:column;gap:2px"><span class="t-label" style="color:var(--ghost)">Add a photo</span><span class="t-caption" style="color:var(--text-muted)">Optional. Your initial works too.</span></div></div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-label" style="color:var(--text-secondary);padding-left:4px">Display name</span><div style="height:56px;padding:0 18px;border-radius:var(--radius-field);display:flex;align-items:center;background:var(--field-fill);box-shadow:{{ nameRing }}"><span class="t-body" style="font-size:17px;color:var(--text)">{{ nameVal }}</span><sc-if value="{{ nameCaret }}"><span class="fb-motion" style="width:2px;height:20px;margin-left:2px;background:var(--focus-ring);animation:fbCaret 1s steps(1) infinite"></span></sc-if></div><sc-if value="{{ nameFrom }}"><span class="t-caption" style="color:var(--text-muted);padding-left:4px">From your Apple account. Change it if you like.</span></sc-if></div>
+    </sc-if>
+
+    <sc-if value="{{ sDob }}">
+      <sc-if value="{{ dobTitle }}"><div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">When’s your birthday?</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Flipbook adapts to your age. You set this once.</span></div></sc-if>
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <sc-if value="{{ dobLabel }}"><span class="t-label" style="color:var(--text-secondary);padding-left:4px">Your birthday</span></sc-if>
+        <div style="position:relative;height:200px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring);overflow:hidden;display:grid;grid-template-columns:0.8fr 1.4fr 1fr">
+          <div style="position:absolute;left:8px;right:8px;top:78px;height:44px;border-radius:var(--radius-inner);background:var(--tint-2)"></div>
+          <sc-for list="{{ wheel }}" as="col" hint-placeholder-count="3">
+            <div style="position:relative;display:flex;flex-direction:column;align-items:center;margin-top:-10px">
+              <sc-for list="{{ col.rows }}" as="r" hint-placeholder-count="5"><span style="height:44px;margin-top:{{ r.mt }}px;display:grid;place-items:center;font:{{ r.font }};color:{{ r.color }}">{{ r.t }}</span></sc-for>
+            </div>
+          </sc-for>
+        </div>
+        <span class="t-caption" style="color:var(--text-secondary);padding:2px 4px 0;text-wrap:pretty">Used to keep Flipbook right for your age. Never shown to anyone, and it can’t be changed later.</span>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ sGenres }}">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">What do you like to read?</span><span class="t-body" style="color:var(--text-secondary)">Pick at least 3. Home starts from these.</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ genres }}" as="g" hint-placeholder-count="12"><span class="t-label" style="height:44px;padding:0 16px;border-radius:var(--radius-button);display:inline-flex;align-items:center;gap:6px;color:var(--text);background:{{ g.bg }};box-shadow:{{ g.ring }}"><sc-if value="{{ g.on }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="check" size="{{ 16 }}" hint-size="16px,16px"></x-import></sc-if>{{ g.t }}</span></sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ sTeen }}">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">Flipbook for readers 13 to 17</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Everything about reading works the same. A few things are set up for your age.</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ teenRows }}" as="t" hint-placeholder-count="4">
+          <div style="display:flex;gap:14px;align-items:flex-start;padding:14px 16px;border-radius:var(--radius-option);background:var(--option-fill)"><span style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--tint-2)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ t.icon }}" size="sm" hint-size="20px,20px"></x-import></span><div style="display:flex;flex-direction:column;gap:2px"><span class="t-label" style="color:var(--text)">{{ t.t }}</span><span class="t-caption" style="color:var(--text-secondary);text-wrap:pretty">{{ t.s }}</span></div></div>
+        </sc-for>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ sNew }}">
+      <sc-if value="{{ intact }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 16px 12px 12px;border-radius:var(--radius-option);background:var(--positive-surface)"><span style="width:32px;height:32px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--positive);background:color-mix(in oklab, var(--positive) 18%, transparent)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="circle-check" size="sm" hint-size="20px,20px"></x-import></span><span class="t-caption" style="flex:1;color:var(--on-positive-surface);text-wrap:pretty">Your 2 clubs, 9 books, 148 highlights and every place in every book are right where you left them.</span></div>
+      </sc-if>
+      <div style="height:300px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring);position:relative;overflow:hidden;padding:22px">
+        <sc-if value="{{ new1 }}">
+          <div style="display:flex;flex-direction:column;gap:16px;padding-right:44px;position:relative">
+            <span class="t-caption" style="color:var(--text-muted);letter-spacing:.14em">CHAPTER 34</span>
+            <span style="font:400 17px/28px var(--font-serif);color:var(--text)">“In vain I have struggled. It will not do. <span style="background:var(--highlight-rose);border-radius:4px;padding:1px 2px">My feelings will not be repressed.</span> You must allow me to tell you how ardently I admire and love you.”</span>
+            <div style="position:absolute;right:-8px;top:58px;display:flex;flex-direction:column;gap:8px">
+              <span style="height:28px;padding:0 9px;border-radius:9999px;display:flex;align-items:center;gap:4px;font:600 12px/1 var(--font-sans);background:var(--float-fill-strong);box-shadow:var(--float-ring)">♥ 23</span>
+              <span style="height:28px;padding:0 9px;border-radius:9999px;display:flex;align-items:center;gap:4px;font:600 12px/1 var(--font-sans);background:var(--float-fill-strong);box-shadow:var(--float-ring)">😮 11</span>
+              <span class="t-caption" style="width:28px;height:28px;border-radius:9999px;display:grid;place-items:center;font-weight:700;background:var(--highlight-sand)">A</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ new2 }}">
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <span class="t-h3" style="color:var(--text)">Where everyone is</span>
+            <div style="position:relative;height:40px;margin:0 13px"><div style="position:absolute;left:-13px;right:-13px;top:17px;height:6px;border-radius:9999px;background:var(--progress-track)"></div><div style="position:absolute;left:-13px;top:17px;width:48%;height:6px;border-radius:9999px;background:var(--progress-fill)"></div>
+              <sc-for list="{{ railDots }}" as="d" hint-placeholder-count="5"><span class="t-caption" style="position:absolute;top:7px;left:{{ d.l }};transform:translateX(-50%);width:26px;height:26px;border-radius:9999px;display:grid;place-items:center;font-weight:700;color:var(--text);background:{{ d.bg }};box-shadow:{{ d.ring }}">{{ d.i }}</span></sc-for></div>
+            <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-inner);background:var(--tint-1)"><span style="width:44px;height:48px;flex:none;border-radius:14px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--tint-2)"><span style="font:700 9px/12px var(--font-sans);letter-spacing:.12em;color:var(--text-accent)">SAT</span><span style="font:700 18px/22px var(--font-sans)">18</span></span><div style="display:flex;flex-direction:column"><span class="t-label">Chapters 10 to 20</span><span class="t-caption" style="color:var(--text-secondary)">7:00 pm · audio · Ada hosts</span></div></div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ new3 }}">
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div style="align-self:flex-start;display:flex;flex-direction:column;gap:4px;max-width:86%"><span class="t-caption" style="color:var(--text-secondary);padding:0 6px">Chidi · Ch 11</span><span class="t-body" style="padding:10px 14px;border-radius:var(--radius-bubble-main) var(--radius-bubble-main) var(--radius-bubble-main) var(--radius-bubble-corner);background:var(--bubble-theirs);box-shadow:var(--bubble-theirs-ring)">Mr Collins proposing is the most uncomfortable I’ve been all year.</span></div>
+            <div style="align-self:flex-start;display:flex;gap:10px;align-items:center;max-width:90%;padding:10px 14px;border-radius:var(--radius-bubble-main);background:var(--veil);color:var(--veil-text)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="eye-off" size="sm" hint-size="20px,20px"></x-import><span class="t-label" style="color:var(--veil-text)">Ada is in Chapter 14. Tap to reveal.</span></div>
+            <div style="align-self:flex-end;display:flex;flex-direction:column;gap:4px;align-items:flex-end;max-width:80%"><span class="t-body" style="padding:10px 14px;border-radius:var(--radius-bubble-main) var(--radius-bubble-main) var(--radius-bubble-corner) var(--radius-bubble-main);background:var(--bubble-mine-fill);color:var(--on-bubble-mine)">Still Jazzhole, 7 pm Saturday.</span></div>
+          </div>
+        </sc-if>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;text-align:center;padding:0 8px"><span class="t-h1" style="color:var(--text);text-wrap:balance">{{ newTitle }}</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ newBody }}</span></div>
+      <div style="display:flex;justify-content:center;gap:6px"><sc-for list="{{ dots }}" as="d" hint-placeholder-count="3"><span style="width:{{ d.w }}px;height:6px;border-radius:9999px;background:{{ d.bg }}"></span></sc-for></div>
+    </sc-if>
+  </div>
+
+  <sc-if value="{{ banner }}">
+    <div style="position:absolute;left:16px;right:16px;top:{{ bannerTop }}px;z-index:25">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="positive" pill="{{ true }}" hint-size="100%,48px">Your invite from Ada came with you</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ skip }}">
+    <span class="t-label" style="position:absolute;right:16px;top:{{ skipTop }}px;z-index:25;height:36px;padding:0 16px;border-radius:var(--radius-button);display:grid;place-items:center;color:var(--text);background:var(--button-secondary)">Skip</span>
+  </sc-if>
+
+  <sc-if value="{{ foot }}">
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px">
+      <sc-if value="{{ fCaption }}"><span class="t-caption" style="text-align:center;color:var(--text-secondary);padding-bottom:4px;text-wrap:pretty">{{ fCaption }}</span></sc-if>
+      <sc-if value="{{ fSocial }}">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Continue with Apple</x-import>
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="{{ socialRest }}" size="lg" full-width="{{ true }}" hint-size="100%,52px">Continue with Google</x-import>
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="{{ socialRest }}" size="lg" full-width="{{ true }}" hint-size="100%,52px">Continue with phone or email</x-import>
+      </sc-if>
+      <sc-if value="{{ fPrimary }}">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" loading="{{ fLoading }}" hint-size="100%,52px">{{ fPrimary }}</x-import>
+      </sc-if>
+      <sc-if value="{{ fSecondary }}">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="{{ fSecondaryVariant }}" size="lg" full-width="{{ true }}" hint-size="100%,52px">{{ fSecondary }}</x-import>
+      </sc-if>
+      <sc-if value="{{ fLegal }}"><span class="t-caption" style="text-align:center;color:var(--text-muted);padding-top:4px">By continuing you agree to the Terms and Privacy notice.</span></sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ confirm }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Is 14 March 2001 right?" footer="{{ confirmFoot }}" hint-size="100%,100%"><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Your birthday can’t be changed after this, so it’s worth a second look.</span></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text)">
+      <span style="font:600 16px/20px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text)">
+      <span style="font:500 14px/18px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;invite&quot;,&quot;inviteWeb&quot;,&quot;inviteResume&quot;,&quot;signup&quot;,&quot;phone&quot;,&quot;otp&quot;,&quot;about&quot;,&quot;aboutConfirm&quot;,&quot;expired&quot;,&quot;closed&quot;,&quot;teenAdult&quot;,&quot;welcome&quot;,&quot;profile&quot;,&quot;genres&quot;,&quot;dob&quot;,&quot;teen&quot;,&quot;under13&quot;,&quot;new1&quot;,&quot;new2&quot;,&quot;new3&quot;],&quot;default&quot;:&quot;invite&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;glass&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;glass&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const h = React.createElement;
+const IC = {
+  signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+  wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+  battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+};
+const CONF = {
+  invite: { base: 'invite' }, inviteWeb: { base: 'invite', web: true }, inviteResume: { base: 'invite', resume: true },
+  signup: { base: 'signup', joining: true }, phone: { base: 'phone' }, otp: { base: 'otp' }, email: { base: 'phone', email: true }, emailOtp: { base: 'otp', email: true },
+  about: { base: 'about' }, aboutConfirm: { base: 'about', confirm: true },
+  expired: { base: 'edge', edge: 'expired' }, closed: { base: 'edge', edge: 'closed' }, teenAdult: { base: 'edge', edge: 'teenAdult' },
+  welcome: { base: 'welcome' }, profile: { base: 'profile' }, genres: { base: 'genres' }, dob: { base: 'dob' },
+  teen: { base: 'teen' }, under13: { base: 'edge', edge: 'under13' },
+  new1: { base: 'new', n: 1 }, new2: { base: 'new', n: 2 }, new3: { base: 'new', n: 3 },
+};
+const EDGE = {
+  expired: ['calendar', 'This invite has expired', 'Invite links last 14 days. Ask Ada for a fresh one, or look around Flipbook while you wait.', 'Explore Flipbook', 'Ask Ada for a new link'],
+  closed: ['lock', 'Lumee Book Club has closed', 'Ada closed this room on 2 October. Pride and Prejudice is still on Flipbook if you’d like to read it.', 'See the book', 'Explore Flipbook'],
+  teenAdult: ['users', 'This room is for readers 18 and up', 'Lumee Book Club isn’t open to your account. Ada can start a room for younger readers and invite you there.', 'Find books for you', ''],
+  under13: ['book-open', 'Flipbook is for readers 13 and up', 'Thank you for telling the truth. Nothing has been saved. Come back when you turn 13 and your shelf will be waiting.', '', 'Close'],
+};
+const NEW = [
+  ['Your friends now read in the margin', 'Reactions sit beside the paragraph that sparked them, and only show once you reach it.'],
+  ['Every club has a Lobby', 'See the book, where everyone is and the next session, all in one place.'],
+  ['Chat that never spoils', 'Messages from readers ahead of you stay veiled until you catch up.'],
+];
+const GENRES = ['Literary fiction', 'African fiction', 'Romance', 'Thrillers', 'Classics', 'Fantasy', 'Poetry', 'Memoir', 'Non-fiction', 'Young adult', 'Short stories', 'Faith'];
+const PICKED = { 'African fiction': 1, Classics: 1, Romance: 1 };
+
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, c = CONF[p.screen] || CONF.invite, base = c.base;
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, theme = p.theme || 'flip';
+    const footPad = ios ? 34 : 24;
+    const header = ['phone', 'otp', 'profile', 'genres', 'dob', 'teen'].includes(base) || (base === 'about');
+    const hText = { phone: ['', ''], otp: ['', ''], about: ['', '3 of 3 · Joining Lumee Book Club'], profile: ['', '1 of 3'], genres: ['', '2 of 3'], dob: ['', '3 of 3'], teen: ['', ''] }[base] || ['', ''];
+    const bodyTop = header ? statusH + 76 : c.web ? statusH + 64 : statusH + 16;
+    const e = EDGE[c.edge] || [];
+    // footer
+    let fPrimary = '', fSecondary = '', fSecondaryVariant = 'ghost', fSocial = false, fCaption = '', fLegal = false, fLoading = false;
+    if (base === 'invite') { fPrimary = c.web ? 'Get Flipbook' : 'Join Lumee Book Club'; fSecondary = c.web ? 'Open in the app' : 'I already have an account'; }
+    if (base === 'signup' || base === 'welcome') { fSocial = true; fLegal = true; if (base === 'welcome') fCaption = 'Have an invite link? Open it and you’ll land in the room.'; }
+    if (base === 'phone') fPrimary = 'Send code';
+    if (base === 'otp') { fPrimary = 'Checking'; fLoading = true; }
+    if (base === 'about') fPrimary = 'Join Lumee Book Club';
+    if (base === 'profile' || base === 'genres' || base === 'dob') fPrimary = 'Continue';
+    if (base === 'genres') fCaption = '3 chosen';
+    if (base === 'teen') fPrimary = 'Start reading';
+    if (base === 'edge') { fPrimary = e[3]; fSecondary = e[4]; fSecondaryVariant = e[3] ? 'ghost' : 'secondary'; }
+    if (base === 'new') { fPrimary = c.n === 3 ? 'Back to my books' : 'Next'; }
+    const footH = base === 'new' ? 96 + footPad : fSocial ? 52 * 3 + 16 + 34 + (fCaption ? 28 : 0) + footPad : (fPrimary ? 64 : 0) + (fSecondary ? 60 : 0) + (fCaption ? 24 : 0) + footPad;
+    const wheelCol = (items, sel) => ({ rows: items.map((t, i) => ({ t, mt: i === 0 ? 0 : 0, font: i === sel ? '700 19px/1 var(--font-sans)' : '500 16px/1 var(--font-sans)', color: i === sel ? 'var(--text)' : Math.abs(i - sel) === 1 ? 'var(--text-secondary)' : 'var(--text-muted)' })) });
+    const dotsN = c.n || 1;
+    return {
+      theme, look: p.look || 'glass', ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, noop: () => {},
+      logo: `assets/flipbook-full-${theme}-colored.svg`,
+      browser: !!c.web, header, hTitle: hText[0], hSub: hText[1], hProps: { style: { background: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } },
+      bodyTop, footH, bodyJustify: ['invite', 'edge', 'welcome', 'new'].includes(base) ? 'center' : 'flex-start',
+      sInvite: base === 'invite', inviteNote: c.web ? 'Free on iPhone and Android. Your invite comes with you: open the app after it installs and you’ll land in Lumee Book Club.' : 'Chapter 1 is free. The margin shows each reaction only once you reach it.',
+      banner: !!c.resume, bannerTop: statusH + 8,
+      sEdge: base === 'edge', edgeIcon: e[0] || 'book-open', edgeTitle: e[1] || '', edgeBody: e[2] || '',
+      sWelcome: base === 'welcome',
+      sSignup: base === 'signup', joining: !!c.joining, suTitle: 'Create your account', suBody: 'One more screen after this, then you’re in the Lobby.',
+      sContact: base === 'phone', sPhone: base === 'phone' && !c.email, sEmail: base === 'phone' && !!c.email,
+      contactTabs: ['Phone', 'Email'], contactMode: c.email ? 'Email' : 'Phone',
+      contactBody: c.email ? 'A 6-digit code comes to your inbox. Your email stays private.' : 'A 6-digit code comes by SMS. Your number stays private.',
+      otpTo: c.email ? 'Sent to lara.okafor@gmail.com. Check spam if it’s not there.' : 'Sent to +234 803 555 0142',
+      sOtp: base === 'otp', otp: ['4', '8', '1', '9', '0', '7'].map(v => ({ v, ring: 'var(--no-ring)' })),
+      sName: base === 'about' || base === 'profile', nameTitle: base === 'about' ? 'A little about you' : 'What’s your name?', nameBody: base === 'about' ? 'Your name is how the room sees you.' : 'This is how people in your communities see you.',
+      avatarPick: base === 'profile', nameVal: base === 'about' ? 'Lara Okafor' : 'Lara', nameFrom: base === 'about', nameCaret: base === 'profile', nameRing: base === 'profile' ? 'var(--selected-ring)' : 'var(--no-ring)',
+      sDob: base === 'about' || base === 'dob', dobTitle: base === 'dob', dobLabel: base === 'about',
+      wheel: [wheelCol(['12', '13', '14', '15', '16'].slice(0, 5), 2), wheelCol(['January', 'February', 'March', 'April', 'May'], 2), wheelCol(['1999', '2000', '2001', '2002', '2003'], 2)].map((col, i) => ({ ...col, key: i })),
+      sGenres: base === 'genres', genres: GENRES.map(t => ({ t, bg: PICKED[t] ? 'var(--selected-fill)' : 'var(--option-fill)', ring: PICKED[t] ? 'var(--selected-ring)' : 'var(--no-ring)', on: !!PICKED[t] })),
+      sTeen: base === 'teen', teenRows: [
+        { icon: 'users', t: 'Rooms you’re invited to', s: 'Join communities a friend, teacher or family member invites you into.' },
+        { icon: 'lock', t: 'Only your rooms can reach you', s: 'Nobody outside your communities can message or mention you.' },
+        { icon: 'book-open', t: 'Books chosen for your age', s: 'Home and search show titles picked for readers 13 to 17.' },
+        { icon: 'sparkle', t: 'The margin, chat and sessions', s: 'All here, with the same spoiler veils as everyone else.' },
+      ],
+      sNew: base === 'new', intact: c.n === 1, new1: c.n === 1, new2: c.n === 2, new3: c.n === 3, newTitle: NEW[dotsN - 1][0], newBody: NEW[dotsN - 1][1],
+      dots: [1, 2, 3].map(i => ({ w: i === dotsN ? 20 : 6, bg: i === dotsN ? 'var(--text)' : 'var(--tint-3)' })),
+      railDots: [['A', 58, 'sand'], ['B', 8, 'mint'], ['Ọ', 76, 'lavender'], ['T', 30, 'aqua'], ['', 48, 'you']].map(([i, l, t]) => ({ i, l: l + '%', bg: t === 'you' ? 'var(--progress-fill)' : `var(--highlight-${t})`, ring: t === 'you' ? '0 0 0 2px var(--surface), 0 0 0 4px var(--progress-fill)' : '0 0 0 2px var(--surface)' })),
+      skip: base === 'new' && c.n < 3, skipTop: statusH + 8,
+      socialRest: (p.look || 'glass') === 'classic' ? 'ghost' : 'secondary',
+      foot: true, footPad, fPrimary, fSecondary, fSecondaryVariant, fSocial, fCaption, fLegal, fLoading,
+      confirm: !!c.confirm,
+      confirmFoot: window.FlipbookDesignSystem_7ad4ad ? h(React.Fragment, null,
+        h(window.FlipbookDesignSystem_7ad4ad.Button, { variant: 'primary', size: 'lg', fullWidth: true }, 'Yes, that’s right'),
+        h(window.FlipbookDesignSystem_7ad4ad.Button, { variant: 'ghost', size: 'lg', fullWidth: true }, 'Change it')) : null,
+    };
+  }
+}
+</script>
+</body>
+</html>

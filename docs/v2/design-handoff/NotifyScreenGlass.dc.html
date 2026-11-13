@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/glass.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" data-style="{{ look }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ sLock }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;bottom:0;padding:24px 10px 0;display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:0;padding-bottom:28px;color:var(--text)"><span class="t-label" style="color:var(--text-secondary)">Saturday 7 November</span><span style="font:300 88px/96px var(--font-sans);letter-spacing:-0.03em">9:41</span></div>
+      <sc-for list="{{ pushes }}" as="n" hint-placeholder-count="4">
+        <div style="display:flex;gap:12px;padding:14px;border-radius:24px;background:var(--glass-fill-strong);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:var(--float-ring)">
+          <img src="assets/flipbook-icon-flip-primary.svg" alt="" style="width:38px;height:38px;border-radius:9px;flex:none">
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+            <div style="display:flex;justify-content:space-between;gap:8px"><span class="t-caption" style="color:var(--text-muted);letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ n.app }}</span><span class="t-caption" style="color:var(--text-muted);flex:none">{{ n.time }}</span></div>
+            <span class="t-label" style="font-size:15px;line-height:20px;color:var(--text)">{{ n.t }}</span>
+            <span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">{{ n.d }}</span>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sActivity }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:14px">
+      <span class="t-h1" style="color:var(--text)">Activity</span>
+      <sc-if value="{{ actEmpty }}">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:8px;padding:24px 20px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <span class="t-h2" style="color:var(--text)">Nothing new</span>
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Replies, sessions, gifts and anything about your books will show up here. Pride and Prejudice is where you left it, in Chapter 12.</span>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" style="margin-top:8px" hint-size="130px,40px">Continue reading</x-import>
+        </div>
+      </sc-if>
+      <sc-for list="{{ groups }}" as="g" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span class="t-label" style="color:var(--text-secondary);padding:0 4px 2px">{{ g.t }}</span>
+          <sc-for list="{{ g.items }}" as="a" hint-placeholder-count="3">
+            <div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px 12px 12px;border-radius:var(--radius-row);background:var(--option-fill)">
+              <span class="t-label" style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:{{ a.bg }}"><sc-if value="{{ a.init }}">{{ a.init }}</sc-if><sc-if value="{{ a.icon }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ a.icon }}" size="sm" hint-size="20px,20px"></x-import></sc-if></span>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px">
+                <span class="t-body" style="font-size:14px;line-height:20px;color:var(--text);text-wrap:pretty"><strong style="font-weight:700">{{ a.who }}</strong>{{ a.what }}</span>
+                <span class="t-caption" style="color:var(--text-muted)">{{ a.ctx }}</span>
+              </div>
+              <div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:8px;padding-top:2px"><span class="t-caption" style="color:var(--text-muted)">{{ a.time }}</span><sc-if value="{{ a.unread }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.UnreadDot" hint-size="7px,7px"></x-import></sc-if></div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sSettings }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h1" style="color:var(--text)">Notifications</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Each one has something to open behind it. Turn off any you don’t want.</span></div>
+      <sc-for list="{{ setGroups }}" as="g" hint-placeholder-count="3">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <span class="t-label" style="color:var(--text-secondary);padding:0 4px 4px">{{ g.t }}</span>
+          <sc-for list="{{ g.rows }}" as="r" hint-placeholder-count="3">
+            <div style="min-height:60px;padding:10px 16px;border-radius:var(--radius-row);display:flex;align-items:center;gap:14px;background:var(--option-fill)">
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ r.t }}</span><sc-if value="{{ r.d }}"><span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary)">{{ r.d }}</span></sc-if></div>
+              <sc-if value="{{ r.toggle }}"><span style="width:50px;height:30px;flex:none;border-radius:9999px;padding:3px;display:flex;justify-content:{{ r.jc }};background:{{ r.track }}"><span style="width:24px;height:24px;border-radius:9999px;background:{{ r.knob }}"></span></span></sc-if>
+              <sc-if value="{{ r.value }}"><span class="t-caption" style="color:var(--text-muted)">{{ r.value }}</span><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span></sc-if>
+            </div>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sRhythm }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-h1" style="color:var(--text)">Reading rhythm</span><div style="display:flex;align-items:center;gap:6px;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="lock" size="{{ 16 }}" hint-size="16px,16px"></x-import><span class="t-caption">Only you can see this</span></div></div>
+      <div style="display:flex;flex-direction:column;gap:16px;padding:18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px"><span class="t-label" style="color:var(--text-secondary)">This week</span><span class="t-caption" style="color:var(--text-muted)">{{ wk.mins }}</span></div>
+        <span style="font:700 32px/40px var(--font-sans);color:var(--text)">{{ wk.days }}</span>
+        <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px">
+          <sc-for list="{{ wk.cells }}" as="d" hint-placeholder-count="7"><div style="display:flex;flex-direction:column;align-items:center;gap:6px"><span style="width:32px;height:32px;border-radius:9999px;background:{{ d.bg }};box-shadow:{{ d.ring }}"></span><span class="t-caption" style="color:{{ d.lc }}">{{ d.l }}</span></div></sc-for>
+        </div>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ wk.line }}</span>
+      </div>
+      <sc-if value="{{ hasGoal }}">
+        <div style="display:flex;flex-direction:column;gap:10px;padding:18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <div style="display:flex;align-items:center;justify-content:space-between"><span class="t-h3" style="color:var(--text)">Your goal: 5 days a week</span><span class="t-label" style="color:var(--ghost)">Change</span></div>
+          <div style="height:6px;border-radius:9999px;background:var(--progress-track)"><div style="width:{{ goalPct }}%;height:6px;border-radius:9999px;background:var(--progress-fill)"></div></div>
+          <span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ goalLine }}</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noGoal }}">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <span class="t-h3" style="color:var(--text)">A goal, if you’d like one</span>
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Days a week or minutes a day. Change it or drop it whenever you like.</span>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" style="margin-top:8px" hint-size="110px,40px">Set a goal</x-import>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:0 4px">
+        <span class="t-label" style="color:var(--text-secondary)">Earlier weeks</span>
+        <sc-for list="{{ past }}" as="w" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:12px"><span class="t-caption" style="width:64px;flex:none;color:var(--text-muted)">{{ w.l }}</span><div style="display:flex;gap:6px"><sc-for list="{{ w.d }}" as="x" hint-placeholder-count="7"><span style="width:12px;height:12px;border-radius:9999px;background:{{ x }}"></span></sc-for></div></div></sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ header }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.AppHeader" title="" on-back="{{ noop }}" actions="{{ hActions }}" dc-props="{{ hProps }}" hint-size="100%,60px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ goalSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Set a goal" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">It’s just for you. Nobody else sees it, and a quiet week is fine.</span>
+          <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ goals }}" as="o" hint-placeholder-count="4"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.OptionRow" label="{{ o.l }}" description="{{ o.d }}" selected="{{ o.sel }}" hint-size="100%,56px"></x-import></sc-for></div>
+          <div style="min-height:60px;padding:10px 16px;border-radius:var(--radius-row);display:flex;align-items:center;gap:14px;background:var(--option-fill)"><div style="flex:1;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">A nudge in the evening</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">About the book you’re in, at 8pm</span></div><span style="width:50px;height:30px;flex:none;border-radius:9999px;padding:3px;display:flex;justify-content:flex-start;background:var(--tint-3)"><span style="width:24px;height:24px;border-radius:9999px;background:var(--surface)"></span></span></div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Save goal</x-import>
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">No goal for now</x-import>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text);pointer-events:none"><span style="font:600 16px/20px var(--font-sans);opacity:{{ clockOp }}">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text);pointer-events:none"><span style="font:500 14px/18px var(--font-sans);opacity:{{ clockOp }}">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;lock&quot;,&quot;activity&quot;,&quot;activityEmpty&quot;,&quot;settings&quot;,&quot;rhythm&quot;,&quot;rhythmNoGoal&quot;,&quot;rhythmQuiet&quot;,&quot;goalSheet&quot;],&quot;default&quot;:&quot;activity&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;glass&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;glass&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const h = React.createElement;
+const IC = {
+  signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+  wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+  battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+};
+const PUSHES = [
+  ['FLIPBOOK · PRIDE AND PREJUDICE', 'now', 'Ada left a note in Chapter 5', 'That’s where you’re headed next.'],
+  ['FLIPBOOK · LAGOS NIGHT READERS', '20m ago', 'Session in 1 hour', 'It covers up to Chapter 8. You’re in Chapter 9, so you’re all set.'],
+  ['FLIPBOOK · STAY WITH ME', '2h ago', 'Kemi replied to your reaction', 'In Chapter 3, on the paragraph you hearted.'],
+  ['FLIPBOOK', 'Yesterday', 'Ada got you a copy of Stay With Me', 'Open it in one tap. It’s on your Shelf.'],
+];
+const av = (init, tone) => ({ init, icon: '', bg: `var(--highlight-${tone})` });
+const ic = icon => ({ init: '', icon, bg: 'var(--tint-2)' });
+const ACT = [
+  { t: 'New', items: [
+    { ...av('A', 'sand'), who: 'Ada', what: ' left a note in Chapter 5, where you’re headed next.', ctx: 'Pride and Prejudice · Lumee Book Club', time: '12m', unread: true },
+    { ...av('K', 'aqua'), who: 'Kemi', what: ' replied to your reaction in Chapter 3.', ctx: 'Stay With Me · Lagos Night Readers', time: '1h', unread: true },
+    { ...ic('calendar'), who: '', what: 'Saturday’s session is tomorrow at 7pm. It covers up to Chapter 8.', ctx: 'Lagos Night Readers', time: '3h', unread: true },
+    { ...ic('eye-off'), who: 'Chidi', what: ' replied in Chapter 14. You’ll see it when you get there.', ctx: 'Pride and Prejudice · you’re in Ch 12', time: '5h', unread: false },
+  ] },
+  { t: 'Earlier', items: [
+    { ...ic('book'), who: '', what: 'Small Rain in Yaba ends in 2 days. Keep it 4 more weeks for ₦1,500.', ctx: 'You’re in Chapter 2', time: 'Thu', unread: false },
+    { ...av('A', 'sand'), who: 'Ada', what: ' got you a copy of Stay With Me.', ctx: 'Gift · on your Shelf', time: 'Wed', unread: false },
+    { ...ic('users'), who: 'Funmi and Tolu', what: ' joined Lagos Night Readers.', ctx: 'A community you host', time: 'Tue', unread: false },
+  ] },
+];
+const tg = (t, d, on) => ({ t, d, toggle: true, on });
+const SET = [
+  { t: 'Your books', rows: [tg('Notes ahead of you', 'When someone leaves one in the chapter you’re about to read', true), tg('Replies to you', '', true), tg('Rentals ending', '48 hours before', true), tg('Gifts', '', true)] },
+  { t: 'Communities', rows: [tg('Sessions', 'The day before and an hour before', true), tg('New members', 'In communities you host', false), { t: 'Chat', d: '', value: 'Mentions only' }] },
+  { t: 'Rhythm', rows: [tg('A nudge to read', 'Off unless you turn it on', false)] },
+];
+const DAYS = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+const S = {
+  lock: { v: 'lock' }, activity: { v: 'activity' }, activityEmpty: { v: 'activity', empty: true }, settings: { v: 'settings' },
+  rhythm: { v: 'rhythm', read: [1, 1, 0, 1, 1, 0, 0], goal: true }, rhythmNoGoal: { v: 'rhythm', read: [1, 1, 0, 1, 1, 0, 0] },
+  rhythmQuiet: { v: 'rhythm', read: [0, 0, 1, 0, 0, 0, 0], goal: true, quiet: true }, goalSheet: { v: 'rhythm', read: [1, 1, 0, 1, 1, 0, 0], sheet: true },
+};
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, c = S[p.screen] || S.activity, v = c.v;
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, footPad = ios ? 34 : 24;
+    const read = c.read || [], today = 5, n = read.filter(Boolean).length;
+    const cells = DAYS.map((l, i) => ({ key: i, l, bg: read[i] ? 'var(--progress-fill)' : i > today ? 'transparent' : 'var(--progress-track)', ring: i === today ? 'inset 0 0 0 2px var(--focus-ring)' : i > today ? 'inset 0 0 0 1.5px var(--divider)' : 'none', lc: i === today ? 'var(--text)' : 'var(--text-muted)' }));
+    const wk = { days: n === 1 ? '1 day' : n + ' days', mins: c.quiet ? '25 min read' : '2 hr 50 min read', cells,
+      line: c.quiet ? 'Your place in Persuasion is saved, Chapter 7, for whenever you’re ready.' : 'You’re 12 minutes from the end of Chapter 13 in Pride and Prejudice.' };
+    const dots = arr => arr.map(x => x ? 'var(--progress-fill)' : 'var(--progress-track)');
+    return {
+      theme: p.theme || 'flip', look: p.look || 'glass', ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, noop: () => {}, footPad,
+      bodyTop: statusH + 64, sheetPad: footPad - 16, clockOp: v === 'lock' ? 0 : 1,
+      hProps: { style: { background: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } },
+      hActions: v === 'activity' ? [{ icon: 'more', label: 'Notification settings' }] : [],
+      header: v !== 'lock',
+      sLock: v === 'lock', pushes: PUSHES.map(([app, time, t, d], i) => ({ key: i, app, time, t, d })),
+      sActivity: v === 'activity', actEmpty: !!c.empty, groups: c.empty ? [] : ACT.map((g, i) => ({ key: i, t: g.t, items: g.items.map((a, j) => ({ key: j, ...a })) })),
+      sSettings: v === 'settings', setGroups: SET.map((g, i) => ({ key: i, t: g.t, rows: g.rows.map((r, j) => ({ key: j, t: r.t, d: r.d || '', toggle: !!r.toggle, value: r.value || '', jc: r.on ? 'flex-end' : 'flex-start', track: r.on ? 'var(--text)' : 'var(--tint-3)', knob: 'var(--surface)' })) })),
+      sRhythm: v === 'rhythm', wk, hasGoal: !!c.goal, noGoal: v === 'rhythm' && !c.goal,
+      goalPct: Math.min(100, Math.round(n / 5 * 100)), goalLine: c.quiet ? '1 of 5 days so far. The week resets on Monday.' : '4 of 5 days. One more this week reaches it.',
+      past: [['Last week', [1, 1, 1, 0, 1, 1, 0]], ['2 weeks ago', [0, 1, 0, 0, 1, 1, 1]], ['3 weeks ago', [0, 0, 0, 0, 0, 1, 0]]].map(([l, d], i) => ({ key: i, l, d: dots(d) })),
+      goalSheet: !!c.sheet, goals: [['3 days a week', ''], ['5 days a week', ''], ['Every day', ''], ['20 minutes a day', 'Counted on days you read']].map(([l, d], i) => ({ key: i, l, d, sel: i === 1 })),
+    };
+  }
+}
+</script>
+</body>
+</html>

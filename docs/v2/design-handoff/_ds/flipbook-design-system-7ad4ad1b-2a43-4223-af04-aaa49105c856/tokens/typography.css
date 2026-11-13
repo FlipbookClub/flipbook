@@ -1,0 +1,75 @@
+/* Flipbook type tokens. Manrope for interface, Literata for book text. */
+:root{
+  --font-sans:"Manrope", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-serif:"Literata", Georgia, "Times New Roman", serif;
+  /* One per screen at most: welcome, finish moment, Pro unlock. */
+  --type-display-size:32px;
+  --type-display-line:40px;
+  --type-display-weight:700;
+  --type-display-tracking:-0.01em;
+  --type-display:700 32px/40px var(--font-sans);
+  /* Screen titles. */
+  --type-h1-size:24px;
+  --type-h1-line:32px;
+  --type-h1-weight:700;
+  --type-h1-tracking:0;
+  --type-h1:700 24px/32px var(--font-sans);
+  /* Section and shelf headings. */
+  --type-h2-size:20px;
+  --type-h2-line:28px;
+  --type-h2-weight:600;
+  --type-h2-tracking:0;
+  --type-h2:600 20px/28px var(--font-sans);
+  /* Card titles, sheet titles, book titles in lists. */
+  --type-h3-size:17px;
+  --type-h3-line:24px;
+  --type-h3-weight:600;
+  --type-h3-tracking:0;
+  --type-h3:600 17px/24px var(--font-sans);
+  /* Running UI text, chat messages, descriptions. */
+  --type-body-size:15px;
+  --type-body-line:22px;
+  --type-body-weight:400;
+  --type-body-tracking:0;
+  --type-body:400 15px/22px var(--font-sans);
+  /* Buttons, chips, tabs, form labels. */
+  --type-label-size:13px;
+  --type-label-line:18px;
+  --type-label-weight:600;
+  --type-label-tracking:0.01em;
+  --type-label:600 13px/18px var(--font-sans);
+  /* Positions, timestamps, metadata. */
+  --type-caption-size:12px;
+  --type-caption-line:16px;
+  --type-caption-weight:500;
+  --type-caption-tracking:0.02em;
+  --type-caption:500 12px/16px var(--font-sans);
+  /* Book body text at the default size. */
+  --type-reading-size:18px;
+  --type-reading-line:30px;
+  --type-reading-weight:400;
+  --type-reading-tracking:0;
+  --type-reading:400 18px/30px var(--font-serif);
+  /* Chapter openings inside the reader. */
+  --type-reading-chapter-size:24px;
+  --type-reading-chapter-line:32px;
+  --type-reading-chapter-weight:600;
+  --type-reading-chapter-tracking:0;
+  --type-reading-chapter:600 24px/32px var(--font-serif);
+  /* Passage quote cards in chat and the finish moment. */
+  --type-quote-size:16px;
+  --type-quote-line:24px;
+  --type-quote-weight:400;
+  --type-quote-tracking:0;
+  --type-quote:italic 400 16px/24px var(--font-serif);
+}
+.t-display{font:var(--type-display);letter-spacing:var(--type-display-tracking);}
+.t-h1{font:var(--type-h1);letter-spacing:var(--type-h1-tracking);}
+.t-h2{font:var(--type-h2);letter-spacing:var(--type-h2-tracking);}
+.t-h3{font:var(--type-h3);letter-spacing:var(--type-h3-tracking);}
+.t-body{font:var(--type-body);letter-spacing:var(--type-body-tracking);}
+.t-label{font:var(--type-label);letter-spacing:var(--type-label-tracking);}
+.t-caption{font:var(--type-caption);letter-spacing:var(--type-caption-tracking);}
+.t-reading{font:var(--type-reading);letter-spacing:var(--type-reading-tracking);font-variation-settings:"opsz" 18;}
+.t-reading-chapter{font:var(--type-reading-chapter);letter-spacing:var(--type-reading-chapter-tracking);font-variation-settings:"opsz" 24;}
+.t-quote{font:var(--type-quote);letter-spacing:var(--type-quote-tracking);font-variation-settings:"opsz" 16;}

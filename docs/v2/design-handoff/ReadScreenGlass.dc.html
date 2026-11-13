@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/styles.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}@keyframes fb-sk{0%{background-position:-240px 0}100%{background-position:240px 0}}</style>
+</helmet>
+<div data-theme="{{ theme }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ showAura }}">
+    <div style="position:absolute;left:0;right:0;top:0;height:{{ auraH }}px;overflow:hidden;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,#000 55%,transparent);mask-image:linear-gradient(to bottom,#000 55%,transparent)">
+      <div style="position:absolute;left:-60px;top:-40px;width:280px;height:280px;border-radius:9999px;background:var(--coral-400);filter:blur(70px);opacity:.55"></div>
+      <div style="position:absolute;right:-80px;top:60px;width:300px;height:300px;border-radius:9999px;background:var(--gold);filter:blur(80px);opacity:.42"></div>
+      <div style="position:absolute;left:60px;top:260px;width:260px;height:220px;border-radius:9999px;background:var(--plum);filter:blur(80px);opacity:.5"></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isShelf }}">
+    <div style="position:absolute;inset:0;padding-top:{{ topPad }}px">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 20px 0">
+        <h1 class="t-display" style="margin:0;color:var(--text);letter-spacing:-0.02em">Shelf</h1>
+        <div style="display:flex;gap:8px">
+          <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">{{ ic.search }}</span>
+          <span class="t-label" style="width:44px;height:44px;border-radius:9999px;background:var(--highlight-sand);display:grid;place-items:center;color:var(--text);box-shadow:inset 0 0 0 1px rgba(255,255,255,.3)">L</span>
+        </div>
+      </div>
+
+      <sc-if value="{{ skeleton }}">
+        <div style="display:flex;flex-direction:column;align-items:center;padding:28px 20px 0;gap:14px">
+          <div style="width:140px;height:210px;border-radius:6px;background:linear-gradient(90deg,var(--skeleton) 0,var(--skeleton-shimmer) 50%,var(--skeleton) 100%) 0 0/240px 100%;animation:fb-sk 1.4s linear infinite"></div>
+          <div style="width:96px;height:10px;border-radius:9999px;background:var(--skeleton);margin-top:12px"></div>
+          <div style="width:220px;height:22px;border-radius:9999px;background:var(--skeleton)"></div>
+          <div style="width:180px;height:12px;border-radius:9999px;background:var(--skeleton)"></div>
+          <div style="width:100%;height:52px;border-radius:9999px;background:var(--skeleton);margin-top:12px"></div>
+          <div style="width:100%;display:grid;grid-template-columns:repeat(3,1fr);gap:8px"><div style="height:48px;border-radius:9999px;background:var(--skeleton)"></div><div style="height:48px;border-radius:9999px;background:var(--skeleton)"></div><div style="height:48px;border-radius:9999px;background:var(--skeleton)"></div></div>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ notSkeleton }}" hint-placeholder-val="{{ true }}">
+        <sc-if value="{{ dlLow }}">
+          <div style="margin:14px 20px 0;padding:12px 12px 12px 14px;border-radius:22px;display:flex;align-items:center;gap:12px;background:color-mix(in oklab, var(--warning-surface) 70%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--warning) 30%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">
+            <span style="color:var(--warning);display:flex">{{ ic.alertSm }}</span>
+            <span class="t-caption" style="flex:1;color:var(--on-warning-surface)">Your phone is almost full. Free up 120 MB to keep this book offline.</span>
+            <span class="t-label" style="height:32px;padding:0 12px;border-radius:9999px;display:grid;place-items:center;background:color-mix(in oklab, var(--warning) 22%, transparent);color:var(--on-warning-surface);white-space:nowrap">Manage</span>
+          </div>
+        </sc-if>
+        <div style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:{{ heroPad }}px 20px 0">
+          <div style="border-radius:6px;box-shadow:0 24px 40px -16px rgba(8,6,30,.7),0 0 0 1px rgba(255,255,255,.12)"><dc-import name="Cover" book="pp" width="{{ heroW }}" hint-size="128px,192px"></dc-import></div>
+          <span class="t-caption" style="margin-top:18px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.16em">Continue reading</span>
+          <span style="margin-top:4px;color:var(--text);font:700 26px/32px var(--font-sans);letter-spacing:-0.02em">Pride and Prejudice</span>
+          <span class="t-caption" style="margin-top:4px;color:var(--text-secondary)">Ch 34 · 55% · 9 min left in chapter</span>
+        </div>
+        <div style="padding:16px 20px 0;display:flex;flex-direction:column;gap:8px">
+          <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px -10px var(--primary)">{{ ic.bookSm }}<span style="font:700 16px/20px var(--font-sans)">Continue</span></div>
+          <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">{{ ic.headphonesSm }}<span class="t-label">Listen</span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text);position:relative;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">{{ ic.usersSm }}<span class="t-label">Lobby</span><span style="width:6px;height:6px;border-radius:9999px;background:var(--text-accent)"></span></div>
+            <div style="height:48px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">
+              <sc-if value="{{ dlDownloading }}"><span style="width:18px;height:18px;border-radius:9999px;background:conic-gradient(var(--progress-fill) 230deg,var(--progress-track) 0);display:grid;place-items:center;flex:none"><span style="width:12px;height:12px;border-radius:9999px;background:var(--surface)"></span></span><span class="t-label">64%</span></sc-if>
+              <sc-if value="{{ dlReady }}"><span style="color:var(--positive);display:flex">{{ ic.checkCircleSm }}</span><span class="t-label">Saved</span></sc-if>
+              <sc-if value="{{ dlPaused }}"><span style="color:var(--warning);display:flex">{{ ic.pauseCircleSm }}</span><span class="t-label">Paused</span></sc-if>
+              <sc-if value="{{ dlLow }}"><span style="color:var(--warning);display:flex">{{ ic.alertSm }}</span><span class="t-label">Not saved</span></sc-if>
+            </div>
+          </div>
+          <sc-if value="{{ dlPaused }}">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:4px 8px 0">
+              <span class="t-caption" style="color:var(--text-secondary)">Paused at Ch 40. Picks up again on Wi-Fi.</span>
+              <span class="t-label" style="color:var(--ghost)">Resume now</span>
+            </div>
+          </sc-if>
+        </div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;padding:20px 20px 10px">
+          <span class="t-h3" style="color:var(--text)">Also reading</span>
+          <span class="t-label" style="color:var(--ghost)">See all</span>
+        </div>
+        <div style="display:flex;gap:10px;padding:0 20px;overflow:hidden">
+          <div style="display:flex;align-items:center;gap:10px;width:168px;flex:none;padding:6px 12px 6px 6px;border-radius:18px;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 8%, transparent)"><dc-import name="Cover" book="stay" width="44" hint-size="44px,66px"></dc-import><div style="display:flex;flex-direction:column;min-width:0"><span class="t-label" style="color:var(--text)">Stay With Me</span><span class="t-caption" style="color:var(--text-muted)">Gift from Ada</span></div></div>
+          <div style="display:flex;align-items:center;gap:10px;width:168px;flex:none;padding:6px 12px 6px 6px;border-radius:18px;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 8%, transparent)"><dc-import name="Cover" book="middlemarch" width="44" hint-size="44px,66px"></dc-import><div style="display:flex;flex-direction:column;min-width:0"><span class="t-label" style="color:var(--text)">Middlemarch</span><span class="t-caption" style="color:var(--text-muted)">Club copy · Ch 2</span></div></div>
+          <div style="display:flex;align-items:center;gap:10px;width:168px;flex:none;padding:6px 12px 6px 6px;border-radius:18px;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 8%, transparent)"><dc-import name="Cover" book="north" width="44" hint-size="44px,66px"></dc-import><div style="display:flex;flex-direction:column;min-width:0"><span class="t-label" style="color:var(--text)">North and South</span><span class="t-caption" style="color:var(--text-muted)">Ch 11 · 28%</span></div></div>
+        </div>
+      </sc-if>
+    </div>
+    <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+      <div style="position:absolute;left:50%;bottom:26px;transform:translateX(-50%);z-index:30;display:flex;gap:2px;padding:5px;border-radius:9999px;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 16px 36px -12px rgba(8,6,30,.55)">
+        <div style="width:76px;height:54px;border-radius:9999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-secondary)">{{ ic.home }}<span style="font:600 10px/12px var(--font-sans)">Home</span></div>
+        <div style="width:76px;height:54px;border-radius:9999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text);background:color-mix(in oklab, var(--text) 12%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.18)">{{ ic.shelf }}<span style="font:700 10px/12px var(--font-sans)">Shelf</span></div>
+        <div style="width:76px;height:54px;border-radius:9999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-secondary)">{{ ic.communities }}<span style="font:600 10px/12px var(--font-sans)">Communities</span></div>
+        <div style="width:76px;height:54px;border-radius:9999px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--text-secondary)">{{ ic.you }}<span style="font:600 10px/12px var(--font-sans)">You</span></div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ android }}">
+      <div style="position:absolute;left:0;right:0;bottom:0;z-index:30;display:flex;justify-content:space-around;padding:12px 8px 28px;background:color-mix(in oklab, var(--surface-raised) 60%, transparent);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 1px 0 color-mix(in oklab, var(--text) 10%, transparent)">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text-secondary);width:80px"><span style="height:32px;display:grid;place-items:center">{{ ic.home }}</span><span class="t-caption">Home</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text);width:80px"><span style="width:64px;height:32px;border-radius:9999px;background:color-mix(in oklab, var(--text) 12%, transparent);display:grid;place-items:center">{{ ic.shelf }}</span><span class="t-caption" style="font-weight:700">Shelf</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text-secondary);width:80px"><span style="height:32px;display:grid;place-items:center">{{ ic.communities }}</span><span class="t-caption">Communities</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--text-secondary);width:80px"><span style="height:32px;display:grid;place-items:center">{{ ic.you }}</span><span class="t-caption">You</span></div>
+      </div>
+    </sc-if>
+  </sc-if>
+
+  <sc-if value="{{ isOpening }}">
+    <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:32px">
+      <div style="border-radius:6px;box-shadow:0 30px 60px -20px rgba(8,6,30,.75),0 0 0 1px rgba(255,255,255,.12)"><dc-import name="Cover" book="pp" width="208" hint-size="208px,312px"></dc-import></div>
+      <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:14px 22px;border-radius:24px;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">
+        <div style="display:flex;gap:6px"><span style="width:6px;height:6px;border-radius:9999px;background:var(--text)"></span><span style="width:6px;height:6px;border-radius:9999px;background:var(--text);opacity:.6"></span><span style="width:6px;height:6px;border-radius:9999px;background:var(--text);opacity:.3"></span></div>
+        <span class="t-label" style="color:var(--text)">Opening at Ch 34 · 55%</span>
+        <span class="t-caption" style="color:var(--text-secondary)">The rest of the book saves in the background</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isReader }}">
+    <div style="position:absolute;inset:0;background:var(--reader-page)">
+      <div style="position:absolute;left:0;right:0;top:{{ readerTop }}px;bottom:{{ textBottom }}px;overflow:hidden;padding:56px 14px 0 24px;margin-top:-56px;display:flex;flex-direction:column;gap:16px">
+        <div style="display:flex;flex-direction:column;gap:6px;padding-right:52px">
+          <span class="t-caption" style="color:var(--reader-text-secondary);letter-spacing:.16em;text-transform:uppercase">{{ volume }}</span>
+          <h2 class="t-reading-chapter" style="margin:0;color:var(--reader-text)">Chapter {{ ch }}</h2>
+          <span style="width:28px;height:2px;border-radius:2px;background:var(--reader-text-secondary);opacity:.5;margin-top:4px"></span>
+        </div>
+        <sc-if value="{{ marginQuiet }}">
+          <div style="display:flex;gap:10px;align-items:center;margin-right:52px;padding:10px 14px;border-radius:9999px;background:var(--veil);color:var(--veil-text)">{{ ic.eyeOffSm }}<span class="t-caption">You haven't reached this part, so the margin stays quiet.</span></div>
+        </sc-if>
+        <sc-for list="{{ paras }}" as="p" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) 40px;gap:12px;position:relative">
+            <p style="margin:0;color:var(--reader-text);font-family:{{ fontFamily }};font-size:{{ fs }}px;line-height:{{ lh }}px;font-variation-settings:'opsz' 18;text-wrap:pretty">{{ p.pre }}<span style="background:{{ p.hlBg }};box-shadow:{{ p.ring }};border-radius:4px">{{ p.hl }}</span>{{ p.post }}</p>
+            <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-start;padding-top:4px">
+              <sc-for list="{{ p.reactions }}" as="r" hint-placeholder-count="1">
+                <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.MarginReaction" emoji="{{ r.emoji }}" count="{{ r.count }}" own="{{ r.own }}" thread="{{ r.thread }}" replies="{{ r.replies }}" hint-size="40px,28px"></x-import>
+              </sc-for>
+            </div>
+            <sc-if value="{{ p.menu }}">
+              <div style="position:absolute;bottom:100%;left:0;right:52px;display:flex;flex-direction:column;align-items:center;gap:8px;margin-bottom:10px;z-index:6">
+                <div style="display:flex;align-items:center;gap:2px;padding:4px;border-radius:9999px;background:color-mix(in oklab, var(--surface-raised) 60%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+                  <span class="t-label" style="height:40px;padding:0 16px 0 12px;border-radius:9999px;display:flex;align-items:center;gap:8px;color:var(--text);background:{{ shareBg }}">{{ ic.messageSm }}Share to chat</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:2px;padding:5px;border-radius:9999px;background:color-mix(in oklab, var(--surface-raised) 60%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+                  <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="5">
+                    <span style="width:40px;height:40px;display:grid;place-items:center"><span style="width:26px;height:26px;border-radius:9999px;background:{{ s.bg }};box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)"></span></span>
+                  </sc-for>
+                  <span style="width:1px;height:24px;background:color-mix(in oklab, var(--text) 14%, transparent);margin:0 4px"></span>
+                  <span style="width:40px;height:40px;border-radius:9999px;display:grid;place-items:center;color:var(--text)">{{ ic.smilePlus }}</span>
+                </div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+        <sc-if value="{{ isMid }}">
+          <div style="padding-right:52px"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.MarginAhead" chapter="{{ 36 }}" hint-size="100%,40px"></x-import></div>
+        </sc-if>
+        <sc-if value="{{ isEnd }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:20px;padding:28px 52px 0 0">
+            <span style="width:28px;height:2px;border-radius:2px;background:var(--reader-text-secondary);opacity:.5"></span>
+            <span class="t-quote" style="color:var(--reader-text-secondary)">The end</span>
+            <div style="height:52px;padding:0 28px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px -10px var(--primary)"><span style="font:700 16px/20px var(--font-sans)">Close the book</span></div>
+          </div>
+        </sc-if>
+      </div>
+
+      <sc-if value="{{ chrome }}">
+        <div style="position:absolute;top:0;left:0;right:0;padding:{{ statusH }}px 16px 0;display:flex;align-items:center;gap:8px;z-index:20">
+          <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">{{ backIcon }}</span>
+          <div style="flex:1;min-width:0;height:44px;border-radius:9999px;display:flex;flex-direction:column;align-items:center;justify-content:center;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">
+            <span class="t-label" style="color:var(--text);line-height:16px">Pride and Prejudice</span>
+            <span style="font:500 11px/14px var(--font-sans);color:var(--text-secondary)">Lumee Book Club</span>
+          </div>
+          <div style="height:44px;border-radius:9999px;display:flex;align-items:center;padding:0 4px;flex:none;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 8px 24px -10px rgba(8,6,30,.45)">
+            <span style="width:40px;height:40px;display:grid;place-items:center;color:var(--text)">{{ ic.headphonesSm }}</span>
+            <span style="width:40px;height:40px;display:grid;place-items:center;color:var(--text)">{{ ic.typeSm }}</span>
+          </div>
+        </div>
+        <div style="position:absolute;left:12px;right:12px;bottom:{{ panelBottom }}px;z-index:20;border-radius:28px;padding:16px 16px 8px;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 18px 40px -14px rgba(8,6,30,.55)">
+          <div style="height:24px;position:relative;margin:0 6px">
+            <div style="position:absolute;left:0;right:0;top:9px;height:6px;border-radius:9999px;background:color-mix(in oklab, var(--text) 14%, transparent)"></div>
+            <div style="position:absolute;left:0;top:9px;height:6px;border-radius:9999px;background:var(--progress-fill);width:{{ fillW }}"></div>
+            <sc-for list="{{ marks }}" as="m" hint-placeholder-count="8">
+              <span style="position:absolute;top:1px;left:{{ m.left }};width:2px;height:5px;border-radius:2px;background:var(--margin-reaction);transform:translateX(-1px)"></span>
+            </sc-for>
+            <span style="position:absolute;top:5px;left:55.6%;width:2px;height:14px;border-radius:2px;background:var(--text-muted);transform:translateX(-1px)"></span>
+            <span style="position:absolute;top:2px;left:{{ fillW }};width:20px;height:20px;border-radius:9999px;background:#fff;box-shadow:0 2px 8px rgba(8,6,30,.35);transform:translateX(-10px) scale({{ thumbScale }})"></span>
+            <sc-if value="{{ scrubbing }}">
+              <div style="position:absolute;bottom:36px;left:{{ fillW }};transform:translateX(-50%);padding:10px 16px;border-radius:20px;display:flex;flex-direction:column;align-items:center;white-space:nowrap;background:color-mix(in oklab, var(--surface) 70%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+                <span class="t-label" style="color:var(--text)">{{ posLabel }}</span>
+                <span class="t-caption" style="color:var(--text-muted)">Ahead of you. The margin stays quiet.</span>
+              </div>
+            </sc-if>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-top:6px">
+            <span style="height:40px;padding:0 14px 0 10px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--text) 8%, transparent)">{{ ic.listSm }}<span class="t-label">Contents</span></span>
+            <span class="t-caption" style="color:var(--text-secondary)">{{ posLabel }}</span>
+            <span style="height:40px;padding:0 10px 0 14px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--text);background:color-mix(in oklab, var(--text) 8%, transparent)"><span class="t-label">{{ minsShort }}</span>{{ ic.highlighterSm }}</span>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ noChrome }}">
+        <div style="position:absolute;left:0;right:0;bottom:{{ footBottom }}px;display:flex;justify-content:center;gap:12px;z-index:15">
+          <span class="t-caption" style="color:var(--reader-text-secondary)">{{ posLabel }}</span>
+          <span class="t-caption" style="color:var(--reader-text-secondary);opacity:.6">·</span>
+          <span class="t-caption" style="color:var(--reader-text-secondary)">{{ minsLeft }}</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ toastSynced }}">
+        <div style="position:absolute;left:50%;bottom:{{ toastBottom }}px;transform:translateX(-50%);z-index:25;display:flex;align-items:center;gap:10px;padding:10px 20px 10px 12px;border-radius:9999px;white-space:nowrap;background:color-mix(in oklab, var(--surface) 65%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+          <span style="width:32px;height:32px;border-radius:9999px;display:grid;place-items:center;background:var(--positive-surface);color:var(--positive)">{{ ic.checkCircleSm }}</span>
+          <div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Picked up where you left off</span><span class="t-caption" style="color:var(--text-secondary)">Ch 34 · 55%, from your tablet last night</span></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ toastOffline }}">
+        <div style="position:absolute;left:16px;right:16px;bottom:{{ toastBottom }}px;z-index:25;display:flex;align-items:center;gap:12px;padding:10px 18px 10px 10px;border-radius:9999px;background:color-mix(in oklab, var(--surface) 65%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+          <span style="width:32px;height:32px;flex:none;border-radius:9999px;display:grid;place-items:center;background:var(--positive-surface);color:var(--positive)">{{ ic.checkCircleSm }}</span>
+          <span class="t-caption" style="color:var(--text)">You're offline. This book is on your phone, so keep going.</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ toastPartial }}">
+        <div style="position:absolute;left:16px;right:16px;bottom:{{ toastBottom }}px;z-index:25;display:flex;align-items:center;gap:12px;padding:10px 8px 10px 10px;border-radius:9999px;background:color-mix(in oklab, var(--surface) 65%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22),0 14px 30px -10px rgba(8,6,30,.5)">
+          <span style="width:32px;height:32px;flex:none;border-radius:9999px;display:grid;place-items:center;background:var(--warning-surface);color:var(--warning)">{{ ic.alertSm }}</span>
+          <span class="t-caption" style="flex:1;color:var(--text)">Saved up to Chapter 40. You can read to there without signal.</span>
+          <span class="t-label" style="height:36px;padding:0 14px;border-radius:9999px;display:grid;place-items:center;background:color-mix(in oklab, var(--text) 10%, transparent);color:var(--text)">Resume</span>
+        </div>
+      </sc-if>
+      <sc-if value="{{ jumped }}">
+        <div style="position:absolute;left:50%;bottom:{{ backPillBottom }}px;transform:translateX(-50%);z-index:22;height:44px;padding:0 18px 0 14px;border-radius:9999px;background:var(--text);color:var(--surface);box-shadow:0 14px 30px -10px rgba(8,6,30,.6);display:flex;align-items:center;gap:8px;white-space:nowrap">{{ ic.undoSm }}<span class="t-label">Back to Ch 34 · 55%</span></div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isFinish }}">
+    <div style="position:absolute;inset:0;overflow:hidden">
+      <div style="position:absolute;left:0;right:0;top:0;padding:{{ topPad }}px 20px 0;transform:translateY({{ finishScroll }}px)">
+        <div style="display:flex;justify-content:flex-end"><span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">{{ ic.xSm }}</span></div>
+        <div style="position:relative;height:244px;display:grid;place-items:center">
+          <div style="position:absolute;left:24px;top:0;width:112px;height:112px;border-bottom-right-radius:112px;border-top-left-radius:24px;transform:scale({{ qScale }});transform-origin:0 0;background:color-mix(in oklab, var(--surface-accent) 70%, transparent);backdrop-filter:blur(12px);box-shadow:inset 0 1px 0 rgba(255,255,255,.25)"></div>
+          <div style="position:absolute;right:24px;bottom:0;width:132px;height:132px;border-top-left-radius:132px;border-bottom-right-radius:24px;transform:scale({{ qScale }});transform-origin:100% 100%;background:color-mix(in oklab, var(--progress-fill) 80%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"></div>
+          <div style="position:absolute;right:24px;top:0;width:64px;height:64px;border-bottom-left-radius:64px;border-top-right-radius:20px;transform:scale({{ qScale }});transform-origin:100% 0;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(20px);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent)"></div>
+          <div style="position:relative;opacity:{{ coverOp }};transform:translateY({{ coverY }}px) rotate(-3deg);border-radius:6px;box-shadow:0 30px 50px -18px rgba(8,6,30,.75)"><dc-import name="Cover" book="pp" width="136" hint-size="136px,204px"></dc-import></div>
+        </div>
+        <sc-if value="{{ showTitle }}">
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin-top:24px">
+            <h1 style="margin:0;color:var(--text);font:800 32px/38px var(--font-sans);letter-spacing:-0.025em;text-wrap:balance">You finished Pride and Prejudice</h1>
+            <span class="t-body" style="color:var(--text-secondary)">61 chapters, read over 19 days</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showRoom }}">
+          <div style="display:flex;flex-direction:column;margin-top:20px;padding:6px 16px;border-radius:24px;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.2)">
+            <span class="t-caption" style="color:var(--text-muted);text-transform:uppercase;letter-spacing:.16em;padding:10px 0 2px">Lumee Book Club</span>
+            <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid color-mix(in oklab, var(--text) 9%, transparent)">
+              <div style="display:flex;width:48px;flex:none"><span class="t-caption" style="width:28px;height:28px;border-radius:9999px;display:grid;place-items:center;background:var(--highlight-sand);color:var(--text);box-shadow:0 0 0 2px var(--surface)">A</span><span class="t-caption" style="width:28px;height:28px;border-radius:9999px;display:grid;place-items:center;background:var(--highlight-aqua);color:var(--text);box-shadow:0 0 0 2px var(--surface);margin-left:-8px">M</span></div>
+              <div style="flex:1;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Ada, Mateo and 4 others finished</span><span class="t-caption" style="color:var(--text-muted)">You're among the first seven</span></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;padding:10px 0;border-bottom:1px solid color-mix(in oklab, var(--text) 9%, transparent)">
+              <div style="width:48px;height:48px;flex:none;border-radius:16px;background:color-mix(in oklab, var(--text) 8%, transparent);display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font:700 9px/10px var(--font-sans);letter-spacing:.1em;color:var(--text-accent)">OCT</span><span style="font:700 18px/20px var(--font-sans);color:var(--text)">18</span></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">The ending, and everything before it</span><span class="t-caption" style="color:var(--text-muted)">Sat · 7:00 pm · Hosted by Ada · 14 going</span></div>
+              <span style="color:var(--text-muted);display:flex">{{ ic.chevronRightSm }}</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px;padding:10px 0">
+              <div style="width:48px;height:48px;flex:none;border-radius:16px;background:color-mix(in oklab, var(--text) 8%, transparent);display:grid;place-items:center;color:var(--text)">{{ ic.messageSm }}</div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">The whole-book conversation is open</span><span class="t-caption" style="color:var(--text-muted)">Nothing in chat is veiled for you now</span></div>
+              <span style="color:var(--text-muted);display:flex">{{ ic.chevronRightSm }}</span>
+            </div>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showSolo }}">
+          <div style="display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;margin-top:28px;padding:24px 20px;border-radius:24px;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 9%, transparent),inset 0 1px 0 rgba(255,255,255,.2)">
+            <span class="t-h3" style="color:var(--text)">Read this with someone</span>
+            <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Start a community around this book and the margin fills up with the people you'd talk to anyway.</span>
+          </div>
+        </sc-if>
+        <sc-if value="{{ showRoomOrSolo }}"><div style="display:flex;flex-direction:column;gap:14px;margin-top:40px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between"><span class="t-h3" style="color:var(--text)">Read next</span><span class="t-label" style="color:var(--ghost)">See all</span></div>
+          <div style="display:flex;gap:16px">
+            <div style="display:flex;flex-direction:column;gap:8px;width:104px;flex:none"><dc-import name="Cover" book="persuasion" width="104" hint-size="104px,156px"></dc-import><div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Persuasion</span><span class="t-caption" style="color:var(--text-muted)">Included with Pro</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;width:104px;flex:none"><dc-import name="Cover" book="emma" width="104" hint-size="104px,156px"></dc-import><div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Emma</span><span class="t-caption" style="color:var(--text-muted)">Included with Pro</span></div></div>
+            <div style="display:flex;flex-direction:column;gap:8px;width:104px;flex:none"><dc-import name="Cover" book="north" width="104" hint-size="104px,156px"></dc-import><div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">North and South</span><span class="t-caption" style="color:var(--text-muted)">Ada is reading</span></div></div>
+          </div>
+        </div></sc-if>
+      </div>
+      <sc-if value="{{ showCta }}">
+        <div style="position:absolute;left:0;right:0;bottom:0;padding:14px 20px {{ ctaPad }}px;background:color-mix(in oklab, var(--surface) 55%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 1px 0 color-mix(in oklab, var(--text) 8%, transparent)">
+          <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 10px 24px -10px var(--primary)"><span style="font:700 16px/20px var(--font-sans)">{{ ctaLabel }}</span></div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ isPlayer }}">
+    <div style="position:absolute;inset:0;padding:{{ statusH }}px 24px {{ playerPad }}px;display:flex;flex-direction:column">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px">
+        <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">{{ ic.chevronDown }}</span>
+        <div style="display:flex;flex-direction:column;align-items:center"><span class="t-caption" style="color:var(--text-secondary);text-transform:uppercase;letter-spacing:.16em">Listening</span><span class="t-label" style="color:var(--text)">Lumee Book Club</span></div>
+        <span style="width:44px;height:44px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">{{ ic.listSm }}</span>
+      </div>
+      <div style="flex:1;display:grid;place-items:center;min-height:0">
+        <div style="transform:scale({{ playScale }});border-radius:8px;box-shadow:0 36px 60px -20px rgba(8,6,30,.8),0 0 0 1px rgba(255,255,255,.12)"><dc-import name="Cover" book="pp" width="236" hint-size="236px,354px"></dc-import></div>
+      </div>
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:20px">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="color:var(--text);font:800 26px/32px var(--font-sans);letter-spacing:-0.02em">Chapter 34</span><span class="t-caption" style="color:var(--text-secondary)">Pride and Prejudice · Read by Rosamund Hale</span></div>
+        <span style="height:40px;padding:0 16px 0 12px;border-radius:9999px;display:flex;align-items:center;gap:6px;color:var(--text);flex:none;background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">{{ ic.bookSm }}<span class="t-label">Read</span></span>
+      </div>
+      <sc-if value="{{ lapsed }}">
+        <div style="margin-bottom:16px;padding:14px 16px;border-radius:22px;display:flex;flex-direction:column;gap:10px;background:color-mix(in oklab, var(--warning-surface) 70%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--warning) 30%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">
+          <div style="display:flex;gap:10px;align-items:flex-start"><span style="color:var(--warning);display:flex;margin-top:1px">{{ ic.alertSm }}</span><span class="t-caption" style="color:var(--on-warning-surface)">Your Pro has ended, so audio stops after this chapter. The book carries on in text, right where you are.</span></div>
+          <span class="t-label" style="align-self:flex-start;margin-left:30px;height:32px;padding:0 14px;border-radius:9999px;display:grid;place-items:center;background:color-mix(in oklab, var(--warning) 22%, transparent);color:var(--on-warning-surface)">See Pro</span>
+        </div>
+      </sc-if>
+      <div style="height:20px;position:relative">
+        <div style="position:absolute;left:0;right:0;top:7px;height:6px;border-radius:9999px;background:color-mix(in oklab, var(--text) 16%, transparent)"></div>
+        <div style="position:absolute;left:0;top:7px;height:6px;width:22%;border-radius:9999px;background:var(--text)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-top:2px"><span class="t-caption" style="color:var(--text-secondary);font-variant-numeric:tabular-nums">4:12</span><span class="t-caption" style="color:var(--text-secondary);font-variant-numeric:tabular-nums">-14:40</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin:18px 0 22px">
+        <span style="width:48px;height:48px;display:grid;place-items:center;color:var(--text)">{{ ic.skipBack }}</span>
+        <span style="width:56px;height:56px;display:grid;place-items:center;color:var(--text)">{{ ic.rotCcw }}</span>
+        <span style="width:80px;height:80px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:grid;place-items:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 16px 32px -12px var(--primary)">{{ playIcon }}</span>
+        <span style="width:56px;height:56px;display:grid;place-items:center;color:var(--text)">{{ ic.rotCw }}</span>
+        <span style="width:48px;height:48px;display:grid;place-items:center;color:var(--text)">{{ ic.skipFwd }}</span>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span class="t-label" style="height:36px;min-width:56px;padding:0 14px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">1.25×</span>
+        <span class="t-caption" style="color:var(--text-secondary);display:flex;align-items:center;gap:6px"><span style="color:var(--positive);display:flex">{{ ic.checkCircleXs }}</span>Saved on your phone · 38 MB</span>
+        <span class="t-label" style="height:36px;padding:0 14px;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:color-mix(in oklab, var(--surface-raised) 50%, transparent);backdrop-filter:blur(24px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.22)">Ch 35</span>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ mini }}">
+    <div style="position:absolute;left:12px;right:12px;bottom:{{ miniBottom }}px;z-index:28;height:64px;border-radius:9999px;display:flex;align-items:center;gap:12px;padding:0 8px 0 14px;overflow:hidden;background:color-mix(in oklab, var(--surface-raised) 55%, transparent);backdrop-filter:blur(28px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 16px 36px -12px rgba(8,6,30,.55)">
+      <dc-import name="Cover" book="pp" width="30" hint-size="30px,45px"></dc-import>
+      <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Chapter 34</span><span class="t-caption" style="color:var(--text-secondary)">Pride and Prejudice · 14 min left</span></div>
+      <span style="width:44px;height:44px;display:grid;place-items:center;color:var(--text)">{{ ic.rotCcwSm }}</span>
+      <span style="width:48px;height:48px;border-radius:9999px;display:grid;place-items:center;color:var(--surface);background:var(--text)">{{ ic.pauseSm }}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ scrim }}"><div style="position:absolute;inset:0;z-index:40;background:color-mix(in oklab, #121212 40%, transparent)"></div></sc-if>
+
+  <sc-if value="{{ sheetDisplay }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:45;border-radius:36px;padding:10px 18px {{ sheetPadIn }}px;display:flex;flex-direction:column;gap:18px;background:color-mix(in oklab, var(--surface) 62%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <div style="width:36px;height:5px;border-radius:9999px;background:color-mix(in oklab, var(--text) 22%, transparent);align-self:center"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:-6px"><span class="t-h2" style="color:var(--text)">Display</span><span style="width:36px;height:36px;border-radius:9999px;background:color-mix(in oklab, var(--text) 10%, transparent);display:grid;place-items:center;color:var(--text)">{{ ic.xSm }}</span></div>
+      <div style="display:flex;align-items:center;height:56px;border-radius:9999px;padding:0 6px;background:color-mix(in oklab, var(--text) 7%, transparent)">
+        <span style="width:44px;text-align:center;color:var(--text);font:500 14px/1 var(--font-serif)">A</span>
+        <div style="flex:1;display:flex;justify-content:space-between;align-items:center;padding:0 10px">
+          <sc-for list="{{ steps }}" as="st" hint-placeholder-count="5"><span style="width:{{ st.size }}px;height:{{ st.size }}px;border-radius:9999px;background:{{ st.bg }}"></span></sc-for>
+        </div>
+        <span style="width:44px;text-align:center;color:var(--text);font:500 24px/1 var(--font-serif)">A</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span class="t-caption" style="color:var(--text-muted);text-transform:uppercase;letter-spacing:.16em;padding-left:4px">Typeface</span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div style="height:72px;border-radius:22px;background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:{{ serifRing }};display:flex;align-items:center;gap:12px;padding:0 16px;color:var(--text)"><span style="font:500 28px/1 var(--font-serif)">Aa</span><div style="display:flex;flex-direction:column"><span class="t-label">Literata</span><span class="t-caption" style="color:var(--text-muted)">Default</span></div></div>
+          <div style="height:72px;border-radius:22px;background:color-mix(in oklab, var(--text) 7%, transparent);box-shadow:{{ sansRing }};display:flex;align-items:center;gap:12px;padding:0 16px;color:var(--text)"><span style="font:600 28px/1 var(--font-sans)">Aa</span><div style="display:flex;flex-direction:column"><span class="t-label">Manrope</span><span class="t-caption" style="color:var(--text-muted)">Sans serif</span></div></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <span class="t-caption" style="color:var(--text-muted);text-transform:uppercase;letter-spacing:.16em;padding-left:4px">Theme</span>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div data-theme="light" style="height:92px;border-radius:22px;background:var(--reader-page);box-shadow:inset 0 0 0 1px #1212121a,{{ lightRing }};display:flex;flex-direction:column;justify-content:space-between;padding:12px 14px;color:var(--reader-text)"><span style="font:500 22px/1 var(--font-serif)">Aa</span><span class="t-label">Light</span></div>
+          <div data-theme="flip" style="height:92px;border-radius:22px;background:var(--reader-page);box-shadow:inset 0 0 0 1px #ffffff1a,{{ flipRing }};display:flex;flex-direction:column;justify-content:space-between;padding:12px 14px;color:var(--reader-text)"><span style="font:500 22px/1 var(--font-serif)">Aa</span><span class="t-label">Flip</span></div>
+          <div data-theme="dark" style="height:92px;border-radius:22px;background:var(--reader-page);box-shadow:inset 0 0 0 1px #ffffff1a,{{ darkRing }};display:flex;flex-direction:column;justify-content:space-between;padding:12px 14px;color:var(--reader-text)"><span style="font:500 22px/1 var(--font-serif)">Aa</span><span class="t-label">Dark</span></div>
+        </div>
+      </div>
+      <span class="t-caption" style="color:var(--text-muted);text-align:center;margin-top:-4px">Changes show on the page as you choose, and stay for every book.</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sheetContents }}">
+    <div style="position:absolute;left:0;right:0;bottom:0;top:{{ contentsTop }}px;z-index:45;border-radius:36px 36px 0 0;display:flex;flex-direction:column;overflow:hidden;background:color-mix(in oklab, var(--surface) 72%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <div style="width:36px;height:5px;border-radius:9999px;background:color-mix(in oklab, var(--text) 22%, transparent);align-self:center;margin-top:10px"></div>
+      <div style="display:flex;align-items:center;gap:14px;padding:14px 20px 0">
+        <dc-import name="Cover" book="pp" width="40" hint-size="40px,60px"></dc-import>
+        <div style="flex:1;display:flex;flex-direction:column"><span class="t-h3" style="color:var(--text)">Pride and Prejudice</span><span class="t-caption" style="color:var(--text-muted)">61 chapters · about 11 h · Ch 34 · 55%</span></div>
+        <span style="width:36px;height:36px;border-radius:9999px;background:color-mix(in oklab, var(--text) 10%, transparent);display:grid;place-items:center;color:var(--text)">{{ ic.xSm }}</span>
+      </div>
+      <div style="display:flex;gap:4px;padding:4px;margin:16px 20px 8px;border-radius:9999px;background:color-mix(in oklab, var(--text) 8%, transparent)">
+        <span class="t-label" style="flex:1;height:36px;border-radius:9999px;display:grid;place-items:center;background:{{ tabCBg }};box-shadow:{{ tabCSh }};color:var(--text)">Contents</span>
+        <span class="t-label" style="flex:1;height:36px;border-radius:9999px;display:grid;place-items:center;background:{{ tabHBg }};box-shadow:{{ tabHSh }};color:var(--text)">Highlights</span>
+      </div>
+      <sc-if value="{{ tabIsContents }}" hint-placeholder-val="{{ true }}">
+        <div style="flex:1;overflow:hidden;padding:0 20px">
+          <div style="display:flex;align-items:baseline;gap:8px;padding:14px 4px 6px"><span class="t-label" style="color:var(--text)">Volume II</span><span class="t-caption" style="color:var(--text-muted)">Chapters 24–42</span></div>
+          <sc-for list="{{ chapters }}" as="c" hint-placeholder-count="10">
+            <div style="height:52px;display:flex;align-items:center;gap:14px;padding:0 16px;margin:0 -8px;border-radius:9999px;background:{{ c.bg }}">
+              <span class="t-caption" style="width:20px;color:var(--text-muted);font-variant-numeric:tabular-nums">{{ c.n }}</span>
+              <span class="t-body" style="flex:1;color:{{ c.color }};font-weight:{{ c.weight }}">Chapter {{ c.n }}</span>
+              <sc-if value="{{ c.cur }}"><span class="t-caption" style="padding:4px 10px;border-radius:9999px;background:var(--primary);color:var(--on-primary);font-weight:700">You're here</span></sc-if>
+              <sc-if value="{{ c.done }}"><span style="color:var(--text-muted);display:flex">{{ c.check }}</span></sc-if>
+              <span class="t-caption" style="color:var(--text-muted);width:44px;text-align:right">{{ c.mins }}</span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+      <sc-if value="{{ tabIsHighlights }}">
+        <div style="flex:1;overflow:hidden;padding:4px 20px 0;display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ highlights }}" as="h" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:22px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+              <div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:9999px;background:{{ h.bg }};box-shadow:inset 0 0 0 1px rgba(255,255,255,.25)"></span><span class="t-caption" style="color:var(--text-muted)">Ch {{ h.ch }} · {{ h.name }}</span></div>
+              <span class="t-quote" style="color:var(--text)">{{ h.q }}</span>
+            </div>
+          </sc-for>
+          <span class="t-caption" style="color:var(--text-muted);text-align:center;padding:12px 0">Only you can see your highlights.</span>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sheetShare }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:46;border-radius:36px;padding:10px 20px {{ sheetPadIn }}px;display:flex;flex-direction:column;gap:16px;background:color-mix(in oklab, var(--surface) 76%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <div style="width:36px;height:5px;border-radius:9999px;background:color-mix(in oklab, var(--text) 22%, transparent);align-self:center"></div>
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h2" style="color:var(--text)">Share to chat</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">It arrives as a quote card. Anyone who hasn’t reached Chapter 34 sees it veiled.</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;padding:14px 16px;border-radius:22px;background:color-mix(in oklab, var(--text) 6%, transparent)"><span style="font:italic 400 16px/24px var(--font-serif);color:var(--text);text-wrap:pretty">“He sat down for a few moments, and then getting up, walked about the room.”</span><span class="t-caption" style="color:var(--text-secondary)">Pride and Prejudice · Ch 34</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="min-height:60px;padding:10px 16px 10px 10px;box-sizing:border-box;border-radius:22px;display:flex;align-items:center;gap:12px;background:color-mix(in oklab, var(--focus-ring) 12%, transparent);box-shadow:inset 0 0 0 1.5px var(--focus-ring)">
+          <span style="width:40px;height:40px;flex:none;border-radius:9999px;position:relative;overflow:hidden;background:var(--gold)"><span style="position:absolute;right:0;bottom:0;width:20px;height:20px;border-top-left-radius:20px;background:var(--coral-400)"></span><span style="position:absolute;left:0;top:0;width:12px;height:12px;border-bottom-right-radius:12px;background:var(--indigo-900)"></span><span style="position:absolute;inset:0;display:grid;place-items:center;font:600 19px/1 var(--font-serif);color:var(--indigo-900)">L</span></span>
+          <div style="flex:1;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Lumee Book Club</span><span class="t-caption" style="color:var(--text-secondary)">14 reading this book</span></div>
+          <span style="width:22px;height:22px;border-radius:9999px;display:grid;place-items:center;box-shadow:inset 0 0 0 2px var(--focus-ring)"><span style="width:10px;height:10px;border-radius:9999px;background:var(--focus-ring)"></span></span>
+        </div>
+        <div style="min-height:60px;padding:10px 16px 10px 10px;box-sizing:border-box;border-radius:22px;display:flex;align-items:center;gap:12px;background:color-mix(in oklab, var(--text) 6%, transparent)">
+          <span class="t-label" style="width:40px;height:40px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--highlight-aqua)">T</span>
+          <div style="flex:1;display:flex;flex-direction:column"><span class="t-label" style="color:var(--text)">Thursday Readers</span><span class="t-caption" style="color:var(--text-secondary)">5 reading this book</span></div>
+          <span style="width:22px;height:22px;border-radius:9999px;box-shadow:inset 0 0 0 2px color-mix(in oklab, var(--text) 30%, transparent)"></span>
+        </div>
+      </div>
+      <div style="height:52px;border-radius:9999px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--primary);color:var(--on-primary);box-shadow:inset 0 1px 0 rgba(255,255,255,.3)">{{ ic.messageSm }}<span style="font:700 16px/20px var(--font-sans)">Share to Lumee Book Club</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sheetAudio }}">
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:46;border-radius:36px;padding:36px 22px {{ sheetPadIn }}px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;background:color-mix(in oklab, var(--surface) 70%, transparent);backdrop-filter:blur(36px) saturate(180%);box-shadow:inset 0 0 0 1px color-mix(in oklab, var(--text) 10%, transparent),inset 0 1px 0 rgba(255,255,255,.25),0 -10px 40px -10px rgba(8,6,30,.5)">
+      <span style="width:68px;height:68px;border-radius:9999px;color:var(--text);display:grid;place-items:center;margin-bottom:6px;background:color-mix(in oklab, var(--text) 9%, transparent);box-shadow:inset 0 1px 0 rgba(255,255,255,.2)">{{ ic.headphones }}</span>
+      <sc-if value="{{ aNonPro }}">
+        <span class="t-h1" style="color:var(--text)">Listen with Pro</span>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Switch between reading and listening and keep one place in both. Pro also includes classics like this one.</span>
+        <div style="width:100%;display:flex;flex-direction:column;gap:8px;margin-top:16px">
+          <div style="height:52px;border-radius:9999px;background:var(--primary);color:var(--on-primary);display:flex;align-items:center;justify-content:center;box-shadow:inset 0 1px 0 rgba(255,255,255,.3)"><span style="font:700 16px/20px var(--font-sans)">See what Pro includes</span></div>
+          <div style="height:52px;border-radius:9999px;background:color-mix(in oklab, var(--text) 9%, transparent);color:var(--text);display:flex;align-items:center;justify-content:center"><span style="font:600 16px/20px var(--font-sans)">Keep reading</span></div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ aOnWay }}">
+        <span class="t-h1" style="color:var(--text)">Audio is on its way</span>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">The narration for this edition is still being recorded. It will appear here, at your place in the book, when it's ready.</span>
+        <div style="width:100%;margin-top:16px;height:52px;border-radius:9999px;background:color-mix(in oklab, var(--text) 9%, transparent);color:var(--text);display:flex;align-items:center;justify-content:center"><span style="font:600 16px/20px var(--font-sans)">Keep reading</span></div>
+      </sc-if>
+      <sc-if value="{{ aTextOnly }}">
+        <span class="t-h1" style="color:var(--text)">Made for reading</span>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">The author chose text only for this book, so there's no audio edition.</span>
+        <div style="width:100%;margin-top:16px;height:52px;border-radius:9999px;background:color-mix(in oklab, var(--text) 9%, transparent);color:var(--text);display:flex;align-items:center;justify-content:center"><span style="font:600 16px/20px var(--font-sans)">Back to the page</span></div>
+      </sc-if>
+      <sc-if value="{{ aUnavailable }}">
+        <span class="t-h1" style="color:var(--text)">Audio isn't available here</span>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">This edition doesn't have audio in your region yet. Your place in the text is saved.</span>
+        <div style="width:100%;margin-top:16px;height:52px;border-radius:9999px;background:color-mix(in oklab, var(--text) 9%, transparent);color:var(--text);display:flex;align-items:center;justify-content:center"><span style="font:600 16px/20px var(--font-sans)">Keep reading</span></div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:{{ sbColor }};opacity:{{ sbOp }}">
+      <span style="font:600 16px/20px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:{{ sbColor }};z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:{{ sbColor }};opacity:{{ sbOp }}">
+      <span style="font:500 14px/18px var(--font-sans)">9:41</span>
+      <div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div>
+    </div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:{{ sbColor }};z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;shelf&quot;,&quot;shelfReady&quot;,&quot;shelfPaused&quot;,&quot;shelfLow&quot;,&quot;shelfSkeleton&quot;,&quot;shelfMini&quot;,&quot;opening&quot;,&quot;reader&quot;,&quot;readerChrome&quot;,&quot;readerSynced&quot;,&quot;readerOffline&quot;,&quot;readerPartial&quot;,&quot;readerMini&quot;,&quot;display&quot;,&quot;displaySans&quot;,&quot;contents&quot;,&quot;highlights&quot;,&quot;scrub&quot;,&quot;jumped&quot;,&quot;select&quot;,&quot;highlighted&quot;,&quot;lastPage&quot;,&quot;finish1&quot;,&quot;finish2&quot;,&quot;finish&quot;,&quot;finishNext&quot;,&quot;finishSolo&quot;,&quot;player&quot;,&quot;playerPaused&quot;,&quot;playerLapsed&quot;,&quot;nonPro&quot;,&quot;onItsWay&quot;,&quot;textOnly&quot;,&quot;unavailable&quot;],&quot;default&quot;:&quot;shelf&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;aura&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+const CH34 = [
+  { id: 'a', t: ['When they were gone, Elizabeth, as if intending to exasperate herself as much as possible against Mr. Darcy, chose for her employment ', 'the examination of all the letters which Jane had written to her', ' since her being in Kent.'], r: [['🤔', 4]] },
+  { id: 'b', t: ['But this idea was soon banished, and her spirits were very differently affected, when, ', 'to her utter amazement, she saw Mr. Darcy walk into the room', '.'], r: [['😮', 16], ['🔥', 7]], th: 9 },
+  { id: 'c', t: ['In an hurried manner he immediately began an inquiry after her health. She answered him with cold civility. ', 'He sat down for a few moments, and then getting up, walked about the room.', ''], r: [['😂', 5]] },
+  { id: 'd', t: ['“In vain I have struggled. It will not do. My feelings will not be repressed. ', 'You must allow me to tell you how ardently I admire and love you.', '”'], r: [['♥', 23], ['😮', 11]], th: 18 },
+  { id: 'e', t: ['Elizabeth’s astonishment was beyond expression. ', 'She stared, coloured, doubted, and was silent.', ' This he considered sufficient encouragement; and the avowal of all that he felt, and had long felt for her, immediately followed.'], r: [['😂', 8]] },
+  { id: 'f', t: ['He spoke well; but there were feelings besides those of the heart to be detailed; and ', 'he was not more eloquent on the subject of tenderness than of pride', '.'], r: [['🔥', 6]], th: 4 },
+];
+const END = [
+  { id: 'z', t: ['With the Gardiners, they were always on the most intimate terms. Darcy, as well as Elizabeth, really loved them; and they were both ever sensible of the warmest gratitude towards the persons who, by bringing her into Derbyshire, ', 'had been the means of uniting them', '.'], r: [] },
+];
+const MARKS = [2, 4.5, 7, 9, 12, 15, 17, 19.5, 22, 24, 27, 30, 32, 35, 37, 40, 42, 44, 46, 48, 50, 51.5, 53, 54.2, 55.2];
+const STEPS = [[16, 26], [17, 28], [18, 30], [20, 33], [22, 36]];
+const HLS = ['sand', 'aqua', 'rose', 'mint', 'lavender'];
+const NAMES = { sand: 'Sand', aqua: 'Aqua', rose: 'Rose', mint: 'Mint', lavender: 'Lavender' };
+const PAST_HL = [
+  { c: 'rose', ch: 1, q: 'It is a truth universally acknowledged, that a single man in possession of a good fortune, must be in want of a wife.' },
+  { c: 'aqua', ch: 6, q: 'Happiness in marriage is entirely a matter of chance.' },
+  { c: 'mint', ch: 11, q: 'I declare after all there is no enjoyment like reading!' },
+];
+const CONF = {
+  shelf: { base: 'shelf', dl: 'downloading' }, shelfReady: { base: 'shelf', dl: 'ready' }, shelfPaused: { base: 'shelf', dl: 'paused' },
+  shelfLow: { base: 'shelf', dl: 'low' }, shelfSkeleton: { base: 'shelf', skeleton: true }, shelfMini: { base: 'shelf', dl: 'ready', mini: true },
+  opening: { base: 'opening' },
+  reader: { base: 'reader' }, readerChrome: { base: 'reader', chrome: true }, readerSynced: { base: 'reader', chrome: true, toast: 'synced' },
+  readerOffline: { base: 'reader', chrome: true, toast: 'offline' }, readerPartial: { base: 'reader', chrome: true, toast: 'partial' },
+  readerMini: { base: 'reader', chrome: true, mini: true },
+  display: { base: 'reader', sheet: 'display' }, displaySans: { base: 'reader', sheet: 'display', face: 'sans', step: 4 },
+  contents: { base: 'reader', sheet: 'contents' }, highlights: { base: 'reader', sheet: 'contents', tab: 'highlights', hl: { b: 'sand', c: 'mint' } },
+  scrub: { base: 'reader', chrome: true, scrub: 71 }, jumped: { base: 'reader', chrome: true, ch: 44 },
+  select: { base: 'reader', sel: 'c' }, shareSelect: { base: 'reader', sel: 'c', share: true }, shareTo: { base: 'reader', sel: 'c', sheet: 'shareTo' }, highlighted: { base: 'reader', hl: { b: 'sand', c: 'mint' } },
+  lastPage: { base: 'reader', ch: 61 },
+  finish1: { base: 'finish', stage: 1 }, finish2: { base: 'finish', stage: 2 }, finish: { base: 'finish', stage: 3 },
+  finishNext: { base: 'finish', stage: 3, scrolled: true }, finishSolo: { base: 'finish', stage: 3, solo: true },
+  player: { base: 'player', playing: true }, playerPaused: { base: 'player' }, playerLapsed: { base: 'player', playing: true, lapsed: true },
+  nonPro: { base: 'reader', sheet: 'audio', audio: 'nonPro' }, onItsWay: { base: 'reader', sheet: 'audio', audio: 'onItsWay' },
+  textOnly: { base: 'reader', sheet: 'audio', audio: 'textOnly' }, unavailable: { base: 'reader', sheet: 'audio', audio: 'unavailable' },
+};
+// Hugeicons stroke-rounded (free set), loaded once and shared by every instance
+const HG_NAMES = {
+  search: 'Search01Icon', headphones: 'HeadphonesIcon', type: 'TextFontIcon', list: 'LeftToRightListBulletIcon', highlighter: 'HighlighterIcon',
+  chevronLeft: 'ArrowLeft01Icon', chevronRight: 'ArrowRight01Icon', chevronDown: 'ArrowDown01Icon', arrowLeft: 'ArrowLeft02Icon',
+  x: 'Cancel01Icon', check: 'Tick02Icon', checkCircle: 'CheckmarkCircle02Icon', pauseCircle: 'PauseCircleIcon', alert: 'Alert02Icon',
+  pause: 'PauseIcon', play: 'PlayIcon', skipBack: 'PreviousIcon', skipFwd: 'NextIcon', rotCcw: 'GoBackward15SecIcon', rotCw: 'GoForward15SecIcon',
+  undo: 'Undo02Icon', smilePlus: 'SmileIcon', eyeOff: 'ViewOffSlashIcon', message: 'BubbleChatIcon',
+  home: 'Home02Icon', shelf: 'Bookshelf02Icon', communities: 'UserGroup02Icon', you: 'User02Icon', book: 'BookOpen01Icon',
+};
+window.__fbHG = window.__fbHG || { data: null, p: import('https://esm.sh/@hugeicons/core-free-icons?exports=' + Object.values(HG_NAMES).join(',')).then(m => { window.__fbHG.data = m; return m; }).catch(() => null) };
+const h = React.createElement;
+function icon(name, size = 24, fill = false) {
+  const m = window.__fbHG.data, nodes = (m && m[HG_NAMES[name]]) || [];
+  return h('svg', { width: size, height: size, viewBox: '0 0 24 24', fill: 'none', 'aria-hidden': true, style: { display: 'block', flex: 'none' } },
+    nodes.map(([tag, a], i) => {
+      const { key, ...rest } = a;
+      const out = { ...rest, key: i, strokeWidth: 1.5 };
+      if (rest.stroke) out.stroke = 'currentColor';
+      if (fill || (rest.fill && rest.fill !== 'none')) out.fill = 'currentColor';
+      return h(tag, out);
+    }));
+}
+let IC_CACHE = null;
+function buildIC() {
+  if (IC_CACHE) return IC_CACHE;
+  const ic = {
+    search: icon('search', 20), headphones: icon('headphones', 30), headphonesSm: icon('headphones', 20), typeSm: icon('type', 20), listSm: icon('list', 20), highlighterSm: icon('highlighter', 20),
+    chevronDown: icon('chevronDown', 22), chevronRightSm: icon('chevronRight', 18), xSm: icon('x', 20),
+    checkCircleSm: icon('checkCircle', 20), checkCircleXs: icon('checkCircle', 14), pauseCircleSm: icon('pauseCircle', 20), alertSm: icon('alert', 20),
+    smilePlus: icon('smilePlus', 22), eyeOffSm: icon('eyeOff', 16), messageSm: icon('message', 20), undoSm: icon('undo', 18), rotCcwSm: icon('rotCcw', 24),
+    skipBack: icon('skipBack', 26), skipFwd: icon('skipFwd', 26), rotCcw: icon('rotCcw', 32), rotCw: icon('rotCw', 32),
+    play: icon('play', 32, true), pause: icon('pause', 32, true), pauseSm: icon('pause', 20, true),
+    home: icon('home', 22), shelf: icon('shelf', 22), communities: icon('communities', 22), you: icon('you', 22), bookSm: icon('book', 20), usersSm: icon('communities', 20),
+    chevronLeft: icon('chevronLeft', 22), arrowLeft: icon('arrowLeft', 22), check: icon('check', 16),
+    signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+    wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+    battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+  };
+  if (window.__fbHG.data) IC_CACHE = ic;
+  return ic;
+}
+
+class Component extends DCLogic {
+  componentDidMount() {
+    if (!window.__fbHG.data) window.__fbHG.p.then(() => this.forceUpdate());
+  }
+  renderVals() {
+    const p = this.props, c = CONF[p.screen] || CONF.shelf;
+    const IC = buildIC();
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36;
+    const base = c.base, ch = c.ch || 34, step = c.step ?? 2, [fs, lh] = STEPS[step];
+    const hl = c.hl || { b: 'sand' }, showMargin = ch <= 34;
+    const paras = (ch === 61 ? END : CH34).map(x => {
+      const reactions = [];
+      if (showMargin) { x.r.forEach(([e, n]) => reactions.push({ emoji: e, count: n })); if (x.th) reactions.push({ thread: true, replies: x.th }); }
+      const sel = c.sel === x.id;
+      return { pre: x.t[0], hl: x.t[1], post: x.t[2], reactions, menu: sel,
+        hlBg: hl[x.id] ? `var(--highlight-${hl[x.id]})` : (sel ? 'var(--highlight-lavender)' : 'transparent'),
+        ring: sel ? '0 0 0 2px var(--focus-ring)' : 'none' };
+    });
+    const pct = c.scrub || (ch === 34 ? 55.2 : ch === 61 ? 99.6 : (ch - 1) / 61 * 100 + 0.8);
+    const posCh = c.scrub ? Math.floor(c.scrub / 100 * 61) + 1 : ch;
+    const chapters = [];
+    for (let n = 29; n <= 39; n++) chapters.push({ n, mins: `${8 + ((n * 7) % 9)} min`, cur: n === 34, done: n < 34, check: IC.check,
+      bg: n === 34 ? 'color-mix(in oklab, var(--text) 9%, transparent)' : 'transparent', color: n > 34 ? 'var(--text-secondary)' : 'var(--text)', weight: n === 34 ? 700 : 400 });
+    const hls = PAST_HL.slice(); CH34.forEach(x => { if (hl[x.id]) hls.push({ c: hl[x.id], ch: 34, q: x.t[1] }); });
+    const ring = on => on ? '0 0 0 2px var(--surface), 0 0 0 4px var(--focus-ring)' : '0 0 0 0 transparent';
+    const theme = p.theme || 'flip';
+    const chrome = base === 'reader' && !!c.chrome;
+    const st = c.stage || 0;
+    const aura = p.aura ?? true;
+    const tabOn = 'color-mix(in oklab, var(--surface) 80%, transparent)', tabOnSh = 'inset 0 1px 0 rgba(255,255,255,.2), 0 4px 12px -4px rgba(8,6,30,.35)';
+    return {
+      theme, ios, android: !ios, radius: ios ? 52 : 34, statusH, topPad: statusH + 6, ic: IC, backIcon: ios ? IC.chevronLeft : IC.arrowLeft,
+      showAura: aura && (base === 'shelf' || base === 'opening' || base === 'finish' || base === 'player'),
+      auraH: base === 'player' || base === 'opening' ? 844 : 620,
+      isShelf: base === 'shelf', isOpening: base === 'opening', isReader: base === 'reader', isFinish: base === 'finish', isPlayer: base === 'player',
+      sbColor: base === 'reader' ? 'var(--reader-text)' : 'var(--text)', sbOp: base === 'reader' && !chrome && !c.sheet ? 0.35 : 1,
+      skeleton: !!c.skeleton, notSkeleton: !c.skeleton, heroPad: c.dl === 'low' ? 12 : 16, heroW: c.dl === 'low' ? 104 : 128,
+      dlDownloading: c.dl === 'downloading', dlReady: c.dl === 'ready', dlPaused: c.dl === 'paused', dlLow: c.dl === 'low',
+      readerTop: statusH + 70, ch, volume: ch > 42 ? 'Volume III' : 'Volume II',
+      marginQuiet: !showMargin && ch !== 61, isMid: ch === 34, isEnd: ch === 61, paras, fs, lh,
+      fontFamily: c.face === 'sans' ? 'var(--font-sans)' : 'var(--font-serif)',
+      swatches: HLS.map(k => ({ bg: `var(--highlight-${k})` })),
+      chrome, noChrome: base === 'reader' && !chrome, panelBottom: ios ? 30 : 22, footBottom: ios ? 26 : 20,
+      marks: MARKS.map(m => ({ left: `${m}%` })), fillW: `${pct}%`, thumbScale: c.scrub ? 1.2 : 1, scrubbing: !!c.scrub,
+      posLabel: `Ch ${posCh} · ${Math.round(pct)}%`, minsLeft: ch === 61 ? '1 min left in book' : ch === 34 ? '9 min left in chapter' : '12 min left in chapter', minsShort: ch === 34 ? '9 min left' : '12 min left',
+      toastBottom: ios ? 150 : 142, textBottom: chrome ? 0 : (ios ? 56 : 46), toastSynced: c.toast === 'synced', toastOffline: c.toast === 'offline', toastPartial: c.toast === 'partial',
+      jumped: ch !== 34 && ch !== 61, backPillBottom: ios ? 156 : 148,
+      finishScroll: c.scrolled ? -480 : 0, qScale: st >= 2 ? 1 : st === 1 ? 0.55 : 0, coverOp: 1, coverY: st >= 2 ? 0 : 18,
+      showTitle: st >= 2, showRoom: st >= 3 && !c.solo, showSolo: st >= 3 && !!c.solo, showCta: st >= 3, showRoomOrSolo: st >= 3,
+      ctaLabel: c.solo ? 'Start a community' : 'Join the conversation', ctaPad: ios ? 34 : 26,
+      playerPad: ios ? 40 : 30, playIcon: c.playing ? IC.pause : IC.play, playScale: c.playing ? 1 : 0.92, lapsed: !!c.lapsed,
+      mini: !!c.mini, miniBottom: base === 'shelf' ? (ios ? 104 : 96) : (ios ? 154 : 146),
+      scrim: c.sheet === 'contents' || c.sheet === 'audio' || c.sheet === 'shareTo', sheetShare: c.sheet === 'shareTo',
+      shareBg: c.share ? 'color-mix(in oklab, var(--text) 16%, transparent)' : 'transparent',
+      sheetDisplay: c.sheet === 'display', sheetContents: c.sheet === 'contents', sheetAudio: c.sheet === 'audio', sheetPadIn: ios ? 26 : 20, contentsTop: statusH + 24,
+      steps: STEPS.map((_, i) => ({ size: 8 + i * 2, bg: i <= step ? 'var(--progress-fill)' : 'color-mix(in oklab, var(--text) 18%, transparent)' })),
+      serifRing: ring(c.face !== 'sans'), sansRing: ring(c.face === 'sans'),
+      lightRing: ring(theme === 'light'), flipRing: ring(theme === 'flip'), darkRing: ring(theme === 'dark'),
+      tabIsContents: c.tab !== 'highlights', tabIsHighlights: c.tab === 'highlights',
+      tabCBg: c.tab !== 'highlights' ? tabOn : 'transparent', tabHBg: c.tab === 'highlights' ? tabOn : 'transparent',
+      tabCSh: c.tab !== 'highlights' ? tabOnSh : 'none', tabHSh: c.tab === 'highlights' ? tabOnSh : 'none',
+      chapters, highlights: hls.map(x => ({ bg: `var(--highlight-${x.c})`, name: NAMES[x.c], ch: x.ch, q: x.q })),
+      aNonPro: c.audio === 'nonPro', aOnWay: c.audio === 'onItsWay', aTextOnly: c.audio === 'textOnly', aUnavailable: c.audio === 'unavailable',
+    };
+  }
+}
+</script>
+</body>
+</html>

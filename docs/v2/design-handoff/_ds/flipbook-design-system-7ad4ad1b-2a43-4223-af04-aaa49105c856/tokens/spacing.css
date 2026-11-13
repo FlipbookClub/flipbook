@@ -1,0 +1,35 @@
+/* Spacing (4px grid), radius and size tokens. */
+:root{
+  --space-1:4px; /* Icon to label. */
+  --space-2:8px; /* Inside chips and tight rows. */
+  --space-3:12px; /* Between related rows; bubble padding. */
+  --space-4:16px; /* Card padding. */
+  --space-5:20px; /* Screen side margin; button side padding. */
+  --space-6:24px; /* Between sections. */
+  --space-8:32px; /* Between major groups. */
+  --space-10:40px; /* Sheet top padding. */
+  --space-12:48px; /* Hero spacing on welcome and finish screens. */
+  --radius-cover:4px; /* Book covers, always with a divider hairline. */
+  --radius-sm:8px; /* Chips, inputs, highlights. */
+  --radius-md:12px; /* Classic: buttons, cards, chat bubbles. */
+  --radius-lg:16px; /* Classic: sheets and dialogs. */
+  --radius-card-glass:28px; /* Glass cards (22–28). */
+  --radius-bubble:22px; /* Glass chat bubbles. */
+  --radius-bubble-tail:8px; /* Glass bubble tail corner. */
+  --radius-sheet-glass:36px; /* Glass sheets, inset 8px from the screen edges. */
+  --radius-row:22px; /* Glass option rows and inline banners. */
+  --radius-full:9999px; /* Avatars, pills, badges. */
+  --touch-target:44px; /* Minimum hit area for any control. */
+  --button-height:48px; /* Standard button. */
+  --icon-md:24px; /* Default icon. Hugeicons stroke-rounded, 1.5 stroke. */
+  --icon-sm:20px; /* Icons in chips and captions, 1.5 stroke. */
+  --button-height-lg:52px; /* Primary in footers and sheets. */
+  --tabbar-height:64px;
+  --duration-fast:150ms; /* @kind other */ /* Press states, toggles. */
+  --duration-base:200ms; /* @kind other */ /* Sheets, fades, reaction arrival. */
+  --duration-slow:250ms; /* @kind other */ /* The five animated moments: reaction sent, reaction arrived, voice recording, going live, finishing a book. */
+  --ease-out:cubic-bezier(0.2,0,0,1); /* @kind other */
+  --screen-margin:var(--space-5);
+  --card-padding:var(--space-4);
+  --section-gap:var(--space-6);
+}

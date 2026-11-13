@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/glass.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" data-style="{{ look }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ sBook }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ bookFootH }}px;overflow:hidden;padding:4px 20px 0;display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;gap:18px;align-items:flex-end">
+        <div style="position:relative;flex:none"><sc-if value="{{ bk.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider),0 18px 30px -14px rgba(8,6,30,.6)"><dc-import name="Cover" book="{{ bk.art }}" width="{{ 116 }}" hint-size="116px,174px"></dc-import></div></sc-if><sc-if value="{{ bk.tone }}"><div style="border-radius:4px;box-shadow:0 18px 30px -14px rgba(8,6,30,.6)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ bk.t }}" author="{{ bk.a }}" tone="{{ bk.tone }}" width="{{ 116 }}" hint-size="116px,174px"></x-import></div></sc-if><span style="position:absolute;right:6px;bottom:6px;height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.02em;white-space:nowrap;color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">{{ bk.band }}</span></div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;padding-bottom:2px"><sc-if value="{{ bk.kicker }}"><span class="t-caption" style="color:var(--text-accent);letter-spacing:.04em">{{ bk.kicker }}</span></sc-if><span class="t-h1" style="color:var(--text);text-wrap:balance">{{ bk.t }}</span><span class="t-body" style="color:var(--text-secondary)">{{ bk.a }}</span></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));padding:14px 0;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <sc-for list="{{ bk.facts }}" as="x" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:{{ x.line }}"><span style="font:700 17px/24px var(--font-sans);color:var(--text)">{{ x.v }}</span><span class="t-caption" style="color:var(--text-muted)">{{ x.l }}</span></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" icon="{{ giftIcon }}" hint-size="100%,48px">Gift a copy</x-import>
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" icon="{{ commIcon }}" hint-size="100%,48px">Start a community</x-import>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px"><span class="t-label" style="color:var(--text-secondary)">About this book</span><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ bk.desc }}</span></div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <span style="text-align:center;font:600 13px/18px var(--font-sans);color:var(--text-accent)">{{ bk.priceLine }}</span>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">{{ bk.primary }}</x-import>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">{{ bk.secondary }}</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sYou }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;bottom:0;overflow:hidden;padding:8px 20px 0;display:flex;flex-direction:column;gap:20px">
+      <sc-if value="{{ grace }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" action-label="Fix" hint-size="100%,64px">Your Pro renewal didn’t go through. Pro stays on until 15 Oct.</x-import></sc-if>
+      <div style="display:flex;gap:16px;align-items:center;padding-top:4px">
+        <span style="width:64px;height:64px;flex:none;border-radius:9999px;display:grid;place-items:center;font:700 24px/1 var(--font-sans);color:var(--text);background:var(--highlight-lavender)">L</span>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:4px"><span class="t-h1" style="color:var(--text)">Lara Adéyẹmí</span><sc-if value="{{ youPro }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Badge" kind="pro" hint-size="44px,22px">Pro</x-import></sc-if><sc-if value="{{ youFree }}"><span class="t-caption" style="color:var(--text-muted)">Reads mostly at night</span></sc-if></div>
+      </div>
+      <sc-if value="{{ youFree }}">
+        <div style="display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <span class="t-h3" style="color:var(--text)">Flipbook Pro</span>
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Free classics, 15% off every other book, audio, and your own communities.</span>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" style="margin-top:8px" hint-size="110px,40px">See plans</x-import>
+        </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <sc-for list="{{ youRows }}" as="r" hint-placeholder-count="5">
+          <div style="min-height:56px;padding:0 16px;border-radius:var(--radius-row);display:flex;align-items:center;gap:14px;background:var(--option-fill)">
+            <span style="display:flex;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ r.icon }}" size="sm" hint-size="20px,20px"></x-import></span>
+            <span style="flex:1;font:600 15px/20px var(--font-sans);color:var(--text)">{{ r.t }}</span>
+            <sc-if value="{{ r.v }}"><span class="t-caption" style="color:{{ r.vc }}">{{ r.v }}</span></sc-if>
+            <span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sPlans }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ plansFootH }}px;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:18px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h1" style="color:var(--text)">Flipbook Pro</span><span class="t-body" style="color:var(--text-secondary)">Every plan includes all of this.</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ perks }}" as="k" hint-placeholder-count="7"><div style="display:flex;gap:10px;align-items:flex-start"><span style="display:flex;color:var(--text-accent)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="check" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text);text-wrap:pretty">{{ k }}</span></div></sc-for>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <sc-for list="{{ plans }}" as="o" hint-placeholder-count="3"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.OptionRow" label="{{ o.l }}" description="{{ o.d }}" selected="{{ o.sel }}" hint-size="100%,64px"></x-import></sc-for>
+      </div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" loading="{{ subscribing }}" hint-size="100%,52px">{{ planCta }}</x-import>
+      <span class="t-caption" style="text-align:center;color:var(--text-muted)">{{ planFoot }}</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sWelcome }}">
+    <div style="position:absolute;left:0;right:0;top:{{ welcomeTop }}px;bottom:{{ welcomeFootH }}px;overflow:hidden;padding:0 24px;display:flex;flex-direction:column;gap:24px">
+      <div style="display:flex;flex-direction:column;align-items:flex-start;gap:12px">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Badge" kind="pro" hint-size="44px,22px">Pro</x-import>
+        <span style="font:700 32px/40px var(--font-sans);letter-spacing:-0.01em;color:var(--text)">Welcome to Pro, Lara</span>
+        <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">It’s on now. Here’s what you can do from today.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <sc-for list="{{ unlocked }}" as="u" hint-placeholder-count="5">
+          <div style="display:flex;gap:14px;align-items:center;padding:14px 16px;border-radius:var(--radius-row);background:var(--option-fill)">
+            <span style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:var(--tint-2)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ u.icon }}" size="sm" hint-size="20px,20px"></x-import></span>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ u.t }}</span><span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary)">{{ u.d }}</span></div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Keep listening to Pride and Prejudice</x-import>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">Look around</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sManage }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <span class="t-h1" style="color:var(--text)">Pro</span>
+      <sc-if value="{{ grace }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,80px">Your renewal didn’t go through. Pro stays on until 15 Oct while the {{ storeTitle }} tries again.</x-import></sc-if>
+      <div style="display:flex;flex-direction:column;gap:14px;padding:18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+        <div style="display:flex;align-items:center;justify-content:space-between"><span class="t-h2" style="color:var(--text)">Annual</span><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Badge" kind="pro" hint-size="44px,22px">Pro</x-import></div>
+        <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding-top:12px;box-shadow:inset 0 1px 0 var(--divider)">
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font:700 17px/24px var(--font-sans);color:var(--text)">₦24,000</span><span class="t-caption" style="color:var(--text-muted)">a year</span></div>
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font:700 17px/24px var(--font-sans);color:{{ renewColor }}">{{ renewV }}</span><span class="t-caption" style="color:var(--text-muted)">{{ renewL }}</span></div>
+        </div>
+      </div>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="{{ manageVariant }}" size="lg" full-width="{{ true }}" icon="{{ shareIcon }}" hint-size="100%,52px">{{ manageCta }}</x-import>
+      <div style="display:flex;flex-direction:column;gap:4px">
+        <div style="min-height:56px;padding:0 16px;border-radius:var(--radius-row);display:flex;align-items:center;gap:14px;background:var(--option-fill)"><span style="flex:1;font:600 15px/20px var(--font-sans);color:var(--text)">Change plan</span><span class="t-caption" style="color:var(--text-muted)">Monthly, quarterly or annual</span><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span></div>
+        <div style="min-height:56px;padding:0 16px;border-radius:var(--radius-row);display:flex;align-items:center;gap:14px;background:var(--option-fill)"><span style="flex:1;font:600 15px/20px var(--font-sans);color:var(--text)">What’s included</span><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span></div>
+      </div>
+      <span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">To cancel, use the {{ storeTitle }}. Pro stays on to the end of the period you’ve paid for, and your books, highlights and communities stay either way.</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sSpecials }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-caption" style="color:var(--text-accent);letter-spacing:.04em">OCTOBER · PICKED BY THE EDITORS</span><span class="t-h1" style="color:var(--text)">Specials</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">{{ specialsIntro }}</span></div>
+      <sc-for list="{{ specials }}" as="b" hint-placeholder-count="4">
+        <div style="display:flex;gap:14px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill)">
+          <div style="flex:none"><sc-if value="{{ b.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ b.art }}" width="{{ 56 }}" hint-size="56px,84px"></dc-import></div></sc-if><sc-if value="{{ b.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ b.t }}" author="{{ b.a }}" tone="{{ b.tone }}" width="{{ 56 }}" hint-size="56px,84px"></x-import></sc-if></div>
+          <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ b.t }}</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ b.a }}</span><span style="margin-top:4px;font:700 14px/18px var(--font-sans);color:var(--text-accent)">{{ b.line }}</span></div>
+          <sc-if value="{{ specialsPro }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" hint-size="70px,40px">Read</x-import></sc-if>
+          <sc-if value="{{ specialsFree }}"><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span></sc-if>
+        </div>
+      </sc-for>
+      <sc-if value="{{ specialsFree }}">
+        <div style="display:flex;align-items:center;gap:12px;padding:16px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+          <span class="t-body" style="flex:1;color:var(--text-secondary);text-wrap:pretty">Chapter 1 of each is free to read now.</span>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" hint-size="110px,40px">See plans</x-import>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ header }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.AppHeader" title="" on-back="{{ noop }}" actions="{{ hActions }}" dc-props="{{ hProps }}" hint-size="100%,60px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ tabbar }}">
+    <div style="position:absolute;left:0;right:0;bottom:{{ tabBottom }}px;z-index:24">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.TabBar" items="{{ tabItems }}" value="{{ tabValue }}" hint-size="100%,80px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ classicSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Get this book" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <div style="display:flex;gap:14px;align-items:center">
+            <div style="flex:none;border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="middlemarch" width="{{ 48 }}" hint-size="48px,72px"></dc-import></div>
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:1px"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">Middlemarch</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">George Eliot</span></div>
+            <span style="flex:none;height:22px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);color:var(--text);background:var(--glass-fill-strong);box-shadow:var(--float-ring)">Band A</span>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));padding:14px 0;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px"><span style="font:700 20px/28px var(--font-sans);color:var(--text)">₦500</span><span class="t-caption" style="color:var(--text-muted)">4-week rental</span></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;box-shadow:inset 1px 0 0 var(--divider)"><span style="font:700 20px/28px var(--font-sans);color:var(--text-accent)">Free</span><span class="t-caption" style="color:var(--text-muted)">With Pro, no end date</span></div>
+          </div>
+          <span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">Every classic is free with Pro, for as long as you have it.</span>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Get it ₦500</x-import>
+            <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">Read it free with Pro</x-import>
+          </div>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ store }}">
+    <div style="position:absolute;inset:0;z-index:45;background:var(--scrim)"></div>
+    <div style="position:absolute;left:8px;right:8px;bottom:8px;z-index:46;padding:18px 20px {{ footPad }}px;border-radius:32px;background:var(--surface-raised);border:1.5px dashed var(--border);display:flex;flex-direction:column;gap:14px">
+      <span style="align-self:flex-start;height:24px;padding:0 10px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.08em;color:var(--text-secondary);border:1.5px dashed var(--border)">WIREFRAME · {{ storeName }} SUBSCRIPTION</span>
+      <div style="display:flex;gap:12px;align-items:center"><span style="width:48px;height:48px;border-radius:12px;border:1.5px dashed var(--border)"></span><div style="display:flex;flex-direction:column"><span class="t-label" style="color:var(--text-secondary)">Flipbook Pro · Annual</span><span class="t-caption" style="color:var(--text-muted)">Auto-renewing subscription</span></div></div>
+      <sc-for list="{{ storeRows }}" as="r" hint-placeholder-count="3"><div style="display:flex;justify-content:space-between;padding:10px 0;border-top:1.5px dashed var(--border)"><span class="t-caption" style="color:var(--text-muted)">{{ r.l }}</span><span class="t-caption" style="color:var(--text-secondary)">{{ r.v }}</span></div></sc-for>
+      <div style="height:52px;border-radius:14px;display:grid;place-items:center;background:var(--tint-2)"><span class="t-label" style="color:var(--text-secondary)">{{ storeCta }}</span></div>
+      <span class="t-caption" style="text-align:center;color:var(--text-muted)">System UI. On success, the welcome replaces the plan picker.</span>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text);pointer-events:none"><span style="font:600 16px/20px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text);pointer-events:none"><span style="font:500 14px/18px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;specialPrompt&quot;,&quot;classicPrompt&quot;,&quot;youFree&quot;,&quot;youPro&quot;,&quot;youGrace&quot;,&quot;plans&quot;,&quot;subscribing&quot;,&quot;storeSub&quot;,&quot;welcome&quot;,&quot;manage&quot;,&quot;manageGrace&quot;,&quot;specialsFree&quot;,&quot;specialsPro&quot;],&quot;default&quot;:&quot;plans&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;glass&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;glass&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const h = React.createElement;
+const IC = {
+  signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+  wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+  battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+};
+const BK = {
+  special: { t: 'The House on Ọba Road', a: 'Kémi Ọlátúnjí', tone: 'plum', band: 'Band C', kicker: 'A FLIPBOOK SPECIAL', facts: [['8 hr', 'Reading time'], ['30', 'Chapters'], ['Pro', 'Access']], desc: 'Three generations of one Ibadan family, one house they all claim, and the summer the youngest decides to sell it.', priceLine: 'Included with Pro', primary: 'Read it with Pro', secondary: 'Read chapter 1 free' },
+  classic: { t: 'Middlemarch', a: 'George Eliot', art: 'middlemarch', band: 'Band A', facts: [['32 hr', 'Reading time'], ['86', 'Chapters'], ['4 weeks', 'Rental']], desc: '', priceLine: '', primary: 'Get it ₦500', secondary: '' },
+};
+const PERKS = ['Unlimited classics (Band A), free', '15% off every other book', 'Flipbook Specials, the members’ shelf', 'Start and host communities', '6-week rentals instead of 4', 'Unlimited communities instead of 3', 'Audio narration'];
+const PLANS = [['Monthly', '₦2,500 a month'], ['Quarterly', '₦6,750 every 3 months · ₦2,250 a month'], ['Annual', '₦24,000 a year · ₦2,000 a month']];
+const UNLOCKED = [
+  { icon: 'headphones', t: 'Listen to Pride and Prejudice', d: 'Pick up the audio at Chapter 12, where you are.' },
+  { icon: 'book', t: 'Every classic, free', d: 'Middlemarch, Persuasion and the rest open straight away.' },
+  { icon: 'sparkle', t: 'Specials and 15% off', d: 'The members’ shelf, and less on every other book.' },
+  { icon: 'users', t: 'Start a community', d: 'Choose the book, invite people, host sessions.' },
+  { icon: 'calendar', t: '6-week rentals', d: 'And as many communities as you like.' },
+];
+const SPECIALS = [['The House on Ọba Road', 'Kémi Ọlátúnjí', 'plum'], ['Things Fall Apart', 'Chinua Achebe', 'coral'], ['The Fishermen', 'Chigozie Obioma', 'aqua'], ['The Secret Lives of Baba Segi’s Wives', 'Lola Shoneyin', 'ivory']];
+const S = {
+  specialPrompt: { v: 'book', b: 'special' }, classicPrompt: { v: 'book', b: 'classic', classicSheet: true },
+  youFree: { v: 'you' }, youPro: { v: 'you', pro: true }, youGrace: { v: 'you', pro: true, grace: true },
+  plans: { v: 'plans' }, subscribing: { v: 'plans', subscribing: true }, storeSub: { v: 'plans', store: true },
+  welcome: { v: 'welcome' },
+  manage: { v: 'manage' }, manageGrace: { v: 'manage', grace: true },
+  specialsFree: { v: 'specials' }, specialsPro: { v: 'specials', pro: true },
+};
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, c = S[p.screen] || S.plans, v = c.v;
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, footPad = ios ? 34 : 24;
+    const store = ios ? 'App Store' : 'Google Play';
+    const b = BK[c.b] || BK.special;
+    const bk = { ...b, art: b.art || '', tone: b.tone || '', kicker: b.kicker || '', facts: b.facts.map(([v, l], i) => ({ key: i, v, l, line: i ? 'inset 1px 0 0 var(--divider)' : 'none' })) };
+    const DS = window.FlipbookDesignSystem_7ad4ad;
+    return {
+      theme: p.theme || 'flip', look: p.look || 'glass', ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, noop: () => {}, footPad,
+      bodyTop: statusH + 64, sheetPad: footPad - 16, welcomeTop: statusH + 40,
+      hProps: { style: { background: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } },
+      hActions: v === 'book' ? [{ icon: 'share', label: 'Share' }] : [],
+      header: v === 'book' || v === 'plans' || v === 'manage' || v === 'specials',
+      giftIcon: DS ? h(DS.Icon, { name: 'send', size: 'sm' }) : null, commIcon: DS ? h(DS.Icon, { name: 'users', size: 'sm' }) : null, shareIcon: DS ? h(DS.Icon, { name: 'share', size: 'sm' }) : null,
+      sBook: v === 'book', bk, bookFootH: 12 + 52 + 60 + 26 + footPad, classicSheet: !!c.classicSheet,
+      sYou: v === 'you', youFree: v === 'you' && !c.pro, youPro: !!c.pro, grace: !!c.grace,
+      youRows: [
+        ...(c.pro ? [{ key: 'pro', icon: 'sparkle', t: 'Pro', v: c.grace ? 'Renewal didn’t go through' : 'Annual · renews 8 Oct 2027', vc: c.grace ? 'var(--warning)' : 'var(--text-muted)' }] : []),
+        { key: 'r', icon: 'calendar', t: 'Reading rhythm', v: '', vc: '' }, { key: 'n', icon: 'bell', t: 'Notifications', v: '', vc: '' },
+        { key: 'h', icon: 'book-open', t: 'Highlights', v: '', vc: '' }, { key: 's', icon: 'more', t: 'Settings', v: '', vc: '' },
+      ],
+      tabbar: v === 'you', tabValue: 'you', tabBottom: ios ? 18 : 12,
+      tabItems: [{ value: 'home', label: 'Home', icon: 'house' }, { value: 'shelf', label: 'Shelf', icon: 'shelf' }, { value: 'comm', label: 'Communities', icon: 'users' }, { value: 'you', label: 'You', icon: 'user' }],
+      sPlans: v === 'plans', perks: PERKS, plans: PLANS.map(([l, d], i) => ({ key: i, l, d, sel: i === 2 })),
+      plansFootH: 12 + 52 + 8 + 16 + footPad, subscribing: !!c.subscribing, planCta: c.subscribing ? 'Subscribing' : 'Subscribe ₦24,000 a year', planFoot: `Billed through the ${store}. Cancel any time there.`,
+      store: !!c.store, storeName: ios ? 'APP STORE' : 'GOOGLE PLAY', storeCta: ios ? 'Double-click to subscribe' : 'Subscribe',
+      storeRows: [{ key: 1, l: 'Price', v: '₦24,000 a year' }, { key: 2, l: 'Renews', v: '8 Oct 2027' }, { key: 3, l: 'Account', v: 'lara@…' }],
+      sWelcome: v === 'welcome', unlocked: UNLOCKED, welcomeFootH: 12 + 52 + 60 + footPad,
+      sManage: v === 'manage', storeTitle: store,
+      renewV: c.grace ? 'Retrying' : '8 Oct 2027', renewL: c.grace ? 'Pro on until 15 Oct' : 'Renews', renewColor: c.grace ? 'var(--warning)' : 'var(--text)',
+      manageCta: c.grace ? `Update payment in ${store}` : `Manage in ${store}`, manageVariant: c.grace ? 'primary' : 'secondary',
+      sSpecials: v === 'specials', specialsPro: !!c.pro, specialsFree: v === 'specials' && !c.pro,
+      specialsIntro: c.pro ? 'A members’ shelf. Every book here is yours to read while you have Pro.' : 'A members’ shelf, picked each month. Every book here is included with Pro.',
+      specials: SPECIALS.map(([t, a, tone], i) => ({ key: i, t, a, tone, art: '', line: 'Included with Pro' })),
+    };
+  }
+}
+</script>
+</body>
+</html>

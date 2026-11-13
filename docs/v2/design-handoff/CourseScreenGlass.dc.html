@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/glass.css">
+  <link rel="stylesheet" href="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/tokens/base.css">
+  <script src="_ds/flipbook-design-system-7ad4ad1b-2a43-4223-af04-aaa49105c856/_ds_bundle.js"></script>
+  <style>a{color:var(--ghost)}a:hover{color:var(--ghost-hover)}</style>
+</helmet>
+<div data-theme="{{ theme }}" data-style="{{ look }}" style="width:390px;height:844px;position:relative;overflow:hidden;border-radius:{{ radius }}px;background:var(--surface);color:var(--text);font-family:var(--font-sans);box-shadow:0 0 0 8px #121212,0 0 0 9px #464646,0 40px 80px -24px #12121266;isolation:isolate;flex:none">
+
+  <sc-if value="{{ sCreate }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ footH }}px;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-caption" style="color:var(--text-muted)">Step 1 of 2</span><span class="t-h1" style="color:var(--text)">Create a course</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Students see this when they’re invited.</span></div>
+      <sc-for list="{{ fields }}" as="f" hint-placeholder-count="3"><div style="display:flex;flex-direction:column;gap:6px"><span class="t-label" style="color:var(--text-secondary)">{{ f.l }}</span><div style="height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;background:var(--field-fill);box-shadow:{{ f.ring }}"><span class="t-body" style="color:var(--text)">{{ f.v }}</span></div></div></sc-for>
+      <div style="display:flex;flex-direction:column;gap:6px"><span class="t-label" style="color:var(--text-secondary)">Term dates</span><div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px"><div style="height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;gap:10px;background:var(--field-fill)"><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="calendar" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text)">14 Sep</span></div><div style="height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;gap:10px;background:var(--field-fill)"><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="calendar" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text)">12 Dec</span></div></div><span class="t-caption" style="color:var(--text-muted)">The course closes to new students on the end date.</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sInvite }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ footH }}px;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-caption" style="color:var(--text-muted)">Step 2 of 2</span><span class="t-h1" style="color:var(--text)">Invite the class</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Paste student emails from your class list. Commas, spaces or new lines all work.</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px;padding:14px;border-radius:16px;background:var(--field-fill);box-shadow:var(--selected-ring)">
+        <div style="display:flex;flex-wrap:wrap;gap:6px"><sc-for list="{{ emails }}" as="e" hint-placeholder-count="8"><span style="height:28px;padding:0 10px;border-radius:9999px;display:inline-flex;align-items:center;font:500 12px/1 var(--font-sans);white-space:nowrap;color:{{ e.c }};background:{{ e.bg }}">{{ e.t }}</span></sc-for></div>
+        <span class="t-caption" style="color:var(--text-muted)">and 23 more</span>
+      </div>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,64px">One address looks incomplete: tunde.ade@unilag. Fix it or leave it out.</x-import>
+      <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--radius-row);background:var(--option-fill)"><span style="display:flex;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="lock" size="sm" hint-size="20px,20px"></x-import></span><span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">Only invited emails can join. You’ll see the class as totals, never who is where.</span></div>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sCourse }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:0;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;gap:14px;align-items:center">
+        <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Emblem" name="ENG 214" size="{{ 56 }}" hint-size="56px,56px"></x-import>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:2px"><span class="t-caption" style="color:var(--text-muted);letter-spacing:.04em">ENG 214 · UNIVERSITY OF LAGOS</span><span class="t-h2" style="color:var(--text)">The African Novel</span><span class="t-caption" style="color:var(--text-secondary)">{{ termLine }}</span></div>
+      </div>
+      <sc-if value="{{ closed }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Banner" kind="warning" hint-size="100%,64px">Term ended on 12 Dec. The course is closed to new students; the class keeps its books and highlights.</x-import></sc-if>
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.SegmentedTabs" items="{{ tabs }}" value="{{ tab }}" hint-size="100%,44px"></x-import>
+
+      <sc-if value="{{ tList }}">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <sc-for list="{{ list }}" as="b" hint-placeholder-count="3">
+            <div style="display:flex;gap:14px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill)">
+              <div style="flex:none"><sc-if value="{{ b.tone }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="{{ b.t }}" author="{{ b.a }}" tone="{{ b.tone }}" width="{{ 48 }}" hint-size="48px,72px"></x-import></sc-if><sc-if value="{{ b.art }}"><div style="border-radius:4px;box-shadow:0 0 0 1px var(--divider)"><dc-import name="Cover" book="{{ b.art }}" width="{{ 48 }}" hint-size="48px,72px"></dc-import></div></sc-if><sc-if value="{{ b.pdf }}"><span style="width:48px;height:72px;border-radius:4px;display:grid;place-items:center;font:700 11px/1 var(--font-sans);letter-spacing:.06em;color:var(--text-secondary);background:var(--tint-2);box-shadow:0 0 0 1px var(--divider)">PDF</span></sc-if></div>
+              <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:3px">
+                <span style="align-self:flex-start;height:20px;padding:0 8px;border-radius:9999px;display:inline-flex;align-items:center;font:700 11px/1 var(--font-sans);color:var(--text);background:{{ b.tagBg }}">{{ b.tag }}</span>
+                <span style="font:600 15px/20px var(--font-sans);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ b.t }}</span>
+                <span class="t-caption" style="font-size:13px;color:var(--text-secondary)">{{ b.sub }}</span>
+              </div>
+              <sc-if value="{{ student }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="sm" hint-size="72px,40px">{{ b.btn }}</x-import></sc-if>
+            </div>
+          </sc-for>
+          <sc-if value="{{ lecturer }}"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="md" full-width="{{ true }}" icon="{{ plusIcon }}" hint-size="100%,48px">Add to reading list</x-import></sc-if>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tProgress }}">
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <sc-for list="{{ progress }}" as="p" hint-placeholder-count="2">
+            <div style="display:flex;flex-direction:column;gap:12px;padding:16px 18px;border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring)">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><span class="t-label" style="color:var(--text-secondary)">{{ p.t }}</span><span class="t-caption" style="color:var(--text-muted)">{{ p.week }}</span></div>
+              <span style="font:700 20px/28px var(--font-sans);color:var(--text);text-wrap:balance">{{ p.head }}</span>
+              <div style="display:flex;height:10px;border-radius:9999px;overflow:hidden;gap:2px"><sc-for list="{{ p.segs }}" as="s" hint-placeholder-count="3"><span style="flex:{{ s.n }};background:{{ s.bg }}"></span></sc-for></div>
+              <div style="display:flex;flex-direction:column;gap:6px"><sc-for list="{{ p.segs }}" as="s" hint-placeholder-count="3"><div style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:9999px;flex:none;background:{{ s.bg }}"></span><span class="t-caption" style="flex:1;font-size:13px;color:var(--text-secondary)">{{ s.l }}</span><span class="t-caption" style="font-size:13px;color:var(--text)">{{ s.v }}</span></div></sc-for></div>
+            </div>
+          </sc-for>
+          <span class="t-caption" style="color:var(--text-muted);text-wrap:pretty;padding:0 4px">Totals only. Flipbook never shows where an individual student is, and groups of fewer than 3 show as “a few”.</span>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ tTools }}">
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <sc-for list="{{ tools }}" as="r" hint-placeholder-count="5">
+            <div style="min-height:56px;padding:0 16px;border-radius:var(--radius-row);display:flex;align-items:center;gap:14px;background:var(--option-fill)">
+              <span style="display:flex;color:var(--text-secondary)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="{{ r.icon }}" size="sm" hint-size="20px,20px"></x-import></span>
+              <span style="flex:1;font:600 15px/20px var(--font-sans);color:var(--text)">{{ r.t }}</span>
+              <sc-if value="{{ r.v }}"><span class="t-caption" style="color:var(--text-muted)">{{ r.v }}</span></sc-if>
+              <span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="chevron-right" size="sm" hint-size="20px,20px"></x-import></span>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ sStudents }}">
+    <div style="position:absolute;left:0;right:0;top:{{ bodyTop }}px;bottom:{{ footH }}px;overflow:hidden;padding:0 20px;display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span class="t-h1" style="color:var(--text)">Students</span><span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">29 joined · 3 invited. Names only; reading positions stay private.</span></div>
+      <div style="height:48px;padding:0 16px;border-radius:var(--radius-button);display:flex;align-items:center;gap:10px;background:var(--field-fill)"><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="search" size="sm" hint-size="20px,20px"></x-import></span><span class="t-body" style="color:var(--text-muted)">Search by name or email</span></div>
+      <sc-for list="{{ roster }}" as="g" hint-placeholder-count="2">
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <span class="t-label" style="color:var(--text-secondary);padding:0 4px">{{ g.t }}</span>
+          <div style="border-radius:var(--radius-card);background:var(--card-fill);box-shadow:var(--card-ring);overflow:hidden">
+            <sc-for list="{{ g.rows }}" as="s" hint-placeholder-count="4">
+              <div style="min-height:60px;padding:0 14px 0 12px;display:flex;align-items:center;gap:12px">
+                <span class="t-label" style="width:36px;height:36px;flex:none;border-radius:9999px;display:grid;place-items:center;color:var(--text);background:{{ s.bg }}">{{ s.i }}</span>
+                <div style="flex:1;min-width:0;min-height:60px;display:flex;align-items:center;gap:10px;box-shadow:{{ s.line }}">
+                  <div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">{{ s.n }}</span><span class="t-caption" style="color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ s.e }}</span></div>
+                  <sc-if value="{{ s.act }}"><span class="t-label" style="color:var(--ghost)">{{ s.act }}</span></sc-if>
+                  <sc-if value="{{ s.more }}"><span style="display:flex;color:var(--text-muted)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="more" size="sm" hint-size="20px,20px"></x-import></span></sc-if>
+                </div>
+              </div>
+            </sc-for>
+          </div>
+        </div>
+      </sc-for>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ foot }}">
+    <div style="position:absolute;left:0;right:0;bottom:0;z-index:20;padding:12px 20px {{ footPad }}px;display:flex;flex-direction:column;gap:8px;background:var(--chrome-fill);backdrop-filter:var(--chrome-blur);-webkit-backdrop-filter:var(--chrome-blur);box-shadow:var(--chrome-edge)">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">{{ foot }}</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ header }}">
+    <div style="position:absolute;left:0;right:0;top:{{ statusH }}px;z-index:20">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.AppHeader" title="" on-back="{{ noop }}" actions="{{ hActions }}" dc-props="{{ hProps }}" hint-size="100%,60px"></x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ toast }}">
+    <div style="position:absolute;left:16px;right:16px;bottom:{{ footPad }}px;z-index:30">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Toast" kind="positive" hint-size="100%,56px">{{ toast }}</x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ addSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Add to reading list" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <div style="display:flex;gap:14px;align-items:center"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.BookCover" title="The Fishermen" author="Chigozie Obioma" tone="aqua" width="{{ 48 }}" hint-size="48px,72px"></x-import><div style="flex:1;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">The Fishermen</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">Chigozie Obioma · Band C</span></div><span class="t-label" style="color:var(--ghost)">Change</span></div>
+          <div style="display:flex;flex-direction:column;gap:8px"><sc-for list="{{ reqOpts }}" as="o" hint-placeholder-count="2"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.OptionRow" label="{{ o.l }}" description="{{ o.d }}" selected="{{ o.sel }}" hint-size="100%,64px"></x-import></sc-for></div>
+          <div style="height:56px;padding:0 16px;border-radius:var(--radius-row);display:flex;align-items:center;justify-content:space-between;background:var(--option-fill)"><span style="font:600 15px/20px var(--font-sans);color:var(--text)">Weeks</span><span class="t-body" style="color:var(--text-secondary)">10 to 12</span></div>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Add to list</x-import>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">Share a PDF instead</x-import>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ pdfSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Share a PDF" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <div style="display:flex;gap:14px;align-items:center;padding:10px 14px 10px 10px;border-radius:var(--radius-row);background:var(--option-fill)"><span style="width:40px;height:52px;flex:none;border-radius:4px;display:grid;place-items:center;font:700 10px/1 var(--font-sans);letter-spacing:.06em;color:var(--text-secondary);background:var(--tint-2)">PDF</span><div style="flex:1;min-width:0;display:flex;flex-direction:column"><span style="font:600 15px/20px var(--font-sans);color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">Achebe interview, 1994.pdf</span><span class="t-caption" style="font-size:13px;color:var(--text-secondary)">2.1 MB · 14 pages</span></div></div>
+          <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:var(--radius-row);background:var(--selected-fill);box-shadow:var(--selected-ring)"><span style="width:22px;height:22px;flex:none;border-radius:6px;display:grid;place-items:center;color:var(--surface);background:var(--text)"><x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Icon" name="check" size="{{ 16 }}" hint-size="16px,16px"></x-import></span><span class="t-body" style="color:var(--text);text-wrap:pretty">I hold the rights to share this with my class, or it’s covered by my institution’s licence.</span></div>
+          <span class="t-caption" style="font-size:13px;line-height:18px;color:var(--text-secondary);text-wrap:pretty">Only students in ENG 214 can open it. It isn’t downloadable or shared outside the course.</span>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="primary" size="lg" full-width="{{ true }}" hint-size="100%,52px">Share with the class</x-import>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ elsewhereSheet }}">
+    <div style="position:absolute;inset:0;z-index:45">
+      <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Sheet" overlay="{{ true }}" title="Grading and attendance" on-close="{{ noop }}" hint-size="100%,100%">
+        <div style="display:flex;flex-direction:column;gap:14px;padding-bottom:{{ sheetPad }}px">
+          <span style="font:600 20px/28px var(--font-sans);color:var(--text);text-wrap:pretty">Use your classroom tool for that, and Flipbook for the reading.</span>
+          <span class="t-body" style="color:var(--text-secondary);text-wrap:pretty">Flipbook doesn’t do grades, attendance or video. It keeps the class on the same books, with totals you can share.</span>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="secondary" size="lg" full-width="{{ true }}" hint-size="100%,52px">See class progress</x-import>
+          <x-import component-from-global-scope="FlipbookDesignSystem_7ad4ad.Button" variant="ghost" size="lg" full-width="{{ true }}" hint-size="100%,52px">Done</x-import>
+        </div>
+      </x-import>
+    </div>
+  </sc-if>
+
+  <sc-if value="{{ ios }}" hint-placeholder-val="{{ true }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:54px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:16px 32px 0 46px;color:var(--text);pointer-events:none"><span style="font:600 16px/20px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.signal }}{{ ic.wifi }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:124px;height:36px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:9999px;background:var(--text);z-index:60;opacity:.85"></div>
+  </sc-if>
+  <sc-if value="{{ android }}">
+    <div style="position:absolute;top:0;left:0;right:0;height:36px;z-index:60;display:flex;align-items:center;justify-content:space-between;padding:0 22px;color:var(--text);pointer-events:none"><span style="font:500 14px/18px var(--font-sans)">9:41</span><div style="display:flex;gap:6px;align-items:center">{{ ic.wifi }}{{ ic.signal }}{{ ic.battery }}</div></div>
+    <div style="position:absolute;top:12px;left:50%;transform:translateX(-50%);width:12px;height:12px;border-radius:9999px;background:#121212;z-index:61"></div>
+    <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:108px;height:4px;border-radius:9999px;background:var(--text);z-index:60;opacity:.7"></div>
+  </sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;410px&quot;,&quot;height&quot;:&quot;864px&quot;},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;create&quot;,&quot;invite&quot;,&quot;invited&quot;,&quot;list&quot;,&quot;addBook&quot;,&quot;sharePdf&quot;,&quot;student&quot;,&quot;progress&quot;,&quot;tools&quot;,&quot;students&quot;,&quot;elsewhere&quot;,&quot;closed&quot;],&quot;default&quot;:&quot;list&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;light&quot;,&quot;flip&quot;,&quot;dark&quot;],&quot;default&quot;:&quot;flip&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;look&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;glass&quot;,&quot;classic&quot;],&quot;default&quot;:&quot;glass&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;platform&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;ios&quot;,&quot;android&quot;],&quot;default&quot;:&quot;ios&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;gradingRow&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:false,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Manage&quot;}}">
+const h = React.createElement;
+const IC = {
+  signal: h('svg', { width: 18, height: 12, viewBox: '0 0 18 12', fill: 'currentColor' }, [0, 1, 2, 3].map(i => h('rect', { key: i, x: i * 5, y: 9 - i * 3, width: 3, height: 3 + i * 3, rx: 1 }))),
+  wifi: h('svg', { width: 16, height: 12, viewBox: '0 0 16 12', fill: 'currentColor' }, h('path', { d: 'M8 12 5.6 9.4a3.4 3.4 0 0 1 4.8 0zM2.8 6.6a7.4 7.4 0 0 1 10.4 0l-1.4 1.4a5.4 5.4 0 0 0-7.6 0zM0 3.8a11.3 11.3 0 0 1 16 0l-1.4 1.4a9.3 9.3 0 0 0-13.2 0z' })),
+  battery: h('svg', { width: 26, height: 12, viewBox: '0 0 26 12', fill: 'none' }, h('rect', { x: 0.5, y: 0.5, width: 22, height: 11, rx: 3.5, stroke: 'currentColor', opacity: 0.4 }), h('rect', { x: 2, y: 2, width: 17, height: 8, rx: 2, fill: 'currentColor' }), h('rect', { x: 24, y: 4, width: 1.5, height: 4, rx: 0.75, fill: 'currentColor', opacity: 0.4 })),
+};
+const LIST = [
+  { t: 'Things Fall Apart', a: 'Chinua Achebe', tone: 'coral', req: true, sub: 'Weeks 1 to 3 · Ch 3 by Friday', stu: 'Ch 2 · 14%', btn: 'Read' },
+  { t: 'Achebe interview, 1994', a: '', pdf: true, req: false, sub: 'Shared by you · 14 pages', stu: 'Shared by Dr Okonkwo', btn: 'Open' },
+  { t: 'Stay With Me', a: 'Ayọ̀bámi Adébáyọ̀', art: 'stay', req: true, sub: 'Weeks 4 to 6', stu: 'Weeks 4 to 6 · Chapter 1 free', btn: 'Get' },
+  { t: 'The Fishermen', a: 'Chigozie Obioma', tone: 'aqua', req: false, sub: 'Weeks 10 to 12', stu: 'Weeks 10 to 12', btn: 'Get' },
+];
+const PROG = [
+  { t: 'Things Fall Apart · Required', week: 'Week 3', head: '18 of 32 are on Chapter 3', segs: [['Chapter 3 or further', 18, 'var(--progress-fill)'], ['Chapters 1 to 2', 10, 'var(--highlight-aqua)'], ['Not started', 4, 'var(--tint-3)']] },
+  { t: 'Achebe interview · Optional', week: 'Shared 2 Oct', head: '21 of 32 have opened it', segs: [['Opened', 21, 'var(--progress-fill)'], ['Not opened', 11, 'var(--tint-3)']] },
+];
+const S = {
+  create: { v: 'create' }, invite: { v: 'invite' },
+  invited: { v: 'course', tab: 'list', role: 'lecturer', toast: '32 invites sent. Students join with one tap.' },
+  list: { v: 'course', tab: 'list', role: 'lecturer' }, addBook: { v: 'course', tab: 'list', role: 'lecturer', sheet: 'add' }, sharePdf: { v: 'course', tab: 'list', role: 'lecturer', sheet: 'pdf' },
+  student: { v: 'course', tab: 'list', role: 'student' },
+  progress: { v: 'course', tab: 'progress', role: 'lecturer' },
+  tools: { v: 'course', tab: 'tools', role: 'lecturer' }, elsewhere: { v: 'course', tab: 'tools', role: 'lecturer', sheet: 'elsewhere' },
+  closed: { v: 'course', tab: 'list', role: 'lecturer', closed: true }, students: { v: 'students' },
+};
+class Component extends DCLogic {
+  renderVals() {
+    const p = this.props, c = S[p.screen] || S.list, v = c.v;
+    const ios = (p.platform || 'ios') !== 'android', statusH = ios ? 54 : 36, footPad = ios ? 34 : 24;
+    const stu = c.role === 'student';
+    const DS = window.FlipbookDesignSystem_7ad4ad;
+    return {
+      theme: p.theme || 'flip', look: p.look || 'glass', ios, android: !ios, radius: ios ? 52 : 34, statusH, ic: IC, noop: () => {}, footPad,
+      bodyTop: statusH + 64, sheetPad: footPad - 16, footH: 12 + 52 + footPad,
+      hProps: { style: { background: 'transparent', boxShadow: 'none', backdropFilter: 'none', WebkitBackdropFilter: 'none' } },
+      hActions: v === 'course' && !stu ? [{ icon: 'share', label: 'Invite' }] : [], header: true,
+      foot: v === 'create' ? 'Next' : v === 'invite' ? 'Send 32 invites' : v === 'students' ? 'Invite more students' : '',
+      sStudents: v === 'students',
+      roster: [
+        { t: 'Invited, not joined yet', rows: [['Kunle Bakare', 'kunle.b@unilag.edu.ng'], ['Ngozi Eze', 'ngozi.e@unilag.edu.ng'], ['Tunde Adé', 'tunde.ade@unilag.edu.ng']].map(([n, e]) => ({ n, e, act: 'Resend', more: false })) },
+        { t: 'Joined', rows: [['Adaeze Nwosu', 'adaeze.n@unilag.edu.ng'], ['Bolu Ojo', 'bolu.ojo@unilag.edu.ng'], ['Chika Eke', 'chika.e@unilag.edu.ng']].map(([n, e]) => ({ n, e, act: '', more: true })) },
+      ].map((g, gi) => ({ key: gi, t: g.t, rows: g.rows.map((s, j) => ({ key: j, ...s, i: s.n[0], bg: `var(--highlight-${['sand', 'aqua', 'rose', 'mint', 'lavender'][(gi * 3 + j) % 5]})`, line: j ? 'inset 0 1px 0 var(--divider)' : 'none' })) })),
+      sCreate: v === 'create', fields: [['Institution', 'University of Lagos'], ['Course code', 'ENG 214'], ['Course name', 'The African Novel']].map(([l, val], i) => ({ key: i, l, v: val, ring: i === 2 ? 'var(--selected-ring)' : 'none' })),
+      sInvite: v === 'invite',
+      emails: ['adaeze.n@unilag.edu.ng', 'bolu.ojo@unilag.edu.ng', 'chika.e@unilag.edu.ng', 'dayo.k@unilag.edu.ng', 'efe.o@unilag.edu.ng', 'tunde.ade@unilag', 'funke.b@unilag.edu.ng', 'ifeanyi.m@unilag.edu.ng', 'jumoke.a@unilag.edu.ng'].map((t, i) => ({ key: i, t, c: t === 'tunde.ade@unilag' ? 'var(--on-warning-surface)' : 'var(--text)', bg: t === 'tunde.ade@unilag' ? 'var(--warning-surface)' : 'var(--tint-2)' })),
+      sCourse: v === 'course', closed: !!c.closed, termLine: c.closed ? '32 students · term ended 12 Dec' : stu ? 'Dr Ngozi Okonkwo · term ends 12 Dec' : '32 students · term ends 12 Dec',
+      tab: c.tab, tabs: stu ? [{ value: 'list', label: 'Reading list' }, { value: 'chat', label: 'Chat' }] : [{ value: 'list', label: 'Reading list' }, { value: 'progress', label: 'Progress' }, { value: 'tools', label: 'Manage' }],
+      tList: c.tab === 'list', tProgress: c.tab === 'progress', tTools: c.tab === 'tools', student: stu, lecturer: !stu && !c.closed,
+      plusIcon: DS ? h(DS.Icon, { name: 'plus', size: 'sm' }) : null,
+      list: LIST.map((b, i) => ({ key: i, t: b.t, a: b.a, tone: b.tone || '', art: b.art || '', pdf: !!b.pdf, tag: b.req ? 'Required' : 'Optional', tagBg: b.req ? 'var(--selected-fill)' : 'var(--tint-2)', sub: stu ? b.stu : b.sub, btn: b.btn })),
+      progress: PROG.map((x, i) => ({ key: i, t: x.t, week: x.week, head: x.head, segs: x.segs.map(([l, n, bg], j) => ({ key: j, l, n, v: String(n), bg })) })),
+      tools: [['users', 'Students', '32'], ['share', 'Invite more', 'Until 12 Dec'], ['calendar', 'Term dates', '14 Sep to 12 Dec'], ...(p.gradingRow ? [['circle-check', 'Grading and attendance', '']] : []), ['x', 'Close the course early', '']].map(([icon, t, val], i) => ({ key: i, icon, t, v: val })),
+      toast: c.toast || '',
+      addSheet: c.sheet === 'add', reqOpts: [['Required', 'Students see it first, with the weeks you set'], ['Optional', 'Listed after required reading']].map(([l, d], i) => ({ key: i, l, d, sel: i === 1 })),
+      pdfSheet: c.sheet === 'pdf', elsewhereSheet: c.sheet === 'elsewhere',
+    };
+  }
+}
+</script>
+</body>
+</html>
