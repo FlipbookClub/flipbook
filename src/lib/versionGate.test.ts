@@ -1,7 +1,3 @@
-// @ts-nocheck — TEMPORARY. This file is written for Jest, but the repo has no
-// test runner or Jest types until S0-5 (CI) lands, and tsconfig includes every
-// .ts file, so without this line `tsc` would fail on `describe`/`expect`.
-// S0-5: remove this comment once Jest and its types are installed.
 import {
   compareVersions,
   isUpdateRequired,
