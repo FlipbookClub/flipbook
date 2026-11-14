@@ -68,6 +68,11 @@ This is the big lever: most beta bugs are JS and can be hot-fixed OTA.
 Entry is gated by **invite codes** minted from waitlist signups. Gating is OFF
 until you set the Convex env flag, so dev/pre-beta needs no codes.
 
+> **Decided 14 Nov 2026: the gate stays off in production.** Anyone with the
+> TestFlight or Play testing link can create an account; access is controlled
+> by who receives those links. See `docs/v2/environments.md` → "Production
+> decisions". The steps below are kept for if that changes.
+
 **Turn it on (when the beta opens):**
 ```
 npx convex env set BETA_INVITE_REQUIRED 1   # prod: add --prod
