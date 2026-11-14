@@ -326,4 +326,18 @@ export default defineSchema({
     emailLower: v.string(),
     sentAt: v.number(),
   }).index("by_campaign_and_email", ["campaign", "emailLower"]),
+
+  // S0-2 minimum-version gate. One row with key "app", edited by hand in the
+  // dashboard; read by appConfig.getMinVersion. Versions are version NAMES
+  // ("1.0.1"), never build numbers. The update links live only here, not in
+  // code. An install below its platform's minimum sees a blocking update
+  // screen; a missing row, an unreadable version or an empty link all mean
+  // "don't block" (src/lib/versionGate.ts).
+  appConfig: defineTable({
+    key: v.string(),
+    minVersionIos: v.string(),
+    minVersionAndroid: v.string(),
+    updateUrlIos: v.string(),
+    updateUrlAndroid: v.string(),
+  }).index("by_key", ["key"]),
 });

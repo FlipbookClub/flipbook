@@ -8,6 +8,7 @@
  * @module
  */
 
+import type * as appConfig from "../appConfig.js";
 import type * as bookmarks from "../bookmarks.js";
 import type * as books from "../books.js";
 import type * as chapters from "../chapters.js";
@@ -38,6 +39,7 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  appConfig: typeof appConfig;
   bookmarks: typeof bookmarks;
   books: typeof books;
   chapters: typeof chapters;

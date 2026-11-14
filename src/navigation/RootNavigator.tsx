@@ -7,11 +7,14 @@ import { ActivityIndicator, View } from "react-native";
 import { AuthStack } from "./AuthStack";
 import { MainTabs } from "./MainTabs";
 import { OnboardingStack } from "./OnboardingStack";
+import { VersionGateProbe } from "./VersionGate";
 import { OnboardingModal, ONBOARDING_SEEN_KEY } from "@/components/features/OnboardingModal";
 import { getInitialURL, linkingConfig, linkingPrefixes, subscribeToURL } from "@/lib/deeplinks";
 import { usePushTokenRegistration } from "@/lib/notifications";
 import { useReactionQueueFlush } from "@/lib/useReactionQueueFlush";
 import { storage } from "@/lib/storage";
+import { GATE_OPEN, type VersionGateResult } from "@/lib/versionGate";
+import { UpdateRequiredScreen } from "@/screens/UpdateRequiredScreen";
 import { useTheme } from "@/theme/ThemeContext";
 import { api } from "../../convex/_generated/api";
 
@@ -35,6 +38,9 @@ export function RootNavigator() {
   // MMKV flag persists across app restarts; re-openable later via a help link.
   const [modalDismissed, setModalDismissed] = useState(false);
   const showModal = !!me && !modalDismissed && storage.getString(ONBOARDING_SEEN_KEY) !== "1";
+  // S0-2 minimum-version gate. Open until VersionGateProbe says otherwise;
+  // setVersionGate is stable, so the probe's effect only fires on a change.
+  const [versionGate, setVersionGate] = useState<VersionGateResult>(GATE_OPEN);
 
   // FR-028: register a push token once an onboarded user exists. Permission
   // prompt fires here (post-onboarding) rather than at first sign-in.
@@ -77,19 +83,31 @@ export function RootNavigator() {
   }
 
   return (
-    <NavigationContainer
-      theme={navTheme}
-      linking={{
-        prefixes: linkingPrefixes,
-        config: linkingConfig,
-        // TASK-089: combine OS deep links with push-notification taps so
-        // cold-launches from a notification route to the right screen.
-        getInitialURL,
-        subscribe: subscribeToURL,
-      }}
-    >
-      {content}
-    </NavigationContainer>
+    <>
+      {/* Mounted in both branches so the gate lifts as soon as the minimum
+          is lowered, without a restart. */}
+      <VersionGateProbe onChange={setVersionGate} />
+      {versionGate.blocked ? (
+        // Replaces the navigator outright, signed in or not: nothing behind
+        // the screen can be reached by a gesture, a deep link or a
+        // notification tap.
+        <UpdateRequiredScreen updateUrl={versionGate.updateUrl} />
+      ) : (
+        <NavigationContainer
+          theme={navTheme}
+          linking={{
+            prefixes: linkingPrefixes,
+            config: linkingConfig,
+            // TASK-089: combine OS deep links with push-notification taps so
+            // cold-launches from a notification route to the right screen.
+            getInitialURL,
+            subscribe: subscribeToURL,
+          }}
+        >
+          {content}
+        </NavigationContainer>
+      )}
+    </>
   );
 }
 
