@@ -136,6 +136,8 @@ Check each cell against `eas env:list` for every EAS environment. **Testers on t
 - Sentry: set `EXPO_PUBLIC_SENTRY_DSN` and `EXPO_PUBLIC_ENV` per EAS environment (Sentry org `flipbook-ni`, project `react-native` already configured in `app.json`). Trigger a test error from a development build.
 - PostHog: follow the steps at the top of `src/lib/analytics.ts` (package is already installed); set the key per EAS environment; rebuild the dev client.
 - Never send book text, reaction text or chat content to either service.
+- *Added by Moks, 14 Nov 2026:* attach the environment (`EXPO_PUBLIC_ENV`) to every PostHog event, so development traffic can be filtered out.
+- *Added by Moks, 14 Nov 2026:* cover source-map upload. `SENTRY_AUTH_TOKEN` is a secret in all three EAS environments; check what still blocks the upload (e.g. `SENTRY_DISABLE_AUTO_UPLOAD` in `preview`). Current state: `docs/v2/environments.md`.
 
 **Done when:** both dashboards show events from a development build.
 
