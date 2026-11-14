@@ -11,6 +11,11 @@
       // `development` environment. See docs/v2/environments.md for how that
       // environment does (and does not) reach a development build's code.
       "environment": "development",
+      // Node for the EAS build machine, pinned to match .nvmrc (22). EAS
+      // needs an exact version: "22" and "22.x" fail eas.json validation.
+      // Development profiles only until a build proves it; then preview
+      // and production get the same line in their own pull request.
+      "node": "22.23.4",
       // S0-3: builds "Flipbook Dev" (com.flipbook.club.dev), which installs
       // beside the v1 app. Read by app.config.ts. Only the two development
       // profiles set this; preview and production must never.
@@ -25,6 +30,7 @@
       "developmentClient": true,
       "distribution": "internal",
       "environment": "development",
+      "node": "22.23.4",
       "env": {
         "APP_VARIANT": "development"
       },
