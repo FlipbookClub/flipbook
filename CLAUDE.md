@@ -40,7 +40,7 @@ Business context in `business/` (untracked; read only if you genuinely need it, 
 - Every screen implements the loading, empty, error and offline states the spec lists.
 - Write tests first for anything touching spoilers, access or money (`docs/v2/testing/strategy.md`).
 - One concern per pull request. If the spec and the code disagree, stop and flag it.
-- Never run git merge, rebase or `git clean`. Moks handles git.
+- Commit and push only to your own `claude/` branch and open a pull request. Never merge into `main`, never force-push, rebase shared branches or run `git clean`. Fast-forwarding your own branch to `main` is allowed. Moks merges.
 
 <!-- convex-ai-start -->
 
