@@ -7,6 +7,12 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
+      // S0-3: builds "Flipbook Dev" (com.flipbook.club.dev), which installs
+      // beside the v1 app. Read by app.config.ts. Only the two development
+      // profiles set this; preview and production must never.
+      "env": {
+        "APP_VARIANT": "development"
+      },
       "ios": {
         "simulator": true
       }
@@ -14,6 +20,9 @@
     "development-device": {
       "developmentClient": true,
       "distribution": "internal",
+      "env": {
+        "APP_VARIANT": "development"
+      },
       "ios": {
         "simulator": false
       },
