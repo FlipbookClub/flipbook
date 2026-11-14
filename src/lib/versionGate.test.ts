@@ -47,8 +47,7 @@ describe("parseVersion", () => {
 
 describe("compareVersions", () => {
   it("compares segments as numbers, not strings", () => {
-    // DELIBERATELY WRONG (S0-5): proves CI goes red. Reverted in the next commit.
-    expect(compareVersions("1.0.10", "1.0.9")).toBe(-1);
+    expect(compareVersions("1.0.10", "1.0.9")).toBe(1);
     expect(compareVersions("1.0.9", "1.0.10")).toBe(-1);
     expect(compareVersions("1.10.0", "1.9.9")).toBe(1);
     expect(compareVersions("2.0.0", "1.99.99")).toBe(1);
