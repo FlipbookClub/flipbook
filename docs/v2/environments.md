@@ -13,12 +13,12 @@ Which backend, sign-in instance and monitoring each kind of build talks to. Depl
 | Where its code's settings come from | **The dev server on your Mac**, not the build. See "Development builds and EAS variables" | EAS `preview` environment, baked in at build time | EAS `production` environment, baked in at build time |
 | Convex deployment | **Development** | **Production** | **Production** |
 | Clerk instance | **Development** (`pk_test_` key) | **Production** (`pk_live_` key) | **Production** (`pk_live_` key) |
-| Sentry environment | `development`: DSN and `EXPO_PUBLIC_ENV` are in the EAS `development` environment, and reach the app only through the dev server | **Labelled `production` today** (no `EXPO_PUBLIC_ENV`); should be `preview` | `production` (the default) |
-| PostHog project | Key in the EAS `development` environment, reaching the app only through the dev server ⚠️ confirm it is the same project | One project, shared with production | One project, shared with preview |
+| Sentry environment | `development`. DSN and `EXPO_PUBLIC_ENV` are in the EAS `development` environment, and reach the app only through the dev server | `preview` | `production` |
+| PostHog project | Same project as preview and production. Key in the EAS `development` environment, reaching the app only through the dev server | Same project | Same project |
 
 **Testers on the `preview` profile use production data.** Their builds sign in with the production Clerk instance and read the production Convex deployment, the same as store users. Anything run against preview touches real readers: never seed, migrate or test destructively there. This includes S0-2's version-gate test, which blocks every tester for as long as the minimum is raised.
 
-**PostHog is one project for every build**, as the spec intended, but it cannot yet be filtered by environment: the app sends no environment property with its events (issue 3).
+**Sentry and PostHog are one project each for every build** (confirmed by Moks, 14 Nov 2026). Sentry separates builds by `EXPO_PUBLIC_ENV`. PostHog cannot yet: the app sends no environment property with its events (open issue 3).
 
 ## App variables
 
@@ -28,18 +28,20 @@ What the app reads (`src/`, `App.tsx`, `app.config.ts`) and where each is set.
 | --- | --- | --- | --- | --- |
 | `EXPO_PUBLIC_CONVEX_URL` | `src/lib/convex.ts`; the app refuses to start without it | `.env.local`: development deployment | Production deployment | Production deployment |
 | `EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY` | `src/lib/clerk.ts`; the app refuses to start without it | `.env.local`: `pk_test_` | `pk_live_` | `pk_live_` |
-| `EXPO_PUBLIC_SENTRY_DSN` | `src/lib/monitoring.ts`; Sentry is off without it | EAS `development` (not in `.env.local`) | Set | Set |
-| `EXPO_PUBLIC_ENV` | `src/lib/monitoring.ts`; Sentry environment name, default `production` | EAS `development`: `development` (not in `.env.local`) | **Not set** | Not set (default is right) |
-| `EXPO_PUBLIC_POSTHOG_KEY` | `src/lib/analytics.ts`; analytics is a no-op without it | EAS `development` (not in `.env.local`) | Set (same as production) | Set (same as preview) |
+| `EXPO_PUBLIC_SENTRY_DSN` | `src/lib/monitoring.ts`; Sentry is off without it | EAS `development` (not in `.env.local`) | Set | Set (all three: same Sentry project) |
+| `EXPO_PUBLIC_ENV` | `src/lib/monitoring.ts`; Sentry environment name, default `production` | EAS `development`: `development` (not in `.env.local`) | `preview` | `production` |
+| `EXPO_PUBLIC_POSTHOG_KEY` | `src/lib/analytics.ts`; analytics is a no-op without it | EAS `development` (not in `.env.local`) | Set | Set (all three: same PostHog project) |
 | `EXPO_PUBLIC_POSTHOG_HOST` | `src/lib/analytics.ts`, default `https://us.i.posthog.com` | Not set | Not set (default) | Not set (default) |
 | `APP_VARIANT` | `app.config.ts` (S0-3) | Set only by `npm run start:dev`, never in `.env.local` | Never | Never |
 
 Build-time only, read by the Sentry Expo plugin when the build is made:
 
-| Variable | EAS `preview` | EAS `production` | Effect |
-| --- | --- | --- | --- |
-| `SENTRY_AUTH_TOKEN` | Not set | Set | Uploads source maps, so production stack traces are readable |
-| `SENTRY_DISABLE_AUTO_UPLOAD` | Set | Not set | Skips the upload, so **preview crash reports have unreadable stack traces** |
+| Variable | EAS `development` | EAS `preview` | EAS `production` | Effect |
+| --- | --- | --- | --- | --- |
+| `SENTRY_AUTH_TOKEN` | Set (secret) | Set (secret) | Set (secret) | Lets the build upload source maps, so stack traces are readable |
+| `SENTRY_DISABLE_AUTO_UPLOAD` | Not set | **Set as of 14 Nov 2026** | Not set | Skips the upload even with the token, so while it stays, **preview crash reports have unreadable stack traces** (open issue 1) |
+
+A development build's code comes from the dev server, not the build, so the development upload covers only the native app. Development stack traces come from the dev server's own source maps.
 
 `.env.example` also lists RevenueCat keys. Nothing in the app reads them yet and no EAS environment sets them.
 
@@ -96,9 +98,9 @@ Both decided by Moks, 14 Nov 2026.
 
 None of these is fixed here; each belongs to the task named.
 
-1. **Preview crashes are filed as production in Sentry, with unreadable stack traces.** No `EXPO_PUBLIC_ENV` in the EAS `preview` environment, and source-map upload is disabled there. S0-6: set `EXPO_PUBLIC_ENV=preview`, and decide whether preview uploads source maps.
+1. **Source-map upload** (S0-6, decided by Moks, 14 Nov 2026). `SENTRY_AUTH_TOKEN` is now in all three EAS environments, but `SENTRY_DISABLE_AUTO_UPLOAD` was still set in `preview` when last checked, which skips the upload there. S0-6 covers the upload end to end, including that switch. The earlier labelling problem is fixed: preview now reports as `preview`.
 2. **Development builds don't receive their monitoring and analytics settings yet.** The EAS `development` environment holds the Sentry DSN, the PostHog key and `EXPO_PUBLIC_ENV=development`, but `npm run start:dev` doesn't load them, so they never reach a development build's code ("Development builds and EAS variables"). S0-6's exit gate needs a test error and a `sign_in` event from a development build, so this must be settled first.
-3. **PostHog cannot be filtered by environment.** The app sends no environment property with its events, so preview and production events are indistinguishable in the one project. S0-6.
+3. **PostHog cannot be filtered by environment** (S0-6, decided by Moks, 14 Nov 2026). The app sends no environment property with its events, so development, preview and production traffic is mixed in the one project. S0-6 attaches the environment to every event so development traffic can be filtered out.
 4. **No staging deployment** (raised by the spec). There is a development deployment and a production one, and testers are on production. Migration rehearsals ("Moving v1 users across", step 3, in `architecture.md`) need a copy of production data somewhere that is neither, so they have nowhere safe to run. Moks decides before the first migration, in Sprint 10.
 
 ## How to re-check
