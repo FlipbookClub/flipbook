@@ -79,6 +79,12 @@ export default ({ config }: ConfigContext): ExpoConfig => {
     ...base,
     name: DEV_NAME,
     scheme: DEV_SCHEME,
+    // Read at runtime by src/lib/appVariant.ts to show developer-only UI.
+    // Set here and nowhere else, so it can only exist in Flipbook Dev.
+    extra: {
+      ...base.extra,
+      appVariant: DEV_VARIANT,
+    },
     ios: {
       ...base.ios,
       bundleIdentifier: DEV_APP_ID,

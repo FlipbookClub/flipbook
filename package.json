@@ -4,7 +4,8 @@
   "main": "index.ts",
   "scripts": {
     "start": "expo start",
-    "start:dev": "APP_VARIANT=development expo start",
+    "start:dev": "eas env:exec development \"APP_VARIANT=development npx expo start\"",
+    "start:dev:offline": "APP_VARIANT=development expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",

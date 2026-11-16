@@ -32,7 +32,7 @@ What the app reads (`src/`, `App.tsx`, `app.config.ts`) and where each is set.
 | `EXPO_PUBLIC_ENV` | `src/lib/monitoring.ts`; Sentry environment name, default `production` | EAS `development`: `development` (not in `.env.local`) | `preview` | `production` |
 | `EXPO_PUBLIC_POSTHOG_KEY` | `src/lib/analytics.ts`; analytics is a no-op without it | EAS `development` (not in `.env.local`) | Set | Set (all three: same PostHog project) |
 | `EXPO_PUBLIC_POSTHOG_HOST` | `src/lib/analytics.ts`, default `https://us.i.posthog.com` | Not set | Not set (default) | Not set (default) |
-| `APP_VARIANT` | `app.config.ts` (S0-3) | Set only by `npm run start:dev`, never in `.env.local` | Never | Never |
+| `APP_VARIANT` | `app.config.ts` (S0-3); also gates the Developer section in Settings (S0-6) | Set only by `npm run start:dev` / `start:dev:offline`, never in `.env.local` | Never | Never |
 
 Build-time only, read by the Sentry Expo plugin when the build is made:
 
@@ -51,10 +51,11 @@ A development build does not carry its app code; it downloads it from the dev se
 
 So the EAS `development` environment is used while EAS builds the native app, but **its `EXPO_PUBLIC_` values never reach a development build's code on their own**. With `.env.local` as it is today, a development build has no Sentry DSN, no `EXPO_PUBLIC_ENV` and no PostHog key: Sentry and PostHog are off, whatever the EAS `development` environment holds.
 
-Two ways to get them in:
+**`npm run start:dev` loads them** (S0-6). It runs `eas env:exec development "APP_VARIANT=development npx expo start"`: the dev server starts inside the EAS `development` environment, so its Sentry DSN, PostHog key and `EXPO_PUBLIC_ENV` reach the app. Values already in the shell take precedence over `.env.local`, which still supplies the Convex URL and Clerk key.
 
-- **Start the dev server inside the EAS environment** (keeps `.env.local` as it is): `eas env:exec development "APP_VARIANT=development npx expo start"`. Values already in the shell take precedence over `.env.local`, so the three EAS values are added and `.env.local` still supplies the Convex URL and Clerk key.
-- **Pull them into a file:** `eas env:pull --environment development` writes `.env.local` (or another file with `--path`). Check what it does to the Convex URL and Clerk key already there before using it.
+**`npm run start:dev` needs `eas login` on the Mac**, because it fetches the EAS `development` environment each time it starts. Without a connection, `npm run start:dev:offline` starts the dev server as before: same app identity, but no Sentry or PostHog.
+
+`eas env:pull --environment development` is the alternative: it writes the values into `.env.local` (or another file with `--path`). Check what it does to the Convex URL and Clerk key already there before using it.
 
 Preview and production builds are different: their code is bundled on EAS during the build, so their EAS environments do reach it.
 
@@ -96,11 +97,11 @@ Both decided by Moks, 14 Nov 2026.
 
 ## Open issues
 
-None of these is fixed here; each belongs to the task named.
+Each belongs to the task named. Fixed ones are struck through and kept for the record.
 
 1. **Source-map upload** (S0-6, decided by Moks, 14 Nov 2026). `SENTRY_AUTH_TOKEN` is now in all three EAS environments, but `SENTRY_DISABLE_AUTO_UPLOAD` was still set in `preview` when last checked, which skips the upload there. S0-6 covers the upload end to end, including that switch. The earlier labelling problem is fixed: preview now reports as `preview`.
-2. **Development builds don't receive their monitoring and analytics settings yet.** The EAS `development` environment holds the Sentry DSN, the PostHog key and `EXPO_PUBLIC_ENV=development`, but `npm run start:dev` doesn't load them, so they never reach a development build's code ("Development builds and EAS variables"). S0-6's exit gate needs a test error and a `sign_in` event from a development build, so this must be settled first.
-3. **PostHog cannot be filtered by environment** (S0-6, decided by Moks, 14 Nov 2026). The app sends no environment property with its events, so development, preview and production traffic is mixed in the one project. S0-6 attaches the environment to every event so development traffic can be filtered out.
+2. ~~**Development builds don't receive their monitoring and analytics settings.**~~ Fixed in S0-6: `npm run start:dev` loads the EAS `development` environment.
+3. ~~**PostHog cannot be filtered by environment.**~~ Fixed in S0-6: every event and screen view carries `environment`, both on the event and as a registered property. Filter on `environment = development` to exclude development traffic. Users are identified by their internal id only; display names are no longer sent.
 4. **No staging deployment** (raised by the spec). There is a development deployment and a production one, and testers are on production. Migration rehearsals ("Moving v1 users across", step 3, in `architecture.md`) need a copy of production data somewhere that is neither, so they have nowhere safe to run. Moks decides before the first migration, in Sprint 10.
 
 ## How to re-check

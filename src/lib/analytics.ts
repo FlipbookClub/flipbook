@@ -1,16 +1,14 @@
-// Provider-agnostic analytics facade (TASK-091).
+// Provider-agnostic analytics facade (TASK-091, S0-6).
 //
-// It's a NO-OP today (logs in __DEV__) so call sites can be instrumented
-// without adding `posthog-react-native` — a native dependency — to the dev
-// client mid-testing. Flipping PostHog on is three steps + a rebuild:
+// PostHog is live wherever EXPO_PUBLIC_POSTHOG_KEY is set (all three EAS
+// environments; see docs/v2/environments.md) and a no-op that logs in __DEV__
+// everywhere else. Call sites use the typed `analytics` API below.
 //
-//   1. npx expo install posthog-react-native
-//   2. Set EXPO_PUBLIC_POSTHOG_KEY (and optional EXPO_PUBLIC_POSTHOG_HOST,
-//      defaults to https://us.i.posthog.com) in .env.local
-//   3. Uncomment the PostHog backend in `initAnalytics()` below, then rebuild
-//      the dev client / run an EAS build (native dep won't hot-reload).
+// Every event carries `environment` (EXPO_PUBLIC_ENV: development, preview or
+// production) so development traffic can be filtered out of the one project.
 //
-// Call sites use the typed `analytics` API and don't change when PostHog lands.
+// Never send book text, reaction text, chat content or a person's name.
+// Users are identified by their internal Convex id only.
 
 export type AnalyticsEvent =
   | "sign_up"
@@ -47,6 +45,47 @@ const noopBackend: AnalyticsBackend = {
 
 let backend: AnalyticsBackend = noopBackend;
 
+// The slice of the PostHog client this module uses, so the wrapper below can
+// be tested with a fake.
+export interface PostHogLike {
+  identify(distinctId: string, properties?: AnalyticsProps): void;
+  capture(event: string, properties?: AnalyticsProps): void;
+  screen(name: string, properties?: AnalyticsProps): void;
+  reset(): void;
+  register(properties: AnalyticsProps): Promise<void> | void;
+}
+
+export function environmentName(value: string | undefined): string {
+  return value && value.length > 0 ? value : "unknown";
+}
+
+// Wraps a PostHog client so every event and screen carries `environment`.
+// It is passed on each call as well as registered as a super property: the
+// call-level copy covers events sent before registration finishes, and the
+// registered copy covers what PostHog captures on its own (app lifecycle).
+// reset() clears super properties, so it registers them again.
+export function createPostHogBackend(client: PostHogLike, environment: string): AnalyticsBackend {
+  const common = { environment };
+  const registerCommon = () => {
+    try {
+      const pending = client.register(common);
+      if (pending && typeof pending.catch === "function") pending.catch(() => undefined);
+    } catch {
+      /* analytics must never break the app */
+    }
+  };
+  registerCommon();
+  return {
+    identify: (id, traits) => client.identify(id, traits),
+    capture: (event, props) => client.capture(event, { ...props, ...common }),
+    screen: (name, props) => client.screen(name, { ...props, ...common }),
+    reset: () => {
+      client.reset();
+      registerCommon();
+    },
+  };
+}
+
 // Called once at app boot. Stays on the no-op backend unless
 // EXPO_PUBLIC_POSTHOG_KEY is set — fully dormant (no native calls, safe on a
 // binary that doesn't bundle the PostHog SDK) until you configure a key and
@@ -61,12 +100,7 @@ export function initAnalytics(): void {
     const client = new PostHog(key, {
       host: process.env.EXPO_PUBLIC_POSTHOG_HOST ?? "https://us.i.posthog.com",
     });
-    backend = {
-      identify: (id, traits) => client.identify(id, traits),
-      capture: (event, props) => client.capture(event, props),
-      screen: (name, props) => client.screen(name, props),
-      reset: () => client.reset(),
-    };
+    backend = createPostHogBackend(client, environmentName(process.env.EXPO_PUBLIC_ENV));
   } catch (e) {
     devLog("PostHog init failed; staying on no-op", e);
   }

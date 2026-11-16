@@ -16,6 +16,7 @@ import {
   ChevronRight,
   CreditCard,
   LogOut,
+  Settings2,
   Trash2,
 } from "@/lib/icons";
 import { useAuth, useUser } from "@clerk/clerk-expo";
@@ -23,6 +24,8 @@ import { useMutation, useQuery } from "convex/react";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { ThemePicker } from "@/components/features/ThemePicker";
+import { isDevelopmentVariant } from "@/lib/appVariant";
+import { reportError } from "@/lib/monitoring";
 
 import { api } from "../../../convex/_generated/api";
 
@@ -274,6 +277,28 @@ export function SettingsScreen({ navigation }: Props) {
             }}
           />
         </Section>
+
+        {/* Flipbook Dev only (APP_VARIANT=development). Never present in a
+            tester or store build: see src/lib/appVariant.ts. */}
+        {isDevelopmentVariant() ? (
+          <Section title="Developer">
+            <Row
+              icon={<Settings2 size={18} color={colors.textPrimary} />}
+              label="Send a test error"
+              onPress={() => {
+                const ref = reportError(new Error("Flipbook test error from a development build"), {
+                  where: "developer_test_error",
+                });
+                Alert.alert(
+                  ref ? "Test error sent" : "Sentry is off",
+                  ref
+                    ? `Look for reference ${ref} in Sentry, under the development environment.`
+                    : "This build has no Sentry DSN, so nothing was sent.",
+                );
+              }}
+            />
+          </Section>
+        ) : null}
 
         <Section>
           <Row

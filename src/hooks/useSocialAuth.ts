@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import { useSSO } from "@clerk/clerk-expo";
 import * as Linking from "expo-linking";
 import type { OAuthStrategy } from "@clerk/types";
+import { analytics } from "@/lib/analytics";
 
 // Wraps Clerk's `useSSO` for Apple + Google. The same flow handles both sign-up
 // and sign-in: Clerk creates a session if the OAuth identity is new, otherwise
@@ -21,12 +22,18 @@ export function useSocialAuth() {
       setError(null);
       setProviderInFlight(strategy);
       try {
-        const { createdSessionId, setActive } = await startSSOFlow({
+        const { createdSessionId, setActive, signUp } = await startSSOFlow({
           strategy,
           redirectUrl: Linking.createURL("/"),
         });
         if (createdSessionId && setActive) {
           await setActive({ session: createdSessionId });
+          // Clerk creates the session on the sign-up object when this Apple or
+          // Google identity is new, and on the sign-in object when it isn't.
+          const method = strategy === "oauth_apple" ? "apple" : "google";
+          analytics.track(signUp?.createdSessionId === createdSessionId ? "sign_up" : "sign_in", {
+            method,
+          });
         }
         // If createdSessionId is null the user cancelled — leave silently.
       } catch (err) {
