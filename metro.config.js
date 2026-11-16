@@ -1,8 +1,11 @@
-const { getDefaultConfig } = require("expo/metro-config");
+// Sentry's wrapper around Expo's default config. It stamps each JS bundle with
+// a debug ID so source maps uploaded at build time match the crashes Sentry
+// receives (S0-6). Everything below customises the config it returns.
+const { getSentryExpoConfig } = require("@sentry/react-native/metro");
 const { withNativeWind } = require("nativewind/metro");
 const path = require("path");
 
-const config = getDefaultConfig(__dirname);
+const config = getSentryExpoConfig(__dirname);
 
 // SVG imports via react-native-svg-transformer — lets us import `.svg` files as
 // React components (e.g. `import Logo from "@/assets/.../full-light-colored.svg"`).

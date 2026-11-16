@@ -13,6 +13,7 @@ import { typography } from "@/theme/typography";
 
 import type { AuthStackParamList } from "@/navigation/AuthStack";
 import { userFacingError } from "@/lib/monitoring";
+import { analytics } from "@/lib/analytics";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "ResetPassword">;
 
@@ -51,12 +52,14 @@ export function ResetPasswordScreen({ route }: Props) {
         const done = await signIn.resetPassword({ password });
         if (done.status === "complete") {
           await setActive({ session: done.createdSessionId });
+          analytics.track("sign_in", { method: "password_reset" });
           return;
         }
         setFormError("Couldn't set the new password. Please try again.");
       } else if (attempt.status === "complete") {
         // Some configurations complete without a discrete new-password step.
         await setActive({ session: attempt.createdSessionId });
+        analytics.track("sign_in", { method: "password_reset" });
       } else {
         setFormError("That code didn't work. Check it and try again.");
       }

@@ -12,6 +12,7 @@ import { typography } from "@/theme/typography";
 
 import type { AuthStackParamList } from "@/navigation/AuthStack";
 import { userFacingError } from "@/lib/monitoring";
+import { analytics } from "@/lib/analytics";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "VerifyEmail">;
 
@@ -55,6 +56,7 @@ export function VerifyEmailScreen({ route }: Props) {
         const result = await signIn.attemptSecondFactor({ strategy: "email_code", code });
         if (result.status === "complete") {
           await setActiveSignIn({ session: result.createdSessionId });
+          analytics.track("sign_in", { method: "password" });
         } else {
           setFormError("Verification incomplete. Check the code and try again.");
         }
@@ -65,6 +67,7 @@ export function VerifyEmailScreen({ route }: Props) {
         const result = await signIn.attemptSecondFactor({ strategy: secondFactorStrategy, code });
         if (result.status === "complete") {
           await setActiveSignIn({ session: result.createdSessionId });
+          analytics.track("sign_in", { method: "password" });
         } else {
           setFormError("Verification incomplete. Check the code and try again.");
         }
@@ -73,6 +76,7 @@ export function VerifyEmailScreen({ route }: Props) {
         const result = await signIn.attemptFirstFactor({ strategy: "email_code", code });
         if (result.status === "complete") {
           await setActiveSignIn({ session: result.createdSessionId });
+          analytics.track("sign_in", { method: "password" });
         } else {
           setFormError("Verification incomplete. Check the code and try again.");
         }
@@ -81,6 +85,7 @@ export function VerifyEmailScreen({ route }: Props) {
         const result = await signUp.attemptEmailAddressVerification({ code });
         if (result.status === "complete") {
           await setActiveSignUp({ session: result.createdSessionId });
+          analytics.track("sign_up", { method: "email" });
           // RootNavigator (TASK-021) will route to profile-setup since no Convex user yet.
         } else {
           setFormError("Verification incomplete. Check the code and try again.");

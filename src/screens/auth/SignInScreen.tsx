@@ -16,6 +16,7 @@ import { useTheme } from "@/theme/ThemeContext";
 import { typography } from "@/theme/typography";
 
 import type { AuthStackParamList } from "@/navigation/AuthStack";
+import { analytics } from "@/lib/analytics";
 
 type Props = NativeStackScreenProps<AuthStackParamList, "SignIn">;
 
@@ -50,6 +51,7 @@ export function SignInScreen({ navigation }: Props) {
       const attempt = await signIn.create({ identifier: email.trim(), password });
       if (attempt.status === "complete") {
         await setActive({ session: attempt.createdSessionId });
+        analytics.track("sign_in", { method: "password" });
         // RootNavigator's auth gate (TASK-021) will route forward on signed-in.
         return;
       }

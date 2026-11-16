@@ -14,11 +14,12 @@ export function useAnalyticsIdentity(): void {
 
   useEffect(() => {
     if (isSignedIn && me?._id && identifiedId.current !== me._id) {
-      analytics.identify(me._id, { displayName: me.displayName });
+      // The internal id only. No name, email or other personal detail.
+      analytics.identify(me._id);
       identifiedId.current = me._id;
     } else if (!isSignedIn && identifiedId.current) {
       analytics.reset();
       identifiedId.current = null;
     }
-  }, [isSignedIn, me?._id, me?.displayName]);
+  }, [isSignedIn, me?._id]);
 }
