@@ -340,4 +340,16 @@ export default defineSchema({
     updateUrlIos: v.string(),
     updateUrlAndroid: v.string(),
   }).index("by_key", ["key"]),
+
+  // S0-7 feature flags. Edited by hand in the dashboard; read through
+  // flags.listEnabled. A flag is on when `enabled` is true and the user is in
+  // `allowUserIds` or falls inside `rolloutPercent` (0-100, by a stable hash
+  // of user id + key; see convex/lib/flagRollout.ts). Callers without a
+  // Flipbook account only get flags at 100%.
+  flags: defineTable({
+    key: v.string(),
+    enabled: v.boolean(),
+    rolloutPercent: v.number(),
+    allowUserIds: v.array(v.id("users")),
+  }).index("by_key", ["key"]),
 });

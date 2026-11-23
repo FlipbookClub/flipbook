@@ -148,6 +148,9 @@ Check each cell against `eas env:list` for every EAS environment. **Testers on t
 - Add `src/lib/flags.ts` with a `useFlag(key)` hook backed by that live query. Default is off while loading.
 - Create the first flag: `v2_shell`, off.
 
+- *Added by Moks, 23 Nov 2026:* expose a loading state now (`useFlagsStatus`), with a timeout. If flags haven't loaded within about 2 seconds, or the phone is offline, every flag is off and the app carries on into v1. The app must never sit on the splash screen waiting for the network.
+- *Added by Moks, 23 Nov 2026, for Sprint 1:* cache the last known flags on the device (MMKV), so an offline or slow start uses them instead of "all off". When the v2 shell is mounted behind `v2_shell`, choose the shell once, when flags first settle, and keep that choice for the session: flags stay live, so a value that arrives after the timeout must not swap the shell under the reader.
+
 **Done when:** toggling `v2_shell` in the Convex dashboard changes `useFlag("v2_shell")` on a device within seconds.
 
 **Tests:** convex-test cases for off, on for an allowed user, percentage rollout stable for the same user, signed-out behaviour.
