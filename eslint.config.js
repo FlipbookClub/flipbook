@@ -26,6 +26,14 @@ module.exports = defineConfig([
     ],
   },
   {
+    // Maestro runs these scripts in its own JS runtime, which provides
+    // `output` and the flow's env values as globals.
+    files: [".maestro/**/*.js"],
+    languageOptions: {
+      globals: { output: "writable", maestro: "readonly", DEV_SERVER_URL: "readonly" },
+    },
+  },
+  {
     // Existing v1 violations, downgraded to warnings in these files only so
     // new files still fail on them. Unescaped ' and " in JSX text render
     // correctly in React Native; fixing them is cosmetic and left for when

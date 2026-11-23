@@ -1,0 +1,80 @@
+# S0-9 smoke flow: open Flipbook Dev, sign in with the test account, open the
+# Library. Run from the Mac with `npm run smoke`; see .maestro/README.md.
+#
+# Credentials are never in this file. TEST_EMAIL and TEST_PASSWORD come from
+# the environment (`-e`), for a `+clerk_test` account on the Clerk
+# DEVELOPMENT instance whose onboarding is finished in the development Convex
+# deployment.
+#
+# Targets Flipbook Dev only. The appId is fixed, not an input, so the flow can
+# never drive the store app, and step 2 stops it before sign-in unless the
+# build says it is using the development environment and the Clerk test
+# instance.
+appId: com.flipbook.club.dev
+name: Smoke - sign in and open the library
+env:
+  DEV_SERVER_URL: http://localhost:8081
+  # Clerk's fixed code for +clerk_test addresses on a development instance.
+  CLERK_TEST_CODE: "424242"
+---
+# 1. Fresh start, no notification prompt, then load the code from the dev server.
+- launchApp:
+    appId: com.flipbook.club.dev
+    clearState: true
+    permissions:
+      notifications: deny
+- runScript: scripts/devClientLink.js
+- openLink: ${output.devClientLink}
+
+# 2. Production guard. The badge only exists in Flipbook Dev; it must say
+#    development and Clerk test, or the flow fails here, before any sign-in.
+- extendedWaitUntil:
+    visible:
+      id: "dev.environmentBadge"
+    timeout: 90000
+- assertVisible:
+    id: "dev.environmentBadge"
+    text: ".*development.*Clerk test.*"
+- assertNotVisible:
+    text: ".*Clerk live.*"
+
+# 3. Sign in.
+- tapOn: "Sign in here"
+- tapOn: "Email address"
+- inputText: ${TEST_EMAIL}
+- tapOn: "Password"
+- inputText: ${TEST_PASSWORD}
+- hideKeyboard
+# The button's label is exactly "Sign in"; the heading above it is
+# "Sign in to your account", which a full-text match doesn't hit.
+- tapOn: "Sign in"
+
+# 4. Only if Clerk asks for an email code on this new device: Clerk's test
+#    code for +clerk_test addresses.
+- runFlow:
+    when:
+      visible: "6-digit code"
+    commands:
+      - tapOn: "6-digit code"
+      - inputText: ${CLERK_TEST_CODE}
+      - tapOn: "Verify"
+
+# 5. Only if the one-time education pop-up appears.
+- runFlow:
+    when:
+      visible: "Skip"
+    commands:
+      - tapOn: "Skip"
+- runFlow:
+    when:
+      visible: "Got it"
+    commands:
+      - tapOn: "Got it"
+
+# 6. Open the Library and check it rendered.
+- extendedWaitUntil:
+    visible: "Library"
+    timeout: 30000
+- tapOn: "Library"
+- assertVisible: "Reading"
+- assertVisible: "Finished"

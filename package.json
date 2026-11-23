@@ -13,7 +13,8 @@
     "lint": "eslint .",
     "test": "npm run test:app && npm run test:convex",
     "test:app": "jest",
-    "test:convex": "vitest run"
+    "test:convex": "vitest run",
+    "smoke": "maestro test -e TEST_EMAIL=\"$FLIPBOOK_TEST_EMAIL\" -e TEST_PASSWORD=\"$FLIPBOOK_TEST_PASSWORD\" -e DEV_SERVER_URL=\"${FLIPBOOK_DEV_SERVER_URL:-http://localhost:8081}\" .maestro/smoke.yaml"
   },
   "dependencies": {
     "@clerk/clerk-expo": "^2.19.31",
