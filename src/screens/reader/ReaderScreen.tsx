@@ -62,6 +62,12 @@ import { analytics } from "@/lib/analytics";
 import { storage } from "@/lib/storage";
 import { useConnectivity } from "@/lib/connectivity";
 import { enqueueReaction, listQueued } from "@/lib/reactionQueue";
+import {
+  finishedEventKey,
+  hasReachedEnd,
+  readingEventProps,
+  type ReadingPosition,
+} from "@/lib/readingEvents";
 
 import type { Id } from "../../../convex/_generated/dataModel";
 import { api } from "../../../convex/_generated/api";
@@ -225,6 +231,27 @@ export function ReaderScreen({ navigation, route }: Props) {
       : "skip",
   );
   const updateProgress = useMutation(api.progress.update);
+
+  // S0-8. book_opened once per open of this screen, offline opens included.
+  // Ids only; see src/lib/readingEvents.ts.
+  const openedTrackedRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!effective || !contentId || openedTrackedRef.current === contentId) return;
+    openedTrackedRef.current = contentId;
+    analytics.track("book_opened", readingEventProps(effective));
+  }, [effective, contentId]);
+
+  // S0-8. book_finished once per book per device, on reaching the end by the
+  // same rule the server uses. Skipped for a book the server already marks
+  // finished, so a re-read doesn't count twice.
+  const trackFinishedIfDone = (position: ReadingPosition) => {
+    if (!effective || !contentId || !hasReachedEnd(position)) return;
+    if (serverProgress?.finishedAt) return;
+    const key = finishedEventKey(contentId);
+    if (storage.getString(key) === "1") return;
+    storage.set(key, "1");
+    analytics.track("book_finished", readingEventProps(effective));
+  };
 
   // Persist content metadata after every successful server fetch so future
   // offline opens have what they need to hydrate without hitting Convex.
@@ -641,6 +668,7 @@ export function ReaderScreen({ navigation, route }: Props) {
     setTotalPages(total);
     writeCachedProgress({ bookId: contentId, page, totalPages: total, updatedAt: Date.now() });
     syncToServer(page, total);
+    trackFinishedIfDone({ fileType: "pdf", page, totalPages: total });
   };
 
   // P4-T7, and the Phase 1 lesson again. EpubReader sends `open` exactly once,
@@ -884,6 +912,7 @@ export function ReaderScreen({ navigation, route }: Props) {
                 });
               }
               syncEpubToServer(cfi, percent);
+              trackFinishedIfDone({ fileType: "epub", percent });
             }}
             onReady={setEpubToc}
             onError={(message) => setLoadError(message)}
