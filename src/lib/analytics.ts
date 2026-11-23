@@ -10,7 +10,11 @@
 // Never send book text, reaction text, chat content or a person's name.
 // Users are identified by their internal Convex id only.
 
+// The full catalogue, with when each fires and its properties, is
+// docs/v2/analytics-events.md. Ids and small enums only: never titles, text
+// or names.
 export type AnalyticsEvent =
+  // v1, unchanged.
   | "sign_up"
   | "sign_in"
   | "sign_out"
@@ -20,7 +24,21 @@ export type AnalyticsEvent =
   | "book_opened"
   | "reaction_added"
   | "book_finished"
-  | "chapter_published";
+  | "chapter_published"
+  // v2, declared in S0-8; none fires until the sprint named in the plan.
+  | "community_created"
+  | "community_joined"
+  | "book_page_viewed"
+  | "preview_started"
+  | "chapter_finished"
+  | "rental_started"
+  | "gift_sent"
+  | "gift_claimed"
+  | "pro_prompt_viewed"
+  | "pro_started"
+  | "message_sent"
+  | "voice_note_sent"
+  | "session_joined";
 
 export type AnalyticsProps = Record<string, string | number | boolean | undefined>;
 
