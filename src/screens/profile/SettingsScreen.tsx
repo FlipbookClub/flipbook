@@ -25,6 +25,7 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import { ThemePicker } from "@/components/features/ThemePicker";
 import { isDevelopmentVariant } from "@/lib/appVariant";
+import { useFlag, useFlagsStatus } from "@/lib/flags";
 import { reportError } from "@/lib/monitoring";
 
 import { api } from "../../../convex/_generated/api";
@@ -78,6 +79,9 @@ function Row({ icon, label, value, destructive, onPress }: RowProps) {
 }
 
 export function SettingsScreen({ navigation }: Props) {
+  // Read for the Developer section only (S0-7 exit gate: watch it flip live).
+  const v2Shell = useFlag("v2_shell");
+  const flagsStatus = useFlagsStatus();
   const { colors } = useTheme();
   const { signOut } = useAuth();
   const { user } = useUser();
@@ -296,6 +300,20 @@ export function SettingsScreen({ navigation }: Props) {
                     : "This build has no Sentry DSN, so nothing was sent.",
                 );
               }}
+            />
+            <Row
+              icon={<Settings2 size={18} color={colors.textPrimary} />}
+              label="v2_shell"
+              value={
+                !flagsStatus.settled
+                  ? "Loading"
+                  : flagsStatus.source === "server"
+                    ? v2Shell
+                      ? "On"
+                      : "Off"
+                    : `Off (${flagsStatus.source})`
+              }
+              onPress={() => undefined}
             />
           </Section>
         ) : null}

@@ -18,6 +18,8 @@ import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { Text, TextInput, View } from "react-native";
 
+import { FlagsProvider } from "@/lib/flags";
+
 // TASK-082 — Dynamic Type. RN scales text with the OS font-size setting by
 // default; we cap the multiplier so very large accessibility sizes degrade
 // gracefully instead of breaking the reading-room layouts, while still
@@ -84,11 +86,13 @@ export default function App() {
         <SafeAreaProvider>
           <ClerkProvider publishableKey={CLERK_PUBLISHABLE_KEY} tokenCache={tokenCache}>
             <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-              <ThemeProvider>
-                <BottomSheetModalProvider>
-                  <ThemedShell />
-                </BottomSheetModalProvider>
-              </ThemeProvider>
+              <FlagsProvider>
+                <ThemeProvider>
+                  <BottomSheetModalProvider>
+                    <ThemedShell />
+                  </BottomSheetModalProvider>
+                </ThemeProvider>
+              </FlagsProvider>
             </ConvexProviderWithClerk>
           </ClerkProvider>
         </SafeAreaProvider>
