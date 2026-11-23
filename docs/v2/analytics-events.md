@@ -1,6 +1,6 @@
 # Analytics event plan
 
-**Task:** S0-8 (`docs/v2/specs/sprint-00-foundations.md`) · **Written:** 23 Nov 2026 · **Decisions:** Moks, 23 Nov 2026
+**Task:** S0-8 (`docs/v2/specs/sprint-00-foundations.md`) · **Written:** 23 Nov 2026 · **Decisions:** Moks, 23 Nov 2026 ("Decisions on the gaps" below)
 **Feeds:** the founders' dashboard, PRD 13.8–13.12 (13.13–13.16 are P1 and out of scope here) · **Architecture:** ADR 014
 
 Every tile and chart in PRD 13.8–13.12 is mapped below to the event or Convex table that fills it, with the sprint that makes the source real. The event names are declared in `AnalyticsEvent` (`src/lib/analytics.ts`). Apart from `book_opened` and `book_finished` (below), none of the v2 events fires yet; each is wired in the sprint named next to it.
@@ -67,13 +67,14 @@ The tables come from `docs/v2/architecture.md` → Data model unless marked as n
 
 | Source | What it gives the dashboard | Exists from |
 | --- | --- | --- |
-| `users` | Sign-ups, Free vs Pro, Founding Host flag; country (proposed, below); sign-up source (proposed) | Today (fields added later) |
+| `users` | Sign-ups, Free vs Pro, Founding Host flag; `country` (phone region at sign-up) and `storeCountry` (first purchase); sign-up source (proposed) | Today (`country` from Sprint 10, `storeCountry` from Sprints 12–13) |
 | `readingState` | Books started and finished, completion, first chapter reached | Sprint 3 |
-| `rhythmDays` | Reading days per reader per week; part of "active" | Sprint 3–4 |
+| `dailyActivity` (new; replaces `rhythmDays`) | One row per reader per day: opened a book, read, reacted, posted. "Active reader" and reading days both read from it | Sprint 3 |
 | `reactions`, `messages` | Reacted or posted (part of "active"), social activity per reader | Sprints 5, 8 |
 | `entitlements`, `orders` | Rentals, gifts, preview, Pro grants; payment failures (orders that never confirm) | Sprints 12–13 |
 | `ledger` | Gross, store or Paystack fee, net, author share, source, channel, region, currency, refunds | Sprint 13 |
-| `subscriptions` | Pro plan, status (active, grace, billing retry, expired), store country; MRR and churn | Sprint 12 |
+| `subscriptions` | Pro plan, status (active, grace, billing retry, expired), store country; current state | Sprint 12 |
+| `subscriptionEvents` (new) | Every RevenueCat event, append-only: MRR movement (new, churned, plan changes) and churn over time | Sprint 12 |
 | `credits` | Credits issued | Sprint 18 |
 | `sessions`, `rsvps` | Session attendance | Sprint 19 |
 | `inviteOpens` (new) | Invite links opened, per invite code, logged by the website | Sprint 11 |
@@ -81,7 +82,8 @@ The tables come from `docs/v2/architecture.md` → Data model unless marked as n
 
 ## Definitions (PRD 13, "Definitions and data")
 
-- **Active reader:** opened a book, reacted or posted in the period. Counted from Convex: a reader with a `rhythmDays` row, a reaction or a message dated in the period. ⚠️ This needs `rhythmDays` to be written when a book is *opened*, not only when a page counts as read (PRD 10.3 "days read"). If Sprint 3 records reading days only, add a separate daily-activity record so "opened a book" is countable.
+- **Active reader:** opened a book, reacted or posted in the period. Counted from Convex: a reader with a `dailyActivity` row in the period where any of `openedBook`, `reacted` or `posted` is true.
+- **Reading day (PRD 10.3):** a `dailyActivity` row with `read` true. Same table, so the two can never disagree.
 - **Paying reader:** rented, gifted or held Pro in the period. From `ledger` and `subscriptions`.
 - **Churn:** Pro readers whose plan ended without renewal, divided by Pro readers at the start of the month. From `subscriptions`.
 
@@ -96,14 +98,14 @@ Each tile shows the change against the previous period and a trend line, both fr
 | Tile | Source | Notes |
 | --- | --- | --- |
 | Sign-ups | CX `users` | |
-| Active readers, daily / weekly / monthly | CX `rhythmDays` + `reactions` + `messages` | Distinct readers; see the definition above |
+| Active readers, daily / weekly / monthly | CX `dailyActivity` | Distinct readers; see the definition above |
 | Stickiness (daily ÷ monthly) | CX, from the line above | |
 | Free and Pro readers | CX `users` + `subscriptions` | |
 | Paying readers | CX `ledger` + `subscriptions` | |
 | Revenue this month, gross and net | CX `ledger` | Net after store and Paystack fees |
 | MRR | CX `subscriptions` (RC) | Each plan converted to a monthly amount |
 | Pro churn | CX `subscriptions` (RC) | Definition above |
-| Countries with readers | CX `users.country` (proposed) · PH location until then | See "Country" below |
+| Countries with readers | CX `users.country` · PH location for accounts made before it existed | See "Decisions on the gaps" |
 
 ### 13.9 Growth
 
@@ -113,7 +115,7 @@ Each tile shows the change against the previous period and a trend line, both fr
 | Sign-ups by source | PH `sign_up.source` · CX `users` source (recommended) | Five sources above; `direct_unknown` caveat applies |
 | Invite funnel: link opened → signed up → first chapter → first rental | CX, counted **per invite code** (decided 23 Nov): `inviteOpens` → `users` with that invite code → `readingState` first chapter → `entitlements` first rental | A link opened on the website can't be tied to the person who later signs up in the app, so each step is a count per code, not a per-person funnel |
 | Activation: new readers who finish a first chapter within 7 days | CX `users` + `readingState` | `chapter_finished` in PH is a cross-check |
-| Countries and cities: readers, Pro and revenue per country | Readers: CX `users.country` (PH location until then). Pro: CX `subscriptions.storeCountry`. Revenue: CX `ledger` region and currency. Cities: PH location only | City is never stored in Convex |
+| Countries and cities: readers, Pro and revenue per country | Readers: CX `users.country` (PH location for older accounts). Pro: CX `users.storeCountry` / `subscriptions.storeCountry`. Revenue: CX `ledger` region and currency. Cities: PH location only | City is never stored in Convex |
 
 ### 13.10 Retention and engagement
 
@@ -121,7 +123,7 @@ Each tile shows the change against the previous period and a trend line, both fr
 | --- | --- | --- |
 | Cohort table by sign-up week: active in week 1, 4, 8, 12 | PH retention: first `sign_up` → any of `book_opened`, `reaction_added`, `message_sent`, `voice_note_sent`, `session_joined` | ADR 014 assigns cohorts to PostHog. The same events as the "active" definition, so the two agree |
 | Day-1, day-7, day-30 retention | PH retention, as above | |
-| Reading days per active reader per week | CX `rhythmDays` | |
+| Reading days per active reader per week | CX `dailyActivity` (`read`) | |
 | Books started and finished; completion rate | CX `readingState` | `book_opened` / `book_finished` are the cross-check, and the only source for v1 testers before v2 |
 | Social activity per active reader: reactions, chat messages, voice notes, session attendance | CX `reactions`, `messages`, `rsvps` / session attendance | Counts per reader, never content |
 
@@ -132,8 +134,8 @@ Each tile shows the change against the previous period and a trend line, both fr
 | Pro readers by plan and region | CX `subscriptions` (RC) | Region from store country |
 | Free-to-Pro conversion | CX `users` + `subscriptions` | PH `pro_prompt_viewed` → `pro_started` shows which prompt converts |
 | Founding Host Pro due to expire | CX `users` Founding Host flag + their Pro `entitlements` | |
-| MRR movement: new, churned, plan changes | CX `subscriptions` (RC) | Needs every webhook change kept, not only the latest state |
-| Monthly churn, readers and revenue | CX `subscriptions` (RC) | |
+| MRR movement: new, churned, plan changes | CX `subscriptionEvents` (RC) | Append-only history of every RevenueCat event |
+| Monthly churn, readers and revenue | CX `subscriptionEvents` + `subscriptions` (RC) | |
 | Renewals in grace period; failed renewals | CX `subscriptions.status` (RC) | |
 
 ### 13.12 Revenue and money owed
@@ -149,9 +151,18 @@ Each tile shows the change against the previous period and a trend line, both fr
 | Author share accrued this month; next payout total | CX `ledger` author share (70% of net) | |
 | Revenue per active reader and per paying reader | CX `ledger` ÷ the 13.8 counts | |
 
-## Gaps and proposals
+## Decisions on the gaps
 
-1. **Country.** No reader's country is stored today. Proposal: record the store country on the reader's Convex record when Pro or a rental is bought (Sprints 12–13), since pricing needs it anyway. Until then, readers per country use PostHog's location lookup, which is approximate and stays out of Convex.
+All decided by Moks, 23 Nov 2026.
+
+1. **Country is recorded at sign-up, not at first payment** (Sprint 10). Most readers never pay, so a country taken at payment would leave "countries with readers" mostly empty.
+   - `users.country`: the phone's region setting at sign-up, as a two-letter country code. Used for reader counts by country.
+   - `users.storeCountry`: the App Store or Play Store country at the reader's first purchase (Sprints 12–13). This is what pricing uses (PRD 2.5), and it can differ from `country`.
+   - Accounts created before `country` exists fall back to PostHog's location lookup, which is approximate and never copied into Convex.
 2. **The website has no PostHog.** The invite funnel's first step is logged by the website to Convex (`inviteOpens`, Sprint 11), not to PostHog.
-3. **MRR movement needs history.** `subscriptions` must keep each RevenueCat change, not only the latest state, or new/churned/plan-change can't be computed (Sprint 12).
-4. **"Opened a book" must be countable per day** (see "Active reader").
+3. **Subscription history is kept** (Sprint 12). Every RevenueCat webhook event is written to an append-only `subscriptionEvents` table, alongside the current state in `subscriptions`. Rows are never updated or deleted. MRR movement and churn read the history.
+4. **One daily activity record, written on the server** (Sprint 3). `dailyActivity` holds one row per reader per day, created by the first qualifying action and updated after, with yes/no fields `openedBook`, `read`, `reacted` and `posted`.
+   - It is written inside the existing Convex mutations (opening a book, saving reading progress, adding a reaction, sending a message), never from phone events.
+   - "Active reader" and the reading-rhythm days (PRD 10.3) both read from it.
+   - It replaces `rhythmDays` from `docs/v2/architecture.md` → Data model. That file mirrors the Build Plan, so the plan needs the same change.
+   - For Sprint 3 to settle: which calendar day a row belongs to. The reading rhythm is personal, so it should be the reader's own local day, using the time-zone offset the app already reports (`users.reminderTzOffsetMinutes`); the dashboard then counts those days as they are.
