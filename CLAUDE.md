@@ -38,6 +38,7 @@ Business context in `business/` (untracked; read only if you genuinely need it, 
 - Ship the Glass style only (Classic is retired for now), in Light, Flip and Dark. Icons are Hugeicons, stroke-rounded, 1.5.
 - Copy comes verbatim from the design file's logic class (`docs/v2/design-handoff/*ScreenGlass.dc.html`). No invented copy, no exclamation marks, never "platform".
 - Every screen implements the loading, empty, error and offline states the spec lists.
+- Every v2 component and interactive element takes a `testID`, named `screen.element` (e.g. `library.bookCard`).
 - Write tests first for anything touching spoilers, access or money (`docs/v2/testing/strategy.md`).
 - One concern per pull request. If the spec and the code disagree, stop and flag it.
 - Commit and push only to your own `claude/` branch and open a pull request. Never merge into `main`, never force-push, rebase shared branches or run `git clean`. Fast-forwarding your own branch to `main` is allowed. Moks merges.

@@ -18,6 +18,7 @@ import { StatusBar } from "expo-status-bar";
 import * as WebBrowser from "expo-web-browser";
 import { Text, TextInput, View } from "react-native";
 
+import { DevEnvironmentBadge } from "@/components/DevEnvironmentBadge";
 import { FlagsProvider } from "@/lib/flags";
 
 // TASK-082 — Dynamic Type. RN scales text with the OS font-size setting by
@@ -113,6 +114,7 @@ function ThemedShell() {
       <StatusBar style={statusBarStyle} />
       <RootNavigator />
       <OfflineBanner />
+      <DevEnvironmentBadge />
     </>
   );
 }
